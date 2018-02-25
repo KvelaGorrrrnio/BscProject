@@ -1,0 +1,38 @@
+\documentclass[12pt,a4paper]{article}
+
+% Fetch preamble
+\input{preamble.tex}
+
+% Title
+\title{
+    \vspace{5cm}
+    \Huge{Synopsis}\\
+    \Large{Reversible Programming}
+    \linebreak \\
+    Københavns Universitet - Datalogisk Institut\\
+}
+
+% Author
+\author{
+    \Large{Anders Frederik Jørgensen - nbc785}\\
+    \Large{Lars-Bo Vadgaard Nielsen - hnd531}\\
+}
+
+\begin{document}
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %% Frontpage
+  \AddToShipoutPicture*{\put(0,0){\includegraphics*[viewport=0 0 700 600]{nat-farve}}}
+  \AddToShipoutPicture*{\put(0,602){\includegraphics*[viewport=0 600 700 1600]{nat-farve}}}
+  \AddToShipoutPicture*{\put(0,0){\includegraphics*{ku-en}}}
+  \clearpage
+  \maketitle
+  \thispagestyle{empty}
+  \pagebreak
+  \setcounter{page}{1}
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %% Sections
+  \input{sections/content.tex}
+
+\end{document}
