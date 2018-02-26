@@ -1,9 +1,35 @@
-\section{Preface}
+\section{Problem definition}
+\label{sec:problem_definition}
+The purpose of this bachelor thesis is to implement an interpreter for two reversible languages, where the differences between them are mainly that one is structured and the other unstructered.
+Inspiration will be heavily drawn from the languages SRL and RL described in the article "Fundamentals of reversible flowchart languages"[1].
+Furthermore we will implement various program transformations, e.g. program inversion, translation between SRL and RL, and RSPT.
+To test our implementation and evaluate the practicality of the two languages, we write a collection of test programs of different magnitude.
+
+\section{Boundaries of problem definition}
+\label{sec:boundaries_of_problem_definition}
+
+The focus of the project is writing an interpreter for each of the languages RL and SRL in Haskell, that works correctly and has a reasonable operating speed.
+We may choose to alter the syntax or semantics of the languages in cooperation with our supervirsor.
+The test programs should reflect "real world" problems, in the sense that they should have some level of complexity and purpose.
+We will also implement a command-line interface for the interpreters along with a web-based interface for running and testing the languages.
 
 \section{Motivation}
+\label{sec:motivation}
+Most programming languages today discard information along the execution path, due to the limitation of only being forward deterministic. Reverisble programming languages gives the opportunity for both forward- and backward deterministic execution flows.
 
-\section{Purpose}
+\section{Tasks}
+\label{sec:tasks}
 
-\section{Goal}
+\begin{enumerate}
 
-\section{References}
+  \item We'll have to decide whether to use a parser generator or write our own parser. If we choose to use a parser generator, we'll have to decide on which.
+
+  \item Identify syntax and semantics of core features and full implementation features.
+
+  \item Write the report.
+
+\end{enumerate}
+
+\section{Time Schedule}
+\label{sec:time_schedule}
+
