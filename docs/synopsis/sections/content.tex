@@ -1,17 +1,16 @@
 \section{Problem definition}
 \label{sec:problem_definition}
-The purpose of this bachelor thesis is to implement an interpreter for two reversible languages, where the differences between them are mainly that one is structured and the other unstructered.
-Inspiration will be heavily drawn from the languages SRL and RL described in the article "Fundamentals of reversible flowchart languages"[1].
-Furthermore we will implement various program transformations, e.g. program inversion, translation between SRL and RL, and RSPT.
-To test our implementation and evaluate the practicality of the two languages, we write a collection of test programs of different magnitude.
+Implemementing an interpreter for each of the two reversible programming languages RL and SRL as described in the article "Fundamentals of reversible flowchart languages"[1]. RL, which is an abbreviation of Reversible Language, is a low-level, assembler-style language with jumps that is, thus, non-structured. SRL, which is an abbreviation of Structured Reversible Language, is, as the name implies, a structured version og RL. \\
+\indent Furthermore, we will implement various program transformations such as program inversion and translation between RL and SRL. %, and structured reversible program theorem.
+To test our implementation and evaluate the practicality of the two languages, we write a collection of test programs of varying complexity.
 
 \section{Boundaries of problem definition}
 \label{sec:boundaries_of_problem_definition}
 
-The focus of the project is writing an interpreter for each of the languages RL and SRL in Haskell, that works correctly and has a reasonable operating speed.
-We may choose to alter the syntax or semantics of the languages in cooperation with our supervirsor.
-The test programs should reflect "real world" problems, in the sense that they should have some level of complexity and purpose.
-We will also implement a command-line interface for the interpreters along with a web-based interface for running and testing the languages.
+The focus of the project is on writing the two interpreters in Haskell. Each of the interpreters has to run reasonably fast, although the main focus will be on correctly implementing the full feature set of both languages. \\
+\indent We may choose to alter the syntax or semantics of the languages in question in cooperation with our supervisors --- given that the alteration is well argued for. \\
+\indent The test programs should demonstrate all of the implemented features of both languages. Some of the test programs should reflect real world problems, in the sense that they should have some level of purpose and complexity. \\
+\indent We will also implement a command-line interface for the interpreters along with a web-based interface for running and testing the languages.
 
 \section{Motivation}
 \label{sec:motivation}
@@ -22,7 +21,7 @@ Most programming languages today discard information along the execution path, d
 
 \begin{enumerate}
 
-  \item We'll have to decide whether to use a parser generator or write our own parser. If we choose to use a parser generator, we'll have to decide on which.
+  \item We will have to decide on whether to use a parser generator or write our own parser. If we choose to use a parser generator, we have to decide on which one to use.
 
   \item Identify syntax and semantics of core features and full implementation features.
 
