@@ -14,7 +14,8 @@ The focus of the project is on writing the two interpreters in Haskell. Each of 
 
 \section{Motivation}
 \label{sec:motivation}
-Most programming languages today discard information along the execution path, due to the limitation of only being forward deterministic. Reverisble programming languages gives the opportunity for both forward- and backward deterministic execution flows.
+Most programming languages today discard information along the execution path, due to the limitation of only being forward deterministic. Reverisble programming languages gives the freedom for both forward- and backward deterministic execution flows, hereby enabling the possibility of running programs forward and backward.\\
+In computer science some topics like encryption/ decryption and compression/ decompression exhibit reversability.
 
 \section{Tasks}
 \label{sec:tasks}
@@ -24,6 +25,14 @@ Most programming languages today discard information along the execution path, d
   \item We will have to decide on whether to use a parser generator or write our own parser. If we choose to use a parser generator, we have to decide on which one to use.
 
   \item Identify syntax and semantics of core features and full implementation features.
+
+  \item Implement parser and interpreter for core features.
+
+  \item Write a testsuite consisting of non-trivial "real" programs, for demonstration of the usefulness of RL and SRL.
+
+  \item Implement programtransformations, e.g. program-inversion translation between the languages and RSPT.
+
+  \item Implement minimal interface, for interacting with the interpreters, along with program transformations. A command-line interface and a web-based interface is prefered.
 
   \item Write the report.
 
