@@ -14,19 +14,6 @@ The focus of the project is on writing the two interpreters in Haskell. Each of 
 
 \section{Motivation}
 \label{sec:motivation}
-%Most programming languages today discard information along the execution path, due to the limitation of only being forward deterministic. Reverisble programming languages gives the freedom for both forward- and backward deterministic execution flows, hereby enabling the possibility of running programs forward and backward.\\
-%\indent In computer science some topics like encryption/ decryption and compression/ decompression exhibit reversability.
-
-% fleste sprog er foruddeterministiske
-% de smider dog information væk, så de er ikke reversible
-% der findes til gengæld reversible programmeringssprog, som ikke tillader tab af information
-% Deres struktur gør, at de er både forud- og bagud-deterministiske.
-
-
-
-%Alle programmeringssprog i dag er foruddeterminiske; en given instruktion bestemmer unikt den næste tilstand i en beregningsmaskine. Det gængse programmeringssprog smider dog løbende information væk under udførslen af et program. Dette gør, at de ikke er bagud-deterministiske.
-%Der findes dog reversible programmeringssprog, som ikke tillader tab af information i denne forstand. Deres stuktur gør, at en given instruktion ikke blot unikt bestemmer den næste tilstand, men også den forrige. To sådanne sprog, som er blevet foreslået, er RL og SRL.
-
 All programming languages today are forward deterministic; a given instruction in a program uniquely defines the next state. Most of these languages, however, discard a lot of information along the execution path. Thus, one given instruction in a program cannot uniquely define the previous state. These languages are therefore not backward deterministic; they are irreversible. \\
 \indent There are, however, reversible programming languages that do not allow this loss of information. A given instruction still uniquely defines the next state, but it also uniquely defines the previous. Two such languages, proposed in the article "Fundamentals of reversible flowchart languages"[1], are RL and SRL. \\
 \indent \textit{Landauer's Principle}[2] states that erased information must be dissipated as heat. That is, the lower limit of power consumption in a microprocessor depends, in some way, on erasure of information. Thus, reversible computing, which does not allow loss of information, can ideally circumvent this lower bound and improve upon the power efficiency of modern computers. \\
