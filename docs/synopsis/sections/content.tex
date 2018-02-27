@@ -15,26 +15,24 @@ The focus of the project is on writing the two interpreters in Haskell. Each of 
 \section{Motivation}
 \label{sec:motivation}
 Most programming languages today discard information along the execution path, due to the limitation of only being forward deterministic. Reverisble programming languages gives the freedom for both forward- and backward deterministic execution flows, hereby enabling the possibility of running programs forward and backward.\\
-In computer science some topics like encryption/ decryption and compression/ decompression exhibit reversability.
+\indent In computer science some topics like encryption/ decryption and compression/ decompression exhibit reversability.
 
 \section{Tasks}
 \label{sec:tasks}
 
 \begin{enumerate}
 
-  \item We will have to decide on whether to use a parser generator or write our own parser. If we choose to use a parser generator, we have to decide on which one to use.
+  \item Decide on whether to use a parser generator or write our own parser. If we choose to use a parser generator, we have to decide on which one to use.
 
-  \item Identify syntax and semantics of core features and full implementation features.
+  \item Identify the syntax and semantics of core features and full implementation features.
 
-  \item Implement parser and interpreter for core features.
+  \item Implement lexer, parser and interpreter for core features. Later, extend these into the full implementation.
 
-  \item Extend parser and interpreter with full implementation features.
+  \item Implement program transformations, namely inversion and translation between the two languages.
 
-  \item Write a testsuite consisting of non-trivial "real" programs, for demonstration of the usefulness of RL and SRL. Test programs for both the core features and full implementation is required.
+  \item Write a small test suite and a collection of both some trivial and some non-trivial programs reflecting real world problems. The programs should test --- and hopefully demonstrate --- the usefulness of RL and SRL. Test programs should, together, make use of all implemented features.
 
-  \item Implement programtransformations, e.g. program-inversion translation between the languages and RSPT.
-
-  \item Implement minimal interface, for interacting with the interpreters, along with program transformations. A command-line interface and a web-based interface is prefered.
+  \item Implement minimal command-line- and web interfaces for interacting with the interpreters.
 
   \item Write the report.
 
