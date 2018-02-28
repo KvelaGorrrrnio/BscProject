@@ -1,23 +1,23 @@
 \section{Problem definition}
 \label{sec:problem_definition}
-Implemementing an interpreter for each of the two reversible programming languages RL and SRL as described in the article "Fundamentals of reversible flowchart languages"[1]. RL, which is an abbreviation of Reversible Language, is a low-level, assembler-style language with jumps that is, thus, non-structured. SRL, which is an abbreviation of Structured Reversible Language, is, as the name implies, a structured version og RL. \\
-\indent Furthermore, we will implement various program transformations such as program inversion and translation between RL and SRL. %, and structured reversible program theorem.
+The project concerns the implementation of interpreters for each of the two reversible programming languages RL and SRL as described in the article "Fundamentals of reversible flowchart languages"[1]. RL, which is an abbreviation of Reversible Language, is a low-level, assembler-style language with jumps that is, thus, non-structured. SRL, which is an abbreviation of Structured Reversible Language, is, as the name implies, a structured version of RL (with conditionals and loops). \\
+\indent Furthermore, we will implement program transformations on them, specifically program inversion and translation between RL and SRL. %, and structured reversible program theorem.
 To test our implementation and evaluate the practicality of the two languages, we write a collection of test programs of varying complexity.
 
 \section{Boundaries of problem definition}
 \label{sec:boundaries_of_problem_definition}
 
 The focus of the project is on writing the two interpreters in Haskell. Each of the interpreters has to run reasonably fast, although the main focus will be on correctly implementing the full feature set of both languages. \\
-\indent We may choose to alter the syntax or semantics of the languages in question in cooperation with our supervisors --- given that the alteration is well argued for. \\
+\indent We may choose to alter the syntax or semantics of the languages in question in cooperation with our supervisor --- given that the alteration is well argued for. \\
 \indent The test programs should demonstrate all of the implemented features of both languages. Some of the test programs should reflect real world problems, in the sense that they should have some level of purpose and complexity. \\
 \indent We will also implement a command-line interface for the interpreters along with a web-based interface for running and testing the languages.
 
 \section{Motivation}
 \label{sec:motivation}
-All programming languages today are forward deterministic; a given instruction in a program uniquely defines the next state. Most of these languages, however, discard a lot of information along the execution path. Thus, one given instruction in a program cannot uniquely define the previous state. These languages are therefore not backward deterministic; they are irreversible. \\
+Many sequential programming languages today are forward deterministic; a given instruction in a program uniquely defines the next state. Most of these languages, however, may discard information along the execution path. Thus, one given instruction in a program may not uniquely define the previous state. These languages are therefore not backward deterministic; they are irreversible. \\
 \indent There are, however, reversible programming languages that do not allow this loss of information. A given instruction still uniquely defines the next state, but it also uniquely defines the previous. Two such languages, proposed in the article "Fundamentals of reversible flowchart languages"[1], are RL and SRL. \\
 \indent \textit{Landauer's Principle}[2] states that erased information must be dissipated as heat. That is, the lower limit of power consumption in a microprocessor depends, in some way, on erasure of information. Thus, reversible computing, which does not allow loss of information, can ideally circumvent this lower bound and improve upon the power efficiency of modern computers. \\
-\indent In this project we will implement interpreters for RL and SRL along with some useful program transformations and evaluate the practicality of these --- and other --- reversible programming languages.
+\indent In this project we will implement interpreters for RL and SRL along with some useful program transformations, see Section \ref{sec:problem_definition}.
 
 \section{Tasks}
 \label{sec:tasks}
@@ -28,15 +28,13 @@ All programming languages today are forward deterministic; a given instruction i
 
   \item Identify the syntax and semantics of core features and full implementation features.
 
-  \item Implement lexer, parser and interpreter for core features. Later, extend these into the full implementation.
+  \item Implement lexers, parsers and interpreters for core features. Later, extend these into the full implementations.
 
   \item Implement program transformations, namely inversion and translation between the two languages.
 
   \item Write a small test suite and a collection of both some trivial and some non-trivial programs reflecting real world problems. The programs should test --- and hopefully demonstrate --- the usefulness of RL and SRL. Test programs should, together, make use of all implemented features.
 
   \item Implement minimal command-line- and web interfaces for interacting with the interpreters.
-
-  \item If time allows: Implement a form of floating point numbers that keeps the reversible property of the languages intact.
 
   \item Write the report.
 
@@ -49,6 +47,6 @@ All programming languages today are forward deterministic; a given instruction i
 \section{References}
 
 \begin{enumerate}
-    \item[[1]] R. Glück, T. Yokoyama, H.B. Axelsen. "Fundamentals of reversible flowchart languages". In: \textit{Elsevier} (2015).
+  \item[[1]] R. Glück, T. Yokoyama, H.B. Axelsen. "Fundamentals of reversible flowchart languages". In: \textit{Theoretical Computer Science} 611 (2016), pp. 87-115.
   \item[[2]] R. Landauer. "Irreversibility and heat generation in the computing process". In: \textit{IBM Journal of Research and Development} 5.3 (1961), pp. 183-191.
 \end{enumerate}
