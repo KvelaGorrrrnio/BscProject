@@ -1,3 +1,6 @@
+## Report
+Read about how to write, structure and format a good report. Using packages correctly, set up front page, etc.
+
 ## Interpreters
 1: First, decide on the format of the abstract syntax tree; how should our program be abstractly represented such that intepretation of the given language is as simple as possible?
 2: After a format has been found, consider the parser and interpreting engine. These depend upon the format of the abstract syntax tree. How do we handle the different structures?
