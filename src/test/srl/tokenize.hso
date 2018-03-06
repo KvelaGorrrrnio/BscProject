@@ -1,0 +1,4 @@
+[Num 123]
+[Var "x"]
+[Var "x5a"]
+[Sub If,Var "a",Eq,Var "b",Sub Then,Num 5,Sub Else,Num 2]

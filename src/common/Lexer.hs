@@ -6,40 +6,42 @@ import Keywords
 import Data.Char
 -- import Text.Regex.Posix
 
-lexer :: String -> [Token]
-lexer [] = []
-lexer ('+':s) = Plus   : lexer s
-lexer ('-':s) = Minus  : lexer s
-lexer ('^':s) = Bind   : lexer s
-lexer ('*':s) = Times  : lexer s
-lexer ('/':s) = Divide : lexer s
-lexer ('=':s) = Eq     : lexer s
-lexer ('(':s) = Lpar   : lexer s
-lexer (')':s) = Rpar   : lexer s
-lexer ('[':s) = Lbrack : lexer s
-lexer (']':s) = Lbrack : lexer s
-lexer ('~':s) = -- Comments
+tokenize :: String -> [Token]
+tokenize [] = []
+tokenize ('+':s) = Plus   : tokenize s
+tokenize ('-':s) = Minus  : tokenize s
+tokenize ('^':s) = Hat    : tokenize s
+tokenize ('*':s) = Times  : tokenize s
+tokenize ('/':s) = Divide : tokenize s
+tokenize ('=':s) = Eq     : tokenize s
+tokenize ('(':s) = Lpar   : tokenize s
+tokenize (')':s) = Rpar   : tokenize s
+tokenize ('[':s) = Lbrack : tokenize s
+tokenize (']':s) = Lbrack : tokenize s
+tokenize ('~':s) = -- Comments
     let (_, rest) = span (/= '\n') s
-        in lexer rest
-lexer (c:s)
+        in tokenize rest
+tokenize (c:s)
 
-    | isSpace c = lexer s
+    | isSpace c = tokenize s
 
     | isDigit c =
         let (n, rest) = span isDigit (c:s)
-            in Num (read n :: Int) : lexer rest
-
+            in Num (read n :: Int) : tokenize rest
     | isAlpha c = do
         let (v, rest) = span isAlphaNum (c:s)
         case v of
-            "top"   -> Top            : lexer rest
-            "empty" -> Empty          : lexer rest
-            "push"  -> Push           : lexer rest
-            "pop"   -> Pop            : lexer rest
-            "skip"  -> Skip           : lexer rest
-            word    ->
-                case matchWord word of
-                    Just token  -> Sub token  : lexer rest
-                    Nothing     -> Var word   : lexer rest
+            "top"   -> Top            : tokenize rest
+            "empty" -> Empty          : tokenize rest
+            "push"  -> Push           : tokenize rest
+            "pop"   -> Pop            : tokenize rest
+            "skip"  -> Skip           : tokenize rest
+            word    -> case matchWord word of
+                Just token  -> Sub token  : tokenize rest
+                Nothing     -> Var word   : tokenize rest
 
-    | otherwise = error "hej"
+    | isPunctuation c = case matchWord [c] of
+        Just token  -> Sub token  : tokenize s
+        Nothing     -> error $"Unknown symbol encountered '"++[c]++"'."
+
+    | otherwise = error $"Unknown symbol encountered '"++[c]++"'."

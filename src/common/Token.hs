@@ -7,7 +7,7 @@ data Token
     -- Ops
     = Plus
     | Minus
-    | Bind
+    | Hat
     | Times
     | Divide
     | Eq
