@@ -297,13 +297,14 @@ testAST ast sstate = do
   let res  = interpAST ast sstate
       ast' = reverseAST ast
       res' = interpAST ast' res
-  putStrLn $ "Starting state:\n" ++ varTabToString sstate ++ "\n"
+  putStrLn "Starting state:"
+  putStrLn $ varTabToString sstate ++ "\n"
   putStrLn $ astToString ast
-  putStrLn "\nResult:\n"
+  putStrLn "\nResult:"
   putStrLn $ varTabToString res
   putStrLn "\n---- Reversed ----\n"
   putStrLn $ astToString ast'
-  putStrLn "\nResult:\n"
+  putStrLn "\nResult:"
   putStrLn $ varTabToString res'
 
 -- Main
@@ -329,7 +330,7 @@ let ast = toAST
             "loop_body"
             (From "test")
             [
-              PlusEq  "acc" (Const $ IntVal 3),
+              PlusEq  "a" (Const $ IntVal 3),
               MinusEq "c"   (Const $ IntVal 1)
             ]
             (Goto "test")
@@ -338,10 +339,10 @@ let ast = toAST
             "end"
             (From "loop_body")
             [
-              Swap "acc" "c"
+              Swap "a" "c"
             ]
             Exit
           ]
 
 
-testAST ast [("acc", IntVal 11)]
+testAST ast [("a", IntVal 11)]

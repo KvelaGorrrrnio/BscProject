@@ -48,22 +48,22 @@ data Value
   deriving Show
 
 -- Converting AST to string for pretty printing
-astToString :: AST -> String
-astToString = intercalate "\n" . map instToString
+astToString :: Int -> AST -> String
+astToString ind = intercalate "\n" . map (\i -> replicate (ind*2) ' ' ++ instToString ind i)
 
-instToString :: Inst -> String
-instToString (Swap n1 n2)   = n1 ++ " <=> " ++ n2
-instToString (PlusEq  n e)  = n ++ " += " ++ expToString e
-instToString (MinusEq n e)  = n ++ " -= " ++ expToString e
-instToString (XOREq n e)    = n ++ " ^= " ++ expToString e
-instToString (If t b1 b2 a) =
+instToString :: Int -> Inst -> String
+instToString _ (Swap n1 n2)   = n1 ++ " <=> " ++ n2
+instToString _ (PlusEq  n e)  = n ++ " += " ++ expToString e
+instToString _ (MinusEq n e)  = n ++ " -= " ++ expToString e
+instToString _ (XOREq n e)    = n ++ " ^= " ++ expToString e
+instToString ind (If t b1 b2 a) =
   "if (" ++ expToString t ++ ") then\n" ++
-  astToString b1 ++ "\nelse\n" ++
-  astToString b2 ++ "\nfi(" ++ expToString a ++ ")"
-instToString (From a b t) =
+  astToString (ind+1) b1 ++ "\nelse\n" ++
+  astToString (ind+1) b2 ++ "\nfi(" ++ expToString a ++ ")"
+instToString ind (From a b t) =
   "from (" ++ expToString a ++ ")\ndo\n" ++
-  astToString b ++ "\nuntil (" ++ expToString t ++ ")"
-instToString Skip           = "skip"
+  astToString (ind+1) b ++ "\nuntil (" ++ expToString t ++ ")"
+instToString _ Skip           = "skip"
 
 expToString :: Exp -> String
 expToString (Plus   e1 e2) = expToString e1 ++ " + "  ++ expToString e2
@@ -216,13 +216,14 @@ testAST ast sstate = do
   let res  = interpAST ast sstate
       ast' = reverseAST ast
       res' = interpAST ast' res
-  putStrLn $ "Starting state:\n" ++ varTabToString sstate ++ "\n"
-  putStrLn $ astToString ast
-  putStrLn "\nResult:\n"
+  putStrLn "Starting state:"
+  putStrLn $ varTabToString sstate ++ "\n"
+  putStrLn $ astToString 0 ast
+  putStrLn "\nResult:"
   putStrLn $ varTabToString res
   putStrLn "\n---- Reversed ----\n"
-  putStrLn $ astToString ast'
-  putStrLn "\nResult:\n"
+  putStrLn $ astToString 0 ast'
+  putStrLn "\nResult:"
   putStrLn $ varTabToString res'
 
 -- Main
