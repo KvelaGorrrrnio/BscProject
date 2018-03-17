@@ -1,0 +1,9 @@
+n ^= 11 ~ for the 11th fibonacci number
+w ^= 1
+from v=0
+do
+  v += w
+  v <=> w
+  n -= 1
+until n = 0 || v > w
+
