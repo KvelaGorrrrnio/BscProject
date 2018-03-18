@@ -164,15 +164,7 @@ reverseInst (MinusEq n e)  = PlusEq  n e
 reverseInst (XOREq   n e)  = XOREq   n e
 reverseInst Skip           = Skip
 
--- data Inst
---  = Swap Var Var
---  | PlusEq  Var  Exp
---  | MinusEq Var  Exp
---  | XOREq   Var  Exp
---  deriving Show
-
 -- VarTab
-
 type VarTab = [(Var, Value)]
 
 update :: String -> Value -> VarTab -> VarTab
@@ -181,6 +173,17 @@ update name vn vtab = case vtab of
         | n == name  -> (n,vn) : bs
         | otherwise  -> (n,vo) : update name vn bs
       [] -> error $ "Variable not defined: " ++ name
+
+-- lookup name vtab is a predefined function
+-- but we also want to index
+lookupIdx :: String -> Int -> VarTab -> Value
+lookupIdx name i vtab
+  | i < 0     = error "Negative index is not allowed."
+  | otherwise = case lookup name vtab of
+    Nothing                             -> IntVal 0
+    Just (ListVal lst) | length lst > i -> lst !! i
+                       | otherwise      -> IntVal 0
+    _                                   -> error "Indexing on non-list."
 
 bind :: String -> Value -> VarTab -> VarTab
 bind name value vtab = (name,value):vtab

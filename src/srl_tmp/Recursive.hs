@@ -48,6 +48,7 @@ data Value
   deriving Show
 
 -- Converting AST to string for pretty printing
+-- Converting AST to string for pretty printing
 astToString :: Int -> AST -> String
 astToString ind = intercalate "\n" . map (\i -> replicate (ind*2) ' ' ++ instToString ind i)
 
@@ -57,13 +58,16 @@ instToString _ (PlusEq  n e)  = n ++ " += " ++ expToString e
 instToString _ (MinusEq n e)  = n ++ " -= " ++ expToString e
 instToString _ (XOREq n e)    = n ++ " ^= " ++ expToString e
 instToString ind (If t b1 b2 a) =
-  "if (" ++ expToString t ++ ") then\n" ++
-  astToString (ind+1) b1 ++ "\nelse\n" ++
-  astToString (ind+1) b2 ++ "\nfi(" ++ expToString a ++ ")"
+  cyan "if" ++ " (" ++ expToString t ++ ") " ++ cyan "then\n" ++
+  astToString (ind+1) b1  ++ cyan "\nelse\n" ++
+  astToString (ind+1) b2  ++ cyan "\nfi" ++ " (" ++ expToString a ++ ")"
 instToString ind (From a b t) =
-  "from (" ++ expToString a ++ ")\ndo\n" ++
-  astToString (ind+1) b ++ "\nuntil (" ++ expToString t ++ ")"
-instToString _ Skip           = "skip"
+  green "from" ++ " ("   ++ expToString a ++ ")\n"  ++
+  replicate (ind*2) ' ' ++ green "do\n"  ++
+  astToString (ind+1) b ++ "\n"    ++
+  replicate (ind*2) ' ' ++ green "until" ++
+  " (" ++ expToString t ++ ")"
+instToString _ Skip           = yellow "skip"
 
 expToString :: Exp -> String
 expToString (Plus   e1 e2) = expToString e1 ++ " + "  ++ expToString e2
@@ -85,6 +89,16 @@ valueToString (FloatVal x)  = show x
 valueToString (BoolVal b)   = show b
 valueToString (ListVal lst) = concatMap valueToString lst
 
+-- For color highlighting
+black   s = "\x1b[30m" ++ s ++ "\x1b[0m"
+red     s = "\x1b[31m" ++ s ++ "\x1b[0m"
+green   s = "\x1b[32m" ++ s ++ "\x1b[0m"
+yellow  s = "\x1b[33m" ++ s ++ "\x1b[0m"
+blue    s = "\x1b[34m" ++ s ++ "\x1b[0m"
+magenta s = "\x1b[35m" ++ s ++ "\x1b[0m"
+cyan    s = "\x1b[36m" ++ s ++ "\x1b[0m"
+white   s = "\x1b[37m" ++ s ++ "\x1b[0m"
+
 -- Reversion
 reverseAST :: AST -> AST
 reverseAST = map reverseInst . reverse
@@ -102,15 +116,20 @@ reverseInst Skip           = Skip
 
 type VarTab = [(Var, Value)]
 
-update :: String -> Value -> VarTab -> VarTab
-update name vn vtab = case vtab of
-      (n,vo) : bs
-        | n == name  -> (n,vn) : bs
-        | otherwise  -> (n,vo) : update name vn bs
-      [] -> error $ "Variable not defined: " ++ name
+update :: Var -> (Value -> Value -> Value) -> Value -> VarTab -> VarTab
+update name op val vtab = case vtab of
+  (n,v):rst | n == name -> (n, op v val) : rst
+            | otherwise -> (n,v) : update name op val rst
+  []                    -> error "Variable not defined."
 
 bind :: String -> Value -> VarTab -> VarTab
 bind name value vtab = (name,value):vtab
+
+swap :: Var -> Var -> VarTab -> VarTab
+swap name1 name2 vtab = case (lookup name1 vtab, lookup name2 vtab) of
+  (Just v1, Just v2) -> (update name1 (\_ v -> v) v2 . update name2 (\_ v -> v) v1) vtab
+  (Nothing, Just _ ) -> error $ name1 ++ " not defined."
+  (Just _,  Nothing) -> error $ name2 ++ " not defined."
 
 varTabToString :: VarTab -> String
 varTabToString = intercalate "\n" . map (\(n,v) -> n ++ " -> " ++ show v)
@@ -124,26 +143,16 @@ interpAST ast vtab = foldl (flip interpInst) vtab ast
 -- interpreting an instruction
 interpInst :: Inst -> VarTab -> VarTab
 interpInst i vtab = case i of
-  PlusEq name exp -> case (lookup name vtab, eval exp vtab) of
-    (Just (IntVal   n), IntVal   m) -> update name (IntVal   $ n + m) vtab
-    (Just (FloatVal n), FloatVal m) -> update name (FloatVal $ n + m) vtab
-    (Nothing, IntVal   m)         -> bind   name (IntVal   m) vtab
-    (Nothing, FloatVal m)         -> bind   name (FloatVal m) vtab
-    _                           -> error "Operands not of correct type"
-  MinusEq name exp -> case (lookup name vtab, eval exp vtab) of
-    (Just (IntVal   n), IntVal   m) -> update name (IntVal   $ n - m) vtab
-    (Just (FloatVal n), FloatVal m) -> update name (FloatVal $ n - m) vtab
-    (Nothing, _)                -> error "No support for negative numbers"
-    _                           -> error "Operands not of correct type"
-  XOREq   name exp -> case (lookup name vtab, eval exp vtab) of
-    (Just (IntVal n), IntVal m) -> update name (IntVal $ xor n m) vtab
-    (Nothing, IntVal m)         -> bind   name (IntVal m) vtab
-    _                           -> error "Operands not of correct type"
-  Swap name1 name2 -> case (lookup name1 vtab, lookup name2 vtab) of
-    (Just v1, Just v2) ->
-      let vtab' = update name1 v2 vtab
-        in update name2 v1 vtab'
-    _ -> error "Variable is not defined"
+  PlusEq name exp  -> case lookup name vtab of
+    Nothing      -> (interpInst i . bind name (IntVal 0))   vtab
+    Just _       -> update name (apply (+)) (eval exp vtab) vtab
+  MinusEq name exp -> case lookup name vtab of
+    Nothing      -> (interpInst i . bind name (IntVal 0))   vtab
+    Just _       -> update name (apply (-)) (eval exp vtab) vtab
+  XOREq name exp  -> case lookup name vtab of
+    Nothing      -> (interpInst i . bind name (IntVal 0))   vtab
+    Just _       -> update name (apply xor) (eval exp vtab) vtab
+  Swap name1 name2 -> swap name1 name2 vtab
   If t b1 b2 a     -> case eval t vtab of
     BoolVal bl1    -> do
       let vtab' = interpAST (if bl1 then b1 else b2) vtab
@@ -167,6 +176,10 @@ doLoop a b t vtab = case eval t vtab' of
       _             -> error "do-until: Test is of wrong type."
     _ -> error "do-until: Assertion is of wrong type."
     where vtab' = interpAST b vtab
+
+apply :: (Int -> Int -> Int) -> Value -> Value -> Value
+apply op (IntVal n) (IntVal m) = IntVal $ op n m
+apply op _ _                   = error "Operands must be integers."
 
 -- evaluating an expression
 eval :: Exp -> VarTab -> Value
@@ -226,20 +239,34 @@ testAST ast sstate = do
   putStrLn "\nResult:"
   putStrLn $ varTabToString res'
 
--- Main
-main = do
--- A sample AST - calculate the nth fibonacci number
-let ast =
+-- Sample AST
+ast =
+  [
+    XOREq "w" (Const $ IntVal 1),
+    From
+      (Eq (Var "v") (Const $ IntVal 0))
       [
-        XOREq "w" (Const $ IntVal 1),
-        From
-          (Eq (Var "v") (Const $ IntVal 0))
-          [
-            PlusEq "v" (Var "w"),
-            Swap   "v" "w",
-            MinusEq "n" (Const $ IntVal 1)
-          ]
-          (Or (Eq (Var "n") (Const $ IntVal 0)) (Gth (Var "v") (Var "w")))
+        PlusEq "v" (Var "w"),
+        Swap   "v" "w",
+        MinusEq "n" (Const $ IntVal 1)
       ]
+    (Or (Eq (Var "n") (Const $ IntVal 0)) (Gth (Var "v") (Var "w"))),
+    If (Gth (Var "w") (Const $ IntVal 0))
+      [
+        PlusEq "x" (Var "w"),
+        From
+          (Eq (Var "x") (Var "w"))
+          [
+            MinusEq "x" (Const $ IntVal 1)
+          ]
+        (Eq (Var "x") (Const $ IntVal 0)),
+        Swap "x" "w"
+      ]
+      [
+        Skip
+      ]
+    (Eq (Var "w") (Const $ IntVal 0))
+  ]
 
-testAST ast [("n", IntVal 16)]
+-- Main
+main = testAST ast [("n", IntVal 16)]
