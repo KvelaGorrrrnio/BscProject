@@ -48,7 +48,6 @@ data Value
   deriving Show
 
 -- Converting AST to string for pretty printing
--- Converting AST to string for pretty printing
 astToString :: Int -> AST -> String
 astToString ind = intercalate "\n" . map (\i -> replicate (ind*2) ' ' ++ instToString ind i)
 
@@ -250,22 +249,7 @@ ast =
         Swap   "v" "w",
         MinusEq "n" (Const $ IntVal 1)
       ]
-    (Or (Eq (Var "n") (Const $ IntVal 0)) (Gth (Var "v") (Var "w"))),
-    If (Gth (Var "w") (Const $ IntVal 0))
-      [
-        PlusEq "x" (Var "w"),
-        From
-          (Eq (Var "x") (Var "w"))
-          [
-            MinusEq "x" (Const $ IntVal 1)
-          ]
-        (Eq (Var "x") (Const $ IntVal 0)),
-        Swap "x" "w"
-      ]
-      [
-        Skip
-      ]
-    (Eq (Var "w") (Const $ IntVal 0))
+    (Or (Eq (Var "n") (Const $ IntVal 0)) (Gth (Var "v") (Var "w")))
   ]
 
 -- Main
