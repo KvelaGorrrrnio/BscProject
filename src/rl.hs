@@ -1,4 +1,5 @@
 import RL.Parser
+import RL.Interp
 -- Main
 
 main = do

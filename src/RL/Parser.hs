@@ -104,7 +104,7 @@ parseExpressionOperators = E.buildExpressionParser operatorTable parseExpression
 operatorTable = [ [ binary "*"  RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divide E.AssocLeft]
                 , [ binary "+"  RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
                 , [ binary "^"  RL.AST.Xor   E.AssocLeft]
-                , [ binary "==" RL.AST.Eq    E.AssocLeft] ]
+                , [ binary "=" RL.AST.Eq    E.AssocLeft] ]
   where binary name fun assoc = E.Infix (fun <$ reservedOp name) assoc
         reservedOp :: String -> Parser String
         reservedOp name = ws *> P.string name <* ws

@@ -8,6 +8,8 @@ Understøttelse af patenteser og flere operatorer til RL
 Ordn SRL med nyt AST parser
 Overvej at strippe result state, så det ikke indeholder zero-bindings.
 
+Definer syntax highlighting
+
 
 Mappestruktur:
 src
