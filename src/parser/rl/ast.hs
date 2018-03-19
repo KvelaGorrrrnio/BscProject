@@ -1,7 +1,7 @@
 module RL.AST
 ( AST             (..)
 , Block           (..)
-, Identifier
+, Identifier      (..)
 , From            (..)
 , Goto            (..)
 , Statement       (..)
@@ -14,27 +14,31 @@ module RL.AST
 data AST = AST [Block] [Block]
   deriving Show
 
-data Block = Block Identifier From [Statement] Goto
+data Block = Block Label From [Statement] Goto
   deriving Show
 
 data From
-  = From  Identifier
-  | Fi    Expression Identifier Identifier
+  = From  Label
+  | Fi    Expression Label Label
   | Entry
   deriving Show
 
 data Goto
-  = Goto  Identifier
-  | If    Expression Identifier Identifier
+  = Goto  Label
+  | If    Expression Label Label
   | Exit
   deriving Show
 
 -- Common
-type Identifier = String
+type Label = String
+
+data Identifier
+  = Variable String
+  | Index String Expression
+  deriving Show
 
 data Statement
   = Assignment      Identifier AssignOperator Expression
-  | IndexAssignment Identifier Expression AssignOperator Expression
   | Push Identifier Identifier
   | Pop  Identifier Identifier
   | Swap Identifier Identifier
@@ -49,7 +53,6 @@ data AssignOperator
 
 data Expression
   = Var       Identifier
-  | Index     Identifier Expression
   | Constant  Value
   | Plus      Expression Expression
   | Minus     Expression Expression
