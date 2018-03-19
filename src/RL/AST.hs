@@ -69,6 +69,7 @@ data Expression
   | Not       Expression
   | Top       Identifier
   | Empty     Identifier
+  | Parens    Expression
   deriving Show
 
 data Value

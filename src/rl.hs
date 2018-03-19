@@ -5,8 +5,11 @@ import RL.Interp
 main = do
 -- A sample AST
 -- data Block = Block Label From [Inst] To deriving Show
-  east <- fparse "test.rl"
+  east <- fparse "RL/test.rl"
   case east of
     Left err -> print err
-    Right ast -> print $ interpAST (toAST ast) []
+    Right ast -> do
+      let ast' = toAST ast
+      writeFile "testpp.rl" $ astToString ast'
+      print $ interpAST ast' []
 

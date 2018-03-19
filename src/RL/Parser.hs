@@ -29,10 +29,10 @@ import RL.AST
 
 -- Interface
 fparse :: String -> IO (Either P.ParseError [Block])
-fparse path = parseFromFile (parseBlocks <* ws <* P.eof) path
+fparse = parseFromFile (parseBlocks <* ws <* P.eof)
 
 parse :: String -> Either P.ParseError [Block]
-parse code = P.parse (parseBlocks <* ws <* P.eof) "" code
+parse = P.parse (parseBlocks <* ws <* P.eof) ""
 
 -- Safe parse
 sparse :: Show a => Parser a -> String -> String
@@ -53,14 +53,18 @@ parseGoto :: Parser Goto
 parseGoto = P.try parseGoto' P.<|> P.try parseIf P.<|> parseExit
   where parseGoto' = P.string "goto" *> (Goto <$> parseName)
         parseIf    = P.string "if"   *> (If <$> parseExpression <*> parseName <*> parseName)
-        parseExit = (\_ -> Exit) <$> P.string "exit"
+        parseExit = const Exit <$> P.string "exit"
+
+-- Paranthesis
+parens :: Parser Expression -> Parser Expression
+parens e = P.char '(' *> e <* P.char ')'
 
 -- From
 parseFrom :: Parser From
 parseFrom = P.try parseFrom' P.<|> P.try parseFi P.<|> parseEntry
   where parseFrom' = P.string "from" *> ws *> (From <$> parseName)
         parseFi    = P.string "fi"   *> ws *> (Fi <$> parseExpression <*> parseName <*> parseName)
-        parseEntry = (\_ -> Entry) <$> P.string "entry"
+        parseEntry = const Entry <$> P.string "entry"
 
 -- Multiple statements
 parseStatements :: Parser [Statement]
@@ -71,7 +75,7 @@ parseStatement :: Parser Statement
 parseStatement =  P.try parseSkip P.<|> P.try parseSwap
             P.<|> P.try parsePush P.<|> P.try parsePop
             P.<|> P.try parseAssignment
-  where parseSkip = (\_ -> Skip) <$> P.string "skip" <* ws
+  where parseSkip = const Skip <$> P.string "skip" <* ws
         parseSwap = P.string "swap" *> ws *> (Swap <$> parseIdentifier <*> parseIdentifier) <* ws
         parsePush = P.string "push" *> ws *> (Push <$> parseIdentifier <*> parseIdentifier) <* ws
         parsePop  = P.string "pop"  *> ws *> (Pop  <$> parseIdentifier <*> parseIdentifier) <* ws
@@ -79,13 +83,13 @@ parseStatement =  P.try parseSkip P.<|> P.try parseSwap
 parseAssignment :: Parser Statement
 parseAssignment = Assignment <$> (P.try parseIndex P.<|> parseVariable) <*> parseAssignOperator <*> parseExpression
   where parseAssignOperator = ws *> (parsePlusEq P.<|> parseMinusEq P.<|> parseXorEq) <* ws
-        parsePlusEq  = (\_ -> PlusEq) <$> P.string "+="
-        parseMinusEq = (\_ -> MinusEq) <$> P.string "-="
-        parseXorEq   = (\_ -> XorEq) <$> P.string "^="
+        parsePlusEq  = const PlusEq  <$> P.string "+="
+        parseMinusEq = const MinusEq <$> P.string "-="
+        parseXorEq   = const XorEq   <$> P.string "^="
 
 -- Whitespace
 ws :: Parser ()
-ws = (P.skipMany P.space) P.<?> ""
+ws = P.skipMany P.space P.<?> ""
 
 -- Expression
 parseExpression :: Parser Expression
@@ -105,13 +109,16 @@ operatorTable = [ [ binary "*"  RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divi
                 , [ binary "+"  RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
                 , [ binary "^"  RL.AST.Xor   E.AssocLeft]
                 , [ binary "=" RL.AST.Eq    E.AssocLeft] ]
-  where binary name fun assoc = E.Infix (fun <$ reservedOp name) assoc
+  where binary name fun = E.Infix (fun <$ reservedOp name)
         reservedOp :: String -> Parser String
         reservedOp name = ws *> P.string name <* ws
 
 -- Expression values (leafs)
 parseExpressionValue :: Parser Expression
-parseExpressionValue = ws *> (parseConstant P.<|> (Var <$> (P.try parseIndex)) P.<|> (Var <$> parseVariable)) <* ws
+parseExpressionValue = ws *> ((Parens <$> parens parseExpression)
+                              P.<|> (parseConstant P.<|> (Var <$> P.try parseIndex)
+                              P.<|> (Var <$> parseVariable)))
+                       <* ws
 
 -- Identifiers
 parseIdentifier :: Parser Identifier
@@ -152,19 +159,19 @@ parseString = StringValue <$> (P.char '"' *> P.many (P.noneOf ['"']) <* P.char '
 -- Booleans
 parseBoolean :: Parser Value
 parseBoolean = BoolValue <$> (parseTrue P.<|> parseFalse) P.<?> "boolean"
-  where parseTrue  = (\_ -> True)  <$> P.string "true"
-        parseFalse = (\_ -> False) <$> P.string "false"
+  where parseTrue  = const True  <$> P.string "true"
+        parseFalse = const False <$> P.string "false"
 
 -- Numbers
 parseNumber :: Parser Value
 parseNumber = P.try parseFloat P.<|> parseInteger P.<?> "number"
 
 parseInteger :: Parser Value
-parseInteger = (IntValue . readInt) <$> P.many1 P.digit P.<?> "integer"
+parseInteger = IntValue . readInt <$> P.many1 P.digit P.<?> "integer"
   where readInt = read :: String -> Int
 
 parseFloat :: Parser Value
-parseFloat = (FloatValue . readFloat) <$> ((++) <$> integer <*> fraction) P.<?> "float"
+parseFloat = FloatValue . readFloat <$> ((++) <$> integer <*> fraction) P.<?> "float"
   where readFloat = read :: String -> Float
         integer  = P.many1 P.digit
         fraction = (:) <$> P.char '.' <*> integer

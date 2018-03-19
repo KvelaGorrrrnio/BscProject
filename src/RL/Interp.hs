@@ -35,7 +35,7 @@ blockToString :: Block -> String
 blockToString (Block l f insts t) =
   labelToString l     ++ " "  ++
   fromToString  f     ++ "\n  " ++
-  instsToString insts ++ "\n" ++
+  instsToString insts ++ "\n  " ++
   toToString t
 
 labelToString :: Label -> String
@@ -43,14 +43,16 @@ labelToString l = l++":"
 
 fromToString :: From -> String
 fromToString (From l)     = "from " ++ l
-fromToString (Fi e l1 l2) = "fi (" ++ expToString e ++ ") " ++ l1 ++ " " ++ l2
+fromToString (Fi e l1 l2) = case e of
+  Parens _ -> "fi " ++ expToString e ++ " " ++ l1 ++ " " ++ l2
+  _        -> "fi " ++ expToString (Parens e) ++ " " ++ l1 ++ " " ++ l2
 fromToString Entry = "entry"
 
 instsToString :: [Statement] -> String
 instsToString = intercalate "\n  " . map instToString
 
 instToString :: Statement -> String
-instToString (Swap (Variable n1) (Variable n2))  = n1 ++ " <=> " ++ n2
+instToString (Swap (Variable n1) (Variable n2))  = "swap " ++ n1 ++ " " ++ n2
 instToString (Assignment (Variable n) PlusEq  e) = n ++ " += " ++ expToString e
 instToString (Assignment (Variable n) MinusEq e) = n ++ " += " ++ expToString e
 instToString (Assignment (Variable n) XorEq   e) = n ++ " += " ++ expToString e
@@ -58,7 +60,9 @@ instToString Skip          = "skip"
 
 toToString :: Goto -> String
 toToString (Goto l)     = "goto " ++ l
-toToString (If e l1 l2) = "if (" ++ expToString e ++ ") " ++ l1 ++ " " ++ l2
+toToString (If e l1 l2) = case e of
+  Parens _ -> "if " ++ expToString e ++ " " ++ l1 ++ " " ++ l2
+  _        -> "if " ++ expToString (Parens e) ++ " " ++ l1 ++ " " ++ l2
 toToString Exit         = "exit"
 
 expToString :: Expression -> String
@@ -67,7 +71,7 @@ expToString (Minus  e1 e2) = expToString e1 ++ " - "  ++ expToString e2
 expToString (Xor    e1 e2) = expToString e1 ++ " / "  ++ expToString e2
 expToString (Times  e1 e2) = expToString e1 ++ " * "  ++ expToString e2
 expToString (Divide e1 e2) = expToString e1 ++ " / "  ++ expToString e2
-expToString (Eq  e1 e2)    = expToString e1 ++ " == " ++ expToString e2
+expToString (Eq  e1 e2)    = expToString e1 ++ " = "  ++ expToString e2
 expToString (Neq  e1 e2)   = expToString e1 ++ " != " ++ expToString e2
 expToString (Lth e1 e2)    = expToString e1 ++ " < "  ++ expToString e2
 expToString (Gth e1 e2)    = expToString e1 ++ " > "  ++ expToString e2
@@ -78,6 +82,10 @@ expToString (Top v)        = "top "    ++ varToString v
 expToString (Empty v)      = "empty "  ++ varToString v
 expToString (Constant v)   = valueToString v
 expToString (Var v)        = varToString v
+expToString (Parens -- Redundant brackets
+              (Parens e)
+            ) = expToString $ Parens e
+expToString (Parens e)     = "(" ++ expToString e ++ ")"
 
 varToString :: Identifier -> String
 varToString (Variable x) = x
@@ -86,7 +94,9 @@ varToString (Index x i) = x ++ "[" ++ expToString i ++ "]"
 valueToString :: Value -> String
 valueToString (IntValue   n)  = show n
 valueToString (FloatValue x)  = show x
-valueToString (BoolValue b)   = show b
+valueToString (BoolValue b)
+  | b     = "true"
+  | not b = "false"
 valueToString (ListValue lst) = concatMap valueToString lst
 
 -- Reversion
@@ -230,6 +240,7 @@ eval (Not e) vtab        = case eval e vtab of
   _                        -> error "Comparing two incompatible types."
 eval (Var  (Variable n)) vtab = fromMaybe (IntValue 0) (lookup n vtab)
 eval (Constant v) _ = v
+eval (Parens e) vtab = eval e vtab
 
 -- Helper to test implementation
 testAST :: AST -> VarTab -> IO ()
