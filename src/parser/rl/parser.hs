@@ -1,5 +1,24 @@
 module RL.Parser
 ( parse
+, sparse
+, parseBlocks
+, parseBlock
+, parseGoto
+, parseFrom
+, parseStatements
+, parseStatement
+, parseExpression
+, parseExpressionValue
+, parseIdentifier
+, parseVariable
+, parseIndex
+, parseValue
+, parseBoolean
+, parseNumber
+, parseFloat
+, parseInteger
+, parseString
+, parseName
 ) where
 
 import qualified Text.Parsec as P
@@ -11,26 +30,32 @@ import RL.AST
 parse :: String -> Either P.ParseError [Block]
 parse code = P.parse (parseBlocks <* P.eof) "" code
 
+-- Safe parse
+sparse :: Show a => Parser a -> String -> String
+sparse parser code = case P.parse (parser <* ws <* P.eof) "" code of
+  Left err -> "Nothing"
+  Right ast -> show ast
+
 -- Blocks
 parseBlocks :: Parser [Block]
 parseBlocks = P.many1 parseBlock
 
 -- Block
 parseBlock :: Parser Block
-parseBlock =  Block <$> (parseIdentifier <* P.char ':') <*> (ws *> parseFrom) <*> (ws *> P.option [] parseStatements) <*> (ws *> parseGoto)
+parseBlock =  Block <$> (parseName <* P.char ':') <*> (ws *> parseFrom) <*> (ws *> P.option [] parseStatements) <*> (ws *> parseGoto)
 
 -- Goto
 parseGoto :: Parser Goto
 parseGoto = P.try parseGoto' P.<|> P.try parseIf P.<|> parseExit
-  where parseGoto' = P.string "goto" *> (Goto <$> parseIdentifier)
-        parseIf    = P.string "fi"   *> (If <$> parseExpression <*> parseIdentifier <*> parseIdentifier)
+  where parseGoto' = P.string "goto" *> (Goto <$> parseName)
+        parseIf    = P.string "fi"   *> (If <$> parseExpression <*> parseName <*> parseName)
         parseExit = (\_ -> Exit) <$> P.string "exit"
 
 -- From
 parseFrom :: Parser From
 parseFrom = P.try parseFrom' P.<|> P.try parseFi P.<|> parseEntry
-  where parseFrom' = P.string "from" *> (From <$> parseIdentifier)
-        parseFi    = P.string "fi"   *> (Fi <$> parseExpression <*> parseIdentifier <*> parseIdentifier)
+  where parseFrom' = P.string "from" *> (From <$> parseName)
+        parseFi    = P.string "fi"   *> (Fi <$> parseExpression <*> parseName <*> parseName)
         parseEntry = (\_ -> Entry) <$> P.string "entry"
 
 -- Multiple statements
@@ -48,10 +73,8 @@ parseStatement =  P.try parseSkip P.<|> P.try parseSwap
         parsePop  = P.string "pop"  *> ws *> (Pop  <$> parseIdentifier <*> parseIdentifier) <* ws
 
 parseAssignment :: Parser Statement
-parseAssignment = P.try parseIndexAssignment P.<|> parseVariableAssignment
-  where parseIndexAssignment    = IndexAssignment <$> parseIdentifier <*> (P.char '[' *> parseExpression <* P.char ']') <*> parseAssignOperator <*> parseExpression
-        parseVariableAssignment = Assignment <$> parseIdentifier <*> parseAssignOperator <*> parseExpression
-        parseAssignOperator = ws *> (parsePlusEq P.<|> parseMinusEq P.<|> parseXorEq) <* ws
+parseAssignment = Assignment <$> (P.try parseIndex P.<|> parseVariable) <*> parseAssignOperator <*> parseExpression
+  where parseAssignOperator = ws *> (parsePlusEq P.<|> parseMinusEq P.<|> parseXorEq) <* ws
         parsePlusEq  = (\_ -> PlusEq) <$> P.string "+="
         parseMinusEq = (\_ -> MinusEq) <$> P.string "-="
         parseXorEq   = (\_ -> XorEq) <$> P.string "^="
@@ -83,12 +106,16 @@ operatorTable = [ [ binary "*" RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divid
 
 -- Expression values (leafs)
 parseExpressionValue :: Parser Expression
-parseExpressionValue = ws *> (parseConstant P.<|> P.try parseIndex P.<|> parseVariable) <* ws
+parseExpressionValue = ws *> (parseConstant P.<|> (Var <$> (P.try parseIndex)) P.<|> (Var <$> parseVariable)) <* ws
 
--- Index TODO: Remove value
-parseIndex :: Parser Expression
+-- Identifiers
+parseIdentifier :: Parser Identifier
+parseIdentifier = P.try parseIndex P.<|> parseVariable
+
+-- Index
+parseIndex :: Parser Identifier
 parseIndex = do
-  id <- parseIdentifier
+  id <- parseName
   P.char '['
   ws
   e <- parseExpression
@@ -98,16 +125,16 @@ parseIndex = do
   return (Index id e)
 
 -- Variables
-parseVariable :: Parser Expression
-parseVariable = Var <$> parseIdentifier
+parseVariable :: Parser Identifier
+parseVariable = Variable <$> parseName
 
 -- Constants
 parseConstant :: Parser Expression
 parseConstant = Constant <$> parseValue
 
--- Identifiers
-parseIdentifier :: Parser Identifier
-parseIdentifier = ws *> ((:) <$> P.letter <*> P.many (P.alphaNum P.<|> P.oneOf ['_'])) P.<?> "identifier"
+-- Variable names
+parseName :: Parser String
+parseName = ws *> ((:) <$> P.letter <*> P.many (P.alphaNum P.<|> P.oneOf ['_'])) P.<?> "identifier"
 
 -- Values
 parseValue :: Parser Value
