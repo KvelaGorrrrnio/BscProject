@@ -118,8 +118,8 @@ instsToString = intercalate "\n  " . map instToString
 instToString :: Statement -> String
 instToString (Swap (Variable n1) (Variable n2))  = n1 ++ " <=> " ++ n2
 instToString (Assignment (Variable n) PlusEq  e) = n ++ " += " ++ expToString e
-instToString (Assignment (Variable n) MinusEq e) = n ++ " += " ++ expToString e
-instToString (Assignment (Variable n) XorEq   e) = n ++ " += " ++ expToString e
+instToString (Assignment (Variable n) MinusEq e) = n ++ " -= " ++ expToString e
+instToString (Assignment (Variable n) XorEq   e) = n ++ " ^= " ++ expToString e
 instToString Skip          = "skip"
 
 toToString :: Goto -> String
@@ -343,7 +343,7 @@ let ast = toAST
           ,
             Block
             "end"
-            (From "loop_body")
+            (From "test")
             [
               Swap (Variable "a") (Variable "c")
             ]
