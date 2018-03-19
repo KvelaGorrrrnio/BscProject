@@ -1,7 +1,8 @@
-module Main where
+module Interp where
 import Data.List
 import Data.Maybe
 import Data.Bits
+import RL.Parser (parse)
 
 -- When changing anything;
 -- AST types
@@ -318,38 +319,7 @@ testAST ast sstate = do
 main = do
 -- A sample AST
 -- data Block = Block Label From [Inst] To deriving Show
-let ast = toAST
-          [
-            Block
-            "init"
-            Entry
-            [ Assignment (Variable "c") PlusEq (Constant $ IntValue 20) ]--PlusEq (Variable "c") (Constant $ IntValue 20) ]
-            (Goto "test")
-          ,
-            Block
-            "test"
-            (Fi (Eq (Var (Variable "c")) (Constant $ IntValue 20)) "init" "loop_body")
-            [ Skip ]
-            (If (Eq (Var (Variable "c")) (Constant $ IntValue 0)) "end" "loop_body")
-          ,
-            Block
-            "loop_body"
-            (From "test")
-            [
-              Assignment (Variable "a") PlusEq  (Constant $ IntValue 3),--PlusEq  (Variable "a") (Constant $ IntValue 3),
-              Assignment (Variable "c") MinusEq (Constant $ IntValue 1)--PlusEq  (Variable "a") (Constant $ IntValue 3),
-            ]
-            (Goto "test")
-          ,
-            Block
-            "end"
-            (From "loop_body")
-            [
-              Swap (Variable "a") (Variable "c")
-            ]
-            Exit
-          ]
+  src <- getFile "test.rl"
+  let stt = (interpAST . parse) src
 
-
-print $ genLabels ast
-testAST ast [("a", IntValue 11)]
+  print stt
