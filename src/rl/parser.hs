@@ -1,5 +1,6 @@
 module RL.Parser
 ( parse
+, fparse
 , sparse
 , parseBlocks
 , parseBlock
@@ -23,12 +24,15 @@ module RL.Parser
 
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Expr as E
-import Text.Parsec.String (Parser)
+import Text.Parsec.String (Parser, parseFromFile)
 import RL.AST
 
 -- Interface
+fparse :: String -> IO (Either P.ParseError [Block])
+fparse path = parseFromFile (parseBlocks <* ws <* P.eof) path
+
 parse :: String -> Either P.ParseError [Block]
-parse code = P.parse (parseBlocks <* P.eof) "" code
+parse code = P.parse (parseBlocks <* ws <* P.eof) "" code
 
 -- Safe parse
 sparse :: Show a => Parser a -> String -> String
@@ -42,20 +46,20 @@ parseBlocks = P.many1 parseBlock
 
 -- Block
 parseBlock :: Parser Block
-parseBlock =  Block <$> (parseName <* P.char ':') <*> (ws *> parseFrom) <*> (ws *> P.option [] parseStatements) <*> (ws *> parseGoto)
+parseBlock =  Block <$> (parseName <* P.char ':') <*> (ws *> parseFrom) <*> (ws *> P.option [] parseStatements) <*> (ws *> parseGoto <* ws)
 
 -- Goto
 parseGoto :: Parser Goto
 parseGoto = P.try parseGoto' P.<|> P.try parseIf P.<|> parseExit
   where parseGoto' = P.string "goto" *> (Goto <$> parseName)
-        parseIf    = P.string "fi"   *> (If <$> parseExpression <*> parseName <*> parseName)
+        parseIf    = P.string "if"   *> (If <$> parseExpression <*> parseName <*> parseName)
         parseExit = (\_ -> Exit) <$> P.string "exit"
 
 -- From
 parseFrom :: Parser From
 parseFrom = P.try parseFrom' P.<|> P.try parseFi P.<|> parseEntry
-  where parseFrom' = P.string "from" *> (From <$> parseName)
-        parseFi    = P.string "fi"   *> (Fi <$> parseExpression <*> parseName <*> parseName)
+  where parseFrom' = P.string "from" *> ws *> (From <$> parseName)
+        parseFi    = P.string "fi"   *> ws *> (Fi <$> parseExpression <*> parseName <*> parseName)
         parseEntry = (\_ -> Entry) <$> P.string "entry"
 
 -- Multiple statements
@@ -85,7 +89,7 @@ ws = (P.skipMany P.space) P.<?> ""
 
 -- Expression
 parseExpression :: Parser Expression
-parseExpression = parseExpressionKeyword P.<|> parseExpressionOperators
+parseExpression = P.try parseExpressionKeyword P.<|> parseExpressionOperators
 
 -- Expression keywords
 parseExpressionKeyword :: Parser Expression
@@ -97,9 +101,10 @@ parseExpressionKeyword = parseTop P.<|> parseEmpty
 parseExpressionOperators :: Parser Expression
 parseExpressionOperators = E.buildExpressionParser operatorTable parseExpressionValue
 
-operatorTable = [ [ binary "*" RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divide E.AssocLeft]
-                , [ binary "+" RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
-                , [ binary "^" RL.AST.Xor   E.AssocLeft] ]
+operatorTable = [ [ binary "*"  RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divide E.AssocLeft]
+                , [ binary "+"  RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
+                , [ binary "^"  RL.AST.Xor   E.AssocLeft]
+                , [ binary "==" RL.AST.Eq    E.AssocLeft] ]
   where binary name fun assoc = E.Infix (fun <$ reservedOp name) assoc
         reservedOp :: String -> Parser String
         reservedOp name = ws *> P.string name <* ws

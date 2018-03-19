@@ -8,6 +8,7 @@ module RL.AST
 , AssignOperator  (..)
 , Expression      (..)
 , Value           (..)
+, Label
 ) where
 
 -- RL specific
@@ -65,7 +66,7 @@ data Expression
   | Gth       Expression Expression
   | And       Expression Expression
   | Or        Expression Expression
-  | Not       Expression Expression
+  | Not       Expression
   | Top       Identifier
   | Empty     Identifier
   deriving Show
@@ -75,6 +76,6 @@ data Value
   | FloatValue  Float
   | BoolValue   Bool
   | StringValue String
-  | ListVal     [Value]
+  | ListValue   [Value]
   deriving Show
 

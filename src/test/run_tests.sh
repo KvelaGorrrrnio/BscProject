@@ -29,7 +29,7 @@ for t in "${target[@]}"; do
     if [ ! -f "${f%.*}.hso" ]; then
       printf "\033[0;31m$(basename $f): No output file found.\033[0;0m\n"
     else
-      r=$(runhaskell -i$curdir/../${t} $f 2>err)
+      r=$(runhaskell -i$curdir/.. $f 2>err)
       c=$?
       o=$(cat "${f%.*}.hso")
       if [ $c -ne 0 ]; then

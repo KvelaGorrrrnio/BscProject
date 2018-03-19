@@ -1,81 +1,15 @@
-module Main where
+module RL.Interp where
 import Data.List
 import Data.Maybe
 import Data.Bits
+import RL.Parser
+import RL.AST
 
 -- When changing anything;
 -- AST types
 -- Reversion
 -- toString
 -- evaluation/interpretation
-
--- AST
-data AST = AST [Block] [Block]
-  deriving Show
-
-data Block = Block Label From [Statement] Goto
-  deriving Show
-
-data From
-  = From  Label
-  | Fi    Expression Label Label
-  | Entry
-  deriving Show
-
-data Goto
-  = Goto  Label
-  | If    Expression Label Label
-  | Exit
-  deriving Show
-
--- Common
-type Label = String
-
-data Identifier
-  = Variable String
-  | Index String Expression
-  deriving Show
-
-data Statement
-  = Assignment      Identifier AssignOperator Expression
-  | Push Identifier Identifier
-  | Pop  Identifier Identifier
-  | Swap Identifier Identifier
-  | Skip
-  deriving Show
-
-data AssignOperator
-  = PlusEq
-  | MinusEq
-  | XorEq
-  deriving Show
-
-data Expression
-  = Var       Identifier
-  | Constant  Value
-  | Plus      Expression Expression
-  | Minus     Expression Expression
-  | Xor       Expression Expression
-  | Times     Expression Expression
-  | Divide    Expression Expression
-  | Eq        Expression Expression
-  | Neq       Expression Expression
-  | Lth       Expression Expression
-  | Gth       Expression Expression
-  | And       Expression Expression
-  | Or        Expression Expression
-  | Not       Expression
-  | Top       Identifier
-  | Empty     Identifier
-  deriving Show
-
-data Value
-  = IntValue    Int
-  | FloatValue  Float
-  | BoolValue   Bool
-  | StringValue String
-  | ListValue   [Value]
-  deriving Show
 
 toAST :: [Block] -> AST
 toAST = AST []
@@ -118,8 +52,8 @@ instsToString = intercalate "\n  " . map instToString
 instToString :: Statement -> String
 instToString (Swap (Variable n1) (Variable n2))  = n1 ++ " <=> " ++ n2
 instToString (Assignment (Variable n) PlusEq  e) = n ++ " += " ++ expToString e
-instToString (Assignment (Variable n) MinusEq e) = n ++ " -= " ++ expToString e
-instToString (Assignment (Variable n) XorEq   e) = n ++ " ^= " ++ expToString e
+instToString (Assignment (Variable n) MinusEq e) = n ++ " += " ++ expToString e
+instToString (Assignment (Variable n) XorEq   e) = n ++ " += " ++ expToString e
 instToString Skip          = "skip"
 
 toToString :: Goto -> String
@@ -312,44 +246,3 @@ testAST ast sstate = do
   putStrLn $ astToString ast'
   putStrLn "\nResult:"
   putStrLn $ varTabToString res'
-
--- Main
-
-main = do
--- A sample AST
--- data Block = Block Label From [Inst] To deriving Show
-let ast = toAST
-          [
-            Block
-            "init"
-            Entry
-            [ Assignment (Variable "c") PlusEq (Constant $ IntValue 20) ]--PlusEq (Variable "c") (Constant $ IntValue 20) ]
-            (Goto "test")
-          ,
-            Block
-            "test"
-            (Fi (Eq (Var (Variable "c")) (Constant $ IntValue 20)) "init" "loop_body")
-            [ Skip ]
-            (If (Eq (Var (Variable "c")) (Constant $ IntValue 0)) "end" "loop_body")
-          ,
-            Block
-            "loop_body"
-            (From "test")
-            [
-              Assignment (Variable "a") PlusEq  (Constant $ IntValue 3),--PlusEq  (Variable "a") (Constant $ IntValue 3),
-              Assignment (Variable "c") MinusEq (Constant $ IntValue 1)--PlusEq  (Variable "a") (Constant $ IntValue 3),
-            ]
-            (Goto "test")
-          ,
-            Block
-            "end"
-            (From "test")
-            [
-              Swap (Variable "a") (Variable "c")
-            ]
-            Exit
-          ]
-
-
-print $ genLabels ast
-testAST ast [("a", IntValue 11)]

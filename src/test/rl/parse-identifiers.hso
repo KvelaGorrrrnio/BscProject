@@ -1,0 +1,24 @@
+Variable "a"
+Variable "A"
+Nothing
+Nothing
+Variable "some_variable"
+Variable "some_variable_1"
+Index "a" (Constant (IntValue 0))
+Index "A" (Constant (IntValue 0))
+Nothing
+Nothing
+Index "some_variable" (Constant (IntValue 0))
+Index "some_variable_1" (Constant (IntValue 0))
+Index "a" (Plus (Constant (IntValue 1)) (Var (Variable "a")))
+Index "A" (Plus (Constant (IntValue 1)) (Var (Variable "a")))
+Nothing
+Nothing
+Index "some_variable" (Plus (Constant (IntValue 1)) (Var (Variable "a")))
+Index "some_variable_1" (Plus (Constant (IntValue 1)) (Var (Variable "a")))
+Index "a" (Constant (BoolValue True))
+Index "A" (Constant (BoolValue True))
+Nothing
+Nothing
+Index "some_variable" (Constant (BoolValue True))
+Index "some_variable_1" (Constant (BoolValue True))
