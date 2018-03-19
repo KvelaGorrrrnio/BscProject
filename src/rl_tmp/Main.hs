@@ -11,7 +11,10 @@ import Data.Bits
 
 -- AST
 type Label = String
-type Var   = String
+data Var
+   = Variable String
+   | Index    String Exp
+   deriving Show
 
 data AST = AST [Block] [Block] deriving Show
 
@@ -39,10 +42,6 @@ data Inst
   | XOREq   Var  Exp
   | Skip
   deriving Show
-
--- data Var    -- TODO: implement this everywhere
---   = Sgl String
---   | Lst String Exp
 
 data Value
   = IntVal   Int
@@ -102,10 +101,10 @@ instsToString :: [Inst] -> String
 instsToString = intercalate "\n  " . map instToString
 
 instToString :: Inst -> String
-instToString (Swap n1 n2)  = n1 ++ " <=> " ++ n2
-instToString (PlusEq  n e) = n ++ " += " ++ expToString e
-instToString (MinusEq n e) = n ++ " -= " ++ expToString e
-instToString (XOREq n e)   = n ++ " ^= " ++ expToString e
+instToString (Swap (Variable n1) (Variable n2))  = n1 ++ " <=> " ++ n2
+instToString (PlusEq  (Variable n) e) = n ++ " += " ++ expToString e
+instToString (MinusEq (Variable n) e) = n ++ " -= " ++ expToString e
+instToString (XOREq (Variable n) e)   = n ++ " ^= " ++ expToString e
 instToString Skip          = "skip"
 
 toToString :: To -> String
@@ -125,7 +124,11 @@ expToString (And e1 e2)    = expToString e1 ++ " && " ++ expToString e2
 expToString (Or  e1 e2)    = expToString e1 ++ " || " ++ expToString e2
 expToString (Not e1)       = "not (" ++ expToString e1 ++ ")"
 expToString (Const v)      = valueToString v
-expToString (Var n)        = n
+expToString (Var v)        = varToString v
+
+varToString :: Var -> String
+varToString (Variable x) = x
+varToString (Index x i) = x ++ "[" ++ expToString i ++ "]"
 
 valueToString :: Value -> String
 valueToString (IntVal   n)  = show n
@@ -165,7 +168,7 @@ reverseInst (XOREq   n e)  = XOREq   n e
 reverseInst Skip           = Skip
 
 -- VarTab
-type VarTab = [(Var, Value)]
+type VarTab = [(String, Value)]
 
 update :: String -> Value -> VarTab -> VarTab
 update name vn vtab = case vtab of
@@ -173,17 +176,6 @@ update name vn vtab = case vtab of
         | n == name  -> (n,vn) : bs
         | otherwise  -> (n,vo) : update name vn bs
       [] -> error $ "Variable not defined: " ++ name
-
--- lookup name vtab is a predefined function
--- but we also want to index
-lookupIdx :: String -> Int -> VarTab -> Value
-lookupIdx name i vtab
-  | i < 0     = error "Negative index is not allowed."
-  | otherwise = case lookup name vtab of
-    Nothing                             -> IntVal 0
-    Just (ListVal lst) | length lst > i -> lst !! i
-                       | otherwise      -> IntVal 0
-    _                                   -> error "Indexing on non-list."
 
 bind :: String -> Value -> VarTab -> VarTab
 bind name value vtab = (name,value):vtab
@@ -230,22 +222,22 @@ interpInsts insts vtab = foldl (flip interpInst) vtab insts
 -- interpreting an instruction
 interpInst :: Inst -> VarTab -> VarTab
 interpInst i vtab = case i of
-  PlusEq name exp -> case (lookup name vtab, eval exp vtab) of
+  PlusEq (Variable name) exp -> case (lookup name vtab, eval exp vtab) of
     (Just (IntVal   n), IntVal   m) -> update name (IntVal   $ n + m) vtab
     (Just (FloatVal n), FloatVal m) -> update name (FloatVal $ n + m) vtab
     (Nothing, IntVal   m)         -> bind   name (IntVal   m) vtab
     (Nothing, FloatVal m)         -> bind   name (FloatVal m) vtab
     _                           -> error "Operands not of correct type"
-  MinusEq name exp -> case (lookup name vtab, eval exp vtab) of
+  MinusEq (Variable name) exp -> case (lookup name vtab, eval exp vtab) of
     (Just (IntVal   n), IntVal   m) -> update name (IntVal   $ n - m) vtab
     (Just (FloatVal n), FloatVal m) -> update name (FloatVal $ n - m) vtab
     (Nothing, _)                -> error "No support for negative numbers"
     _                           -> error "Operands not of correct type"
-  XOREq   name exp -> case (lookup name vtab, eval exp vtab) of
+  XOREq (Variable name) exp -> case (lookup name vtab, eval exp vtab) of
     (Just (IntVal n), IntVal m) -> update name (IntVal $ xor n m) vtab
     (Nothing, IntVal m)         -> bind   name (IntVal m) vtab
     _                           -> error "Operands not of correct type"
-  Swap name1 name2 -> case (lookup name1 vtab, lookup name2 vtab) of
+  Swap (Variable name1) (Variable name2) -> case (lookup name1 vtab, lookup name2 vtab) of
     (Just v1, Just v2) ->
       let vtab' = update name1 v2 vtab
         in update name2 v1 vtab'
@@ -291,7 +283,7 @@ eval (Or e1 e2) vtab     = case (eval e1 vtab, eval e2 vtab) of
 eval (Not e) vtab        = case eval e vtab of
   BoolVal b                -> BoolVal $ not b
   _                        -> error "Comparing two incompatible types."
-eval (Var  n) vtab = fromMaybe (IntVal 0) (lookup n vtab)
+eval (Var  (Variable n)) vtab = fromMaybe (IntVal 0) (lookup n vtab)
 eval (Const v) _ = v
 
 -- Helper to test implementation
@@ -320,21 +312,21 @@ let ast = toAST
             Block
             "init"
             Entry
-            [ PlusEq "c" (Const $ IntVal 20) ]
+            [ PlusEq (Variable "c") (Const $ IntVal 20) ]
             (Goto "test")
           ,
             Block
             "test"
-            (Fi (Eq (Var "c") (Const $ IntVal 20)) "init" "loop_body")
+            (Fi (Eq (Var (Variable "c")) (Const $ IntVal 20)) "init" "loop_body")
             [ Skip ]
-            (If (Eq (Var "c") (Const $ IntVal 0)) "end" "loop_body")
+            (If (Eq (Var (Variable "c")) (Const $ IntVal 0)) "end" "loop_body")
           ,
             Block
             "loop_body"
             (From "test")
             [
-              PlusEq  "a" (Const $ IntVal 3),
-              MinusEq "c"   (Const $ IntVal 1)
+              PlusEq  (Variable "a") (Const $ IntVal 3),
+              MinusEq (Variable "c") (Const $ IntVal 1)
             ]
             (Goto "test")
           ,
@@ -342,7 +334,7 @@ let ast = toAST
             "end"
             (From "loop_body")
             [
-              Swap "a" "c"
+              Swap (Variable "a") (Variable "c")
             ]
             Exit
           ]

@@ -113,9 +113,7 @@ reverseInst (From a b t)   = From t (reverseAST b) a
 reverseInst Skip           = Skip
 
 -- VarTab
-
 type VarTab = [(Var, Value)]
-
 update :: Var -> (Value -> Value -> Value) -> Value -> State VarTab ()
 update name op val = state $ \vtab -> ((), update' name op val vtab)
   where update' name op val vtab = case vtab of
@@ -281,7 +279,7 @@ eval (Not e)        = do
   case res of
     BoolVal b              -> return $ BoolVal (not b)
     _                      -> error "Notting an non-boolean."
-eval (Var name) = do --fromMaybe (IntVal 0) (lookup n )
+eval (Var name)     = do
   lu <- rd name
   case lu of
     Nothing -> do
@@ -317,22 +315,7 @@ ast =
         Swap   "v" "w",
         MinusEq "n" (Const $ IntVal 1)
       ]
-    (Or (Eq (Var "n") (Const $ IntVal 0)) (Gth (Var "v") (Var "w"))),
-    If (Gth (Var "w") (Const $ IntVal 0))
-      [
-        PlusEq "x" (Var "w"),
-        From
-          (Eq (Var "x") (Var "w"))
-          [
-            MinusEq "x" (Const $ IntVal 1)
-          ]
-        (Eq (Var "x") (Const $ IntVal 0)),
-        Swap "x" "w"
-      ]
-      [
-        Skip
-      ]
-    (Eq (Var "w") (Const $ IntVal 0))
+    (Or (Eq (Var "n") (Const $ IntVal 0)) (Gth (Var "v") (Var "w")))
   ]
 
 -- Main
