@@ -10,8 +10,12 @@ main = do
   if null args
   then putStrLn "Please supply a .rl file to interpret."
   else do -- Do interpretation
-  east <- fparse (head args)
-  case east of
-    Left err  -> print err
-    Right ast -> print $ runProgram ast
+    east <- fparse (head args)
+    case east of
+      Left parseErr -> print parseErr
+      Right ast
+        | res <- runProgram ast -> case res of
+          Left progErr  -> print progErr
+          Right vtab    -> print vtab
+
 
