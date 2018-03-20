@@ -32,6 +32,7 @@ import Control.Monad.Except
 --    assigned variable occurs in expression
 --    index must be integer
 --    indexing on non-lists? - can happen on both left- and right-hand side though
+--    perhaps with 'checkIndexing (Index name ind) = v <- rd name; case v of (IntVal _) -> throwError; (ListVal _) -> return ()'
 
 -- VarTab
 type VarTab    = [(String, Value)]
