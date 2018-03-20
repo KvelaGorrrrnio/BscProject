@@ -31,4 +31,7 @@ release: clean
 	@echo "Compressing release of project into release_${zipfile}..."
 	@zip -r "release_${zipfile}" ${nottest} > /dev/null
 
+run:
+	runhaskell rl.hs RL/test/fib.rl
+
 .PHONY: build rl srl clean test test-srl test-rl zip release

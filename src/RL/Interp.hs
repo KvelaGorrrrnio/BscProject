@@ -17,6 +17,22 @@ import Control.Monad.Except
 --   toString
 --   evaluation/interpretation
 
+-- Split up in statements and expressions
+-- TODO:
+-- Maybe errors should be so too?
+-- Expression errors:
+--    type errors when applying operator
+--    negative index?
+--    division by zero
+--    division has rest
+--    indexing on non-lists? - can happen on both left- and right-hand side though
+-- Instruction errors:
+--    variable being assigned different type than expression
+--    condition is not bool
+--    assigned variable occurs in expression
+--    index must be integer
+--    indexing on non-lists? - can happen on both left- and right-hand side though
+
 -- VarTab
 type VarTab    = [(String, Value)]
 
@@ -64,7 +80,7 @@ rd var = do
 
 -- Swap two identifiers
 swap :: Identifier -> Identifier -> ProgState ()
-swap var1 var2 = do
+swap var1 var2 = do -- hvorfor ikke bare bytte om på navnene lol?
   v1 <- rd var1
   v2 <- rd var2
   update var1 (\_ v -> v) v2
@@ -108,12 +124,20 @@ interpInst i = case i of
   Assignment var op exp
     | exp `contains` var -> throwError AssignedVarIsOperand
     | otherwise -> do
-      v <- eval exp -- TODO: Type check?
-      update var (applyBinOp binop) v
-      where binop = case op of
-              PlusEq  -> (+)
-              MinusEq -> (-)
-              XorEq   -> xor
+      v1 <- rd var
+      -- TODO: Type check?
+      case v1 of
+        IntValue _ -> do
+          v2 <- eval exp
+          case v2 of
+            IntValue _ -> update var (applyBinOp binop) v2
+                          where binop = case op of
+                                  PlusEq  -> (+)
+                                  MinusEq -> (-)
+                                  XorEq   -> xor
+            _          -> throwError $ WrongType "Int"
+        _        -> throwError AssignedValNotScalarValue
+      -- Type check done - but not in the prettiest way
   Swap var1 var2 -> swap var1 var2
   Skip      -> return ()
 
@@ -122,8 +146,14 @@ contains (Plus e1 e2)   var = contains e1 var || contains e2 var
 contains (Minus e1 e2)  var = contains e1 var || contains e2 var
 contains (Times e1 e2)  var = contains e1 var || contains e2 var
 contains (Divide e1 e2) var = contains e1 var || contains e2 var
-contains (Var (Variable n1)) (Variable n2) = n1==n2
--- TODO: Implement Index variation
+contains (Var var2) var1 = case var1 of
+  Variable n1 -> case var2 of
+    Variable n2 -> n1 == n2
+    Index n2 _  -> n1 == n2
+  Index n1 e1 -> case var2 of
+    Variable n2 -> n1 == n2
+    Index n2 e2 -> n1 == n2 -- TODO: Same name should be allowed for different indexes
+  -- TODO: Implement Index variation
 contains (Constant v) (Variable n2) = False
 contains (Parens e)     var = contains e var
 

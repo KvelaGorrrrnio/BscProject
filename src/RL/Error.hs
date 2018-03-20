@@ -6,6 +6,7 @@ type Type    = String
 data ProgError
   = IndexOnNonList VarName
   | IndexNotInteger
+  | AssignedValNotScalarValue
   | TestNotBoolean
   | AssertionNotBoolan
   | AssignedVarIsOperand
