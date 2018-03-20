@@ -38,7 +38,8 @@ import Control.Monad.Except
 type VarTab    = [(String, Value)]
 
 varTabToString :: VarTab -> String
-varTabToString = intercalate "\n" . map (\(n,v) -> n ++ " -> " ++ show v)
+varTabToString []   = "Clear."
+varTabToString vtab = (intercalate "\n" . map (\(n,v) -> n ++ " -> " ++ show v)) vtab
 
 type ProgState = StateT VarTab (Except ProgError)
 
@@ -97,6 +98,19 @@ interpAST []      = return ()
 interpAST (i:rst) = do
   interpInst i
   interpAST rst
+-- stripping vtab from here
+  vtab <- get
+  put $ strip vtab
+
+strip :: VarTab -> VarTab
+strip [] = []
+strip ((n,v):rst) = case v of
+  IntValue 0   -> strip rst
+  ListValue [] -> strip rst
+  ListValue vs -> let vs' = (reverse . takeWhile (\(IntValue n) -> n==0) . reverse) vs
+                    in if null vs' then strip rst else (n,ListValue vs'):strip rst
+  _            -> (n,v):strip rst
+-- to here - just remove if need be
 
 -- interpreting an instruction - CHANGED FROM RL
 interpInst :: Statement -> ProgState ()
