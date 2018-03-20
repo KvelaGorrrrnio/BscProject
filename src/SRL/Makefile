@@ -8,7 +8,7 @@ odir=o
 hidir=hi
 
 build: ${ofile}
-${ofile}: ${pfiles}
+${ofile}: ${main} ${pfiles}
 	@echo "Building ${mod}..."
 	@mkdir -p "$(dir ${ofile})"
 	@${cc} "${main}" -o "${ofile}" -odir "${odir}" -hidir "${hidir}" -i=../
