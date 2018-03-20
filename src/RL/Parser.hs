@@ -22,6 +22,11 @@ module RL.Parser
 , parseName
 ) where
 
+-- Tillad også kommentarer før første block
+-- Tillad måske kommentarer mellem statements?
+-- Tillad arbitrær indentering af gotos
+-- Tving 'label: [from]' til at være på sin egen linje (kan være det allerede er sådan)
+
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Expr as E
 import Text.Parsec.String (Parser, parseFromFile)

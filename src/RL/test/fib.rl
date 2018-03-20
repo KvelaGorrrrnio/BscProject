@@ -1,14 +1,20 @@
-init: entry ~ entry point
-  n ^= 30   ~ find the 30th fib number
+~ initialisation
+init: entry
+  n ^= 30
   w ^= 1
-goto loop ~ start the loop
+goto loop
+~ the loop body
 loop: fi (v = 0) init test
   v += w
   swap v w
   n -= 1
-goto test ~ do the test
+goto test
+~ test if loop is done
 test: from loop
-if (n = 0 || v > w) end loop ~ if not satisfied, continue loop
+  skip
+if (n = 0 || v > w) end loop
+~ when loop is done, exit
 end:  from test
-exit      ~ exit
+  skip
+exit
 
