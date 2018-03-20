@@ -1,5 +1,5 @@
 zipfile=robin.zip
-nottest=Makefile srl rl common
+nottest=Makefile rl.hs srl.hs srl rl
 
 build: rl srl
 
