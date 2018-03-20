@@ -1,4 +1,4 @@
-module RL.Interp ( runProgram, VarTab ) where
+module RL.Interp ( runProgram, VarTab, varTabToString ) where
 import RL.Error
 import RL.AST
 
@@ -19,6 +19,10 @@ import Control.Monad.Except
 
 -- VarTab
 type VarTab    = [(String, Value)]
+
+varTabToString :: VarTab -> String
+varTabToString = intercalate "\n" . map (\(n,v) -> n ++ " -> " ++ show v)
+
 type ProgState = StateT VarTab (Except ProgError)
 
 update :: Identifier -> (Value -> Value -> Value) -> Value -> ProgState ()

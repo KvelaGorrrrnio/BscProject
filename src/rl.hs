@@ -15,5 +15,5 @@ main = do
       Left parseErr  -> print parseErr
       Right ast | res <- runProgram ast -> case res of
         Left progErr -> print progErr
-        Right state  -> print state
+        Right state  -> putStrLn $ varTabToString state
 
