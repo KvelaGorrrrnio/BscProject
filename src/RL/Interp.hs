@@ -5,7 +5,6 @@ import Data.Bits
 import RL.Parser
 import RL.AST
 import Control.Monad.State
-import Control.Monad.Trans.Except
 import Control.Monad.Except
 
 -- When changing anything;
