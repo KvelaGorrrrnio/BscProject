@@ -28,7 +28,7 @@ update (Variable name) op val = do
   st <- get
   case lookup name st of
     Nothing -> do
-      wr name (IntValue 0)
+      put $ (name, IntValue 0):st
       update (Variable name) op val
     Just _  -> put $ update' (Variable name) op val st
 -- TODO: Implement Index variation
@@ -38,14 +38,15 @@ update' (Variable name) op val vtab = case vtab of
             | otherwise -> (n,v) : update' (Variable name) op val rst
 -- TODO: Implement Index variation
 
+-- Read an identifier
 rd :: Identifier -> ProgState Value
 rd var = do
   st <- get
   case var of
     Variable name -> case lookup name st of
         Nothing -> do
-          wr name (IntValue 0)
-          rd (Variable name)
+          put $ (name, IntValue 0):st
+          rd var
         Just v  -> return v
     -- TODO: Implement Index variation properly
     Index name e -> do
@@ -53,21 +54,19 @@ rd var = do
       case ind of
         IntValue i -> case lookup name st of
           Nothing -> do
-            wr name (ListValue $ replicate (i+1) (IntValue 0))
-            rd (Variable name)
+            put $ (name, ListValue $ replicate (i+1) (IntValue 0)):st
+            rd var
           Just (ListValue lst) -> return (lst !! i)
           _ -> throwError "Indexing on non-list."
         _ -> throwError "Index must be an integer."
 
+-- Swap two identifiers
 swap :: Identifier -> Identifier -> ProgState ()
 swap var1 var2 = do
   v1 <- rd var1
   v2 <- rd var2
   update var1 (\_ v -> v) v2
   update var2 (\_ v -> v) v1
-
-wr :: String -> Value -> ProgState ()
-wr n v = StateT $ \vtab -> return ((),(n,v):vtab)
 
 -- Interpreting engine --
 runProgram :: AST -> Either ProgError VarTab
