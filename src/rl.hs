@@ -1,7 +1,6 @@
 import System.Environment
 import RL.Parser
 import RL.Interp
-import RL.AST -- ideally, the parser returns a correct AST
 -- Main
 
 main = do
@@ -15,6 +14,5 @@ main = do
   case east of
     Left err -> print err
     Right ast -> do
-      let ast' = toAST ast
-      print $ runProgram ast'
+      print $ runProgram ast
 

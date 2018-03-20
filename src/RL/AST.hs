@@ -34,9 +34,9 @@ data Goto
   | Exit
   deriving Show
 
--- Common
 type Label = String
 
+-- Common
 data Identifier
   = Variable String
   | Index String Expression

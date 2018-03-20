@@ -28,11 +28,11 @@ import Text.Parsec.String (Parser, parseFromFile)
 import RL.AST
 
 -- Interface
-fparse :: String -> IO (Either P.ParseError [Block])
-fparse = parseFromFile (parseBlocks <* ws <* P.eof)
+fparse :: String -> IO (Either P.ParseError AST)
+fparse = parseFromFile (toAST <$> parseBlocks <* ws <* P.eof)
 
-parse :: String -> Either P.ParseError [Block]
-parse = P.parse (parseBlocks <* ws <* P.eof) ""
+parse :: String -> Either P.ParseError AST
+parse = P.parse (toAST <$> parseBlocks <* ws <* P.eof) ""
 
 -- Safe parse
 sparse :: Show a => Parser a -> String -> String
