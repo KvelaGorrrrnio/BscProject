@@ -4,6 +4,9 @@ import Data.Maybe
 import Data.Bits
 import RL.Parser
 import RL.AST
+import Control.Monad.State
+import Control.Monad.Trans.Except
+import Control.Monad.Except
 
 -- When changing anything;
 -- AST types
@@ -52,7 +55,7 @@ instsToString :: [Statement] -> String
 instsToString = intercalate "\n  " . map instToString
 
 instToString :: Statement -> String
-instToString (Swap (Variable n1) (Variable n2))  = "swap " ++ n1 ++ " " ++ n2
+instToString (Swap var1 var2) = "swap " ++ varToString var1 ++ " " ++ varToString var2
 instToString (Assignment (Variable n) PlusEq  e) = n ++ " += " ++ expToString e
 instToString (Assignment (Variable n) MinusEq e) = n ++ " += " ++ expToString e
 instToString (Assignment (Variable n) XorEq   e) = n ++ " += " ++ expToString e
@@ -134,25 +137,57 @@ reverseOp MinusEq = PlusEq
 reverseOp XorEq   = XorEq
 
 -- VarTab
-type VarTab = [(String, Value)]
+type VarTab    = [(String, Value)]
+type ProgState = StateT VarTab (Except String)
 
-update :: Identifier -> (Value -> Value -> Value) -> Value -> VarTab -> VarTab
-update (Variable name) op val vtab = case vtab of
+update :: Identifier -> (Value -> Value -> Value) -> Value -> ProgState ()
+update (Variable name) op val = do
+  st <- get
+  case lookup name st of
+    Nothing -> do
+      wr name (IntValue 0)
+      update (Variable name) op val
+    Just _  -> put $ update' (Variable name) op val st
+-- TODO: Implement Index variation
+
+update' (Variable name) op val vtab = case vtab of
   (n,v):rst | n == name -> (n, op v val) : rst
-            | otherwise -> (n,v) : update (Variable name) op val rst
-  []                    -> error "Variable not defined."
+            | otherwise -> (n,v) : update' (Variable name) op val rst
+-- TODO: Implement Index variation
 
-bind :: String -> Value -> VarTab -> VarTab
-bind name value vtab = (name,value):vtab
+rd :: Identifier -> ProgState Value
+rd var = do
+  st <- get
+  case var of
+    Variable name -> case lookup name st of
+        Nothing -> do
+          wr name (IntValue 0)
+          rd (Variable name)
+        Just v  -> return v
+    -- TODO: Implement Index variation properly
+    Index name e -> do
+      ind <- eval e
+      case ind of
+        IntValue i -> case lookup name st of
+          Nothing -> do
+            wr name (ListValue $ replicate (i+1) (IntValue 0))
+            rd (Variable name)
+          Just (ListValue lst) -> return (lst !! i)
+          _ -> throwError "Indexing on non-list."
+        _ -> throwError "Index must be an integer."
+
+swap :: Identifier -> Identifier -> ProgState ()
+swap var1 var2 = do
+  v1 <- rd var1
+  v2 <- rd var2
+  update var1 (\_ v -> v) v2
+  update var2 (\_ v -> v) v1
+
+wr :: String -> Value -> ProgState ()
+wr n v = StateT $ \vtab -> return ((),(n,v):vtab)
 
 varTabToString :: VarTab -> String
 varTabToString = intercalate "\n" . map (\(n,v) -> n ++ " -> " ++ show v)
-
-swap :: String -> String -> VarTab -> VarTab
-swap name1 name2 vtab = case (lookup name1 vtab, lookup name2 vtab) of
-  (Just v1, Just v2) -> (update (Variable name1) (\_ v -> v) v2 . update (Variable name2) (\_ v -> v) v1) vtab
-  (Nothing, Just _ ) -> error $ name1 ++ " not defined."
-  (Just _,  Nothing) -> error $ name2 ++ " not defined."
 
 -- LabTab
 type LabTab = [(Label, Int)]
@@ -166,94 +201,119 @@ genLabels (AST _ bs) =
 -- Interpreting engine --
 
 -- interpreting a program
-interpAST :: AST -> VarTab -> VarTab
-interpAST ast vtab = do
+interpAST :: AST -> ProgState ()
+interpAST ast = do
   let labels = genLabels ast
-  interpAST' ast vtab labels
+  interpAST' ast labels
 
-interpAST' :: AST -> VarTab -> LabTab -> VarTab
-interpAST' ast vtab ltab = case ast of
-  AST _ [] -> vtab
-  AST _ (Block l _ [] t:_) -> error $ "Empty block: '" ++ l ++ "'."
-  AST _ (Block l _ insts t:_) -> case t of
-    Exit    -> vtab'
-    Goto lt -> interpAST' (goto l lt ast ltab) vtab' ltab
-    If exp ltt ltf ->
-      case eval exp vtab' of
-        BoolValue True  -> interpAST' (goto l ltt ast ltab) vtab' ltab
-        BoolValue False -> interpAST' (goto l ltf ast ltab) vtab' ltab
-        _             -> error "Type error in if then else"
-    where vtab' = interpInsts insts vtab
+interpAST' :: AST -> LabTab -> ProgState ()
+interpAST' ast ltab = case ast of
+  AST _ [] -> return ()
+  AST _ (Block l _ insts t:_) -> do
+    interpInsts insts
+    case t of
+      Exit    -> return ()
+      Goto lt -> interpAST' (goto l lt ast ltab) ltab
+      If exp ltt ltf -> do
+        t <- eval exp
+        case t of
+          BoolValue True  -> interpAST' (goto l ltt ast ltab) ltab
+          BoolValue False -> interpAST' (goto l ltf ast ltab) ltab
+          _               -> throwError "Test was expected to be boolean."
 
 -- interpreting list of instructions
-interpInsts :: [Statement] -> VarTab -> VarTab
-interpInsts insts vtab = foldl (flip interpInst) vtab insts
+interpInsts :: [Statement] -> ProgState ()
+interpInsts (i:insts) = do
+  interpInst i
+  interpInsts insts
+interpInsts [] = return ()
 
 -- interpreting an instruction
-interpInst :: Statement -> VarTab -> VarTab
-interpInst i vtab = case i of
-  Assignment (Variable name) op exp -> case lookup name vtab of
-    Nothing -> (interpInst i . bind name (IntValue 0)) vtab
-    Just _  -> update (Variable name) (apply binop) (eval exp vtab) vtab
-    where binop = case op of
-            PlusEq  -> (+)
-            MinusEq -> (-)
-            XorEq   -> xor
-  Swap (Variable name1) (Variable name2) -> swap name1 name2 vtab
-  Skip      -> vtab
+interpInst :: Statement -> ProgState ()
+interpInst i = case i of
+  Assignment var op exp
+    | exp `contains` var -> throwError "Expression contains the variable being assigned."
+    | otherwise -> do
+      v <- eval exp -- TODO: Type check?
+      update var (applyBinOp binop) v
+      where binop = case op of
+              PlusEq  -> (+)
+              MinusEq -> (-)
+              XorEq   -> xor
+  Swap var1 var2 -> swap var1 var2
+  Skip      -> return ()
 
-apply :: (Int -> Int -> Int) -> Value -> Value -> Value
-apply op (IntValue n) (IntValue m) = IntValue $ op n m
-apply op _ _                   = error "Operands must be integers."
+contains :: Expression -> Identifier -> Bool
+contains (Plus e1 e2)   var = contains e1 var || contains e2 var
+contains (Minus e1 e2)  var = contains e1 var || contains e2 var
+contains (Times e1 e2)  var = contains e1 var || contains e2 var
+contains (Divide e1 e2) var = contains e1 var || contains e2 var
+contains (Var (Variable n1)) (Variable n2) = n1==n2
+-- TODO: Implement Index variation
+contains (Constant v) (Variable n2) = False
+contains (Parens e)     var = contains e var
+
+applyBinOp :: (Int -> Int -> Int) -> Value -> Value -> Value
+applyBinOp op (IntValue n) (IntValue m) = IntValue $ op n m
 
 -- evaluating an expression
-eval :: Expression -> VarTab -> Value
-eval (Plus e1 e2) vtab  = case (eval e1 vtab, eval e2 vtab) of
-  (IntValue n, IntValue m)     -> IntValue   $ n + m
-  _                        -> error "Adding two incompatible types."
-eval (Minus e1 e2) vtab  = case (eval e1 vtab, eval e2 vtab) of
-  (IntValue n, IntValue m)     -> IntValue   $ n - m
-  _                        -> error "Subtracting two incompatible types."
-eval (Times e1 e2) vtab  = case (eval e1 vtab, eval e2 vtab) of
-  (IntValue n, IntValue m)     -> IntValue   $ n * m
-  _                        -> error "Subtracting two incompatible types."
-eval (Divide e1 e2) vtab = case (eval e1 vtab, eval e2 vtab) of
-  (IntValue n, IntValue m)     -> IntValue   $ n `div` m
-  _                        -> error "Subtracting two incompatible types."
-eval (Eq  e1 e2) vtab    = case (eval e1 vtab, eval e2 vtab) of
-  (IntValue n, IntValue m)     -> BoolValue $ n == m
-  _                        -> error "Comparing two incompatible types."
-eval (Lth e1 e2) vtab    = case (eval e1 vtab, eval e2 vtab) of
-  (IntValue n, IntValue m)     -> BoolValue $ n < m
-  _                        -> error "Comparing two incompatible types."
-eval (Gth e1 e2) vtab    = case (eval e1 vtab, eval e2 vtab) of
-  (IntValue n, IntValue m)     -> BoolValue $ n > m
-  _                        -> error "Comparing two incompatible types."
-eval (And e1 e2) vtab    = case (eval e1 vtab, eval e2 vtab) of
-  (BoolValue b1, BoolValue b2)     -> BoolValue $ b1 && b2
-  _                        -> error "Comparing two incompatible types."
-eval (Or e1 e2) vtab     = case (eval e1 vtab, eval e2 vtab) of
-  (BoolValue b1, BoolValue b2)     -> BoolValue $ b1 || b2
-  _                        -> error "Comparing two incompatible types."
-eval (Not e) vtab        = case eval e vtab of
-  BoolValue b                -> BoolValue $ not b
-  _                        -> error "Comparing two incompatible types."
-eval (Var  (Variable n)) vtab = fromMaybe (IntValue 0) (lookup n vtab)
-eval (Constant v) _ = v
-eval (Parens e) vtab = eval e vtab
-
--- Helper to test implementation
-testAST :: AST -> VarTab -> IO ()
-testAST ast sstate = do
-  let res  = interpAST ast sstate
-      ast' = reverseAST ast
-      res' = interpAST ast' res
-  putStrLn "Starting state:"
-  putStrLn $ varTabToString sstate ++ "\n"
-  putStrLn $ astToString ast
-  putStrLn "\nResult:"
-  putStrLn $ varTabToString res
-  putStrLn "\n---- Reversed ----\n"
-  putStrLn $ astToString ast'
-  putStrLn "\nResult:"
-  putStrLn $ varTabToString res'
+eval :: Expression -> ProgState Value
+eval (Plus e1 e2)  = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (IntValue n,
+     IntValue m) -> return $ IntValue (n + m)
+    _            -> throwError "Add: Types must be integers."
+eval (Minus e1 e2) = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (IntValue n,
+     IntValue m) -> return $ IntValue (n - m)
+    _            -> throwError "Subtract: Types must be integers."
+eval (Times e1 e2) = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (IntValue n,
+     IntValue m) -> return $ IntValue (n * m)
+    _            -> throwError "Times: Types must be integers."
+eval (Divide e1 e2) = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (IntValue n,
+     IntValue m) | m == 0      -> throwError "Division by zero."
+                 | mod n m ==0 -> return $ IntValue (div n m)
+                 | otherwise   -> throwError "Division must result have no rest."
+    _            -> throwError "Divide: Types must be integers."
+eval (Eq e1 e2) = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (IntValue n,
+     IntValue m) -> return $ BoolValue (n == m)
+    _            -> throwError "Equality: Types must be integers."
+eval (Lth e1 e2) = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (IntValue n,
+     IntValue m) -> return $ BoolValue (n < m)
+    _            -> throwError "Less than: Types must be integers."
+eval (Gth e1 e2) = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (IntValue n,
+     IntValue m) -> return $ BoolValue (n > m)
+    _            -> throwError "Greater than: Types must be integers."
+eval (And e1 e2) = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (BoolValue p,
+     BoolValue q) -> return $ BoolValue (p && q)
+    _            -> throwError "And: Types must be booleans."
+eval (Or e1 e2) = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (BoolValue p,
+     BoolValue q) -> return $ BoolValue (p || q)
+    _            -> throwError "And: Types must be booleans."
+eval (Var v) = rd v
+eval (Constant v)  = return v
+eval (Parens e) = eval e
