@@ -1,4 +1,5 @@
 module RL.Interp ( runProgram, VarTab ) where
+import RL.Error
 import RL.AST
 
 -- Working on lists
@@ -16,12 +17,9 @@ import Control.Monad.Except
 --   toString
 --   evaluation/interpretation
 
--- Error type - Can be changed to specified datatype later in its own file
-type ProgError = String
-
 -- VarTab
 type VarTab    = [(String, Value)]
-type ProgState = StateT VarTab (Except String)
+type ProgState = StateT VarTab (Except ProgError)
 
 update :: Identifier -> (Value -> Value -> Value) -> Value -> ProgState ()
 update (Variable name) op val = do
@@ -57,8 +55,8 @@ rd var = do
             put $ (name, ListValue $ replicate (i+1) (IntValue 0)):st
             rd var
           Just (ListValue lst) -> return (lst !! i)
-          _ -> throwError "Indexing on non-list."
-        _ -> throwError "Index must be an integer."
+          _ -> throwError $ IndexOnNonList name
+        _ -> throwError IndexNotInteger
 
 -- Swap two identifiers
 swap :: Identifier -> Identifier -> ProgState ()
@@ -91,7 +89,7 @@ interpAST' ast ltab = case ast of
         case t of
           BoolValue True  -> interpAST' (goto l ltt ast ltab) ltab
           BoolValue False -> interpAST' (goto l ltf ast ltab) ltab
-          _               -> throwError "Test was expected to be boolean."
+          _               -> throwError TestNotBoolean
 
 -- interpreting list of instructions
 interpInsts :: [Statement] -> ProgState ()
@@ -104,7 +102,7 @@ interpInsts [] = return ()
 interpInst :: Statement -> ProgState ()
 interpInst i = case i of
   Assignment var op exp
-    | exp `contains` var -> throwError "Expression contains the variable being assigned."
+    | exp `contains` var -> throwError AssignedVarIsOperand
     | otherwise -> do
       v <- eval exp -- TODO: Type check?
       update var (applyBinOp binop) v
@@ -135,57 +133,57 @@ eval (Plus e1 e2)  = do
   case (v1,v2) of
     (IntValue n,
      IntValue m) -> return $ IntValue (n + m)
-    _            -> throwError "Add: Types must be integers."
+    _            -> throwError $ WrongType "Int"
 eval (Minus e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2
   case (v1,v2) of
     (IntValue n,
      IntValue m) -> return $ IntValue (n - m)
-    _            -> throwError "Subtract: Types must be integers."
+    _            -> throwError $ WrongType "Int"
 eval (Times e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2
   case (v1,v2) of
     (IntValue n,
      IntValue m) -> return $ IntValue (n * m)
-    _            -> throwError "Times: Types must be integers."
+    _            -> throwError $ WrongType "Int"
 eval (Divide e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2
   case (v1,v2) of
     (IntValue n,
-     IntValue m) | m == 0      -> throwError "Division by zero."
+     IntValue m) | m == 0      -> throwError DivByZero
                  | mod n m ==0 -> return $ IntValue (div n m)
-                 | otherwise   -> throwError "Division must result have no rest."
-    _            -> throwError "Divide: Types must be integers."
+                 | otherwise   -> throwError DivHasRest
+    _            -> throwError $ WrongType "Int"
 eval (Eq e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2
   case (v1,v2) of
     (IntValue n,
      IntValue m) -> return $ BoolValue (n == m)
-    _            -> throwError "Equality: Types must be integers."
+    _            -> throwError $ WrongType "Int"
 eval (Lth e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2
   case (v1,v2) of
     (IntValue n,
      IntValue m) -> return $ BoolValue (n < m)
-    _            -> throwError "Less than: Types must be integers."
+    _            -> throwError $ WrongType "Int"
 eval (Gth e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2
   case (v1,v2) of
     (IntValue n,
      IntValue m) -> return $ BoolValue (n > m)
-    _            -> throwError "Greater than: Types must be integers."
+    _            -> throwError $ WrongType "Int"
 eval (And e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2
   case (v1,v2) of
     (BoolValue p,
      BoolValue q) -> return $ BoolValue (p && q)
-    _            -> throwError "And: Types must be booleans."
+    _             -> throwError $ WrongType "Bool"
 eval (Or e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2
   case (v1,v2) of
     (BoolValue p,
      BoolValue q) -> return $ BoolValue (p || q)
-    _            -> throwError "And: Types must be booleans."
+    _             -> throwError $ WrongType "Bool"
 eval (Var v) = rd v
 eval (Constant v)  = return v
 eval (Parens e) = eval e
