@@ -1,27 +1,27 @@
 zipfile=robin.zip
-nottest=Makefile rl.hs srl.hs srl rl
+nottest=Makefile rl.hs srl.hs SRL RL
 
 build: rl srl
 
 rl:
-	@$(MAKE) -C rl
+	@$(MAKE) -C RL
 
 srl:
-	@$(MAKE) -C srl
+	@$(MAKE) -C SRL
 
 clean:
-	@$(MAKE) -C rl clean
-	@$(MAKE) -C srl clean
+	@$(MAKE) -C RL clean
+	@$(MAKE) -C SRL clean
 	@rm -rf ${zipfile} bin
 
 test:
 	@./test/run_tests.sh -d
 
 test-rl:
-	@./test/run_tests.sh rl -d
+	@./test/run_tests.sh RL -d
 
 test-srl:
-	@./test/run_tests.sh srl -d
+	@./test/run_tests.sh SRL -d
 
 zip: clean
 	@echo "Compressing project into ${zipfile}..."
