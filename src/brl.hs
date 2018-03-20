@@ -2,7 +2,6 @@ import System.Environment
 import RL.Parser
 import RL.Interp
 import RL.Inversion
-import RL.ToString
 -- Main
 
 main = do
@@ -19,15 +18,10 @@ main = do
                   res <- runProgram ast [] -> case res of
         Left progErr -> print progErr
         Right state  -> do
-          putStrLn $ astToString ast ++ "\n"
-          putStrLn "Results:"
           putStrLn $ varTabToString state
           case runProgram inv state of
             Left progErr' -> print progErr'
-            Right state'  -> do
-              putStrLn "\n---- inverse ----\n"
-              putStrLn $ astToString inv ++ "\n"
-              putStrLn "Results:"
-              putStrLn $ varTabToString state'
+            Right state'  -> putStrLn $ "---- inverse ----\n"
+                                        ++ varTabToString state'
 
 

@@ -1,0 +1,65 @@
+\documentclass[12pt,a4paper]{article}
+
+% Fetch preamble
+\usepackage{mystyle}
+
+% Title
+\title{
+    \vspace{5cm}
+    \Huge{COURSE \\ }
+    \Large{Assignment number}
+    \linebreak \\
+    University of Copenhagen - Department of Computer Science \\
+}
+
+% Author
+\author{
+    \Large{Lars Vadgaard - hnd531}
+}
+
+\lstset{
+  language=C,
+  basicstyle=\small,
+  breaklines=true
+  }
+
+%----------------------------------------------------
+% Forside
+%----------------------------------------------------
+\begin{document}
+% Frontpage
+\AddToShipoutPicture*{\put(0,0){\includegraphics*[viewport=0 0 700 600]{\string~/grive/uni/tex/front/ku-farve.pdf}}}
+\AddToShipoutPicture*{\put(0,602){\includegraphics*[viewport=0 600 700 1600]{\string~/grive/uni/tex/front/ku-farve.pdf}}}
+\AddToShipoutPicture*{\put(0,0){\includegraphics*{\string~/grive/uni/tex/front/ku-en.pdf}}}
+
+\clearpage\maketitle
+\thispagestyle{empty}
+
+\newpage
+\setcounter{page}{1}
+
+\begin{tabular}{|p{7cm}|p{7cm}|}
+  \hline
+
+\begin{lstlisting}
+if t then b1 else b2 a
+\end{lstlisting}
+&
+\begin{lstlisting}
+l1: [from]
+if t then lb1 lb2
+lb1: from l1
+  b1
+goto ifend
+lb2: from l1
+  b2
+goto ifend
+ifend: fi a bl1 bl2
+  ..
+\end{lstlisting}
+\\
+
+  \hline
+\end{tabular}
+
+\end{document}

@@ -1,7 +1,7 @@
 ~ Fibonacci program
 ~ Written in RL
 init: entry ~ Entry
-  n ^= 5 ~ 30
+  n ^= 30 ~ 30
   w ^= 1
 goto loop
 

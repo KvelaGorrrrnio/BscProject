@@ -104,13 +104,15 @@ reverseAST :: AST -> AST
 reverseAST = map reverseInst . reverse
 
 reverseInst :: Inst -> Inst
-reverseInst (Swap  n1 n2)  = Swap n1 n2
-reverseInst (PlusEq  n e)  = MinusEq n e
-reverseInst (MinusEq n e)  = PlusEq  n e
-reverseInst (XOREq   n e)  = XOREq   n e
-reverseInst (If t b1 b2 a) = If a (reverseAST b1) (reverseAST b2) t
-reverseInst (From a b t)   = From t (reverseAST b) a
-reverseInst Skip           = Skip
+reverseInst (Swap  n1 n2)     = Swap n1 n2
+reverseInst (If t b1 b2 a)    = If a (reverseAST b1) (reverseAST b2) t
+reverseInst (From a b t)      = From t (reverseAST b) a
+reverseInst Skip              = Skip
+reverseInst (Assign var op e) = Assign var invop e
+  where invop = case op of
+          MinusEq -> PlusEq
+          PlusEq  -> MinusEq
+          XorEq   -> XorEq
 
 -- VarTab
 type VarTab = [(Var, Value)]

@@ -12,6 +12,8 @@ Overvej at strippe result state, så det ikke indeholder zero-bindings.
 
 Definer syntax highlighting
 
+Gør Expression, Vartab fælles
+
 
 Mappestruktur:
 src

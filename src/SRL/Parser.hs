@@ -18,6 +18,23 @@ module SRL.Parser
 , parseName
 ) where
 
+-- TODO:
+-- Kunne godt tænke mig, at man kan have frie linjer, hvor man har lyst. Ville eksempelvis gerne kunne lave et program:
+--
+--   ~ Fibonacci program
+--   ~ Written in SRL
+--
+--   n ^= 16
+--   w ^= 1
+--   from (v = 0)
+--   do
+--     v += w
+--     swap v w
+--     n -= 1
+--   until (n = 0 || v > w)
+--
+-- Hvilke begrænsninger er der ellers?
+
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Expr as E
 import Text.Parsec.String (Parser, parseFromFile)
@@ -38,7 +55,7 @@ sparse parser code = case P.parse (parser <* ws <* P.eof) "" code of
 
 -- Multiple statements
 parseStatements :: Parser AST
-parseStatements = AST <$>P.many (ws *> parseStatement <* eol)
+parseStatements = P.many (ws *> parseStatement <* eol)
 
 -- Statements
 parseStatement :: Parser Statement

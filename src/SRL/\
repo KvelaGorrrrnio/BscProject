@@ -9,7 +9,7 @@ astToString (AST _ blocks) = (intercalate "\n" . map blockToString) blocks
 blockToString :: Block -> String
 blockToString (Block l f insts t) =
   labelToString l     ++ " "  ++
-  fromToString  f     ++ "\n" ++
+  fromToString  f     ++ "\n  " ++
   instsToString insts ++
   toToString t
 
@@ -24,8 +24,7 @@ fromToString (Fi e l1 l2) = case e of
 fromToString Entry = "entry"
 
 instsToString :: [Statement] -> String
-instsToString [] = ""
-instsToString insts = "  " ++ (intercalate "\n  " . map instToString) insts ++ "\n"
+instsToString = intercalate "\n  " . map instToString
 
 instToString :: Statement -> String
 instToString (Swap var1 var2) = "swap " ++ varToString var1 ++ " " ++ varToString var2

@@ -8,8 +8,10 @@ module SRL.AST
 ) where
 
 -- SRL specific
-data AST = AST [Statement]
-  deriving Show
+--data AST = AST [Statement] -- Change to just type synonym?
+--  deriving Show
+type AST   = [Statement]
+type Block = [Statement]
 
 -- Common
 data Identifier
