@@ -1,9 +1,7 @@
 import System.Environment
 import RL.Parser
 import RL.Interp
-import RL.AST
-import Control.Monad.State
-import Control.Monad.Except
+import RL.AST -- ideally, the parser returns a correct AST
 -- Main
 
 main = do
@@ -18,5 +16,5 @@ main = do
     Left err -> print err
     Right ast -> do
       let ast' = toAST ast
-      print $ (runExcept . execStateT (interpAST ast')) []
+      print $ runProgram ast'
 

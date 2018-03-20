@@ -1,17 +1,23 @@
-module RL.Interp where
-import Data.List
-import Data.Maybe
-import Data.Bits
-import RL.Parser
+module RL.Interp ( runProgram, VarTab ) where
 import RL.AST
+
+-- Working on lists
+import Data.List
+-- Bitwise XOR
+import Data.Bits
+
+-- StateT and Except monads
 import Control.Monad.State
 import Control.Monad.Except
 
 -- When changing anything;
--- AST types
--- Reversion
--- toString
--- evaluation/interpretation
+--   AST types
+--   Reversion
+--   toString
+--   evaluation/interpretation
+
+-- Error type - Can be changed to specified datatype later in its own file
+type ProgError = String
 
 -- VarTab
 type VarTab    = [(String, Value)]
@@ -64,6 +70,8 @@ wr :: String -> Value -> ProgState ()
 wr n v = StateT $ \vtab -> return ((),(n,v):vtab)
 
 -- Interpreting engine --
+runProgram :: AST -> Either ProgError VarTab
+runProgram ast = (runExcept . execStateT (interpAST ast)) []
 
 -- interpreting a program
 interpAST :: AST -> ProgState ()
