@@ -17,6 +17,22 @@ import Control.Monad.Except
 --   toString
 --   evaluation/interpretation
 
+-- Split up in statements and expressions
+-- TODO:
+-- Maybe errors should be so too?
+-- Expression errors:
+--    type errors when applying operator
+--    negative index?
+--    division by zero
+--    division has rest
+--    indexing on non-lists? - can happen on both left- and right-hand side though
+-- Instruction errors:
+--    variable being assigned different type than expression
+--    condition is not bool
+--    assigned variable occurs in expression
+--    index must be integer
+--    indexing on non-lists? - can happen on both left- and right-hand side though
+
 -- VarTab
 type VarTab    = [(String, Value)]
 
