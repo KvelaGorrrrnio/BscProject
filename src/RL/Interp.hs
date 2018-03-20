@@ -71,8 +71,8 @@ swap var1 var2 = do
   update var2 (\_ v -> v) v1
 
 -- Interpreting engine --
-runProgram :: AST -> Either ProgError VarTab
-runProgram ast = (runExcept . execStateT (interpAST ast)) []
+runProgram :: AST -> (VarTab -> Either ProgError VarTab)
+runProgram ast = runExcept . execStateT (interpAST ast)
 
 -- interpreting a program
 interpAST :: AST -> ProgState ()

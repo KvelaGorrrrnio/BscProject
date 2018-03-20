@@ -1,9 +1,9 @@
-module RL.Reversion ( reverseAST ) where
+module RL.Inversion ( inverseAST ) where
 import RL.AST
 
 -- Reversion
-reverseAST :: AST -> AST
-reverseAST (AST [] blocks) = AST [] $ (map reverseBlock . reverse) blocks
+inverseAST :: AST -> AST
+inverseAST (AST [] blocks) = AST [] $ (map reverseBlock . reverse) blocks
 
 reverseBlock :: Block -> Block
 reverseBlock (Block l f insts t) = do

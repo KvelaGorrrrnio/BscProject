@@ -1,6 +1,7 @@
 import System.Environment
 import RL.Parser
 import RL.Interp
+import RL.Inversion
 -- Main
 
 main = do
@@ -13,7 +14,14 @@ main = do
     east <- fparse (head args)
     case east of
       Left parseErr  -> print parseErr
-      Right ast | res <- runProgram ast -> case res of
+      Right ast | inv <- inverseAST ast,
+                  res <- runProgram ast [] -> case res of
         Left progErr -> print progErr
-        Right state  -> putStrLn $ varTabToString state
+        Right state  -> do
+          putStrLn $ varTabToString state
+          case runProgram inv state of
+            Left progErr' -> print progErr'
+            Right state'  -> putStrLn $ "---- inverse ----\n"
+                                        ++ varTabToString state'
+
 
