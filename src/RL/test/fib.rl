@@ -9,6 +9,6 @@ loop: fi (v = 0) init test
   goto test
 test: from loop
   if (n = 0 || v > w) end loop
-end: from test
+end:  from test
   exit
 
