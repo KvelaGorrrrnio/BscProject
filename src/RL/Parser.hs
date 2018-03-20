@@ -46,7 +46,7 @@ parseBlocks = P.many1 parseBlock
 
 -- Block
 parseBlock :: Parser Block
-parseBlock =  Block <$> (parseName <* P.char ':') <*> (ws *> parseFrom) <*> (ws *> P.option [] parseStatements) <*> (ws *> parseGoto <* ws)
+parseBlock =  Block <$> (parseName <* P.char ':') <*> (ws *> parseFrom <* ws <* eol) <*> parseStatements <*> parseGoto <* ws <* P.many1 eol
 
 -- Goto
 parseGoto :: Parser Goto
@@ -54,10 +54,6 @@ parseGoto = P.try parseGoto' P.<|> P.try parseIf P.<|> parseExit
   where parseGoto' = P.string "goto" *> (Goto <$> parseName)
         parseIf    = P.string "if"   *> (If <$> parseExpression <*> parseName <*> parseName)
         parseExit = const Exit <$> P.string "exit"
-
--- Paranthesis
-parens :: Parser Expression -> Parser Expression
-parens e = P.char '(' *> e <* P.char ')'
 
 -- From
 parseFrom :: Parser From
@@ -68,32 +64,42 @@ parseFrom = P.try parseFrom' P.<|> P.try parseFi P.<|> parseEntry
 
 -- Multiple statements
 parseStatements :: Parser [Statement]
-parseStatements = P.many parseStatement
+parseStatements = P.many (ws *> parseStatement <* eol)
 
 -- Statements
 parseStatement :: Parser Statement
-parseStatement =  P.try parseSkip P.<|> P.try parseSwap
-            P.<|> P.try parsePush P.<|> P.try parsePop
-            P.<|> P.try parseAssignment
-  where parseSkip = const Skip <$> P.string "skip" <* ws
-        parseSwap = P.string "swap" *> ws *> (Swap <$> parseIdentifier <*> parseIdentifier) <* ws
-        parsePush = P.string "push" *> ws *> (Push <$> parseIdentifier <*> parseIdentifier) <* ws
-        parsePop  = P.string "pop"  *> ws *> (Pop  <$> parseIdentifier <*> parseIdentifier) <* ws
+parseStatement =  (P.try parseAssignment P.<|> P.try parseSkip
+                   P.<|> P.try parseSwap P.<|> P.try parsePush
+                   P.<|> P.try parsePop)
+  where parseSkip = const Skip <$> P.string "skip"
+        parseSwap = P.string "swap" *> ws *> (Swap <$> parseIdentifier <*> parseIdentifier)
+        parsePush = P.string "push" *> ws *> (Push <$> parseIdentifier <*> parseIdentifier)
+        parsePop  = P.string "pop"  *> ws *> (Pop  <$> parseIdentifier <*> parseIdentifier)
 
 parseAssignment :: Parser Statement
-parseAssignment = Assignment <$> (P.try parseIndex P.<|> parseVariable) <*> parseAssignOperator <*> parseExpression
-  where parseAssignOperator = ws *> (parsePlusEq P.<|> parseMinusEq P.<|> parseXorEq) <* ws
+parseAssignment = Assignment <$> (P.try parseIndex P.<|> parseVariable) <*> parseAssignOperator <*> (ws *> parseExpression)
+  where parseAssignOperator = ws *> (parsePlusEq P.<|> parseMinusEq P.<|> parseXorEq)
         parsePlusEq  = const PlusEq  <$> P.string "+="
         parseMinusEq = const MinusEq <$> P.string "-="
         parseXorEq   = const XorEq   <$> P.string "^="
 
+-- Comments
+cmt :: Parser String
+cmt = P.char '~' *> (P.manyTill P.anyChar P.newline)
+
+-- End of Line
+eol :: Parser ()
+eol = do
+  P.skipMany1 cmt P.<|> (const () <$>P.newline)
+  return ()
+
 -- Whitespace
 ws :: Parser ()
-ws = P.skipMany P.space P.<?> ""
+ws = P.skipMany (P.oneOf " \t") P.<?> ""
 
 -- Expression
 parseExpression :: Parser Expression
-parseExpression = P.try parseExpressionKeyword P.<|> parseExpressionOperators
+parseExpression =  parseExpressionOperators
 
 -- Expression keywords
 parseExpressionKeyword :: Parser Expression
@@ -101,9 +107,13 @@ parseExpressionKeyword = parseTop P.<|> parseEmpty
   where parseTop   = Top   <$> (P.string "top"   *> ws *> parseIdentifier)
         parseEmpty = Empty <$> (P.string "empty" *> ws *> parseIdentifier)
 
+-- Paranthesis
+parens :: Parser Expression -> Parser Expression
+parens e = P.char '(' *> e <* P.char ')'
+
 -- Operators
 parseExpressionOperators :: Parser Expression
-parseExpressionOperators = E.buildExpressionParser operatorTable parseExpressionValue
+parseExpressionOperators = E.buildExpressionParser operatorTable (P.try parseExpressionKeyword P.<|> parseExpressionValue)
 
 operatorTable = [ [ binary "*"  RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divide E.AssocLeft]
                 , [ binary "+"  RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
@@ -118,14 +128,12 @@ operatorTable = [ [ binary "*"  RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divi
 
 -- Expression values (leafs)
 parseExpressionValue :: Parser Expression
-parseExpressionValue = ws *> ((Parens <$> parens parseExpression)
-                              P.<|> (parseConstant P.<|> (Var <$> P.try parseIndex)
-                              P.<|> (Var <$> parseVariable)))
-                       <* ws
+parseExpressionValue = ws *> ((Parens <$> parens parseExpression) P.<|> (parseConstant P.<|> (Var <$> P.try parseIndex)
+                              P.<|> (Var <$> parseVariable))) <* ws
 
 -- Identifiers
 parseIdentifier :: Parser Identifier
-parseIdentifier = P.try parseIndex P.<|> parseVariable
+parseIdentifier = ws *> (P.try parseIndex P.<|> parseVariable)
 
 -- Index
 parseIndex :: Parser Identifier
@@ -136,7 +144,6 @@ parseIndex = do
   e <- parseExpression
   ws
   P.char ']'
-  ws
   return (Index id e)
 
 -- Variables
