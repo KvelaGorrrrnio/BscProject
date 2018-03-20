@@ -1,11 +1,7 @@
-module RL.Parser
+module SRL.Parser
 ( parse
 , fparse
 , sparse
-, parseBlocks
-, parseBlock
-, parseGoto
-, parseFrom
 , parseStatements
 , parseStatement
 , parseExpression
@@ -22,22 +18,17 @@ module RL.Parser
 , parseName
 ) where
 
--- Tillad måske kommentarer mellem statements?
--- Tillad arbitrær indentering af gotos
--- Tving 'label: [from]' til at være på sin egen linje (kan være det allerede er sådan)
--- Tilføj not og neq
-
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Expr as E
 import Text.Parsec.String (Parser, parseFromFile)
-import RL.AST
+import SRL.AST
 
 -- Interface
 fparse :: String -> IO (Either P.ParseError AST)
-fparse = parseFromFile (toAST <$> parseBlocks <* ws <* P.many eol <* P.eof)
+fparse = parseFromFile (P.skipMany cmt *> parseStatements <* ws <* P.many eol <* P.eof)
 
 parse :: String -> Either P.ParseError AST
-parse = P.parse (toAST <$> parseBlocks <* ws <* P.many eol <* P.eof) ""
+parse = P.parse (P.skipMany cmt *> parseStatements <* ws <* P.many eol <* P.eof) ""
 
 -- Safe parse
 sparse :: Show a => Parser a -> String -> String
@@ -45,38 +36,21 @@ sparse parser code = case P.parse (parser <* ws <* P.eof) "" code of
   Left err -> "Nothing"
   Right ast -> show ast
 
--- Blocks
-parseBlocks :: Parser [Block]
-parseBlocks = P.skipMany cmt *> P.many1 parseBlock
-
--- Block
-parseBlock :: Parser Block
-parseBlock =  Block <$> (parseName <* P.char ':') <*> (ws *> parseFrom <* ws <* eol) <*> parseStatements <*> parseGoto <* ws <* P.many1 eol
-
--- Goto
-parseGoto :: Parser Goto
-parseGoto = P.try parseGoto' P.<|> P.try parseIf P.<|> parseExit
-  where parseGoto' = P.string "goto" *> (Goto <$> parseName)
-        parseIf    = P.string "if"   *> (If <$> parseExpression <*> parseName <*> parseName)
-        parseExit = const Exit <$> P.string "exit"
-
--- From
-parseFrom :: Parser From
-parseFrom = P.try parseFrom' P.<|> P.try parseFi P.<|> parseEntry
-  where parseFrom' = P.string "from" *> ws *> (From <$> parseName)
-        parseFi    = P.string "fi"   *> ws *> (Fi <$> parseExpression <*> parseName <*> parseName)
-        parseEntry = const Entry <$> P.string "entry"
-
 -- Multiple statements
-parseStatements :: Parser [Statement]
-parseStatements = P.many (ws *> parseStatement <* eol)
+parseStatements :: Parser AST
+parseStatements = AST <$>P.many (ws *> parseStatement <* eol)
 
 -- Statements
 parseStatement :: Parser Statement
-parseStatement =  (P.try parseAssignment P.<|> P.try parseSkip
+parseStatement =  (P.try parseIf
+                   P.<|> P.try parseFrom
+                   P.<|> P.try parseAssignment P.<|> P.try parseSkip
                    P.<|> P.try parseSwap P.<|> P.try parsePush
                    P.<|> P.try parsePop)
-  where parseSkip = const Skip <$> P.string "skip"
+  where parseIf   = If <$> (P.string "if"     *> ws *> parseExpression) <*> (wrapEol (P.string "then") *> ws *> parseStatements) <*> (wrapEol (P.string "else")  *> ws *> parseStatements) <*> (P.string "fi" *> ws *> parseExpression)
+        parseFrom = From <$> (P.string "from" *> ws *> parseExpression) <*> (wrapEol (P.string "do") *> ws *> parseStatements) <*> (P.string "until" *> ws *> parseExpression)
+        wrapEol a = P.optional eol *> ws *> a <* ws <* P.optional eol
+        parseSkip = const Skip <$> P.string "skip"
         parseSwap = P.string "swap" *> ws *> (Swap <$> parseIdentifier <*> parseIdentifier)
         parsePush = P.string "push" *> ws *> (Push <$> parseIdentifier <*> parseIdentifier)
         parsePop  = P.string "pop"  *> ws *> (Pop  <$> parseIdentifier <*> parseIdentifier)
@@ -120,13 +94,13 @@ parens e = P.char '(' *> e <* P.char ')'
 parseExpressionOperators :: Parser Expression
 parseExpressionOperators = E.buildExpressionParser operatorTable (P.try parseExpressionKeyword P.<|> parseExpressionValue)
 
-operatorTable = [ [ binary "*"  RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divide E.AssocLeft]
-                , [ binary "+"  RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
-                , [ binary "^"  RL.AST.Xor   E.AssocLeft]
-                , [ binary "="  RL.AST.Eq    E.AssocLeft, binary "<" RL.AST.Lth    E.AssocLeft
-                  , binary ">"  RL.AST.Gth   E.AssocLeft]
-                , [ binary "&&" RL.AST.And   E.AssocLeft]
-                , [ binary "||" RL.AST.Or    E.AssocLeft] ]
+operatorTable = [ [ binary "*"  SRL.AST.Times E.AssocLeft, binary "/" SRL.AST.Divide E.AssocLeft]
+                , [ binary "+"  SRL.AST.Plus  E.AssocLeft, binary "-" SRL.AST.Minus  E.AssocLeft]
+                , [ binary "^"  SRL.AST.Xor   E.AssocLeft]
+                , [ binary "="  SRL.AST.Eq    E.AssocLeft, binary "<" SRL.AST.Lth    E.AssocLeft
+                  , binary ">"  SRL.AST.Gth   E.AssocLeft]
+                , [ binary "&&" SRL.AST.And   E.AssocLeft]
+                , [ binary "||" SRL.AST.Or    E.AssocLeft] ]
   where binary name fun = E.Infix (fun <$ reservedOp name)
         reservedOp :: String -> Parser String
         reservedOp name = ws *> P.string name <* ws

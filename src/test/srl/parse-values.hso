@@ -1,0 +1,5 @@
+IntValue 1234
+FloatValue 1.234
+BoolValue True
+BoolValue False
+StringValue "some string"

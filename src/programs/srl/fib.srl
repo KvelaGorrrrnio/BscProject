@@ -1,3 +1,5 @@
+~ Fibonacci program
+~ Written in SRL
 w ^= 1
 from (v = 0)
 do
