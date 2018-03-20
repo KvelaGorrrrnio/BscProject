@@ -12,10 +12,6 @@ main = do
   else do -- Do interpretation
     east <- fparse (head args)
     case east of
-      Left parseErr -> print parseErr
-      Right ast
-        | res <- runProgram ast -> case res of
-          Left progErr  -> print progErr
-          Right vtab    -> print vtab
-
+      Left err  -> print err
+      Right ast -> print $ runProgram ast
 
