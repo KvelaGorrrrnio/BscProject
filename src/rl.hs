@@ -17,6 +17,5 @@ main = do
     Left err -> print err
     Right ast -> do
       let ast' = toAST ast
-      writeFile "testpp.rl" $ astToString ast'
       print $ (runExcept . execStateT (interpAST ast')) []
 
