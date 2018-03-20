@@ -9,6 +9,10 @@ module RL.AST
 , Expression      (..)
 , Value           (..)
 , Label
+, goto
+, toAST
+, LabTab
+, genLabels
 ) where
 
 -- RL specific
@@ -80,3 +84,27 @@ data Value
   | ListValue   [Value]
   deriving Show
 
+toAST :: [Block] -> AST
+toAST = AST []
+
+next :: AST -> AST
+next (AST ls (r:rs)) = AST (r:ls) rs
+
+prev :: AST -> AST
+prev (AST (l:ls) rs) = AST ls (l:rs)
+
+goto :: Label -> Label -> AST -> LabTab -> AST
+goto l1 l2 ast ltab = case (lookup l1 ltab, lookup l2 ltab) of
+  (Just n, Just m) | m-n >  0 -> iterate next ast !! (m-n)
+  (Just n, Just m) | m-n <  0 -> iterate prev ast !! (n-m)
+  (Just n, Just m) | m-n == 0 -> ast
+  _                           -> error "Label not defined."
+
+-- LabTab
+type LabTab = [(Label, Int)]
+
+genLabels :: AST -> LabTab
+genLabels (AST _ bs) =
+  fst $ foldl
+        (\(lst, n) (Block l _ _ _) -> (lst++[(l,n)],n+1))
+        ([],0) bs

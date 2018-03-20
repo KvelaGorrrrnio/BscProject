@@ -1,6 +1,7 @@
 import System.Environment
 import RL.Parser
 import RL.Interp
+import RL.AST
 import Control.Monad.State
 import Control.Monad.Except
 -- Main
