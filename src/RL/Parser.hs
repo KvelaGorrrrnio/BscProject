@@ -22,8 +22,8 @@ module RL.Parser
 , parseName
 ) where
 
--- Tillad arbitrær indentering af gotos
--- Tilføj not og neq
+-- [SVÆR] Tillad arbitrær indentering af gotos
+-- Tillad newlines i expressions
 
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Expr as E
@@ -112,20 +112,22 @@ parseExpressionKeyword = parseTop P.<|> parseEmpty
 
 -- Paranthesis
 parens :: Parser Expression -> Parser Expression
-parens e = P.char '(' *> e <* P.char ')'
+parens e = P.char '(' *> ws *> e  <* ws <* P.char ')'
 
 -- Operators
 parseExpressionOperators :: Parser Expression
 parseExpressionOperators = E.buildExpressionParser operatorTable (P.try parseExpressionKeyword P.<|> parseExpressionValue)
 
-operatorTable = [ [ binary "*"  RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divide E.AssocLeft]
-                , [ binary "+"  RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
-                , [ binary "^"  RL.AST.Xor   E.AssocLeft]
-                , [ binary "="  RL.AST.Eq    E.AssocLeft, binary "<" RL.AST.Lth    E.AssocLeft
-                  , binary ">"  RL.AST.Gth   E.AssocLeft]
-                , [ binary "&&" RL.AST.And   E.AssocLeft]
-                , [ binary "||" RL.AST.Or    E.AssocLeft] ]
-  where binary name fun = E.Infix (fun <$ reservedOp name)
+operatorTable = [ [ binary "*"   RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divide E.AssocLeft]
+                , [ binary "+"   RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
+                , [ binary "^"   RL.AST.Xor   E.AssocLeft]
+                , [ unary  "not" RL.AST.Not]
+                , [ binary "="   RL.AST.Eq    E.AssocLeft, binary "!=" RL.AST.Neq   E.AssocLeft
+                  , binary "<"   RL.AST.Lth   E.AssocLeft, binary ">"  RL.AST.Gth   E.AssocLeft]
+                , [ binary "&&"  RL.AST.And   E.AssocLeft]
+                , [ binary "||"  RL.AST.Or    E.AssocLeft] ]
+  where binary name fun = E.Infix  (fun <$ reservedOp name)
+        unary  name fun = E.Prefix (fun <$ reservedOp name)
         reservedOp :: String -> Parser String
         reservedOp name = ws *> P.string name <* ws
 
