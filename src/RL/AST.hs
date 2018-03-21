@@ -10,7 +10,6 @@ module RL.AST
 , Value           (..)
 , Label
 , goto
-, toAST
 , LabTab
 , genLabels
 ) where
@@ -72,14 +71,20 @@ data Expression
   | Parens    Expression
   deriving Show
 
+-- ændr Expression til kun at have
+--    Variable Identifier
+--    Literal Value
+--    BinOperation
+--    UnOperation
+--    Top
+--    Empty
+--    Parens
+
 data Value
   = IntValue    Int
   | BoolValue   Bool
-  | ListValue   [Value]
+  | StackValue  [Value]
   deriving Show
-
-toAST :: [Block] -> AST
-toAST = AST []
 
 next :: AST -> AST
 next (AST ls (r:rs)) = AST (r:ls) rs

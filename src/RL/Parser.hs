@@ -28,10 +28,10 @@ import RL.AST
 
 -- Interface
 fparse :: String -> IO (Either P.ParseError AST)
-fparse = parseFromFile (toAST <$> parseBlocks <* ws <* P.many eol <* P.eof)
+fparse = parseFromFile (AST [] <$> parseBlocks <* ws <* P.many eol <* P.eof)
 
 parse :: String -> Either P.ParseError AST
-parse = P.parse (toAST <$> parseBlocks <* ws <* P.many eol <* P.eof) ""
+parse = P.parse (AST [] <$> parseBlocks <* ws <* P.many eol <* P.eof) ""
 
 -- Safe parse
 sparse :: Show a => Parser a -> String -> String

@@ -2,6 +2,9 @@ module RL.Interp ( runProgram, VarTab, varTabToString ) where
 import RL.Error
 import RL.AST
 
+------- TEMP
+import Data.Maybe
+
 -- Working on lists
 import Data.List
 -- Bitwise XOR
@@ -44,38 +47,34 @@ varTabToString vtab = (intercalate "\n" . map (\(n,v) -> n ++ " -> " ++ show v))
 type ProgState = StateT VarTab (Except ProgError)
 
 update :: Identifier -> (Value -> Value -> Value) -> Value -> ProgState ()
-update (name) op val = do
+update name op val = do
   st <- get
   case lookup name st of
     Nothing -> do
       put $ (name, IntValue 0):st
-      update (name) op val
-    Just _  -> put $ update' (name) op val st
--- TODO: Implement Index variation
+      update name op val
+    Just _  -> put $ update' name op val st
+    where update' name op val vtab = case vtab of
+            (n,v):rst | n == name -> (n, op v val) : rst
+                      | otherwise -> (n,v) : update' name op val rst
 
-update' (name) op val vtab = case vtab of
-  (n,v):rst | n == name -> (n, op v val) : rst
-            | otherwise -> (n,v) : update' (name) op val rst
--- TODO: Implement Index variation
+--push :: Identifier -> Identifier -> ProgState ()
+--push n1 n2 = update n1 (\val (StackValue st) -> StackValue (val:st))
+--
+--pop :: Identifier -> Identifier -> ProgState ()
+--pop n1 n2 | isZero n1 = do
+--  v <- pop n2
+--  update n1 const v
+
+-- TODO: Implement stack
 
 -- Read an identifier
 rd :: Identifier -> ProgState Value
-rd var = do
-  st <- get
-  case lookup var st of
-    Nothing -> do
-      put $ (var, IntValue 0):st
-      rd var
-    Just v  -> return v
-    -- TODO: Implement Index variation properly
+rd var = state $ \st -> (fromMaybe (IntValue 0) (lookup var st),st)
 
 -- Swap two identifiers
 swap :: Identifier -> Identifier -> ProgState ()
-swap var1 var2 = do -- hvorfor ikke bare bytte om på navnene lol?
-  v1 <- rd var1
-  v2 <- rd var2
-  update var1 (\_ v -> v) v2
-  update var2 (\_ v -> v) v1
+swap a b = state $ \st -> return $ map (\(n,v) -> if n == a then (b,v) else if n == b then (a,v) else (n,v)) st
 
 -- Interpreting engine --
 runProgram :: AST -> (VarTab -> Either ProgError VarTab)
@@ -86,18 +85,16 @@ interpAST :: AST -> ProgState ()
 interpAST ast = do
   let labels = genLabels ast
   interpAST' ast labels
+
 -- stripping vtab from here
-  vtab <- get
-  put $ strip vtab
+  state $ \st -> ((),strip st)
 
 strip :: VarTab -> VarTab
-strip [] = []
-strip ((n,v):rst) = case v of
-  IntValue 0   -> strip rst
-  ListValue [] -> strip rst
-  ListValue vs -> let vs' = (reverse . takeWhile (\(IntValue n) -> n==0) . reverse) vs
-                    in if null vs' then strip rst else (n,ListValue vs'):strip rst
-  _            -> (n,v):strip rst
+strip = filter (\(n,v) -> (not . isZero) v)
+
+isZero :: Value -> Bool
+isZero (StackValue st) = null st
+isZero (IntValue n)    = n==0
 -- to here - just remove if need be
 
 interpAST' :: AST -> LabTab -> ProgState ()
@@ -113,20 +110,15 @@ interpAST' ast ltab = case ast of
         case t of
           BoolValue True  -> interpAST' (goto l ltt ast ltab) ltab
           BoolValue False -> interpAST' (goto l ltf ast ltab) ltab
-          _               -> throwError TestNotBoolean
 
 -- interpreting list of instructions
 interpInsts :: [Statement] -> ProgState ()
-interpInsts (i:insts) = do
-  interpInst i
-  interpInsts insts
-interpInsts [] = return ()
+interpInsts = foldr ((>>) . interpInst) (return ())
 
 -- interpreting an instruction
 interpInst :: Statement -> ProgState ()
 interpInst i = case i of
   Update var op exp
-    | exp `contains` var -> throwError UpdatedVarIsOperand
     | otherwise -> do
       v1 <- rd var
       -- TODO: Type check?
@@ -140,19 +132,10 @@ interpInst i = case i of
                                   MinusEq -> (-)
                                   XorEq   -> xor
             _          -> throwError $ WrongType "Int"
-        _        -> throwError UpdatedValNotScalarValue
+        _        -> throwError AssignedValNotScalarValue
       -- Type check done - but not in the prettiest way
   Swap var1 var2 -> swap var1 var2
   Skip      -> return ()
-
-contains :: Expression -> Identifier -> Bool
-contains (Plus e1 e2)   var = contains e1 var || contains e2 var
-contains (Minus e1 e2)  var = contains e1 var || contains e2 var
-contains (Times e1 e2)  var = contains e1 var || contains e2 var
-contains (Divide e1 e2) var = contains e1 var || contains e2 var
-contains (Var n)        var = n == var
-contains (Constant v)   var = False
-contains (Parens e)     var = contains e var
 
 applyBinOp :: (Int -> Int -> Int) -> Value -> Value -> Value
 applyBinOp op (IntValue n) (IntValue m) = IntValue $ op n m

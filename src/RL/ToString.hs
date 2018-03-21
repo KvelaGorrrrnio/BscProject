@@ -52,15 +52,17 @@ expToString (Lth e1 e2)    = expToString e1 ++ " < "  ++ expToString e2
 expToString (Gth e1 e2)    = expToString e1 ++ " > "  ++ expToString e2
 expToString (And e1 e2)    = expToString e1 ++ " && " ++ expToString e2
 expToString (Or  e1 e2)    = expToString e1 ++ " || " ++ expToString e2
-expToString (Not e1)       = "not ("   ++ expToString e1 ++ ")"
-expToString (Top v)        = "top "    ++ varToString v
-expToString (Empty v)      = "empty "  ++ varToString v
-expToString (Constant v)   = valueToString v
-expToString (Var v)        = varToString v
 expToString (Parens -- Redundant brackets
               (Parens e)
             ) = expToString $ Parens e
-expToString (Parens e)     = "(" ++ expToString e ++ ")"
+expToString (Parens e)       = "(" ++ expToString e ++ ")"
+expToString (Not (Not e))    = expToString e
+expToString (Not (Parens e)) = "not "   ++ expToString e
+expToString (Not e)          = "not " ++ "("  ++ expToString e ++ ")"
+expToString (Top v)          = "top "    ++ varToString v
+expToString (Empty v)        = "empty "  ++ varToString v
+expToString (Constant v)     = valueToString v
+expToString (Var v)          = varToString v
 
 varToString :: Identifier -> String
 varToString var = var
@@ -70,4 +72,4 @@ valueToString (IntValue   n)  = show n
 valueToString (BoolValue b)
   | b     = "true"
   | not b = "false"
-valueToString (ListValue lst) = concatMap valueToString lst
+valueToString (StackValue lst) = concatMap valueToString lst

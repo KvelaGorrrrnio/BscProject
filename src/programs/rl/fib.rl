@@ -3,7 +3,7 @@
 
 ~ Initialisation
 init: entry
-  n ^= 30 ~ 5
+  n ^= 16
   w ^= 1
 goto loop
 ~ The loop body
