@@ -8,9 +8,10 @@ syn keyword rlGoTo         goto exit
 syn keyword rlComeFrom     entry from
 syn keyword rlConditional  if fi
 syn keyword rlFunctionlike skip swap
+syn keyword rlOperator     not
 
 syn match rlVariable   "[a-zA-Z][a-zA-Z0-9_']*"
-syn match rlOperator   "[+\-\^\*/><%=&\|]"
+syn match rlOperator   "[!+\-\^\*/><%=&\|]"
 syn match rlBoolean    "\(\w\|\.\)\@<!\(true\|false\)\(\w\|\.\)\@!"
 syn match rlInteger    "\d\+"
 syn match rlComment    "\~.*$"

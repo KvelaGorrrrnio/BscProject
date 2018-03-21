@@ -7,9 +7,10 @@
 syn keyword rlConditional  if then else fi
 syn keyword rlConditional  from do until
 syn keyword rlFunctionlike skip swap
+syn keyword rlOperator     not
 
 syn match rlVariable   "[a-zA-Z][a-zA-Z0-9_']*"
-syn match rlOperator   "[+\-\^\*/><%=&\|]"
+syn match rlOperator   "[!+\-\^\*/><%=&\|]"
 syn match rlBoolean    "\(\w\|\.\)\@<!\(true\|false\)\(\w\|\.\)\@!"
 syn match rlInteger    "\d\+"
 syn match rlComment    "\~.*$"
