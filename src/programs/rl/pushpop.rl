@@ -3,16 +3,13 @@
 ~ Initialisation
 init: entry
   n ^= 20
-  goto loop
+goto loop
 ~ Loop
-loop: fi (c = 0) init loop
-  ~ compute the square
-  w += c * c
-  ~ push it
+loop: fi (n = 20) init loop
+  w += n * n
   push w q
-  ~ increment
-  c += 1
-  if (c = n) end loop
+  n -= 1
+if (n = 0) end loop
 ~ End of loop
 end: from loop
 exit

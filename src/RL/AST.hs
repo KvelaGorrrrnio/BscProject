@@ -97,7 +97,7 @@ goto l1 l2 ast ltab = case (lookup l1 ltab, lookup l2 ltab) of
   (Just n, Just m) | m-n >  0 -> iterate next ast !! (m-n)
   (Just n, Just m) | m-n <  0 -> iterate prev ast !! (n-m)
   (Just n, Just m) | m-n == 0 -> ast
-  _                           -> error "Label not defined."
+  _                           -> error $ "Label not defined: " ++ l1 ++ " ; " ++ l2
 
 -- LabTab
 type LabTab = [(Label, Int)]

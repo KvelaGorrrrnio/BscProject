@@ -32,6 +32,8 @@ instToString (Swap var1 var2) = "swap " ++ varToString var1 ++ " " ++ varToStrin
 instToString (Update n PlusEq  e) = n ++ " += " ++ expToString e
 instToString (Update n MinusEq e) = n ++ " -= " ++ expToString e
 instToString (Update n XorEq   e) = n ++ " ^= " ++ expToString e
+instToString (Push var1 var2)     = "push " ++ var1 ++ " " ++ var2
+instToString (Pop  var1 var2)     = "pop " ++ var1 ++ " " ++ var2
 instToString Skip          = "skip"
 
 toToString :: Goto -> String
@@ -68,7 +70,7 @@ varToString :: Identifier -> String
 varToString var = var
 
 valueToString :: Value -> String
-valueToString (IntValue   n)  = show n
+valueToString (IntValue  n)  = show n
 valueToString (BoolValue b)
   | b     = "true"
   | not b = "false"
