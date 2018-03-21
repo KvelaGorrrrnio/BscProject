@@ -22,9 +22,7 @@ module RL.Parser
 , parseName
 ) where
 
--- Tillad måske kommentarer mellem statements?
 -- Tillad arbitrær indentering af gotos
--- Tving 'label: [from]' til at være på sin egen linje (kan være det allerede er sådan)
 -- Tilføj not og neq
 
 import qualified Text.Parsec as P
@@ -47,7 +45,7 @@ sparse parser code = case P.parse (parser <* ws <* P.eof) "" code of
 
 -- Blocks
 parseBlocks :: Parser [Block]
-parseBlocks = P.skipMany cmt *> P.many1 parseBlock
+parseBlocks = P.skipMany eol *> P.many1 parseBlock
 
 -- Block
 parseBlock :: Parser Block
@@ -69,7 +67,7 @@ parseFrom = P.try parseFrom' P.<|> P.try parseFi P.<|> parseEntry
 
 -- Multiple statements
 parseStatements :: Parser [Statement]
-parseStatements = P.many (ws *> parseStatement <* eol)
+parseStatements = P.many (ws *> parseStatement <* eol <* P.skipMany (P.try (ws *> eol)))
 
 -- Statements
 parseStatement :: Parser Statement

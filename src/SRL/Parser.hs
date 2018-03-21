@@ -42,10 +42,10 @@ import SRL.AST
 
 -- Interface
 fparse :: String -> IO (Either P.ParseError AST)
-fparse = parseFromFile (P.skipMany cmt *> parseStatements <* ws <* P.many eol <* P.eof)
+fparse = parseFromFile (P.skipMany eol *> parseStatements <* ws <* P.many eol <* P.eof)
 
 parse :: String -> Either P.ParseError AST
-parse = P.parse (P.skipMany cmt *> parseStatements <* ws <* P.many eol <* P.eof) ""
+parse = P.parse (P.skipMany eol *> parseStatements <* ws <* P.many eol <* P.eof) ""
 
 -- Safe parse
 sparse :: Show a => Parser a -> String -> String
