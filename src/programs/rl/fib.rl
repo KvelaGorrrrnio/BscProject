@@ -1,16 +1,21 @@
 ~ Fibonacci program
 ~ Written in RL
-init: entry ~ Entry
+
+~ Initialisation
+init: entry
   n ^= 30 ~ 5
   w ^= 1
 goto loop
-loop: fi (v = 0) init test ~ Loop body
+~ The loop body
+loop: fi not (v != 0) init test
   v += w
   swap v w
   n -= 1
 goto test
-test: from loop ~ Condition
+~ Test if loop should end
+test: from loop
 if (n = 0 || v > w) end loop
+~ End
 end: from test ~ Exit
 exit
 
