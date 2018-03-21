@@ -44,41 +44,30 @@ varTabToString vtab = (intercalate "\n" . map (\(n,v) -> n ++ " -> " ++ show v))
 type ProgState = StateT VarTab (Except ProgError)
 
 update :: Identifier -> (Value -> Value -> Value) -> Value -> ProgState ()
-update (Variable name) op val = do
+update (name) op val = do
   st <- get
   case lookup name st of
     Nothing -> do
       put $ (name, IntValue 0):st
-      update (Variable name) op val
-    Just _  -> put $ update' (Variable name) op val st
+      update (name) op val
+    Just _  -> put $ update' (name) op val st
 -- TODO: Implement Index variation
 
-update' (Variable name) op val vtab = case vtab of
+update' (name) op val vtab = case vtab of
   (n,v):rst | n == name -> (n, op v val) : rst
-            | otherwise -> (n,v) : update' (Variable name) op val rst
+            | otherwise -> (n,v) : update' (name) op val rst
 -- TODO: Implement Index variation
 
 -- Read an identifier
 rd :: Identifier -> ProgState Value
 rd var = do
   st <- get
-  case var of
-    Variable name -> case lookup name st of
-        Nothing -> do
-          put $ (name, IntValue 0):st
-          rd var
-        Just v  -> return v
+  case lookup var st of
+    Nothing -> do
+      put $ (var, IntValue 0):st
+      rd var
+    Just v  -> return v
     -- TODO: Implement Index variation properly
-    Index name e -> do
-      ind <- eval e
-      case ind of
-        IntValue i -> case lookup name st of
-          Nothing -> do
-            put $ (name, ListValue $ replicate (i+1) (IntValue 0)):st
-            rd var
-          Just (ListValue lst) -> return (lst !! i)
-          _ -> throwError $ IndexOnNonList name
-        _ -> throwError IndexNotInteger
 
 -- Swap two identifiers
 swap :: Identifier -> Identifier -> ProgState ()
@@ -136,8 +125,8 @@ interpInsts [] = return ()
 -- interpreting an instruction
 interpInst :: Statement -> ProgState ()
 interpInst i = case i of
-  Assignment var op exp
-    | exp `contains` var -> throwError AssignedVarIsOperand
+  Update var op exp
+    | exp `contains` var -> throwError UpdatedVarIsOperand
     | otherwise -> do
       v1 <- rd var
       -- TODO: Type check?
@@ -151,7 +140,7 @@ interpInst i = case i of
                                   MinusEq -> (-)
                                   XorEq   -> xor
             _          -> throwError $ WrongType "Int"
-        _        -> throwError AssignedValNotScalarValue
+        _        -> throwError UpdatedValNotScalarValue
       -- Type check done - but not in the prettiest way
   Swap var1 var2 -> swap var1 var2
   Skip      -> return ()
@@ -161,15 +150,8 @@ contains (Plus e1 e2)   var = contains e1 var || contains e2 var
 contains (Minus e1 e2)  var = contains e1 var || contains e2 var
 contains (Times e1 e2)  var = contains e1 var || contains e2 var
 contains (Divide e1 e2) var = contains e1 var || contains e2 var
-contains (Var var2) var1 = case var1 of
-  Variable n1 -> case var2 of
-    Variable n2 -> n1 == n2
-    Index n2 _  -> n1 == n2
-  Index n1 e1 -> case var2 of
-    Variable n2 -> n1 == n2
-    Index n2 e2 -> n1 == n2 -- TODO: Same name should be allowed for different indexes
-  -- TODO: Implement Index variation
-contains (Constant v) (Variable n2) = False
+contains (Var n)        var = n == var
+contains (Constant v)   var = False
 contains (Parens e)     var = contains e var
 
 applyBinOp :: (Int -> Int -> Int) -> Value -> Value -> Value
@@ -208,12 +190,6 @@ eval (Eq e1 e2) = do
   case (v1,v2) of
     (IntValue n,
      IntValue m) -> return $ BoolValue (n == m)
-    _            -> throwError $ WrongType "Int"
-eval (Eq e1 e2) = do
-  v1 <- eval e1 ; v2 <- eval e2
-  case (v1,v2) of
-    (IntValue n,
-     IntValue m) -> return $ BoolValue (n /= m)
     _            -> throwError $ WrongType "Int"
 eval (Lth e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2

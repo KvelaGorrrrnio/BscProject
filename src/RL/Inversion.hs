@@ -26,11 +26,11 @@ inverseInsts :: [Statement] -> [Statement]
 inverseInsts = map inverseInst . reverse
 
 inverseInst :: Statement -> Statement
-inverseInst (Assignment var op e) = Assignment var (inverseOp op) e
+inverseInst (Update var op e) = Update var (inverseOp op) e
 inverseInst (Swap n1 n2)          = Swap n1 n2
 inverseInst Skip                  = Skip
 
-inverseOp :: AssignOperator -> AssignOperator
+inverseOp :: UpdateOperator -> UpdateOperator
 inverseOp PlusEq  = MinusEq
 inverseOp MinusEq = PlusEq
 inverseOp XorEq   = XorEq

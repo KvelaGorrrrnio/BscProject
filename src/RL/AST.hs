@@ -5,7 +5,7 @@ module RL.AST
 , From            (..)
 , Goto            (..)
 , Statement       (..)
-, AssignOperator  (..)
+, UpdateOperator  (..)
 , Expression      (..)
 , Value           (..)
 , Label
@@ -37,20 +37,17 @@ data Goto
 type Label = String
 
 -- Common
-data Identifier
-  = Variable String
-  | Index String Expression
-  deriving Show
+type Identifier = String
 
 data Statement
-  = Assignment      Identifier AssignOperator Expression
-  | Push Identifier Identifier
-  | Pop  Identifier Identifier
-  | Swap Identifier Identifier
+  = Update Identifier UpdateOperator Expression
+  | Push   Identifier Identifier
+  | Pop    Identifier Identifier
+  | Swap   Identifier Identifier
   | Skip
   deriving Show
 
-data AssignOperator
+data UpdateOperator
   = PlusEq
   | MinusEq
   | XorEq
@@ -65,7 +62,6 @@ data Expression
   | Times     Expression Expression
   | Divide    Expression Expression
   | Eq        Expression Expression
-  | Neq       Expression Expression
   | Lth       Expression Expression
   | Gth       Expression Expression
   | And       Expression Expression
@@ -78,9 +74,7 @@ data Expression
 
 data Value
   = IntValue    Int
-  | FloatValue  Float
   | BoolValue   Bool
-  | StringValue String
   | ListValue   [Value]
   deriving Show
 

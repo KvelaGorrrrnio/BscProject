@@ -29,9 +29,9 @@ instsToString insts = "  " ++ (intercalate "\n  " . map instToString) insts ++ "
 
 instToString :: Statement -> String
 instToString (Swap var1 var2) = "swap " ++ varToString var1 ++ " " ++ varToString var2
-instToString (Assignment (Variable n) PlusEq  e) = n ++ " += " ++ expToString e
-instToString (Assignment (Variable n) MinusEq e) = n ++ " -= " ++ expToString e
-instToString (Assignment (Variable n) XorEq   e) = n ++ " ^= " ++ expToString e
+instToString (Update n PlusEq  e) = n ++ " += " ++ expToString e
+instToString (Update n MinusEq e) = n ++ " -= " ++ expToString e
+instToString (Update n XorEq   e) = n ++ " ^= " ++ expToString e
 instToString Skip          = "skip"
 
 toToString :: Goto -> String
@@ -48,7 +48,6 @@ expToString (Xor    e1 e2) = expToString e1 ++ " / "  ++ expToString e2
 expToString (Times  e1 e2) = expToString e1 ++ " * "  ++ expToString e2
 expToString (Divide e1 e2) = expToString e1 ++ " / "  ++ expToString e2
 expToString (Eq  e1 e2)    = expToString e1 ++ " = "  ++ expToString e2
-expToString (Neq  e1 e2)   = expToString e1 ++ " != " ++ expToString e2
 expToString (Lth e1 e2)    = expToString e1 ++ " < "  ++ expToString e2
 expToString (Gth e1 e2)    = expToString e1 ++ " > "  ++ expToString e2
 expToString (And e1 e2)    = expToString e1 ++ " && " ++ expToString e2
@@ -64,12 +63,10 @@ expToString (Parens -- Redundant brackets
 expToString (Parens e)     = "(" ++ expToString e ++ ")"
 
 varToString :: Identifier -> String
-varToString (Variable x) = x
-varToString (Index x i) = x ++ "[" ++ expToString i ++ "]"
+varToString var = var
 
 valueToString :: Value -> String
 valueToString (IntValue   n)  = show n
-valueToString (FloatValue x)  = show x
 valueToString (BoolValue b)
   | b     = "true"
   | not b = "false"

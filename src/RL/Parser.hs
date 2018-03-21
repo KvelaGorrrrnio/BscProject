@@ -11,14 +11,10 @@ module RL.Parser
 , parseExpression
 , parseExpressionValue
 , parseIdentifier
-, parseVariable
-, parseIndex
 , parseValue
 , parseBoolean
 , parseNumber
-, parseFloat
 , parseInteger
-, parseString
 , parseName
 ) where
 
@@ -71,7 +67,7 @@ parseStatements = P.many (ws *> parseStatement <* eol <* P.skipMany (P.try (ws *
 
 -- Statements
 parseStatement :: Parser Statement
-parseStatement =  (P.try parseAssignment P.<|> P.try parseSkip
+parseStatement =  (P.try parseUpdate P.<|> P.try parseSkip
                    P.<|> P.try parseSwap P.<|> P.try parsePush
                    P.<|> P.try parsePop)
   where parseSkip = const Skip <$> P.string "skip"
@@ -79,9 +75,9 @@ parseStatement =  (P.try parseAssignment P.<|> P.try parseSkip
         parsePush = P.string "push" *> ws *> (Push <$> parseIdentifier <*> parseIdentifier)
         parsePop  = P.string "pop"  *> ws *> (Pop  <$> parseIdentifier <*> parseIdentifier)
 
-parseAssignment :: Parser Statement
-parseAssignment = Assignment <$> (P.try parseIndex P.<|> parseVariable) <*> parseAssignOperator <*> (ws *> parseExpression)
-  where parseAssignOperator = ws *> (parsePlusEq P.<|> parseMinusEq P.<|> parseXorEq)
+parseUpdate :: Parser Statement
+parseUpdate = Update <$> (parseIdentifier) <*> parseUpdateOperator <*> (ws *> parseExpression)
+  where parseUpdateOperator = ws *> (parsePlusEq P.<|> parseMinusEq P.<|> parseXorEq)
         parsePlusEq  = const PlusEq  <$> P.string "+="
         parseMinusEq = const MinusEq <$> P.string "-="
         parseXorEq   = const XorEq   <$> P.string "^="
@@ -102,7 +98,7 @@ ws = P.skipMany (P.oneOf " \t") P.<?> ""
 
 -- Expression
 parseExpression :: Parser Expression
-parseExpression =  parseExpressionOperators
+parseExpression =  ws *> parseExpressionOperators
 
 -- Expression keywords
 parseExpressionKeyword :: Parser Expression
@@ -122,38 +118,23 @@ operatorTable = [ [ binary "*"   RL.AST.Times E.AssocLeft, binary "/" RL.AST.Div
                 , [ binary "+"   RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
                 , [ binary "^"   RL.AST.Xor   E.AssocLeft]
                 , [ unary  "not" RL.AST.Not]
-                , [ binary "="   RL.AST.Eq    E.AssocLeft, binary "!=" RL.AST.Neq   E.AssocLeft
+                , [ binary "="   RL.AST.Eq    E.AssocLeft, binary "!=" neq          E.AssocLeft
                   , binary "<"   RL.AST.Lth   E.AssocLeft, binary ">"  RL.AST.Gth   E.AssocLeft]
                 , [ binary "&&"  RL.AST.And   E.AssocLeft]
                 , [ binary "||"  RL.AST.Or    E.AssocLeft] ]
   where binary name fun = E.Infix  (fun <$ reservedOp name)
-        unary  name fun = E.Prefix (fun <$ reservedOp name)
+        unary  name fun = E.Prefix (fun <$ P.try (reservedOp name))
+        neq l r         = RL.AST.Not $ RL.AST.Eq l r
         reservedOp :: String -> Parser String
         reservedOp name = ws *> P.string name <* ws
 
 -- Expression values (leafs)
 parseExpressionValue :: Parser Expression
-parseExpressionValue = ws *> ((Parens <$> parens parseExpression) P.<|> (parseConstant P.<|> (Var <$> P.try parseIndex)
-                              P.<|> (Var <$> parseVariable))) <* ws
+parseExpressionValue = ws *> ((Parens <$> parens parseExpression) P.<|> parseConstant P.<|> (Var <$> parseIdentifier)) <* ws
 
 -- Identifiers
 parseIdentifier :: Parser Identifier
-parseIdentifier = ws *> (P.try parseIndex P.<|> parseVariable)
-
--- Index
-parseIndex :: Parser Identifier
-parseIndex = do
-  id <- parseName
-  P.char '['
-  ws
-  e <- parseExpression
-  ws
-  P.char ']'
-  return (Index id e)
-
--- Variables
-parseVariable :: Parser Identifier
-parseVariable = Variable <$> parseName
+parseIdentifier = parseName
 
 -- Constants
 parseConstant :: Parser Expression
@@ -165,11 +146,7 @@ parseName = ws *> ((:) <$> P.letter <*> P.many (P.alphaNum P.<|> P.oneOf ['_']))
 
 -- Values
 parseValue :: Parser Value
-parseValue = parseString P.<|> parseBoolean P.<|> parseNumber
-
--- Strings
-parseString :: Parser Value
-parseString = StringValue <$> (P.char '"' *> P.many (P.noneOf ['"']) <* P.char '"') P.<?> "string"
+parseValue = parseBoolean P.<|> parseNumber
 
 -- Booleans
 parseBoolean :: Parser Value
@@ -179,14 +156,8 @@ parseBoolean = BoolValue <$> (parseTrue P.<|> parseFalse) P.<?> "boolean"
 
 -- Numbers
 parseNumber :: Parser Value
-parseNumber = P.try parseFloat P.<|> parseInteger P.<?> "number"
+parseNumber = parseInteger
 
 parseInteger :: Parser Value
 parseInteger = IntValue . readInt <$> P.many1 P.digit P.<?> "integer"
   where readInt = read :: String -> Int
-
-parseFloat :: Parser Value
-parseFloat = FloatValue . readFloat <$> ((++) <$> integer <*> fraction) P.<?> "float"
-  where readFloat = read :: String -> Float
-        integer  = P.many1 P.digit
-        fraction = (:) <$> P.char '.' <*> integer
