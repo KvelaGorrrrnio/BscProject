@@ -18,16 +18,17 @@ syn match rlComment    "\~.*$"
 syn match rlBlockStart "[a-zA-Z][a-zA-Z0-9_']*:"
 
 " hi def link rlStatement	   Statement
-hi def link rlGoTo	   Function
-hi def link rlComeFrom	   Statement
+hi def link rlGoTo	   Structure
+hi def link rlComeFrom	   Structure
 hi def link rlConditional  Conditional
 
+hi def link rlVariable	   Underlined
 hi def link rlComment      Comment
 hi def link rlOperator     Operator
 hi def link rlFunctionlike Function
 hi def link rlBoolean      Boolean
 hi def link rlInteger      Number
-hi def link rlBlockStart   Statement
+hi def link rlBlockStart   Label
 
 let b:current_syntax = "rl"
 
