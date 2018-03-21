@@ -42,9 +42,10 @@ for t in "${target[@]}"; do
       elif [ "$r" == "$o" ]; then
         printf "\033[0;32m$(basename $f): Success\033[0;0m\n"
       else
-        printf "\033[0;31m$(basename $f): Failed."
+        printf "\033[0;31m$(basename $f): Failed.\033[0;0m"
         if [ $details -eq 1 ]; then
-          printf " Expected:\n\033[0;0m$o\033[0;31m\n, but got:\n\033[0;0m$r\n\n"
+          dif=$(diff <(echo "$o") <(echo "$r"))
+          printf "\n$dif\n\n"
         else
           printf "\n"
         fi
