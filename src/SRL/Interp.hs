@@ -219,6 +219,12 @@ eval (Eq e1 e2) = do
     (IntValue n,
      IntValue m) -> return $ BoolValue (n == m)
     _            -> throwError $ WrongType "Int"
+eval (Eq e1 e2) = do
+  v1 <- eval e1 ; v2 <- eval e2
+  case (v1,v2) of
+    (IntValue n,
+     IntValue m) -> return $ BoolValue (n /= m)
+    _            -> throwError $ WrongType "Int"
 eval (Lth e1 e2) = do
   v1 <- eval e1 ; v2 <- eval e2
   case (v1,v2) of
@@ -243,6 +249,11 @@ eval (Or e1 e2) = do
     (BoolValue p,
      BoolValue q) -> return $ BoolValue (p || q)
     _             -> throwError $ WrongType "Bool"
+eval (Not e) = do
+  v <- eval e
+  case v of
+    BoolValue q -> return $ BoolValue (not q)
+    _           -> throwError $ WrongType "Bool"
 eval (Var v) = rd v
 eval (Constant v)  = return v
 eval (Parens e) = eval e
