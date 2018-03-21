@@ -1,0 +1,26 @@
+- blok med 3 entry points?
+
+  zer: entry
+    skip
+  if (c==0) one elif (c == 1) two thr
+  one: from zer
+    ..
+  goto end
+  two: from zer
+    ..
+  goto end
+  thr: from zer
+    ..
+  goto end
+  end: [from]
+    ..
+  exit
+
+- monader
+- error handling
+- starting state syntax
+- idé til implementering af lister?
+  dictionary?? [(Int, Value)] - gemmer kun ikke-nul-værdier
+- kodekritik?
+- syntaksbegrænsninger?
+
