@@ -57,8 +57,8 @@ rd :: Identifier -> ProgState (Maybe Value)
 rd var = lookup var <$> get
 
 -- Write and identifier to VarTab
-wr :: Identifier -> Value -> ProgState ()
-wr var val = state $ \st -> return $ (var,val):st
+-- wr :: Identifier -> Value -> ProgState ()
+-- wr var val = state $ \st -> return $ (var,val):st
 
 -- Swap two identifiers
 swap :: Identifier -> Identifier -> ProgState ()
@@ -100,8 +100,8 @@ interpInsts = foldr ((>>) . interpInst) (return ())
 interpInst :: Statement -> ProgState ()
 interpInst i = case i of
   Update var op exp -> join $ update var <$> eval (updateOpMapper op (Var var) exp)
-  Push var1 var2 -> error "Push not implemented yet." -- TODO
-  Pop  var1 var2 -> error "Pop not implemented yet."  -- TODO
+  Push var1 var2    -> error "Push not implemented yet." -- TODO
+  Pop  var1 var2    -> error "Pop not implemented yet."  -- TODO
   Swap var1 var2    -> swap var1 var2
   Skip              -> return ()
 
