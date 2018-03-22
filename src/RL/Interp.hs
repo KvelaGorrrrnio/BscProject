@@ -70,11 +70,9 @@ runProgram ast = runExcept . execStateT (interpAST ast)
 
 -- interpreting a program
 interpAST :: AST -> ProgState ()
-interpAST ast = do
-  (interpAST' ast . genLabels) ast
-
--- stripping vtab from here
-  strip
+interpAST ast = (interpAST' ast . genLabels) ast
+-- stripping starts here
+  >> strip
 
 strip :: ProgState ()
 strip = state $ \st -> return $ filter (\(n,v) -> (not . isZero) v) st
