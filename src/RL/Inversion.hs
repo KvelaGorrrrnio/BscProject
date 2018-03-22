@@ -33,6 +33,8 @@ inverseInst (Pop  n1 n2)          = Push n1 n2
 inverseInst Skip                  = Skip
 
 inverseOp :: UpdateOperator -> UpdateOperator
-inverseOp PlusEq  = MinusEq
-inverseOp MinusEq = PlusEq
-inverseOp XorEq   = XorEq
+inverseOp PlusEq     = MinusEq
+inverseOp MinusEq    = PlusEq
+inverseOp XorEq      = XorEq
+inverseOp TimesEq    = DivideEq
+inverseOp DivideEq   = TimesEq

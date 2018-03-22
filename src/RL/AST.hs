@@ -6,6 +6,8 @@ module RL.AST
 , Goto            (..)
 , Statement       (..)
 , UpdateOperator  (..)
+, BinOperator     (..)
+, UnOperator      (..)
 , Expression      (..)
 , Value           (..)
 , Label
@@ -50,25 +52,39 @@ data UpdateOperator
   = PlusEq
   | MinusEq
   | XorEq
+  | TimesEq
+  | DivideEq
   deriving Show
 
 data Expression
+  -- Normal operations
   = Var       Identifier
   | Constant  Value
-  | Plus      Expression Expression
-  | Minus     Expression Expression
-  | Xor       Expression Expression
-  | Times     Expression Expression
-  | Divide    Expression Expression
-  | Eq        Expression Expression
-  | Lth       Expression Expression
-  | Gth       Expression Expression
-  | And       Expression Expression
-  | Or        Expression Expression
-  | Not       Expression
-  | Top       Identifier
-  | Empty     Identifier
-  | Parens    Expression
+  | BinOperation BinOperator Expression Expression
+  | UnOperation UnOperator Expression
+  -- Stack
+  | Top   Identifier
+  | Empty Identifier
+  -- For printing parantheses
+  | Parens Expression
+  deriving Show
+
+data BinOperator
+  = Plus
+  | Minus
+  | Xor
+  | Times
+  | Divide
+  | Eq
+  | Lth
+  | Gth
+  | And
+  | Or
+  deriving Show
+
+data UnOperator
+  = Not
+  | Negate
   deriving Show
 
 -- ændr Expression til kun at have
@@ -84,7 +100,7 @@ data Value
   = IntValue    Int
   | BoolValue   Bool
   | StackValue  [Value]
-  deriving Show
+  deriving (Show, Eq)
 
 next :: AST -> AST
 next (AST ls (r:rs)) = AST (r:ls) rs
