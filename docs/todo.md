@@ -20,13 +20,32 @@ src
   rl.hs  (interface)
   srl.hs (interface)
   RL
-    interp.hs
-    ast.hs
-    parser.hs
+    Interp.hs
+    AST.hs
+    Parser.hs
   SRL
-    interp.hs
-    ast.hs
-    parser.hs
+    Interp.hs
+    Ast.hs
+    Parser.hs
   common
     *expression*
     *vartab*
+
+Optimeringer:
+
+- Sequential single-variable assignment
+- Sequential swaps
+
+- (Propagation (inlining ved udelukkende interp))
+- One-to-one block removal
+- If a = a l1 l2 => Goto l1 etc.
+
+- ConstantFolding
+- Expression Compression (a < b = true) (not not a)
+- Redundant paranthesis
+- Remove skips
+
+
+Block sts
+optim Block [] = Block [Skip]
+optim Block sts = remove all skips => if []: optim (Block adas)
