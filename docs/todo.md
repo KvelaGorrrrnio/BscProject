@@ -1,3 +1,21 @@
+-- When changing anything;
+--   AST types
+--   Reversion
+--   toString
+--   evaluation/interpretation
+
+-- Split up in statements and expressions
+-- TODO:
+-- Maybe errors should be so too?
+-- Expression errors:
+--    type errors when applying operator
+--    division by zero
+--    division has rest
+-- Instruction errors:
+--    variable being assigned different type than expression
+--    condition is not bool
+--    assigned variable occurs in expression
+
 Del op i filer
 Flet RL og parser sammen
 RL skal ændres til at bruge StateT-med-Except(Except InterpErr)-monaden
