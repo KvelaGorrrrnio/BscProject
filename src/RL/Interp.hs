@@ -16,24 +16,6 @@ import Data.Bits
 import Control.Monad.State
 import Control.Monad.Except
 
--- When changing anything;
---   AST types
---   Reversion
---   toString
---   evaluation/interpretation
-
--- Split up in statements and expressions
--- TODO:
--- Maybe errors should be so too?
--- Expression errors:
---    type errors when applying operator
---    division by zero
---    division has rest
--- Instruction errors:
---    variable being assigned different type than expression
---    condition is not bool
---    assigned variable occurs in expression
-
 -- VarTab
 type VarTab    = [(String, Value)]
 
@@ -132,7 +114,6 @@ binopMapper Xor    = binIntToInt xor
 binopMapper Times  = binIntToInt (*)
 binopMapper Divide = binIntToInt div
 
-binopMapper Eq     = binIntToBool (==)
 binopMapper Lth    = binIntToBool (<)
 binopMapper Gth    = binIntToBool (>)
 
