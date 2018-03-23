@@ -28,10 +28,10 @@ import RL.AST
 
 -- Interface
 fparse :: String -> IO (Either P.ParseError AST)
-fparse = parseFromFile (toAST <$> parseBlocks <* ws <* P.many eol <* P.eof)
+fparse = parseFromFile (AST [] <$> parseBlocks <* ws <* P.many eol <* P.eof)
 
 parse :: String -> Either P.ParseError AST
-parse = P.parse (toAST <$> parseBlocks <* ws <* P.many eol <* P.eof) ""
+parse = P.parse (AST [] <$> parseBlocks <* ws <* P.many eol <* P.eof) ""
 
 -- Safe parse
 sparse :: Show a => Parser a -> String -> String
@@ -76,20 +76,22 @@ parseStatement =  (P.try parseUpdate P.<|> P.try parseSkip
         parsePop  = P.string "pop"  *> ws *> (Pop  <$> parseIdentifier <*> parseIdentifier)
 
 parseUpdate :: Parser Statement
-parseUpdate = Update <$> (parseIdentifier) <*> parseUpdateOperator <*> (ws *> parseExpression)
-  where parseUpdateOperator = ws *> (parsePlusEq P.<|> parseMinusEq P.<|> parseXorEq)
-        parsePlusEq  = const PlusEq  <$> P.string "+="
-        parseMinusEq = const MinusEq <$> P.string "-="
-        parseXorEq   = const XorEq   <$> P.string "^="
+parseUpdate = Update <$> parseIdentifier <*> parseUpdateOperator <*> (ws *> parseExpression)
+  where parseUpdateOperator = ws *> (parsePlusEq P.<|> parseMinusEq P.<|> parseXorEq P.<|> parseTimesEq P.<|> parseDivideEq)
+        parsePlusEq   = const PlusEq   <$> P.string "+="
+        parseMinusEq  = const MinusEq  <$> P.string "-="
+        parseXorEq    = const XorEq    <$> P.string "^="
+        parseTimesEq  = const TimesEq  <$> P.string "*="
+        parseDivideEq = const DivideEq <$> P.string "/="
 
 -- Comments
 cmt :: Parser String
-cmt = P.char '~' *> (P.manyTill P.anyChar P.newline)
+cmt = P.char '~' *> P.manyTill P.anyChar P.newline
 
 -- End of Line
 eol :: Parser ()
 eol = do
-  P.skipMany1 cmt P.<|> (const () <$>P.newline)
+  P.skipMany1 cmt P.<|> const () <$> P.newline
   return ()
 
 -- Whitespace
@@ -103,8 +105,8 @@ parseExpression =  ws *> parseExpressionOperators
 -- Expression keywords
 parseExpressionKeyword :: Parser Expression
 parseExpressionKeyword = parseTop P.<|> parseEmpty
-  where parseTop   = Top   <$> (P.string "top"   *> ws *> parseIdentifier)
-        parseEmpty = Empty <$> (P.string "empty" *> ws *> parseIdentifier)
+  where parseTop   = RL.AST.Top   <$> (P.string "top"   *> ws *> parseIdentifier)
+        parseEmpty = RL.AST.Empty <$> (P.string "empty" *> ws *> parseIdentifier)
 
 -- Paranthesis
 parens :: Parser Expression -> Parser Expression
@@ -114,17 +116,18 @@ parens e = P.char '(' *> ws *> e  <* ws <* P.char ')'
 parseExpressionOperators :: Parser Expression
 parseExpressionOperators = E.buildExpressionParser operatorTable (P.try parseExpressionKeyword P.<|> parseExpressionValue)
 
-operatorTable = [ [ binary "*"   RL.AST.Times E.AssocLeft, binary "/" RL.AST.Divide E.AssocLeft]
-                , [ binary "+"   RL.AST.Plus  E.AssocLeft, binary "-" RL.AST.Minus  E.AssocLeft]
-                , [ binary "^"   RL.AST.Xor   E.AssocLeft]
-                , [ unary  "not" RL.AST.Not]
-                , [ binary "="   RL.AST.Eq    E.AssocLeft, binary "!=" neq          E.AssocLeft
-                  , binary "<"   RL.AST.Lth   E.AssocLeft, binary ">"  RL.AST.Gth   E.AssocLeft]
-                , [ binary "&&"  RL.AST.And   E.AssocLeft]
-                , [ binary "||"  RL.AST.Or    E.AssocLeft] ]
+operatorTable = [ [ unary  "-"   (RL.AST.UnOperation  RL.AST.Negate)]
+                , [ binary "*"   (RL.AST.BinOperation RL.AST.Times) E.AssocLeft, binary "/" (RL.AST.BinOperation RL.AST.Divide) E.AssocLeft]
+                , [ binary "+"   (RL.AST.BinOperation RL.AST.Plus)  E.AssocLeft, binary "-" (RL.AST.BinOperation RL.AST.Minus)  E.AssocLeft]
+                , [ binary "^"   (RL.AST.BinOperation RL.AST.Xor)   E.AssocLeft]
+                , [ unary  "not" (RL.AST.UnOperation  RL.AST.Not)]
+                , [ binary "="   (RL.AST.BinOperation RL.AST.Eq)    E.AssocLeft, binary "!=" neq          E.AssocLeft
+                  , binary "<"   (RL.AST.BinOperation RL.AST.Lth)   E.AssocLeft, binary ">"  (RL.AST.BinOperation RL.AST.Gth)   E.AssocLeft]
+                , [ binary "&&"  (RL.AST.BinOperation RL.AST.And)   E.AssocLeft]
+                , [ binary "||"  (RL.AST.BinOperation RL.AST.Or)    E.AssocLeft] ]
   where binary name fun = E.Infix  (fun <$ reservedOp name)
         unary  name fun = E.Prefix (fun <$ P.try (reservedOp name))
-        neq l r         = RL.AST.Not $ RL.AST.Eq l r
+        neq l r         = (RL.AST.UnOperation RL.AST.Not) $ (RL.AST.BinOperation RL.AST.Eq) l r
         reservedOp :: String -> Parser String
         reservedOp name = ws *> P.string name <* ws
 

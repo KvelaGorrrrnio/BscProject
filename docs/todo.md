@@ -1,3 +1,21 @@
+-- When changing anything;
+--   AST types
+--   Reversion
+--   toString
+--   evaluation/interpretation
+
+-- Split up in statements and expressions
+-- TODO:
+-- Maybe errors should be so too?
+-- Expression errors:
+--    type errors when applying operator
+--    division by zero
+--    division has rest
+-- Instruction errors:
+--    variable being assigned different type than expression
+--    condition is not bool
+--    assigned variable occurs in expression
+
 Del op i filer
 Flet RL og parser sammen
 RL skal ændres til at bruge StateT-med-Except(Except InterpErr)-monaden
@@ -49,3 +67,10 @@ Optimeringer:
 Block sts
 optim Block [] = Block [Skip]
 optim Block sts = remove all skips => if []: optim (Block adas)
+
+OBS!!!!
+Enten SKAL rl-filer starte med en entry-block og slutte med en exit blok,
+
+ellers skal vi lave et ekstra tjek inden vi starter programmet, så vi er sikre på at starte i entry-blokken.
+
+Desuden må vi ikke tillade mere end 1 exit

@@ -6,11 +6,12 @@ module RL.AST
 , Goto            (..)
 , Statement       (..)
 , UpdateOperator  (..)
+, BinOperator     (..)
+, UnOperator      (..)
 , Expression      (..)
 , Value           (..)
 , Label
 , goto
-, toAST
 , LabTab
 , genLabels
 ) where
@@ -51,35 +52,55 @@ data UpdateOperator
   = PlusEq
   | MinusEq
   | XorEq
+  | TimesEq
+  | DivideEq
   deriving Show
 
 data Expression
+  -- Normal operations
   = Var       Identifier
   | Constant  Value
-  | Plus      Expression Expression
-  | Minus     Expression Expression
-  | Xor       Expression Expression
-  | Times     Expression Expression
-  | Divide    Expression Expression
-  | Eq        Expression Expression
-  | Lth       Expression Expression
-  | Gth       Expression Expression
-  | And       Expression Expression
-  | Or        Expression Expression
-  | Not       Expression
-  | Top       Identifier
-  | Empty     Identifier
-  | Parens    Expression
+  | BinOperation BinOperator Expression Expression
+  | UnOperation UnOperator Expression
+  -- Stack
+  | Top   Identifier
+  | Empty Identifier
+  -- For printing parantheses
+  | Parens Expression
   deriving Show
+
+data BinOperator
+  = Plus
+  | Minus
+  | Xor
+  | Times
+  | Divide
+  | Eq
+  | Lth
+  | Gth
+  | And
+  | Or
+  deriving Show
+
+data UnOperator
+  = Not
+  | Negate
+  deriving Show
+
+-- ændr Expression til kun at have
+--    Variable Identifier
+--    Literal Value
+--    BinOperation
+--    UnOperation
+--    Top
+--    Empty
+--    Parens
 
 data Value
   = IntValue    Int
   | BoolValue   Bool
-  | ListValue   [Value]
-  deriving Show
-
-toAST :: [Block] -> AST
-toAST = AST []
+  | StackValue  [Value]
+  deriving (Show, Eq)
 
 next :: AST -> AST
 next (AST ls (r:rs)) = AST (r:ls) rs
@@ -92,7 +113,7 @@ goto l1 l2 ast ltab = case (lookup l1 ltab, lookup l2 ltab) of
   (Just n, Just m) | m-n >  0 -> iterate next ast !! (m-n)
   (Just n, Just m) | m-n <  0 -> iterate prev ast !! (n-m)
   (Just n, Just m) | m-n == 0 -> ast
-  _                           -> error "Label not defined."
+  _                           -> error $ "Label not defined: " ++ l1 ++ " ; " ++ l2
 
 -- LabTab
 type LabTab = [(Label, Int)]
