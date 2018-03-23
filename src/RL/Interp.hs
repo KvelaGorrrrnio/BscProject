@@ -114,6 +114,12 @@ updateOpMapper DivideEq = BinOperation Divide
 
 -- evaluating an expression
 eval :: Expression -> ProgState Value
+eval (BinOperation Divide exp1 exp2) = eval exp2 >>= \case
+  IntValue 0 -> throwError DivByZero
+  v          -> flip (binopMapper Divide) v <$> eval exp1
+eval (BinOperation Eq exp1 exp2)    = eval exp1 >>= \case
+  IntValue n -> binIntToBool  (==) <$> eval exp1 <*> eval exp2
+  v          -> binBoolToBool (==) <$> eval exp1 <*> eval exp2
 eval (BinOperation binop exp1 exp2) = binopMapper binop <$> eval exp1 <*> eval exp2
 eval (UnOperation unop exp)         = unopMapper  unop  <$> eval exp
 eval (Top n)                        = error "Top not implemented yet."   -- TODO

@@ -30,3 +30,13 @@ src
   common
     *expression*
     *vartab*
+
+
+
+
+OBS!!!!
+Enten SKAL rl-filer starte med en entry-block og slutte med en exit blok,
+
+ellers skal vi lave et ekstra tjek inden vi starter programmet, så vi er sikre på at starte i entry-blokken.
+
+Desuden må vi ikke tillade mere end 1 exit
