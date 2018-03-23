@@ -44,13 +44,9 @@ swap a b = modify $ \st -> map (\(n,v) -> if n == a then (b,v) else if n == b th
 
 -- Interpreting engine --
 runProgram :: AST -> (VarTab -> Either ProgError VarTab)
-runProgram ast = runExcept . execStateT (interpAST ast)
-
--- interpreting a program
-interpAST :: AST -> ProgState ()
-interpAST ast = (interpAST' ast . genLabels) ast
--- stripping starts here
-  >> strip
+runProgram ast = runExcept . execStateT ((interpAST ast . genLabels) ast
+  -- Stripping begins here
+  >> strip)
 
 strip :: ProgState ()
 strip = modify $ \st -> filter (\(n,v) -> (not . isZero) v) st
@@ -58,17 +54,17 @@ strip = modify $ \st -> filter (\(n,v) -> (not . isZero) v) st
 isZero :: Value -> Bool
 isZero (StackValue st) = null st
 isZero (IntValue n)    = n == 0
--- to here - just remove if need be
+-- and ends here - just remove if need be
 
-interpAST' :: AST -> LabTab -> ProgState ()
-interpAST' ast ltab = case ast of
+interpAST :: AST -> LabTab -> ProgState ()
+interpAST ast ltab = case ast of
   AST _ [] -> return ()
   AST _ (Block l _ insts t:_) -> interpInsts insts >> case t of
     Exit    -> return ()
-    Goto lt -> interpAST' (goto l lt ast ltab) ltab
+    Goto lt -> interpAST (goto l lt ast ltab) ltab
     If exp ltt ltf -> eval exp >>= \case
-      BoolValue b | b     -> interpAST' (goto l ltt ast ltab) ltab
-      BoolValue b | not b -> interpAST' (goto l ltf ast ltab) ltab
+      BoolValue b | b     -> interpAST (goto l ltt ast ltab) ltab
+      BoolValue b | not b -> interpAST (goto l ltf ast ltab) ltab
 
 -- interpreting list of instructions
 interpInsts :: [Statement] -> ProgState ()
