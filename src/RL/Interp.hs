@@ -56,10 +56,6 @@ update n nv  = state $ \st -> case () of
 rd :: Identifier -> ProgState (Maybe Value)
 rd var = lookup var <$> get
 
--- Write and identifier to VarTab
--- wr :: Identifier -> Value -> ProgState ()
--- wr var val = state $ \st -> return $ (var,val):st
-
 -- Swap two identifiers
 swap :: Identifier -> Identifier -> ProgState ()
 swap a b = state $ \st -> return $ map (\(n,v) -> if n == a then (b,v) else if n == b then (a,v) else (n,v)) st

@@ -1,3 +1,3 @@
 init: entry
-  a ^= 7/0
+  a ^= 7/(6 - 6)
 exit
