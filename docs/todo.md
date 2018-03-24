@@ -10,6 +10,7 @@ Test til parser og fortolker
 Tilføj positioner til alle AST-elementer
 Kombiner det nuværende program med en State- og Reader-monade for henholdsvis AST og LabTab
 Refaktorer RL-fortolkeren - måske bruge et Map til VarTab?
+Brug type classes til at gøre Value-funktioner generiske: https://stackoverflow.com/questions/33983905/how-to-write-a-function-returns-either-integer-or-bool-based-on-a-user-defined-d
 Nogle sanity checks:
   - Kun 1 entry og 1 exit
   - Enten skal programmet starte med en entry og slutte med en exit,
