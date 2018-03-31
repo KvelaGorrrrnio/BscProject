@@ -4,73 +4,48 @@
 --   toString
 --   evaluation/interpretation
 
--- Split up in statements and expressions
--- TODO:
--- Maybe errors should be so too?
--- Expression errors:
---    type errors when applying operator
---    division by zero
---    division has rest
--- Instruction errors:
---    variable being assigned different type than expression
---    condition is not bool
---    assigned variable occurs in expression
-
-Del op i filer
-Flet RL og parser sammen
-RL skal ændres til at bruge StateT-med-Except(Except InterpErr)-monaden
+## I første omgang
 Interaktivt interface
 Test til parser og fortolker
-Understøttelse af patenteser og flere operatorer til RL
-Ændr alle '.ToString' til instance af Show - eller ikke (indentering?)
 Tilføj positioner til alle AST-elementer
+Kombiner det nuværende program med en State- og Reader-monade for henholdsvis AST og LabTab
+Refaktorer RL-fortolkeren - måske bruge et Map til VarTab?
+Brug type classes til at gøre Value-funktioner generiske: https://stackoverflow.com/questions/33983905/how-to-write-a-function-returns-either-integer-or-bool-based-on-a-user-defined-d
+Nogle sanity checks:
+  - Kun 1 entry og 1 exit
+  - Enten skal programmet starte med en entry og slutte med en exit,
+    eller vi skal skanne AST for entry og bevæge os til den givne blok før fortolkning
+  - Bliver alle labels refereret?
+  - Refereres nogle labels, som ikke eksisterer?
+Overvej - og måske implementer - stadig følgende ting:
+  - Måske skal AST også repræsenteres ved et Map i stedet for; altså [(Label,Block)]. På den måde kan man fortolke den enkelte blok og så bruge lookup i mappet for at gå til næste blok. Således behøves relative positioner ikke.
+  - if (e) (b) else if (e) (b) else (b) - og tilsvarende
+    fi (e) (b) else if (e) (b) else (b) - rent syntaktisk sukker og er ikke nødvendigt.
+  - Måske et enkelt pas, som genererer en VarTab af de eksisterende variable med en default value til hver af dem afhængig af typen.
+    Så kan den genererede VarTab fodres til fortolkeren. Fortolkeren kan i så fald fungere på normal vis - ikke noget med at inferere typerne ved runtime.
+  - Logging? - Jeg har allerede implementeret et udkast, hvor vores primære state er (String,VarTab) i stedet for blot VarTab.
+    Man kan således blot fylde meddelelseer på tilstanden løbende og så skrive det til en fil til sidst. Dette betyder dog, at hvis vi rammer en runtime error,
+    så skal log-strengen overføres til fejlmeddelelsen, så loggen stadig kan skrives til en fil. Det ville næsten være bedre at have loggen i et separat state, så vi få den ud uanset om der er error eller ej.
+  - Lidt i samme boldgade; Vil vi tillade at fortolke programmet step-by-step, så man kan se tilstanden til hver en tid? - Og hvordan vil man i så fald gøre det?
 
-Ordn SRL med nyt AST parser
+
+## Når RL er done
+Overfør RL til SRL - bør være ret easy
 Overvej at strippe result state, så det ikke indeholder zero-bindings.
-
-Definer syntax highlighting
 
 Gør Expression, Vartab fælles
 
 
-Mappestruktur:
-src
-  rl.hs  (interface)
-  srl.hs (interface)
-  RL
-    Interp.hs
-    AST.hs
-    Parser.hs
-  SRL
-    Interp.hs
-    Ast.hs
-    Parser.hs
-  common
-    *expression*
-    *vartab*
+## Optimeringer
 
-Optimeringer:
+Sequential single-variable assignment
+Sequential swaps
 
-- Sequential single-variable assignment
-- Sequential swaps
+(Propagation (inlining ved udelukkende interp))
+One-to-one block removal
+If a = a l1 l2 => Goto l1 etc.
 
-- (Propagation (inlining ved udelukkende interp))
-- One-to-one block removal
-- If a = a l1 l2 => Goto l1 etc.
-
-- ConstantFolding
-- Expression Compression (a < b = true) (not not a)
-- Redundant paranthesis
-- Remove skips
-
-
-Block sts
-optim Block [] = Block [Skip]
-optim Block sts = remove all skips => if []: optim (Block adas)
-
-OBS!!!!
-Enten SKAL rl-filer starte med en entry-block og slutte med en exit blok,
-
-ellers skal vi lave et ekstra tjek inden vi starter programmet, så vi er sikre på at starte i entry-blokken.
-
-Desuden må vi ikke tillade mere end 1 exit
+ConstantFolding
+Expression Compression (a < b = true) (not not a) ((e)) etc.
+Redundant paranthesis
+Remove skips

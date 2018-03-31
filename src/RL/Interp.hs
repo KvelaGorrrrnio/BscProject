@@ -30,9 +30,9 @@ valueToString (StackValue lst) = "[" ++ (intercalate ", " . map valueToString) l
 type ProgState = StateT VarTab (Except ProgError)
 
 update :: Identifier -> Value -> ProgState ()
-update n nv  = state $ \st -> case () of
-  _ | any (\(n',v) -> n'==n) st -> return $ map (\(n',v) -> if n'==n then (n',nv) else (n',v)) st
-    | otherwise                 -> return $ (n,nv):st
+update n nv  = modify $ \st -> case () of
+  _ | any (\(n',v) -> n'==n) st -> map (\(n',v) -> if n'==n then (n',nv) else (n',v)) st
+    | otherwise                 -> (n,nv):st
 
 -- Read an identifier
 rd :: Identifier -> ProgState (Maybe Value)
@@ -40,35 +40,31 @@ rd var = lookup var <$> get
 
 -- Swap two identifiers
 swap :: Identifier -> Identifier -> ProgState ()
-swap a b = state $ \st -> return $ map (\(n,v) -> if n == a then (b,v) else if n == b then (a,v) else (n,v)) st
+swap a b = modify $ \st -> map (\(n,v) -> if n == a then (b,v) else if n == b then (a,v) else (n,v)) st
 
 -- Interpreting engine --
 runProgram :: AST -> (VarTab -> Either ProgError VarTab)
-runProgram ast = runExcept . execStateT (interpAST ast)
-
--- interpreting a program
-interpAST :: AST -> ProgState ()
-interpAST ast = (interpAST' ast . genLabels) ast
--- stripping starts here
-  >> strip
+runProgram ast = runExcept . execStateT ((interpAST ast . genLabels) ast
+  -- Stripping begins here
+  >> strip)
 
 strip :: ProgState ()
-strip = state $ \st -> return $ filter (\(n,v) -> (not . isZero) v) st
+strip = modify $ \st -> filter (\(n,v) -> (not . isZero) v) st
 
 isZero :: Value -> Bool
 isZero (StackValue st) = null st
 isZero (IntValue n)    = n == 0
--- to here - just remove if need be
+-- and ends here - just remove if need be
 
-interpAST' :: AST -> LabTab -> ProgState ()
-interpAST' ast ltab = case ast of
+interpAST :: AST -> LabTab -> ProgState ()
+interpAST ast ltab = case ast of
   AST _ [] -> return ()
   AST _ (Block l _ insts t:_) -> interpInsts insts >> case t of
     Exit    -> return ()
-    Goto lt -> interpAST' (goto l lt ast ltab) ltab
+    Goto lt -> interpAST (goto l lt ast ltab) ltab
     If exp ltt ltf -> eval exp >>= \case
-      BoolValue b | b     -> interpAST' (goto l ltt ast ltab) ltab
-      BoolValue b | not b -> interpAST' (goto l ltf ast ltab) ltab
+      BoolValue b | b     -> interpAST (goto l ltt ast ltab) ltab
+      BoolValue b | not b -> interpAST (goto l ltf ast ltab) ltab
 
 -- interpreting list of instructions
 interpInsts :: [Statement] -> ProgState ()

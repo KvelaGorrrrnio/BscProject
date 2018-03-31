@@ -87,26 +87,20 @@ data UnOperator
   | Negate
   deriving Show
 
--- ændr Expression til kun at have
---    Variable Identifier
---    Literal Value
---    BinOperation
---    UnOperation
---    Top
---    Empty
---    Parens
-
 data Value
   = IntValue    Int
   | BoolValue   Bool
   | StackValue  [Value]
-  deriving (Show, Eq)
+  deriving Show
 
+-- Some helper function for traversing the AST
 next :: AST -> AST
 next (AST ls (r:rs)) = AST (r:ls) rs
+next (AST ls [])     = error "Already at the end of the program."
 
 prev :: AST -> AST
 prev (AST (l:ls) rs) = AST ls (l:rs)
+prev (AST ls []) = error "Already at the start of the program."
 
 goto :: Label -> Label -> AST -> LabTab -> AST
 goto l1 l2 ast ltab = case (lookup l1 ltab, lookup l2 ltab) of
