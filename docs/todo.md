@@ -28,6 +28,71 @@ Overvej - og måske implementer - stadig følgende ting:
     så skal log-strengen overføres til fejlmeddelelsen, så loggen stadig kan skrives til en fil. Det ville næsten være bedre at have loggen i et separat state, så vi få den ud uanset om der er error eller ej.
   - Lidt i samme boldgade; Vil vi tillade at fortolke programmet step-by-step, så man kan se tilstanden til hver en tid? - Og hvordan vil man i så fald gøre det?
 
+## Logging:
+type InterpState = ReaderT AST (StateT VarTab (ExceptT Error (State Log)))
+type ProgState   = StateT VarTab (ExceptT Error (State Log))
+
+data Message
+  = ExecMsg Stmt VarTab
+  | ErrMsg Error
+
+log :: Message -> State Log
+log msg = modify $ \log -> log ++ msg
+
+log stmt >> exec stmt
+
+
+## BESLUTNINGER
+AST:
+  - Navngivning: kortere (Exp, Val, Stat)
+  - Type: HashMap (parse blot for en liste af blokke)
+
+VarTab:
+  - Type: HashMap
+  - Bygges på forhånd: antag, at alle variable er bundet fra start
+
+Log:
+  - Egen datastruktur
+  - Til JSON
+  - Blot for exec og error indtil videre
+
+Interp:
+  - type InterpState = ReaderT AST (StateT VarTab (ExceptT Error (State Log)))
+  - type ProgState   = StateT VarTab (ExceptT Error (State Log))
+
+Type:
+  - Unknown type + unification
+  - Build VarTab with default values from TypeTab
+  - Terminerer ved første fejl
+
+CLI: (Tjek CLI-thoughts.txt)
+  - Interp
+  - Invert interp
+  - translate between srl/rl
+  - (optimering)
+
+exec stmt :: StateT VarTab (StateT Log (Exept Error))
+eval exp
+
+Map.insert id val vtab
+Map.insertWith/update (+) 0 id val
+
+type AST = HashMap Label Block
+type Block = (From, Statements, Goto)
+
+runProg ast = -- find entry i ast
+              -- interpBlock
+
+interpBlock lab (_,s,g) ast =
+  interpStats s
+  case g of
+    goto lab' -> (f,s',g') = Map.lookup lab' ast
+                  checkFrom lab f
+                  interpBlock lab' (f,s',g') ast
+
+checkFrom cur nfrom = -- for fi: evaluer exp og tjek om cur stemmer overens med nfrom
+                      -- for from: blot tjek om de stemmer overns
+                      -- entry: giv fejl.
 
 ## Når RL er done
 Overfør RL til SRL - bør være ret easy

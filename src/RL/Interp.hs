@@ -11,6 +11,7 @@ import Data.Maybe
 import Data.List
 -- Bitwise XOR
 import Data.Bits
+import qualified Data.Map.Strict as Map
 
 -- StateT and Except monads
 import Control.Monad.State
