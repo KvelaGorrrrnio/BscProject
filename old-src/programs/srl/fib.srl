@@ -1,0 +1,10 @@
+~ Fibonacci program
+~ Written in SRL
+n ^= 16
+w ^= 1
+from (v = 0)
+do
+  v += w
+  swap v w
+  n -= 1
+until (n = 0 || v > w)
