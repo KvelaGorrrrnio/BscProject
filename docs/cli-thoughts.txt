@@ -1,0 +1,13 @@
+(default): help
+<filename.rl>: interp <filename.rl>
+
+-i: compute inverse with interpretation to stdout
+-I=<filename.rl>: compute inverse into file (without interpretation)
+-T=<filename.srl>: Translate to SRL
+-O=<filename.rl>: Optimize RL program to <filename.rl>
+-l: log to stdout in Las-format
+-L=<filename.log>: log to <filename.log> in Las-format
+-j: log to stdout in JSON
+-J=<filename.json>: log as JSON to <filename.json>
+-h | --help: present help
+--no-vartab: doesn't print variable tab to stdout.
