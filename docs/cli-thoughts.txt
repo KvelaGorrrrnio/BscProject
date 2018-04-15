@@ -12,3 +12,24 @@
 -J=<filename.json>: log as JSON to <filename.json>
 -h | --help: present help
 --no-vartab: doesn't print variable tab to stdout.
+
+Modes:
+
+Interpret: default
+  log   (-l, --log)
+  logJ  ()
+  types (--types)
+  quiet (-q, --quiet)
+  files
+
+Optimize: o
+  outfile (FilePath)
+  keep the order? (-s, --strict)
+  file
+
+Translate: t
+  outfile         (-o [FILE])
+  optimize first  (--optimize)
+  keep the order? (-s, --strict)
+  file
+

@@ -1,17 +1,18 @@
 SRC = Main.hs
-EXE = interp
+HLP = HandleArgs.hs Interp.hs AST.hs Error.hs Inversion.hs
+EXE = revl
 
 default : compile
 
 compile : $(EXE)
 
-$(EXE) : $(SRC)
+$(EXE) : $(SRC) $(HLP)
 	ghc $(SRC) -o $(EXE) -odir xyz -hidir xyz
 
 run : $(EXE)
-	./$(EXE)
+	@./$(EXE) -l fib.rl
 
 clean :
-	rm -rf *.rlog xyz $(EXE)
+	@rm -rf *.rlog xyz $(EXE)
 
 
