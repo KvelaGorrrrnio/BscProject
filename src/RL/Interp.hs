@@ -8,7 +8,6 @@ import AST
 
 import Data.Bits (xor)
 import Data.List (intercalate)
--- skal væk med hardcodede ast'er
 
 import Control.Monad.Writer
 import Control.Monad.Reader

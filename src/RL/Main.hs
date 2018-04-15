@@ -9,8 +9,6 @@ import Interp
 import Inversion
 import Parser
 
-import qualified Data.HashMap.Strict as M
-
 noFile = putStrLn "No .rl file provided."
 
 main = do
@@ -30,22 +28,28 @@ main = do
       -- when t $ putStLn ttab -- if types
 
     Opt o s [] -> noFile
-    Opt o s f  ->
-      mapM_ (\fi -> do
-        ast <- parseFile fi
-        let out = replaceFileName fi (takeBaseName fi ++ "_opt.rl")
-        -- let ast' = if opt then optimize ast else ast
-        (writeFile out . show) ast
-      ) f
+    Opt o s f  -> do
+      ast <- parseFile f
+      let out = if null o
+                then replaceFileName f (takeBaseName f ++ "_opt.rl")
+                else o
+      -- let ast' = if opt then optimize ast else ast
+      (writeFile out . show) ast
+      -- mapM_ (\fi -> do
+      --   ast <- parseFile fi
+      --   let out = replaceFileName fi (takeBaseName fi ++ "_opt.rl")
+      --   -- let ast' = if opt then optimize ast else ast
+      --   (writeFile out . show) ast
+      -- ) f
 
     Inv o s opt [] -> noFile
-    Inv o s opt f  ->
-      mapM_ (\fi -> do
-        ast <- parseFile fi
-        let out = replaceFileName fi (takeBaseName fi ++ "_inv.rl")
-        -- let ast' = if opt then optimize ast else ast
-        (writeFile out . show . invert) ast
-      ) f
+    Inv o s opt f  -> do
+      ast <- parseFile f
+      let out = if null o
+                then replaceFileName f (takeBaseName f ++ "_inv.rl")
+                else o
+      -- let ast' = if opt then optimize ast else ast
+      (writeFile out . show . invert) ast
 
     Trl o s opt [] -> noFile
     Trl o s opt f  -> print args

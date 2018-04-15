@@ -5,30 +5,33 @@ import System.Console.CmdArgs
 import Prelude hiding (log)
 
 data RevL
-  = Trl {out :: FilePath, strict :: Bool, optim :: Bool, files :: [FilePath]}
-  | Inv {out :: FilePath, strict :: Bool, optim :: Bool, files :: [FilePath]}
-  | Opt {out :: FilePath, strict :: Bool, files :: [FilePath]}
+  = Trl {out :: FilePath, strict :: Bool, optim :: Bool, file :: FilePath}
+  | Inv {out :: FilePath, strict :: Bool, optim :: Bool, file :: FilePath}
+  | Opt {out :: FilePath, strict :: Bool,                file :: FilePath}
   | Run {log :: Bool, jlog :: Bool, types :: Bool, quiet :: Bool, file :: FilePath}
   deriving (Data,Typeable,Show,Eq)
 
+helpOutput = help "Output file"
+helpStrict = help "Keep the block order of the original program"
+
 translate = Trl
-  {out    = def &= typFile &= help "Output file"
-  ,strict = def &= help "Keep the block order of the original program"
+  {out    = def &= typFile &= helpOutput
+  ,strict = def &= helpStrict
   ,optim  = def &= explicit &= name "optim" &= help "Optimize program before translation"
-  ,files  = def &= args &= typ "FILES"
+  ,file  = def &= args &= typFile
   } &= help "Translate a RevL program to its SRevL counterpart"
 
 reverse_ = Inv
-  {out    = def &= typFile &= help "Output file"
-  ,strict = def &= help "Keep the block order of the original program"
+  {out    = def &= typFile &= helpOutput
+  ,strict = def &= helpStrict
   ,optim  = def &= explicit &= name "optim" &= help "Optimize program before translation"
-  ,files  = def &= args &= typ "FILES"
+  ,file  = def &= args &= typFile
   } &= help "Invert a RevL program"
 
 optimize = Opt
-  {out    = def &= typFile &= help "Output file"
-  ,strict = def &= help "Keep the block order of the original program"
-  ,files  = def &= args &= typ "FILES"
+  {out    = def &= typFile &= helpOutput
+  ,strict = def &= helpStrict
+  ,file  = def &= args &= typFile
   } &= help "Optimize a RevL program"
 
 interpret = Run
