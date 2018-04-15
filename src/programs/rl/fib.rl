@@ -10,8 +10,7 @@ goto loop
 loop: fi (v = 0) init loop
   v += w
   swap v w
-  n -= 1
-if (n = 0 || v > w) end loop
+if (--n) end loop
 ~ End
 end: from loop ~ Exit
 exit

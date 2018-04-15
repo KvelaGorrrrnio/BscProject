@@ -1,6 +1,6 @@
 ~ Fibonacci program
 ~ Written in SRL
-n ^= 16
+n ^= 0
 w ^= 1
 from (v = 0)
 do

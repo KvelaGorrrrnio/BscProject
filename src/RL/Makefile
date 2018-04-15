@@ -1,20 +1,17 @@
-cc=ghc
-mod=$(notdir ${CURDIR})
-modlc:=$(shell echo '$(mod)' | tr A-Z a-z)
-pfiles=$(wildcard *.hs)
-ofile=../bin/${modlc}i
-main=../${modlc}.hs
-odir=o
-hidir=hi
+SRC = Main.hs
+EXE = interp
 
-build: ${ofile}
-${ofile}: ${main} ${pfiles}
-	@echo "Building ${mod}..."
-	@mkdir -p "$(dir ${ofile})"
-	@${cc} "${main}" -o "${ofile}" -odir "${odir}" -hidir "${hidir}" -i=../
+default : compile
 
-clean:
-	@echo "Cleaning ${mod}..."
-	@rm -rf ${odir} ${hidir} ${ofile}
+compile : $(EXE)
 
-.PHONY: build clean
+$(EXE) : $(SRC)
+	ghc $(SRC) -o $(EXE) -odir xyz -hidir xyz
+
+run : $(EXE)
+	./$(EXE)
+
+clean :
+	rm -rf *.rlog xyz $(EXE)
+
+
