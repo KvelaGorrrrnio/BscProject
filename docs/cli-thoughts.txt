@@ -3,6 +3,7 @@
 
 -i: compute inverse with interpretation to stdout
 -I=<filename.rl>: compute inverse into file (without interpretation)
+--types         : Output type table
 -T=<filename.srl>: Translate to SRL
 -O=<filename.rl>: Optimize RL program to <filename.rl>
 -l: log to stdout in Las-format
