@@ -1,1 +1,3 @@
-inverteret program og starting state????
+- inverteret program og starting state????
+- Integer vs. Int ???
+- Ints i stedet for bool
