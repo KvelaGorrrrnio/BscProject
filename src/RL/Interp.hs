@@ -9,7 +9,6 @@ import AST
 import Data.Bits (xor)
 import Data.List (intercalate)
 -- skal væk med hardcodede ast'er
-import qualified Data.HashMap.Strict as M
 
 import Control.Monad.Writer
 import Control.Monad.Reader
@@ -80,7 +79,7 @@ interp l = do
 -- ==========
 
 execStmts :: [Stmt] -> VarState ()
-execStmts = foldr ((>>) . logStmt) (return ())
+execStmts = mapM_ logStmt
 
 exec :: Stmt -> VarState ()
 
@@ -155,8 +154,8 @@ exec _ = return ()
 eval :: Exp -> VarState Value
 
 -- terminals
-eval (Var id) = rd id
 eval (Lit v)  = return v
+eval (Var id) = rd id
 
 -- binary arithmetic    - probably single group
 eval (ABinary op l r) = applyABinOp (mapABinOp op) <$> eval l <*> eval r
@@ -190,6 +189,9 @@ eval (Top e) = do
     ListV (t:ts) -> return t
 eval (Empty e) = eval e >>= \(ListV ls) -> return $ boolToVal (null ls)
 eval (Size e)  = eval e >>= \(ListV ls) -> return $ IntV ((fromIntegral . length) ls)
+
+-- paranthesis
+eval (Parens e) = eval e
 
 -- =======
 -- helpers
@@ -238,22 +240,20 @@ valToBool (IntV p) = p /= 0
 --         [Skip],
 --         Exit))
 --     ]
-vtab = VarTab $ M.fromList [("n", IntV 0), ("v", IntV 0)]
-ast  = AST $ M.fromList [
-      ("init", Block (Entry,
-        [Update "n" PlusEq (Lit $ IntV 7000)],
-        Goto "loop"))
-
-    , ("loop", Block (Fi (Relational Eq (Var "v") (Lit $ IntV 0)) "init" "loop",
-        [
-          Update "v" PlusEq (Var "n")
-        , Update "n" MinusEq (Lit $ IntV 1)
-        ],
-        If (Var "n") "loop" "end"))
-
-    , ("end", Block (From "loop",
-        [Skip],
-        Exit))
-    ]
-
--- main = print $ runProgram "init" vtab ast
+-- vtab = VarTab $ M.fromList [("n", IntV 0), ("v", IntV 0)]
+-- ast  = AST $ M.fromList [
+--       ("init", Block (Entry,
+--         [Update "n" PlusEq (Lit $ IntV 32)],
+--         Goto "loop"))
+--
+--     , ("loop", Block (Fi (Relational Eq (Var "v") (Lit $ IntV 0)) "init" "loop",
+--         [
+--           Update "v" PlusEq (Var "n")
+--         , Update "n" MinusEq (Lit $ IntV 1)
+--         ],
+--         If (Var "n") "loop" "end"))
+--
+--     , ("end", Block (From "loop",
+--         [Skip],
+--         Exit))
+--     ]

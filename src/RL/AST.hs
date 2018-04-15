@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 module AST where
 
 import Data.Bits (xor)
@@ -45,6 +47,7 @@ instance Show VarTab where
     . M.toList
     . M.filter (not . isClear)
     ) vtab
+buildVTab (AST ast) = VarTab $ M.fromList [("n", IntV 0), ("v", IntV 0), ("w",IntV 0)]
 insert id val (VarTab vtab) = VarTab $ M.insert id val vtab
 adjust op id (VarTab vtab)  = VarTab $ M.adjust op id vtab
 varlookup id (VarTab vtab)  = M.lookup id vtab
@@ -65,6 +68,13 @@ instance Show AST where
 
 mapAST f (AST ast) = AST $ M.map f ast
 blklookup l (AST ast)  = M.lookup l ast
+getEntry (AST ast) = do
+  let entries = (map fst . M.toList . M.filter
+          (\case
+              Block (Entry,_,_) -> True
+              _                 -> False)
+          ) ast
+  if length entries == 1 then head entries else error "Exactly one entry must be defined"
 
 newtype Block = Block (From, [Stmt], To)
 instance Show Block where

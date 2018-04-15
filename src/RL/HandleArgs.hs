@@ -23,7 +23,7 @@ reverse_ = Inv
   ,strict = def &= help "Keep the block order of the original program"
   ,optim  = def &= explicit &= name "optim" &= help "Optimize program before translation"
   ,files  = def &= args &= typ "FILES"
-  } &= help "Translate a RevL program to its SRevL counterpart"
+  } &= help "Invert a RevL program"
 
 optimize = Opt
   {out    = def &= typFile &= help "Output file"

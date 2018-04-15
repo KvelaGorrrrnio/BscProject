@@ -1,0 +1,369 @@
+>> init
+
+> n ^= 16
+
+n -> 16
+
+> w ^= 1
+
+w -> 1
+n -> 16
+
+goto loop
+
+>> loop
+
+> v += w
+
+w -> 1
+n -> 16
+v -> 1
+
+> swap v w
+
+w -> 1
+n -> 16
+v -> 1
+
+> n -= 1
+
+w -> 1
+n -> 15
+v -> 1
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 1
+n -> 15
+v -> 2
+
+> swap v w
+
+w -> 2
+n -> 15
+v -> 1
+
+> n -= 1
+
+w -> 2
+n -> 14
+v -> 1
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 2
+n -> 14
+v -> 3
+
+> swap v w
+
+w -> 3
+n -> 14
+v -> 2
+
+> n -= 1
+
+w -> 3
+n -> 13
+v -> 2
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 3
+n -> 13
+v -> 5
+
+> swap v w
+
+w -> 5
+n -> 13
+v -> 3
+
+> n -= 1
+
+w -> 5
+n -> 12
+v -> 3
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 5
+n -> 12
+v -> 8
+
+> swap v w
+
+w -> 8
+n -> 12
+v -> 5
+
+> n -= 1
+
+w -> 8
+n -> 11
+v -> 5
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 8
+n -> 11
+v -> 13
+
+> swap v w
+
+w -> 13
+n -> 11
+v -> 8
+
+> n -= 1
+
+w -> 13
+n -> 10
+v -> 8
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 13
+n -> 10
+v -> 21
+
+> swap v w
+
+w -> 21
+n -> 10
+v -> 13
+
+> n -= 1
+
+w -> 21
+n -> 9
+v -> 13
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 21
+n -> 9
+v -> 34
+
+> swap v w
+
+w -> 34
+n -> 9
+v -> 21
+
+> n -= 1
+
+w -> 34
+n -> 8
+v -> 21
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 34
+n -> 8
+v -> 55
+
+> swap v w
+
+w -> 55
+n -> 8
+v -> 34
+
+> n -= 1
+
+w -> 55
+n -> 7
+v -> 34
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 55
+n -> 7
+v -> 89
+
+> swap v w
+
+w -> 89
+n -> 7
+v -> 55
+
+> n -= 1
+
+w -> 89
+n -> 6
+v -> 55
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 89
+n -> 6
+v -> 144
+
+> swap v w
+
+w -> 144
+n -> 6
+v -> 89
+
+> n -= 1
+
+w -> 144
+n -> 5
+v -> 89
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 144
+n -> 5
+v -> 233
+
+> swap v w
+
+w -> 233
+n -> 5
+v -> 144
+
+> n -= 1
+
+w -> 233
+n -> 4
+v -> 144
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 233
+n -> 4
+v -> 377
+
+> swap v w
+
+w -> 377
+n -> 4
+v -> 233
+
+> n -= 1
+
+w -> 377
+n -> 3
+v -> 233
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 377
+n -> 3
+v -> 610
+
+> swap v w
+
+w -> 610
+n -> 3
+v -> 377
+
+> n -= 1
+
+w -> 610
+n -> 2
+v -> 377
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 610
+n -> 2
+v -> 987
+
+> swap v w
+
+w -> 987
+n -> 2
+v -> 610
+
+> n -= 1
+
+w -> 987
+n -> 1
+v -> 610
+
+if (n) loop end
+
+>> loop
+
+> v += w
+
+w -> 987
+n -> 1
+v -> 1597
+
+> swap v w
+
+w -> 1597
+n -> 1
+v -> 987
+
+> n -= 1
+
+w -> 1597
+v -> 987
+
+if (n) loop end
+
+>> end
+
+> push a b
+
+*** Error: Variable 'a' not defined.

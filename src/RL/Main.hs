@@ -1,12 +1,15 @@
 module Main where
 
-import System.FilePath.Posix ((-<.>), takeBaseName, replaceBaseName)
+import System.FilePath.Posix ((-<.>), takeBaseName, replaceFileName)
 
 import Control.Monad (when, unless)
 
 import HandleArgs
 import Interp
 import Inversion
+import Parser
+
+import qualified Data.HashMap.Strict as M
 
 noFile = putStrLn "No .rl file provided."
 
@@ -14,7 +17,9 @@ main = do
   args <- handleArgs
   case args of
     Run l j t q [] -> noFile
-    Run l j t q f | (res,log) <- runProgram "init" vtab ast -> do
+    Run l j t q f -> do
+      ast <- parseFile f
+      let (res,log) = runProgram (getEntry ast) (buildVTab ast) ast
       unless q $ do -- if quiet
         putStrLn $ show ast ++ "\n"
         case res of
@@ -24,16 +29,23 @@ main = do
       when j (writeFile (f -<.> "json") $ logToJSON   log)   -- if jlog
       -- when t $ putStLn ttab -- if types
 
-    Opt o s []     -> noFile
-    Opt o s f      -> print args
+    Opt o s [] -> noFile
+    Opt o s f  ->
+      mapM_ (\fi -> do
+        ast <- parseFile fi
+        let out = replaceFileName fi (takeBaseName fi ++ "_opt.rl")
+        -- let ast' = if opt then optimize ast else ast
+        (writeFile out . show) ast
+      ) f
 
     Inv o s opt [] -> noFile
     Inv o s opt f  ->
-      if length f > 1 then return ()
-      else do
-        let out = if null o then ((++"_inv.rl") . takeBaseName) (head f) else o
+      mapM_ (\fi -> do
+        ast <- parseFile fi
+        let out = replaceFileName fi (takeBaseName fi ++ "_inv.rl")
         -- let ast' = if opt then optimize ast else ast
-        (writeFile out . show . invert) ast'
+        (writeFile out . show . invert) ast
+      ) f
 
     Trl o s opt [] -> noFile
     Trl o s opt f  -> print args
