@@ -17,8 +17,8 @@ languageDef =
   emptyDef { Token.commentStart     = "/*"
            , Token.commentEnd       = "*/"
            , Token.commentLine      = "//"
-           , Token.identStart       = letter <|> char '_'
-           , Token.identLetter      = alphaNum <|> char '\'' <|> char '_'
+           , Token.identStart       = letter
+           , Token.identLetter      = alphaNum
            , Token.reservedNames    = [ "entry"
                                       , "from"
                                       , "fi"
@@ -42,7 +42,8 @@ languageDef =
                                       ]
            , Token.reservedOpNames  = [ "+=", "-=", "^=", "*=", "/="
                                       , "+", "-", "^", "*", "**", "/", "%"
-                                      , "=", "<", ">", "&&", "||"
+                                      , "=", "!=", "<", "<=", ">", ">="
+                                      , "&&", "||"
                                       ]
            }
 
@@ -117,7 +118,7 @@ popStmt :: Parser Stmt
 popStmt = reserved "pop" >> Pop <$> identifier <*> identifier
 
 expression :: Parser Exp
-expression = buildExpressionParser operators term
+expression = buildExpressionParser operators term <?> "expression"
 
 operators = [
               [Prefix ((reservedOp "^"  <|> reserved "top"  )
@@ -149,9 +150,10 @@ operators = [
             , [Infix  ((reservedOp "||" <|> reserved "or")
                                          >> return (LBinary    Or       )) AssocLeft ]
             ]
-term =  fmap Parens (parens expression)
-     <|> fmap Var identifier
-     <|> fmap Lit (IntV <$> integer)
+term = Parens <$> parens expression
+   <|> Var    <$> identifier
+   <|> Lit . IntV <$> integer
+   <?> "expression, identifier or value"
 
 parseSrc :: String -> Either ParseError AST
 parseSrc = parse rlParser ""

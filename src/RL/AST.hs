@@ -1,5 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
-
 module AST where
 
 import Data.Bits (xor)

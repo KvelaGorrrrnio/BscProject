@@ -1,0 +1,23 @@
+
+n += 16
+w += 1
+from (v = 0) do
+  v += w
+  swap v w
+  n -= 1
+until (n = 0)
+
+[stmts]
+
+if (n = 0) then
+  v += w
+  swap v w
+  n -= 1
+else skip
+fi (n = 0)
+
+----------
+
+en If   i SRL er en if-goto i RL hvor hver krop er en blok i sig selv
+en From i SRL er en normal goto i RL, hvor næste block
+
