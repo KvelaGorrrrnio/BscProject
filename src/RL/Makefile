@@ -1,5 +1,5 @@
 SRC = Main.hs
-HLP = HandleArgs.hs Interp.hs AST.hs Error.hs Inversion.hs
+HLP = HandleArgs.hs Interp.hs AST.hs Error.hs Inversion.hs Parser.hs
 EXE = ../bin/revl
 
 default : compile
@@ -7,15 +7,16 @@ default : compile
 compile : $(EXE)
 
 $(EXE) : $(SRC) $(HLP)
-	ghc $(SRC) -o $(EXE) -odir xyz -hidir xyz
+	@ghc -XLambdaCase $(SRC) -o $(EXE) -odir xyz -hidir xyz
 
 run : $(EXE)
-	@./$(EXE) fib.rl
+	@./$(EXE) programs/fib.rl
 
 runhelp : $(EXE)
-	@./$(EXE) fib.rl --h
+	@./$(EXE) programs/fib.rl --h
+
+runlog : $(EXE)
+	@./$(EXE) programs/fib.rl --log-stdout
 
 clean :
-	@rm -rf *.rlog xyz $(EXE)
-
-
+	@rm -rf *.rlog xyz $(EXE) programs/*.rlog

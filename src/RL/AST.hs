@@ -4,7 +4,6 @@ module AST where
 
 import Data.Bits (xor)
 import Data.List (intercalate)
-import qualified Data.HashMap.Strict as M
 
 import Error
 
@@ -37,43 +36,44 @@ instance Show Message where
 -- VarTab
 -- ======
 
-newtype VarTab = VarTab (M.HashMap Id Value)
+-- ids
+type Id = String
+
+newtype VarTab = VarTab [(Id,Value)]
 instance Show VarTab where
   show (VarTab vtab) = (
       (\vt -> if null vt
               then "null"
               else (intercalate "\n" . map (\(k,v) -> k ++ " -> " ++ show v)) vt
       )
-    . M.toList
-    . M.filter (not . isClear)
+    . filter (not . isClear . snd)
     ) vtab
-buildVTab (AST ast) = VarTab $ M.fromList [("n", IntV 0), ("v", IntV 0), ("w",IntV 0)]
-insert id val (VarTab vtab) = VarTab $ M.insert id val vtab
-adjust op id (VarTab vtab)  = VarTab $ M.adjust op id vtab
-varlookup id (VarTab vtab)  = M.lookup id vtab
-
-
--- labels and ids
-type Label = String
-type Id    = String
+buildVTab (AST ast) = VarTab [("n", IntV 0), ("v", IntV 0), ("w",IntV 0), ("q",ListV []), ("p",ListV [])]
+insert id val (VarTab vtab)    = VarTab $ map (\(id',v) -> if id'==id then (id,val) else (id',v)) vtab
+adjust op id (VarTab vtab) = VarTab $ map (\(id',v) -> if id'==id then (id,op v) else (id',v)) vtab
+varlookup id (VarTab vtab)     = lookup id vtab
 
 
 -- ===
 -- AST
 -- ===
 
-newtype AST = AST (M.HashMap Label Block)
-instance Show AST where
-  show (AST ast) = (intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ show b) . M.toList) ast
+-- labels
+type Label = String
 
-mapAST f (AST ast) = AST $ M.map f ast
-blklookup l (AST ast)  = M.lookup l ast
+newtype AST = AST [(Label, Block)]
+instance Show AST where
+  show (AST ast) = (intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ show b)) ast
+
+mapAST f (AST ast) = AST $ map f ast
+revAST (AST ast)   = AST $ reverse ast
+blklookup l (AST ast)  = lookup l ast
 getEntry (AST ast) = do
-  let entries = (map fst . M.toList . M.filter
+  let entries = (map fst . filter
           (\case
-              Block (Entry,_,_) -> True
-              _                 -> False)
-          ) ast
+              (_, Block (Entry,_,_)) -> True
+              _                      -> False
+          )) ast
   if length entries == 1 then head entries else error "Exactly one entry must be defined"
 
 newtype Block = Block (From, [Stmt], To)
@@ -153,9 +153,7 @@ data Exp = Lit Value
 
          | Not Exp
 
-         | Top   Exp
-         | Size  Exp
-         | Empty Exp
+         | LstExp LstOp Exp
 
          | Parens Exp
 
@@ -167,19 +165,13 @@ instance Show Exp where
     Parens _ -> show op ++ show e
     _        -> show op ++ "(" ++ show e ++ ")"
   show (Relational op l r) = show l ++ show op ++ show r
-  show (LBinary op l r)    = show l ++ show op ++ show r
+  show (LBinary op l r)    = show op
   show (Not e)             = case e of
     Parens _ -> "not " ++ show e
     _        -> "not (" ++ show e ++ ")"
-  show (Top e)             = case e of
-    Parens _ -> "top " ++ show e
-    _        -> "top (" ++ show e ++ ")"
-  show (Size e)            = case e of
-    Parens _ -> "top " ++ show e
-    _        -> "top (" ++ show e ++ ")"
-  show (Empty e)           = case e of
-    Parens _ -> "top " ++ show e
-    _        -> "top (" ++ show e ++ ")"
+  show (LstExp op e)       = case e of
+    Parens _ -> show op ++ show e
+    _        -> show op ++ "(" ++ show e ++ ")"
   show (Parens e) = case e of
     Parens _ -> show e
     _        -> "(" ++ show e ++ ")"
@@ -218,21 +210,32 @@ mapAUnOp op = case op of
   Neg  -> negate
   Sign -> signum
 -- ^
-data ROp = Eq | Less | Greater
+data ROp = Eq | NEq | Less | LEq | Greater | GEq
 instance Show ROp where
   show Eq      = " = "
+  show NEq     = " != "
   show Less    = " < "
+  show LEq     = " <= "
   show Greater = " > "
+  show GEq     = " >= "
 mapROp op = case op of
   Eq      -> (==)
+  NEq     -> (/=)
   Less    -> (<)
+  LEq     -> (<=)
   Greater -> (>)
+  GEq     -> (>=)
 -- ^
 data LBinOp = And | Or
 instance Show LBinOp where
   show And = " && "
   show Or  = " || "
 mapLBinOp op = case op of
-  And -> (&&)
-  Or  -> (||)
-
+  And -> 0
+  Or  -> 1
+-- ^
+data LstOp = Top | Empty | Size
+instance Show LstOp where
+  show Top   = "top "
+  show Empty = "empty "
+  show Size  = "size "

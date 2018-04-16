@@ -1,8 +1,5 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 module Interp (module Interp, module AST) where
 
-import Prelude hiding (log)
 import Error
 import AST
 
@@ -29,28 +26,28 @@ rd id  = do
     Nothing -> logError $ "Variable '" ++ id ++ "' not defined."
 
 logStmt :: Stmt -> VarState ()
-logStmt Skip = log $ Stmt Skip
+logStmt Skip = tell [Stmt Skip]
 logStmt s = do
-  log $ Stmt s
+  tell [Stmt s]
   exec s
   vtab <- get
-  log $ State vtab
+  tell [State vtab]
 
 logError :: Error -> VarState a
 logError err = do
-  log $ Error err
+  tell [Error err]
   throwError err
 
-log :: MonadWriter Log m => Message -> m ()
-log msg = tell [msg]
 
 -- ==================
 -- Running the program
 -- ==================
 
-runProgram :: Label -> VarTab -> AST -> (Either Error VarTab, Log)
-runProgram entry vtab =
-  runWriter . runExceptT . flip execStateT vtab . runReaderT (interp entry)
+runProgram :: AST -> (Either Error VarTab, Log)
+runProgram ast = do
+  let entry = getEntry  ast
+      vtab  = buildVTab ast
+  runWriter . runExceptT . flip execStateT vtab . runReaderT (interp entry) $ ast
 
 -- ======
 -- Blocks
@@ -58,12 +55,12 @@ runProgram entry vtab =
 
 interp :: Label -> ProgState ()
 interp l = do
-  log $ NewBlock l
+  tell [NewBlock l]
   ast <- ask
   case blklookup l ast of
     Just (Block (_,ss,t)) -> do
       lift $ execStmts ss
-      log $ EndOfBlock t
+      tell [EndOfBlock t]
       case t of
         Exit       -> return ()
         Goto l     -> interp l
@@ -139,10 +136,7 @@ exec (Swap id1 id2) = do
   modify $ insert id1 v2
   modify $ insert id2 v1
 
--- sequence of statements
--- exec (Seq ss) = foldr ((>>) . exec) (return ()) ss
-
--- skip and rest
+-- skip
 exec _ = return ()
 
 
@@ -156,10 +150,10 @@ eval :: Exp -> VarState Value
 eval (Lit v)  = return v
 eval (Var id) = rd id
 
--- binary arithmetic    - probably single group
+-- binary arithmetic
 eval (ABinary op l r) = applyABinOp (mapABinOp op) <$> eval l <*> eval r
 
--- div variations       - probably their own group
+-- div variations
 eval (DivBinary op l r) = do
   vr <- eval r
   case vr of
@@ -167,27 +161,32 @@ eval (DivBinary op l r) = do
     IntV _ -> return ()
   flip (applyABinOp (mapDivOp op)) vr <$> eval l
 
--- unary arithmetic      - probably single group
+-- unary arithmetic
 eval (AUnary op e) = applyAUnOp (mapAUnOp op) <$> eval e
 
--- relational            - also single group
+-- relational
 eval (Relational op l r) = applyROp (mapROp op) <$> eval l <*> eval r
 
--- binary logical      - short cirquiting does not allow grouping
-eval (LBinary op l r) = boolToVal <$> (mapLBinOp op <$> (valToBool <$> eval l) <*> (valToBool <$> eval r))
+-- binary logical
+eval (LBinary op l r) | b <- mapLBinOp op = eval l >>= \case
+  IntV p | p == b -> return $ IntV b
+  IntV _ -> norm <$> eval r
 
--- unary logical         - only one
+-- unary logical
 eval (Not e) = --eval e >>= \(IntV p) -> IntV (boolToInt . not . intToBool $ p)
   applyABinOp xor (IntV 1) <$> (norm <$> eval e)
 
--- list expressions    - two of them can be grouped together
-eval (Top e) = do
+-- list expressions
+eval (LstExp Top e) = do
   v <- eval e
   case v of
     ListV []     -> logError "Accessing top of empty list."
     ListV (t:ts) -> return t
-eval (Empty e) = eval e >>= \(ListV ls) -> return $ boolToVal (null ls)
-eval (Size e)  = eval e >>= \(ListV ls) -> return $ IntV ((fromIntegral . length) ls)
+eval (LstExp op e) = do
+  let f = case op of
+        Empty -> boolToVal . null
+        Size  -> intToVal . length
+  eval e >>= \(ListV ls) -> return $ f ls
 
 -- paranthesis
 eval (Parens e) = eval e
@@ -217,42 +216,6 @@ boolToVal b = IntV $ if b then 1 else 0
 -- converting val to bool
 valToBool :: Value -> Bool
 valToBool (IntV p) = p /= 0
-
--- vtab = VarTab $ M.fromList [("n", IntV 0), ("v", IntV 0), ("w", IntV 0)]
--- ast  = AST $ M.fromList [
---       ("init", Block (Entry,
---         [
---           Update "n" PlusEq (Lit $ IntV 70)
---         , Update "w" XorEq (Lit $ IntV 1)
---         ],
---         Goto "loop"))
---
---     , ("loop", Block (Fi (Relational Eq (Var "v") (Lit $ IntV 0)) "init" "loop",
---         [
---           Update "v" PlusEq (Var "w")
---         , Swap "v" "w"
---         , Update "n" MinusEq (Lit $ IntV 1)
---         ],
---         If (Var "n") "loop" "end"))
---
---     , ("end", Block (From "loop",
---         [Skip],
---         Exit))
---     ]
--- vtab = VarTab $ M.fromList [("n", IntV 0), ("v", IntV 0)]
--- ast  = AST $ M.fromList [
---       ("init", Block (Entry,
---         [Update "n" PlusEq (Lit $ IntV 32)],
---         Goto "loop"))
---
---     , ("loop", Block (Fi (Relational Eq (Var "v") (Lit $ IntV 0)) "init" "loop",
---         [
---           Update "v" PlusEq (Var "n")
---         , Update "n" MinusEq (Lit $ IntV 1)
---         ],
---         If (Var "n") "loop" "end"))
---
---     , ("end", Block (From "loop",
---         [Skip],
---         Exit))
---     ]
+-- int to val
+intToVal :: Int -> Value
+intToVal = IntV . fromIntegral

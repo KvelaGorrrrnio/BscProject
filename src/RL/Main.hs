@@ -14,42 +14,43 @@ noFile = putStrLn "No .rl file provided."
 main = do
   args <- handleArgs
   case args of
-    Run l j t q [] -> noFile
-    Run l j t q f -> do
-      ast <- parseFile f
-      let (res,log) = runProgram (getEntry ast) (buildVTab ast) ast
-      unless q $ do -- if quiet
-        putStrLn $ show ast ++ "\n"
-        case res of
-          Left  err  -> putStrLn $ "*** Error: " ++ err
-          Right vtab -> putStrLn $ "Result:\n"   ++ show vtab
-      when l (writeFile (f -<.> "rlog") $ logToString log) -- if log
-      when j (writeFile (f -<.> "json") $ logToJSON   log)   -- if jlog
-      -- when t $ putStLn ttab -- if types
+    Run _ _ _ _ _ _ []  -> noFile
+    Run l ls j js t q f -> do
 
-    Opt o s [] -> noFile
-    Opt o s f  -> do
+      -- parse file and run
       ast <- parseFile f
-      let out = if null o
-                then replaceFileName f (takeBaseName f ++ "_opt.rl")
-                else o
-      -- let ast' = if opt then optimize ast else ast
-      (writeFile out . show) ast
-      -- mapM_ (\fi -> do
-      --   ast <- parseFile fi
-      --   let out = replaceFileName fi (takeBaseName fi ++ "_opt.rl")
-      --   -- let ast' = if opt then optimize ast else ast
-      --   (writeFile out . show) ast
-      -- ) f
+      let (res,log) = runProgram ast
 
-    Inv o s opt [] -> noFile
-    Inv o s opt f  -> do
+      -- if -q is not set
+      unless (q || ls) $ case res of
+        Left  err  -> putStrLn $ "*** Error: " ++ err
+        Right vtab -> print vtab
+
+      -- if -l flag is set
+      when l $ do
+        let logname = f -<.> "rlog"
+        writeFile logname . (++"\n") . logToString $ log
+        unless q $ putStrLn ("\nThe log was written to " ++ logname)
+
+      -- if --log-stdout flag is set
+      when ls $ putStrLn (logToString log)
+
+      -- if -j flag is set
+      when j $ do
+        let logname = f -<.> "json"
+        writeFile logname . (++"\n") . logToJSON $ log
+        unless q $ putStrLn ("\nThe log was written to " ++ logname)
+
+      -- if --json-stdout flag is set
+      when js $ putStrLn (logToJSON log)
+
+    Inv _ [] -> noFile
+    Inv o f  -> do
       ast <- parseFile f
       let out = if null o
                 then replaceFileName f (takeBaseName f ++ "_inv.rl")
                 else o
-      -- let ast' = if opt then optimize ast else ast
-      (writeFile out . show . invert) ast
+      writeFile out . (++"\n") . show . invert $ ast
 
-    Trl o s opt [] -> noFile
-    Trl o s opt f  -> print args
+    Trl o [] -> noFile
+    Trl o f  -> print args

@@ -1,10 +1,9 @@
 module Inversion where
 
 import AST
-import qualified Data.HashMap.Strict as M
 
 invert :: AST -> AST
-invert = mapAST invertBlock
+invert = revAST . mapAST (\(l,b) -> (l,invertBlock b))
 
 invertBlock :: Block -> Block
 invertBlock (Block (f,s,t)) = Block (invertTo t, (map invertStmt . reverse) s, invertFrom f)
