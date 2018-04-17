@@ -2,7 +2,7 @@ module Translate where
 
 import qualified RlAST as R
 import qualified SrlAST as S
-import Control.Monad.Writer
+import Control.Monad.State
 import Data.List
 
 import Extra
@@ -10,61 +10,72 @@ import Extra
 
 ast = S.AST
   [
-    S.Update "n" S.XorEq (Lit $ IntV 16)
-  , S.Update "w" S.XorEq (Lit $ IntV 1)
-  , S.Until (Relational Eq (Var "v") (Lit $ IntV 0))
+    Update "n" XorEq (Lit $ IntV 16)
+  , Update "w" XorEq (Lit $ IntV 1)
+  , Until (Relational Eq (Var "v") (Lit $ IntV 0))
     [
-      S.Update "v" S.PlusEq (Var "w")
-    , S.Swap "v" "w"
-    , S.Update "n" S.MinusEq (Lit $ IntV 1)
+      Update "v" PlusEq (Var "w")
+    , Swap "v" "w"
+    , Update "n" MinusEq (Lit $ IntV 1)
     ]
     (Relational Eq (Var "n") (Lit $ IntV 0))
-  , S.If (Relational Eq (Var "n") (Lit $ IntV 0))
-    [
-      S.Update "v" S.PlusEq (Var "w")
-    , S.Swap "v" "w"
-    ]
-    [
-      S.If (Relational Eq (Var "n") (Lit $ IntV 0))
-      [
-        S.Update "v" S.PlusEq (Var "w")
-      , S.Swap "v" "w"
-      ]
-      [S.Skip]
-      (Relational Eq (Var "n") (Lit $ IntV 0))
-    ]
-    (Relational Eq (Var "n") (Lit $ IntV 0))
-  ]
+-- extra
+   , If (Relational Eq (Var "n") (Lit $ IntV 0))
+     [
+       Update "v" PlusEq (Var "w")
+     , Swap "v" "w"
+     ]
+     [
+       If (Relational Eq (Var "n") (Lit $ IntV 0))
+       [
+         Update "v" PlusEq (Var "w")
+       , Swap "v" "w"
+       ]
+       [Skip]
+       (Relational Eq (Var "n") (Lit $ IntV 0))
+     ]
+     (Relational Eq (Var "n") (Lit $ IntV 0))
+   ]
 
-translate :: S.AST -> String
-translate (S.AST ast) = (++"exit") $ execWriter $ translateS 0 "init" R.Entry ast
+genLabel :: () -> State Int String
+genLabel () = (++) "lab" . show <$> get <* modify (+1)
 
-translateS :: Int -> String -> R.From -> [S.Stmt] -> Writer String ()
-translateS num label from ss = do
-  let (sblock,rest) = break isIfOrUntil ss
-  tell $ label ++ show num ++ ": "
-  tell $ show from ++ "\n"
-  tell $ "  " ++ if null ss then "skip" else (intercalate "\n  " . map show) sblock
-  tell "\n"
-  case rest of
-    [] -> return ()
-    S.If t s1 s2 a : ss -> do
-      tell $ "if " ++ show t ++ " then" ++ show (num + 1) ++ " else" ++ show (num + 1) ++ "\n\n"
-      translateS (num+1) "then" (R.From label) s1
-      tell "goto next\n\n"
-      translateS (num+1) "else" (R.From label) s2
-      tell "goto next\n\n"
-      translateS (num+1) "next" (R.Fi a "then" "else") ss
-    S.Until a s t : ss -> do
-      tell $ "goto loop" ++ show (num+1) ++ "\n\n"
-      translateS (num+1) "loop" (R.Fi a label "loop") s
-      tell $ "if " ++ show t ++ " next" ++ show (num+1) ++ " loop" ++ show (num+1) ++ "\n\n"
-      translateS (num+1) "next" (R.From "loop") ss
+translate :: S.AST -> R.AST
+translate (S.AST ast) = R.AST $ evalState (translateS "init" R.Entry R.Exit ast) 0
 
+translateS :: R.Label -> R.From -> R.To -> [Stmt] -> State Int [(R.Label, R.Block)]
+translateS thisL thisF thisT ss = do
+  let (stmts,r)  = break isIfOrUntil ss
+      thisB      = if null stmts then [Skip] else stmts
+  case r of
+    [] -> do
+      let block = (thisL , R.Block (thisF, thisB, thisT))
+      return [block]
+    If t s1 s2 a : ss -> do
+      thenL <- genLabel ()
+      elseL <- genLabel ()
+      endL  <- genLabel ()
 
-isIfOrUntil :: S.Stmt -> Bool
-isIfOrUntil S.If{}    = True
-isIfOrUntil S.Until{} = True
+      let ifblock = (thisL , R.Block (thisF, thisB, R.GIf t thenL elseL))
+
+      thenblocks <- translateS thenL (R.From thisL)       (R.Goto endL)  s1
+      elseblocks <- translateS elseL (R.From thisL)       (R.Goto endL)  s2
+      endblocks  <- translateS endL  (R.Fi a thenL elseL) thisT ss
+
+      return $ ifblock : (thenblocks ++ elseblocks ++ endblocks)
+
+    Until a s t : ss -> do
+      loopL <- genLabel ()
+      let firstblock = (thisL , R.Block (thisF, thisB, R.Goto loopL))
+      endL       <- genLabel ()
+      loopblocks <- translateS loopL (R.Fi a thisL loopL) (R.GIf t endL loopL) s
+      endblocks  <- translateS endL  (R.From loopL)       thisT ss
+
+      return $ firstblock : loopblocks ++ endblocks
+
+isIfOrUntil :: Stmt -> Bool
+isIfOrUntil If{}    = True
+isIfOrUntil Until{} = True
 isIfOrUntil _         = False
 
-main = putStrLn $ translate ast
+main = print $ translate ast

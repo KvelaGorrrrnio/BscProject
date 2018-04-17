@@ -73,41 +73,11 @@ instance Show From where
   show Entry        = "entry"
 
 data To = Goto Label
-        | If Exp Label Label
+        | GIf Exp Label Label
         | Exit
 instance Show To where
   show (Goto l)     = "goto " ++ l
-  show (If e l1 l2) = case e of
+  show (GIf e l1 l2) = case e of
     Parens _ -> "if "  ++ show e ++ " "  ++ l1 ++ " " ++ l2
     _        -> "if (" ++ show e ++ ") " ++ l1 ++ " " ++ l2
   show Exit         = "exit"
-
-data Stmt = Update Id UpdOp Exp
-          | Push Id Id
-          | Pop  Id Id
-          | Swap Id Id
-          | Skip
-        -- NU!     | Seq [Stmt]
-instance Show Stmt where
-  show (Update id op e) = id ++ show op ++ show e
-  show (Push id1 id2)   = "push " ++ id1 ++ " " ++ id2
-  show (Pop id1 id2)    = "pop "  ++ id1 ++ " " ++ id2
-  show (Swap id1 id2)   = "swap " ++ id1 ++ " " ++ id2
-  show Skip             = "skip"
-  -- show (Seq s)          = (intercalate "\n  " . map show) s
-
-
-data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq
-instance Show UpdOp where
-  show PlusEq  = " += "
-  show MinusEq = " -= "
-  show XorEq   = " ^= "
-  show MultEq  = " *= "
-  show DivEq   = " /= "
-mapUpdOp :: UpdOp -> Exp -> Exp -> Exp
-mapUpdOp PlusEq  = ABinary   Plus
-mapUpdOp MinusEq = ABinary   Minus
-mapUpdOp XorEq   = ABinary   Xor
-mapUpdOp MultEq  = ABinary   Mult
-mapUpdOp DivEq   = DivBinary Div
-
