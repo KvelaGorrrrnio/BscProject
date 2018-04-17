@@ -1,0 +1,12 @@
+v += 2
+n += 315
+from (empty p && v = 2) do
+  if (n % v = 0) then
+    n /= v
+    push v p
+    v ^= top p
+  else v += 1
+  fi (not (empty p) && top p = v)
+until (n = 1)
+v -= top p
+n -= 1

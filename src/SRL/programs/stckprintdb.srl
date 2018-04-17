@@ -1,0 +1,44 @@
+/*
+  This program is for testing the stack implementation
+  in 3 dimensions. This program should also test debug
+  print statements - that is, print statements without
+  side effects. They are denoted by the '!!' or '!print'
+  syntax. That way, we can print our lists and variables
+  to see if the contents make sense.
+
+  This program will give an error because of a non-zero
+  end state.
+*/
+
+            int t int x
+            stack int l
+      stack stack int l'
+stack stack stack int l''
+
+procedure main:
+  from (empty l'') do
+    from (empty l') do
+      from (empty l) do
+        x += 1
+        t ^= x
+        push t l
+      until (# l = 2)
+      reverse l
+      push l l'
+    until (# l' = 3)
+    reverse l'
+    push l' l''
+  until (# l'' = 4)
+  reverse l'' !! l''
+
+  from (# l'' = 4) do
+    pop l' l''
+    from (# l' = 3) do
+      pop l l'
+      from (# l = 2) do
+        pop t l ! t
+        x -= 1
+      until (empty l)
+    until (empty l')
+  until (empty l'')
+end

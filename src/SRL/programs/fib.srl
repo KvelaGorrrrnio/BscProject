@@ -1,0 +1,17 @@
+// Program for computing the n'th fibonacci pair
+
+int n int v int w
+
+procedure main: ? n
+  error "n must be greater than 0." if (n < 1)
+  call fib ! v ! w
+end
+
+procedure fib:
+  w ^= 1
+  from (v = 0) do
+    v += w
+    v <> w
+    n -= 1
+  until (n = 0)
+end

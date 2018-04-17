@@ -1,20 +1,13 @@
-cc=ghc
-mod=$(notdir ${CURDIR})
-modlc:=$(shell echo '$(mod)' | tr A-Z a-z)
-pfiles=$(wildcard *.hs)
-ofile=../bin/${modlc}i
-main=../${modlc}.hs
-odir=o
-hidir=hi
+SRC = Main.hs
+HLP = HandleArgs.hs SrlAST.hs Error.hs Parser.hs Translation.hs
+EXE = ../bin/srevl
 
-build: ${ofile}
-${ofile}: ${main} ${pfiles}
-	@echo "Building ${mod}..."
-	@mkdir -p "$(dir ${ofile})"
-	@${cc} "${main}" -o "${ofile}" -odir "${odir}" -hidir "${hidir}" -i=../
+default : compile
 
-clean:
-	@echo "Cleaning ${mod}..."
-	@rm -rf ${odir} ${hidir} ${ofile}
+compile : $(EXE)
 
-.PHONY: build clean
+$(EXE) : $(SRC) $(HLP)
+	@ghc $(SRC) -o $(EXE) -odir xyz -hidir xyz
+
+clean :
+	@rm -rf *.rlog xyz $(EXE) programs/*.srlog

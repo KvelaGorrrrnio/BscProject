@@ -45,7 +45,7 @@ instance Show Stmt where
   show (Pop id1 id2)    = "pop "  ++ id1 ++ " " ++ id2
   show (Swap id1 id2)   = "swap " ++ id1 ++ " " ++ id2
   show Skip             = "skip"
-  show (If t s1 s2 a)   = "if " ++ show t ++ " then " ++ show a ++ " fi " ++ show a
+  show (If t s1 s2 a)   = "if " ++ show t ++ " then " ++ show s1 ++ " else " ++ show s2 ++ " fi " ++ show a
   show (Until a s t)    = "from " ++ show a ++ " do " ++ (intercalate "\n" . map show) s ++ " until " ++ show t
 
 data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq
@@ -87,11 +87,12 @@ instance Show Exp where
   show (Lit v)             = show v
   show (Var id)            = id
   show (ABinary op l r)    = show l ++ show op ++ show r
+  show (DivBinary op l r)  = show l ++ show op ++ show r
   show (AUnary op e)       = case e of
     Parens _ -> show op ++ show e
     _        -> show op ++ "(" ++ show e ++ ")"
   show (Relational op l r) = show l ++ show op ++ show r
-  show (LBinary op l r)    = show op
+  show (LBinary op l r)    = show l ++ show op ++ show r
   show (Not e)             = case e of
     Parens _ -> "not " ++ show e
     _        -> "not (" ++ show e ++ ")"

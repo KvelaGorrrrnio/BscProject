@@ -1,0 +1,12 @@
+n ^= 90
+
+from (v = 0) do
+  if (n % 2 = 0)
+    then v += n
+    else skip
+  fi (n % 2 = 0)
+  n -= 1
+until (n = 0)
+
+swap n v
+

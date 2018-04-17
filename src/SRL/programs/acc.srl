@@ -1,0 +1,15 @@
+// Compute the accumulated sum
+
+int a int n
+
+procedure acc:
+  from (a = 0) do
+    a += n
+    n -= 1
+  until (n = 0)
+end
+
+procedure main: ? n
+  error "n must be 1 or greater." if (n < 1)
+  call acc ! a
+end
