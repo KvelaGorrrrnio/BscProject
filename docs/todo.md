@@ -1,9 +1,3 @@
--- When changing anything;
---   AST types
---   Reversion
---   toString
---   evaluation/interpretation
-
 ## I første omgang
 Interaktivt interface
 Test til parser og fortolker
@@ -20,6 +14,12 @@ Overvej - og måske implementer - stadig følgende ting:
   - Optimering
   - Generer VarTab fra TypeTab
   - Lidt i samme boldgade; Vil vi tillade at fortolke programmet step-by-step, så man kan se tilstanden til hver en tid? - Og hvordan vil man i så fald gøre det?
+
+## Gør ting fælles
+- invertStmt (Inversion.hs)
+- Error
+- HandleArgs.hs (giv programnavnet som argument?
+- Main.hs ? grundlæggende forskel er navnene (SRL/RL)
 
 ## BESLUTNINGER
 VarTab:
