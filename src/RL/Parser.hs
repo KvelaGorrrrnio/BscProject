@@ -7,7 +7,7 @@ import CommonParser
 import AST
 
 rlParser :: Parser AST
-rlParser = whiteSpace >> AST <$> blocks
+rlParser = whiteSpace >> blocks
 
 blocks :: Parser [(Label, Block)]
 blocks = many1 block
@@ -19,7 +19,7 @@ block = do
   f <- from
   s <- statements
   t <- to
-  return (l, Block (f,s,t))
+  return (l, (f,s,t))
 
 from :: Parser From
 from = (reserved "from"  >> From <$> identifier)
@@ -28,7 +28,7 @@ from = (reserved "from"  >> From <$> identifier)
 
 to :: Parser To
 to  = (reserved "goto"  >> Goto <$> identifier)
-  <|> (reserved "if"    >> If <$> expression <*> identifier <*> identifier)
+  <|> (reserved "if"    >> IfTo <$> expression <*> identifier <*> identifier)
   <|> (reserved "exit"  >> return Exit)
 
 statements :: Parser [Stmt]

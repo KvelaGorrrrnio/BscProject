@@ -10,25 +10,6 @@ import Control.Monad.State
 
 import Extra
 
-ast = S.AST
-  [
-    Update "n" PlusEq (Lit $ IntV 40)
-  , Until (Relational Eq (Var "v") (Lit $ IntV 0))
-    [
-      If (Relational Eq (DivBinary Mod (Var "n") (Lit $ IntV 2)) (Lit $ IntV 0))
-      [
-        Update "v" PlusEq (Var "n")
-      ]
-      [
-        Skip
-      ]
-      (Relational Eq (DivBinary Mod (Var "n") (Lit $ IntV 2)) (Lit $ IntV 0))
-    , Update "n" MinusEq (Lit $ IntV 1)
-    ]
-    (Relational Eq (Var "n") (Lit $ IntV 0))
-  , Swap "n" "v"
-  ]
-
 genLabel :: MonadState Int m => String -> m R.Label
 genLabel lab = (++) lab . show <$> get
 genLabelI :: MonadState Int m => String -> m R.Label

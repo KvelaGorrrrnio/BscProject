@@ -58,13 +58,13 @@ interp l = do
   tell [NewBlock l]
   ast <- ask
   case blklookup l ast of
-    Just (Block (_,ss,t)) -> do
+    Just (_,ss,t) -> do
       lift $ execStmts ss
       tell [EndOfBlock t]
       case t of
         Exit       -> return ()
         Goto l     -> interp l
-        If t l1 l2 -> do
+        IfTo t l1 l2 -> do
           t' <- lift $ valToBool <$> eval t
           if t' then interp l1 else interp l2
     Nothing -> lift $ logError ("Label '" ++ l ++ "' not defined.")
