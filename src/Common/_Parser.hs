@@ -92,33 +92,33 @@ expression = buildExpressionParser operators term <?> "expression"
 
 operators = [
               [Prefix ((reservedOp "^"  <|> reserved "top"  )
-                                         >> return (Unary     Top      ))           ]
+                                         >> return (LstExp     Top      ))           ]
             , [Prefix ((reservedOp "#"  <|> reserved "size" )
-                                         >> return (Unary     Size     ))           ]
+                                         >> return (LstExp     Size     ))           ]
             , [Prefix ((reservedOp "?"  <|> reserved "empty")
-                                         >> return (Unary     Empty    ))           ]
+                                         >> return (LstExp     Empty    ))           ]
             , [Prefix ((reservedOp "-"  <|> reserved "neg"  )
-                                         >> return (Unary     Neg      ))           ]
+                                         >> return (AUnary     Neg      ))           ]
             , [Prefix ((reservedOp "~"  <|> reserved "sig"  )
-                                         >> return (Unary     Sign     ))           ]
+                                         >> return (AUnary     Sign     ))           ]
             , [Prefix ((reservedOp "!"  <|> reserved "not"  )
-                                         >> return (Unary     Not      ))           ]
-            , [Infix  ( reservedOp "**"  >> return (Binary    Pow      )) AssocRight]
-            , [Infix  ( reservedOp "%"   >> return (Binary    Mod      )) AssocLeft ]
-            , [Infix  ( reservedOp "*"   >> return (Binary    Mult     )) AssocLeft ]
-            , [Infix  ( reservedOp "/"   >> return (Binary    Div      )) AssocLeft ]
-            , [Infix  ( reservedOp "+"   >> return (Binary    Plus     )) AssocLeft ]
-            , [Infix  ( reservedOp "-"   >> return (Binary    Minus    )) AssocLeft ]
-            , [Infix  ( reservedOp "<"   >> return (Binary    Less     )) AssocNone ]
-            , [Infix  ( reservedOp "<="  >> return (Binary    Leq      )) AssocNone ]
-            , [Infix  ( reservedOp ">"   >> return (Binary    Greater  )) AssocNone ]
-            , [Infix  ( reservedOp ">="  >> return (Binary    Geq      )) AssocNone ]
-            , [Infix  ( reservedOp "="   >> return (Binary    Equal    )) AssocNone ]
-            , [Infix  ( reservedOp "!="  >> return (Binary    Neq      )) AssocNone ]
+                                         >> return Not                   )           ]
+            , [Infix  ( reservedOp "**"  >> return (ABinary    Pow      )) AssocRight]
+            , [Infix  ( reservedOp "%"   >> return (DivBinary  Mod      )) AssocLeft ]
+            , [Infix  ( reservedOp "*"   >> return (ABinary    Mult     )) AssocLeft ]
+            , [Infix  ( reservedOp "/"   >> return (DivBinary  Div      )) AssocLeft ]
+            , [Infix  ( reservedOp "+"   >> return (ABinary    Plus     )) AssocLeft ]
+            , [Infix  ( reservedOp "-"   >> return (ABinary    Minus    )) AssocLeft ]
+            , [Infix  ( reservedOp "<"   >> return (Relational Less     )) AssocNone ]
+            , [Infix  ( reservedOp "<="  >> return (Relational LEq      )) AssocNone ]
+            , [Infix  ( reservedOp ">"   >> return (Relational Greater  )) AssocNone ]
+            , [Infix  ( reservedOp ">="  >> return (Relational GEq      )) AssocNone ]
+            , [Infix  ( reservedOp "="   >> return (Relational Eq       )) AssocNone ]
+            , [Infix  ( reservedOp "!="  >> return (Relational NEq      )) AssocNone ]
             , [Infix  ((reservedOp "&&" <|> reserved "and")
-                                         >> return (Binary    And      )) AssocLeft ]
+                                         >> return (LBinary    And      )) AssocLeft ]
             , [Infix  ((reservedOp "||" <|> reserved "or")
-                                         >> return (Binary    Or       )) AssocLeft ]
+                                         >> return (LBinary    Or       )) AssocLeft ]
             ]
 term = Parens <$> parens expression
    <|> Var    <$> identifier

@@ -151,29 +151,42 @@ eval (Lit v)  = return v
 eval (Var id) = rd id
 
 -- binary arithmetic
-eval (Binary op l r) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> eval r
--- binary div and mod
-                     | op <= Mod = eval r >>= \rv -> case rv of
-  IntV 0 -> logError "Dividing by zero."
-  IntV _ -> eval l >>= \lv -> return $ applyABinOp (mapABinOp op) lv rv
--- binary relational
-                     | op <= Geq = applyRBinOp (mapRBinOp op) <$> eval l <*> eval r
--- binary logical
-                     | otherwise = eval l >>= \case
-  IntV 0 | op==And        -> return $ IntV 0
-  IntV v | v/=0 && op==Or -> return $ IntV 1
-  IntV _ -> norm <$> eval r
+eval (ABinary op l r) = applyABinOp (mapABinOp op) <$> eval l <*> eval r
+
+-- div variations
+eval (DivBinary op l r) = do
+  vr <- eval r
+  case vr of
+    IntV 0 -> logError "Dividing by zero."
+    IntV _ -> return ()
+  flip (applyABinOp (mapDivOp op)) vr <$> eval l
+
 -- unary arithmetic
-eval (Unary op exp) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (mapAUnOp op) v
+eval (AUnary op e) = applyAUnOp (mapAUnOp op) <$> eval e
+
+-- relational
+eval (Relational op l r) = applyROp (mapROp op) <$> eval l <*> eval r
+
+-- binary logical
+eval (LBinary op l r) | b <- mapLBinOp op = eval l >>= \case
+  IntV p | p == b -> return $ IntV b
+  IntV _ -> norm <$> eval r
+
 -- unary logical
-                    | op < Top    = eval exp >>= \(IntV v) -> return $ boolToVal $ (mapLUnOp op) $ v/=0
--- unary list
-                    | otherwise   = eval exp >>= \(ListV lv) -> case op of
-  Top   -> case lv of
-    []   -> logError "Accessing top of empty list."
-    t:ts -> return t
-  Empty -> return $ boolToVal.null  $ lv
-  Size  -> return $ intToVal.length $ lv
+eval (Not e) = --eval e >>= \(IntV p) -> IntV (boolToInt . not . intToBool $ p)
+  applyABinOp xor (IntV 1) <$> (norm <$> eval e)
+
+-- list expressions
+eval (LstExp Top e) = do
+  v <- eval e
+  case v of
+    ListV []     -> logError "Accessing top of empty list."
+    ListV (t:ts) -> return t
+eval (LstExp op e) = do
+  let f = case op of
+        Empty -> boolToVal . null
+        Size  -> intToVal . length
+  eval e >>= \(ListV ls) -> return $ f ls
 
 -- paranthesis
 eval (Parens e) = eval e
@@ -181,35 +194,16 @@ eval (Parens e) = eval e
 -- =======
 -- helpers
 -- =======
-mapABinOp Plus    = (+)
-mapABinOp Minus   = (-)
-mapABinOp Xor     = (xor)
-mapABinOp Pow     = (^)
-mapABinOp Mult    = (*)
-mapABinOp Div     = (div)
-mapABinOp Mod     = (mod)
-
-mapRBinOp Equal   = (==)
-mapRBinOp Neq     = (/=)
-mapRBinOp Less    = (<)
-mapRBinOp Leq     = (<=)
-mapRBinOp Greater = (>)
-mapRBinOp Geq     = (>=)
-
-mapAUnOp Neg  = negate
-mapAUnOp Sign = signum
-
-mapLUnOp Not  = not
 
 -- apply arithmetic binary operator
 applyABinOp :: (Integer -> Integer -> Integer) -> Value -> Value -> Value
 applyABinOp op (IntV n) (IntV m) = IntV $ op n m
--- apply relational operator
-applyRBinOp :: (Integer -> Integer -> Bool) -> Value -> Value -> Value
-applyRBinOp op (IntV n) (IntV m) = boolToVal $ op n m
 -- apply arithmetic unary operator
 applyAUnOp :: (Integer -> Integer) -> Value -> Value
 applyAUnOp op (IntV n) = IntV $ op n
+-- apply relational operator
+applyROp :: (Integer -> Integer -> Bool) -> Value -> Value -> Value
+applyROp op (IntV n) (IntV m) = boolToVal $ op n m
 
 -- normalise to bool
 norm :: Value -> Value

@@ -52,115 +52,61 @@ instance Show UpdOp where
   show MultEq  = " *= "
   show DivEq   = " /= "
 mapUpdOp :: UpdOp -> Exp -> Exp -> Exp
-mapUpdOp PlusEq  = ABinary   Plus
-mapUpdOp MinusEq = ABinary   Minus
-mapUpdOp XorEq   = ABinary   Xor
-mapUpdOp MultEq  = ABinary   Mult
-mapUpdOp DivEq   = DivBinary Div
+mapUpdOp PlusEq  = Binary   Plus
+mapUpdOp MinusEq = Binary   Minus
+mapUpdOp XorEq   = Binary   Xor
+mapUpdOp MultEq  = Binary   Mult
+mapUpdOp DivEq   = Binary   Div
 
--- Expressions
-data Exp = Lit Value
-         | Var   Id
-
-         | ABinary ABinOp Exp Exp
-
-         | DivBinary DivOp Exp Exp
-
-         | AUnary AUnOp Exp
-
-         | Relational ROp Exp Exp
-
-         | LBinary LBinOp Exp Exp
-
-         | Not Exp
-
-         | LstExp LstOp Exp
-
-         | Parens Exp
-
+data Exp
+  = Lit    Value
+  | Var    Id
+  | Binary BinOp Exp Exp
+  | Unary  UnOp  Exp
+  | Parens Exp
 instance Show Exp where
-  show (Lit v)             = show v
-  show (Var id)            = id
-  show (ABinary op l r)    = show l ++ show op ++ show r
-  show (DivBinary op l r)  = show l ++ show op ++ show r
-  show (AUnary op e)       = case e of
-    Parens _ -> show op ++ show e
-    _        -> show op ++ "(" ++ show e ++ ")"
-  show (Relational op l r) = show l ++ show op ++ show r
-  show (LBinary op l r)    = show l ++ show op ++ show r
-  show (Not e)             = case e of
-    Parens _ -> "not " ++ show e
-    _        -> "not (" ++ show e ++ ")"
-  show (LstExp op e)       = case e of
-    Parens _ -> show op ++ show e
-    _        -> show op ++ "(" ++ show e ++ ")"
-  show (Parens e) = case e of
-    Parens _ -> show e
-    _        -> "(" ++ show e ++ ")"
--- ^
-data ABinOp = Plus
-            | Minus
-            | Xor
-            | Pow
-            | Mult
-instance Show ABinOp where
-  show Plus  = " + "
-  show Minus = " - "
-  show Xor   = " ^ "
-  show Pow   = " ** "
-  show Mult  = " * "
-mapABinOp op = case op of
-  Plus  -> (+)
-  Minus -> (-)
-  Xor   -> xor
-  Pow   -> (^)
-  Mult  -> (*)
--- ^
-data DivOp = Div | Mod
-instance Show DivOp where
-  show Div = " / "
-  show Mod = " % "
-mapDivOp op = case op of
-  Div -> div
-  Mod -> mod
--- ^
-data AUnOp = Neg | Sign
-instance Show AUnOp where
-  show Neg  = "-"
-  show Sign = "sign "
-mapAUnOp op = case op of
-  Neg  -> negate
-  Sign -> signum
--- ^
-data ROp = Eq | NEq | Less | LEq | Greater | GEq
-instance Show ROp where
-  show Eq      = " = "
-  show NEq     = " != "
-  show Less    = " < "
-  show LEq     = " <= "
-  show Greater = " > "
-  show GEq     = " >= "
-mapROp op = case op of
-  Eq      -> (==)
-  NEq     -> (/=)
-  Less    -> (<)
-  LEq     -> (<=)
-  Greater -> (>)
-  GEq     -> (>=)
--- ^
-data LBinOp = And | Or
-instance Show LBinOp where
-  show And = " && "
-  show Or  = " || "
-mapLBinOp op = case op of
-  And -> 0
-  Or  -> 1
--- ^
-data LstOp = Top | Empty | Size
-instance Show LstOp where
-  show Top   = "top "
-  show Empty = "empty "
-  show Size  = "size "
+  show (Lit v)         = show v
+  show (Var id)        = id
+  show (Binary op l r) = ""
+  show (Unary  op exp) = show op++show exp
+  show (Parens exp)    = "("++show exp++")"
+
+data BinOp
+  = Plus
+  | Minus
+  | Xor
+  | Pow
+  | Mult
+  -- v Non-zero right arithmetic
+  | Div
+  | Mod
+  -- ^ Arithmetic
+  -- v Relational
+  | Equal
+  | Neq
+  | Less
+  | Leq
+  | Greater
+  | Geq
+  -- ^ Relational
+  -- v Logical
+  | Or
+  | And
+  deriving (Show,Eq,Ord)
+
+
+data UnOp
+  = Neg
+  | Sign
+  -- ^ Arithmetic
+  -- v Logical
+  | Not
+  -- ^ Logical
+  -- v Stack
+  | Top
+  | Empty
+  | Size
+  deriving (Show,Eq,Ord)
 
 -- ====
 -- Type
