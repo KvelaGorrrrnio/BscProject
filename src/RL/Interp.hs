@@ -172,8 +172,8 @@ eval (Unary op exp) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (mapA
   Top   -> case lv of
     []   -> logError "Accessing top of empty list."
     t:ts -> return t
-  Empty -> return $ boolToVal.null  $ lv
-  Size  -> return $ intToVal.length $ lv
+  Empty -> return $ boolToVal . null  $ lv
+  Size  -> return $ intToVal . length $ lv
 
 -- paranthesis
 eval (Parens e) = eval e
