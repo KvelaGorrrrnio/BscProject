@@ -28,7 +28,7 @@ main = do
       let out = if null o
                 then replaceFileName f (takeBaseName f ++ "_inv.srl")
                 else o
-      writeFile out . showAST . invert $ ast
+      writeFile out . (++"\n") . showAST . invert $ ast
 
     Translate _ [] -> noFile
     Translate o f  -> do

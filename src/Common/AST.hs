@@ -43,8 +43,6 @@ instance Show Stmt where
   show (Pop id1 id2)    = "pop "  ++ id1 ++ " " ++ id2
   show (Swap id1 id2)   = "swap " ++ id1 ++ " " ++ id2
   show Skip             = "skip"
-  show (If t s1 s2 a)   = "if " ++ show t ++ " then " ++ show s1 ++ " else " ++ show s2 ++ " fi " ++ show a
-  show (Until a s t)    = "from " ++ show a ++ " do " ++ (intercalate "\n" . map show) s ++ " until " ++ show t
 
 data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq
 instance Show UpdOp where
