@@ -8,7 +8,7 @@ import qualified SrlAST as S
 import Control.Monad.Writer
 import Control.Monad.State
 
-import Extra
+import Common.AST
 
 genLabel :: MonadState Int m => String -> m R.Label
 genLabel lab = (++) lab . show <$> get

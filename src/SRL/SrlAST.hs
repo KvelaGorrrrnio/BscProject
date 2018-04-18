@@ -1,9 +1,9 @@
-module SrlAST where
+module SrlAST (module SrlAST, module Common.AST) where
 
 import Data.Bits (xor)
 import Data.List (intercalate)
 
-import Extra
+import Common.AST
 
 import Error
 

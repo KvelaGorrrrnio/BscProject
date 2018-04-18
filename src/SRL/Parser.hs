@@ -3,9 +3,8 @@ module Parser (parseFile) where
 import System.IO
 import Text.ParserCombinators.Parsec
 
-import CommonParser
+import Common.Parser
 import SrlAST
-import Extra
 
 srlParser :: Parser AST
 srlParser = whiteSpace >> AST <$> statements

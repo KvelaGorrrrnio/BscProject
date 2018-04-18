@@ -7,7 +7,7 @@ default : compile
 compile : $(EXE)
 
 $(EXE) : $(SRC) $(HLP)
-	@ghc -XLambdaCase $(SRC) -o $(EXE) -odir xyz -hidir xyz
+	@ghc -XLambdaCase -i../ $(SRC) -o $(EXE) -odir xyz -hidir xyz
 
 run : $(EXE)
 	@./$(EXE) programs/fib.rl
