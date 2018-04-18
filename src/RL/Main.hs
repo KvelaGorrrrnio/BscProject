@@ -53,5 +53,6 @@ main = do
                 else o
       writeFile out . (++"\n") . showAST . invert $ ast
 
-    Translate o [] -> noFile
     Translate o f  -> print args
+
+    Typeof f -> print args

@@ -1,13 +1,15 @@
-module Parser (parseFile) where
+module SRL.Parser
+  ( parseFile
+  ) where
 
 import System.IO
 import Text.ParserCombinators.Parsec
 
 import Common.Parser
-import SrlAST
+import SRL.AST
 
 srlParser :: Parser AST
-srlParser = whiteSpace >> AST <$> statements
+srlParser = whiteSpace >> statements
 
 statements :: Parser [Stmt]
 statements = many1 statement

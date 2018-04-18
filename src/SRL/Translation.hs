@@ -1,24 +1,24 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Translation where
+module SRL.Translation
+( translateToRLSource
+) where
 
-import qualified RlAST as R
-import qualified SrlAST as S
+import RL.AST as RL
+import SRL.AST as SRL
 
 import Control.Monad.Writer
 import Control.Monad.State
 
-import Common.AST
-
-genLabel :: MonadState Int m => String -> m R.Label
+genLabel  :: MonadState Int m => String -> m RL.Label
 genLabel lab = (++) lab . show <$> get
-genLabelI :: MonadState Int m => String -> m R.Label
+genLabelI :: MonadState Int m => String -> m RL.Label
 genLabelI lab = genLabel lab <* modify (+1)
 
-translate :: S.AST -> R.AST
-translate (S.AST ast) = R.AST $ (flip evalState 1 . execWriterT) (translateS "init" R.Entry R.Exit ast)
+translateToRLSource :: SRL.AST -> String
+translateToRLSource ast = RL.showAST $ flip evalState 1 . execWriterT $ translateS "init" Entry Exit ast
 
-translateS :: R.Label -> R.From -> R.To -> [Stmt] -> WriterT [(R.Label, R.Block)] (State Int) R.Label
+translateS :: Label -> From -> To -> [Stmt] -> WriterT RL.AST (State Int) Label
 translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts =
 
   -- the next must be either an if, a loop or nothing
@@ -26,7 +26,7 @@ translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts 
     [] ->
 
       -- push this block to the AST
-      tell [(thisL , R.Block (thisF, thisB, thisT))]
+      tell [(thisL , (thisF, thisB, thisT))]
 
       >> return thisL
 
@@ -38,14 +38,14 @@ translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts 
       endL  <- genLabelI "contif"
 
       -- push this block to the AST
-      tell [(thisL , R.Block (thisF, thisB, R.GIf t thenL elseL))]
+      tell [(thisL , (thisF, thisB, IfTo t thenL elseL))]
 
       -- translate the bodies and fetch the end block labels
-      tl <- translateS thenL (R.From thisL) (R.Goto endL)  s1
-      el <- translateS elseL (R.From thisL) (R.Goto endL)  s2
+      tl <- translateS thenL (From thisL) (Goto endL)  s1
+      el <- translateS elseL (From thisL) (Goto endL)  s2
 
       -- generate the next sequence of blocks
-      translateS endL  (R.Fi a tl el) thisT ss
+      translateS endL  (Fi a tl el) thisT ss
 
     Until a s t : ss -> do
 
@@ -54,13 +54,13 @@ translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts 
       endL  <- genLabelI "contloop"
 
       -- push this block to the AST
-      tell [(thisL , R.Block (thisF, thisB, R.Goto loopL))]
+      tell [(thisL , (thisF, thisB, Goto loopL))]
 
       -- translate the body and fetch the end block label
-      ll <- translateS loopL (R.Fi a thisL loopL) (R.GIf t endL loopL) s
+      ll <- translateS loopL (Fi a thisL loopL) (IfTo t endL loopL) s
 
       -- generate the next sequence of blocks
-      translateS endL (R.From ll) thisT ss
+      translateS endL (From ll) thisT ss
 
     _ -> fail "Something went very wrong."
   where (stmts,r) = break isIfOrUntil ss

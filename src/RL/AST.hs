@@ -45,11 +45,7 @@ type Label = String
 
 type AST = [(Label, Block)]
 showAST :: AST -> String
-showAST   = intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ showB b)
-mapAST    = map
-revAST    = reverse
-blklookup :: Label -> AST -> Maybe Block
-blklookup = lookup
+showAST  = intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ showB b)
 getEntry ast = do
   let entries = (map fst . filter
           (\case

@@ -5,7 +5,7 @@ module RL.Inversion
 import RL.AST
 
 invert :: AST -> AST
-invert = revAST . mapAST (\(l,b) -> (l,invertBlock b))
+invert = reverse . map (\(l,b) -> (l, invertBlock b))
 
 invertBlock :: Block -> Block
 invertBlock (f,s,t) = (invertTo t, (map invertStmt . reverse) s, invertFrom f)

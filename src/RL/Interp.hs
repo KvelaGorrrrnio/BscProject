@@ -21,7 +21,7 @@ type VarState  = StateT VarTab (ExceptT Error (Writer Log))
 rd :: Id -> VarState Value
 rd id  = do
   ast <- get
-  case varlookup id ast of
+  case lookup id ast of
     Just v  -> return v
     Nothing -> logError $ "Variable '" ++ id ++ "' not defined."
 
@@ -57,7 +57,7 @@ interp :: Label -> ProgState ()
 interp l = do
   tell [NewBlock l]
   ast <- ask
-  case blklookup l ast of
+  case lookup l ast of
     Just (_,ss,t) -> do
       lift $ execStmts ss
       tell [EndOfBlock t]

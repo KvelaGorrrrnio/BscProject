@@ -27,8 +27,6 @@ showVTab =
   . filter (not . isClear . snd)
 insert id val = map (\(id',v) -> if id'==id then (id,val) else (id',v))
 adjust op id  = map (\(id',v) -> if id'==id then (id,op v) else (id',v))
-varlookup :: Id -> VarTab -> Maybe Value
-varlookup     = lookup
 
 -- Statements
 data Stmt = Update Id UpdOp Exp

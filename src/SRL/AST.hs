@@ -1,11 +1,14 @@
-module SrlAST (module SrlAST, module Common.AST) where
+module SRL.AST
+  ( module SRL.AST,
+    module Common.AST
+  ) where
 
 import Data.Bits (xor)
 import Data.List (intercalate)
 
 import Common.AST
 
-import Error
+import SRL.Error
 
 -- ===
 -- Log
@@ -32,14 +35,5 @@ instance Show Message where
 -- AST
 -- ===
 
--- labels
-type Label = String
-
-newtype AST = AST [Stmt] deriving Show
--- instance Show AST where
---   show (AST ast) = (intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ show b)) ast
-
-mapAST f (AST ast) = AST $ map f ast
-revAST (AST ast)   = AST $ reverse ast
-
+type AST   = [Stmt]
 type Block = [Stmt]

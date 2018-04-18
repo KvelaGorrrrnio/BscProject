@@ -1,4 +1,4 @@
-module Error where
+module SRL.Error where
 
 -- =====
 -- Errors
