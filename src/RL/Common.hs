@@ -6,8 +6,8 @@ import Data.Bits
 -- values
 data Value = IntV Integer | ListV [Value]
 instance Show Value where
-  show (IntV n)   = show n
-  show (ListV ls) = show ls
+  show (IntV n)    = show n
+  show (ListV ls)  = show ls
 isClear (IntV n)   = n == 0
 isClear (ListV ls) = null ls
 
