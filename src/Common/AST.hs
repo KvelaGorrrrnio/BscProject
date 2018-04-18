@@ -103,9 +103,9 @@ data UnOp
   | Not
   -- ^ Logical
   -- v Stack
-  | Top
-  | Empty
   | Size
+  | Empty
+  | Top
   deriving (Show,Eq,Ord)
 
 -- ====

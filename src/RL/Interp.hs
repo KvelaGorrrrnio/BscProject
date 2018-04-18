@@ -166,7 +166,7 @@ eval (Binary op l r) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> eval
 -- unary arithmetic
 eval (Unary op exp) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (mapAUnOp op) v
 -- unary logical
-                    | op < Top    = eval exp >>= \(IntV v) -> return $ boolToVal $ (mapLUnOp op) $ v/=0
+                    | op < Size    = eval exp >>= \(IntV v) -> return $ boolToVal $ (mapLUnOp op) $ v/=0
 -- unary list
                     | otherwise   = eval exp >>= \(ListV lv) -> case op of
   Top   -> case lv of
