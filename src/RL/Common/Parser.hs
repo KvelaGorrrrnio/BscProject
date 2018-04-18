@@ -6,7 +6,7 @@ import Text.ParserCombinators.Parsec.Language
 
 import qualified Text.ParserCombinators.Parsec.Token as Token
 
-import Common
+import Common.AST
 
 -- specifying the language
 languageDef =

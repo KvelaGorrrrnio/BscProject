@@ -20,3 +20,8 @@ runlog : $(EXE)
 
 clean :
 	@rm -rf *.rlog xyz $(EXE) programs/*.rlog
+
+zip : clean
+	@zip -r rl.zip .
+
+.PHONY: default compile run runhelp runlog clean zip

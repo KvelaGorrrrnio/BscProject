@@ -1,8 +1,5 @@
-module Common
-( module Common.Parser
-) where
+module Common.AST where
 
-import Common.Parser
 import Data.List
 import Data.Bits
 
