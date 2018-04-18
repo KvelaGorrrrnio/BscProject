@@ -20,6 +20,7 @@ Overvej - og måske implementer - stadig følgende ting:
 - Error
 - HandleArgs.hs (giv programnavnet som argument?
 - Main.hs ? grundlæggende forskel er navnene (SRL/RL)
+- exec (statements) og eval (expressions) ?
 
 ## BESLUTNINGER
 VarTab:
