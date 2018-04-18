@@ -8,6 +8,7 @@ import SRL.HandleArgs
 import SRL.Parser
 import SRL.Translation
 import SRL.Inversion
+import SRL.Interp
 
 noFile = putStrLn "No .srl file provided."
 
@@ -19,7 +20,7 @@ main = do
 
       -- parse file and run
       ast <- parseFile f
-      putStrLn . show $ ast
+      putStrLn . showAST $ ast
 
     Invert _ [] -> noFile
     Invert o f  -> do

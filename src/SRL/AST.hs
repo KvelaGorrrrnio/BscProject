@@ -36,4 +36,7 @@ instance Show Message where
 -- ===
 
 type AST   = [Stmt]
+showAST :: AST -> String
+showAST ast = show ast
+
 type Block = [Stmt]
