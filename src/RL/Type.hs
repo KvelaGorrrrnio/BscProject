@@ -1,11 +1,13 @@
-module Type
+module RL.Type
 (
 ) where
 
 import Error
 import AST
 
---
+-- =======
+-- Helpers
+-- =======
 unify :: Type -> Type -> Maybe Type
 unify UnknownT t            = Just t
 unify t UnknownT            = Just t

@@ -1,5 +1,8 @@
-module Common where
+module Common
+( module Common.Parser
+) where
 
+import Common.Parser
 import Data.List
 import Data.Bits
 
@@ -165,3 +168,16 @@ instance Show LstOp where
   show Top   = "top "
   show Empty = "empty "
   show Size  = "size "
+
+-- ====
+-- Type
+-- ====
+data Type
+  = IntT
+  | ListT Type
+  | UnknownT
+  deriving Eq
+instance Show Type where
+  show IntT      = "int"
+  show (ListT t) = "["++show t++"]"
+  show UnknownT  = "?"

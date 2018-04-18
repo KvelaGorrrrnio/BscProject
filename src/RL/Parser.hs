@@ -3,7 +3,7 @@ module Parser (parseFile) where
 import System.IO
 import Text.ParserCombinators.Parsec
 
-import CommonParser
+import Common.Parser
 import AST
 
 rlParser :: Parser AST

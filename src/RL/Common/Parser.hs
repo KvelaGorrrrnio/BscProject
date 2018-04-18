@@ -1,4 +1,4 @@
-module CommonParser where
+module Common.Parser where
 
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Expr

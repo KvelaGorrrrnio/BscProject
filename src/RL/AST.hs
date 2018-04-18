@@ -82,16 +82,3 @@ instance Show To where
     Parens _ -> "if "  ++ show e ++ " "  ++ l1 ++ " " ++ l2
     _        -> "if (" ++ show e ++ ") " ++ l1 ++ " " ++ l2
   show Exit         = "exit"
-
--- ====
--- Type
--- ====
-data Type
-  = IntT
-  | ListT Type
-  | UnknownT
-  deriving Eq
-instance Show Type where
-  show IntT      = "int"
-  show (ListT t) = "["++show t++"]"
-  show UnknownT  = "?"
