@@ -24,7 +24,7 @@ main = do
       -- if -q is not set
       unless (q || ls) $ case res of
         Left  err  -> putStrLn $ "*** Error: " ++ err
-        Right vtab -> print vtab
+        Right vtab -> putStrLn $ showVTab vtab
 
       -- if -l flag is set
       when l $ do
@@ -50,7 +50,7 @@ main = do
       let out = if null o
                 then replaceFileName f (takeBaseName f ++ "_inv.rl")
                 else o
-      writeFile out . (++"\n") . show . invert $ ast
+      writeFile out . (++"\n") . showAST . invert $ ast
 
     Trl o [] -> noFile
     Trl o f  -> print args
