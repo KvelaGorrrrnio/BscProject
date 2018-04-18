@@ -14,11 +14,12 @@ noFile = putStrLn "No .rl file provided."
 main = do
   args <- handleArgs
   case args of
-    Run _ _ _ _ _ _ []  -> noFile
-    Run l ls j js t q f -> do
+    Run _ _ _ _ _ []  -> noFile
+    Run l ls j js q f -> do
 
       -- parse file and run
       ast <- parseFile f
+
       let (res,log) = runProgram ast
 
       -- if -q is not set
