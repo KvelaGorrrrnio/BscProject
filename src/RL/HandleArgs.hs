@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable #-}
+module RL.HandleArgs where
 
-module HandleArgs where
 import System.Console.CmdArgs
 import Prelude hiding (log)
 

@@ -1,10 +1,10 @@
-module Parser (parseFile) where
+module RL.Parser (parseFile) where
 
 import System.IO
 import Text.ParserCombinators.Parsec
 
 import Common.Parser
-import AST
+import RL.AST
 
 rlParser :: Parser AST
 rlParser = whiteSpace >> blocks

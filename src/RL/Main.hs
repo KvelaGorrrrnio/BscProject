@@ -1,13 +1,13 @@
-module Main where
+module Main (main) where
 
 import System.FilePath.Posix ((-<.>), takeBaseName, replaceFileName)
 
 import Control.Monad (when, unless)
 
-import HandleArgs
-import Interp
-import Inversion
-import Parser
+import RL.HandleArgs
+import RL.Interp
+import RL.Inversion
+import RL.Parser
 
 noFile = putStrLn "No .rl file provided."
 

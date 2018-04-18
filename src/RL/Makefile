@@ -1,27 +1,18 @@
 SRC = Main.hs
-HLP = HandleArgs.hs Interp.hs AST.hs Error.hs Inversion.hs Parser.hs
+HLP = *.hs
 EXE = ../bin/revl
+HIDIR = hi
+ODIR  = o
 
 default : compile
 
 compile : $(EXE)
 
 $(EXE) : $(SRC) $(HLP)
-	@ghc -XLambdaCase -i../ $(SRC) -o $(EXE) -odir xyz -hidir xyz
-
-run : $(EXE)
-	@./$(EXE) programs/fib.rl
-
-runhelp : $(EXE)
-	@./$(EXE) programs/fib.rl --h
-
-runlog : $(EXE)
-	@./$(EXE) programs/fib.rl --log-stdout
+	@mkdir -p ../bin
+	@ghc -XLambdaCase -i../ $(SRC) -o $(EXE) -odir $(ODIR) -hidir $(HIDIR)
 
 clean :
-	@rm -rf *.rlog xyz $(EXE) programs/*.rlog
+	@rm -rf *.rlog $(ODIR) $(HIDIR) $(EXE) programs/*.rlog
 
-zip : clean
-	@zip -r rl.zip .
-
-.PHONY: default compile run runhelp runlog clean zip
+.PHONY: default compile clean

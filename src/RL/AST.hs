@@ -1,11 +1,11 @@
 {-# LANGUAGE LambdaCase #-}
-module AST (module AST, module Common.AST) where
+module RL.AST (module RL.AST, module Common.AST) where
 
 import Data.Bits (xor)
 import Data.List (intercalate)
 
 import Common.AST
-import Error
+import RL.Error
 
 -- Extra for VarTab
 buildVTab :: AST -> VarTab

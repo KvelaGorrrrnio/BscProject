@@ -1,5 +1,6 @@
-module Error where
+module RL.Error where
 
+import Common.Error
 -- =====
 -- Errors
 -- =====

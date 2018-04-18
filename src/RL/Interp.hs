@@ -1,7 +1,7 @@
-module Interp (module Interp, module AST) where
+module RL.Interp (module RL.Interp, module RL.AST) where
 
-import Error
-import AST
+import RL.Error
+import RL.AST
 
 import Data.Bits (xor)
 import Data.List (intercalate)

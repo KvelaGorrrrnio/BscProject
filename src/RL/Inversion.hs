@@ -1,6 +1,8 @@
-module Inversion where
+module RL.Inversion
+( invert
+) where
 
-import AST
+import RL.AST
 
 invert :: AST -> AST
 invert = revAST . mapAST (\(l,b) -> (l,invertBlock b))

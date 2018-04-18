@@ -1,13 +1,18 @@
 SRC = Main.hs
-HLP = HandleArgs.hs SrlAST.hs Error.hs Parser.hs Translation.hs
+HLP = *.hs
 EXE = ../bin/srevl
+HIDIR = hi
+ODIR  = o
 
 default : compile
 
 compile : $(EXE)
 
 $(EXE) : $(SRC) $(HLP)
-	@ghc $(SRC) -i../ -o $(EXE) -odir xyz -hidir xyz
+	@mkdir -p ../bin
+	@ghc -XLambdaCase -i../ $(SRC) -o $(EXE) -odir $(ODIR) -hidir $(HIDIR)
 
 clean :
-	@rm -rf *.rlog xyz $(EXE) programs/*.srlog
+	@rm -rf *.srlog $(ODIR) $(HIDIR) $(EXE) programs/*.srlog
+
+.PHONY: default compile clean
