@@ -1,6 +1,0 @@
-from i = 0
-do
-  a += 2
-  i += 1
-until i = 10
-a -= 2

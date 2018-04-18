@@ -1,18 +1,18 @@
 zipfile=robin.zip
-nottest=Makefile rl.hs srl.hs SRL RL
+nottest=Makefile SRL RL
 
 build: rl srl
 
 rl:
-	@$(MAKE) -C RL
+	@$(MAKE) --no-print-directory -C RL
 
 srl:
-	@$(MAKE) -C SRL
+	@$(MAKE) --no-print-directory -C SRL
 
 clean:
-	@$(MAKE) -C RL clean
-	@$(MAKE) -C SRL clean
-	@rm -rf ${zipfile} bin
+	@$(MAKE) --no-print-directory -C RL clean
+	@$(MAKE) --no-print-directory -C SRL clean
+	@rm -rf ${zipfile}
 
 test:
 	@./test/run_tests.sh -d
