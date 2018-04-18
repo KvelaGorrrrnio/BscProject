@@ -183,11 +183,11 @@ eval (Parens e) = eval e
 -- =======
 mapABinOp Plus    = (+)
 mapABinOp Minus   = (-)
-mapABinOp Xor     = (xor)
+mapABinOp Xor     = xor
 mapABinOp Pow     = (^)
 mapABinOp Mult    = (*)
-mapABinOp Div     = (div)
-mapABinOp Mod     = (mod)
+mapABinOp Div     = div
+mapABinOp Mod     = mod
 
 mapRBinOp Equal   = (==)
 mapRBinOp Neq     = (/=)
