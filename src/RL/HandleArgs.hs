@@ -5,29 +5,29 @@ import System.Console.CmdArgs
 import Prelude hiding (log)
 
 data RevL
-  = Trl    {out :: FilePath, file :: FilePath}
-  | Inv    {out :: FilePath, file :: FilePath}
-  | Typeof {file :: FilePath}
-  | Run    {log   :: Bool, logstd  :: Bool
-           ,json  :: Bool, jsonstd :: Bool
-           ,quiet :: Bool, file    :: FilePath}
+  = Typeof    {file :: FilePath}
+  | Translate {out :: FilePath, file :: FilePath}
+  | Invert    {out :: FilePath, file :: FilePath}
+  | Run       {log   :: Bool, logstd  :: Bool
+              ,json  :: Bool, jsonstd :: Bool
+              ,quiet :: Bool, file    :: FilePath}
   deriving (Data,Typeable,Show,Eq)
 
 helpOutput = help "Output file"
 
-translate = Trl
+typeof = Typeof
+  { file   = def &= args &= typFile
+  } &= help "Print the inferred types of the program"
+
+translate = Translate
   {out    = def &= typFile &= helpOutput
   ,file   = def &= args &= typFile
   } &= help "Translate a RevL program to its SRevL counterpart"
 
-invert_ = Inv
+invert_ = Invert
   {out    = def &= typFile &= helpOutput
   ,file   = def &= args &= typFile
   } &= help "Invert a RevL program"
-
-typeof = Typeof
-  { file   = def &= args &= typFile
-  } &= help "Print the inferred types of the program"
 
 interpret = Run
   {log     = def &= help "Log the program execution to an RLog file"
@@ -40,8 +40,8 @@ interpret = Run
   ,file    = def &= args &= typFile
   } &= help "Interpret a RevL program" &= auto
 
-mode = cmdArgsMode $ modes [interpret, typeof, invert_, translate]
-  &= help    "Interpret, optimize or translate a RevL program"
+mode = cmdArgsMode $ modes [interpret, invert_, translate, typeof]
+  &= help    "Interpret, invert or translate a RevL program"
   &= summary "The Glorious RevL Interpreter System, version 1.0.0"
 
 handleArgs :: IO RevL

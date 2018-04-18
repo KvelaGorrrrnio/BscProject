@@ -45,13 +45,13 @@ main = do
       -- if --json-stdout flag is set
       when js $ putStrLn (logToJSON log)
 
-    Inv _ [] -> noFile
-    Inv o f  -> do
+    Invert _ [] -> noFile
+    Invert o f  -> do
       ast <- parseFile f
       let out = if null o
                 then replaceFileName f (takeBaseName f ++ "_inv.rl")
                 else o
       writeFile out . (++"\n") . showAST . invert $ ast
 
-    Trl o [] -> noFile
-    Trl o f  -> print args
+    Translate o [] -> noFile
+    Translate o f  -> print args
