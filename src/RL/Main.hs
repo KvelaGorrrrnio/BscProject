@@ -8,6 +8,7 @@ import RL.HandleArgs
 import RL.Interp
 import RL.Inversion
 import RL.Parser
+import RL.Translation
 
 noFile = putStrLn "No .rl file provided."
 
@@ -53,6 +54,12 @@ main = do
                 else o
       writeFile out . (++"\n") . showAST . invert $ ast
 
-    Translate o f  -> print args
+    Translate _ [] -> noFile
+    Translate o f  -> do
+      ast <- parseFile f
+      let out = if null o
+                then f -<.> "srl"
+                else o
+      writeFile out . (++"\n") . translateToSRLSource $ ast
 
     Typeof f -> print args
