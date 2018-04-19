@@ -16,10 +16,10 @@ genLabelI :: MonadState Int m => String -> m RL.Label
 genLabelI lab = genLabel lab <* modify (+1)
 
 translateToRLSource :: SRL.AST -> String
-translateToRLSource ast = RL.showAST $ flip evalState 1 . execWriterT $ translateS "init" Entry Exit ast
+translateToRLSource ast = RL.showAST $ flip evalState 1 . execWriterT $ translateS "init" (Entry (0,0)) (Exit (0,0)) ast
 
 translateS :: Label -> From -> To -> [Stmt] -> WriterT RL.AST (State Int) Label
-translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts =
+translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip (0,0)] else stmts =
 
   -- the next must be either an if, a loop or nothing
   case r of
@@ -30,7 +30,7 @@ translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts 
 
       >> return thisL
 
-    If t s1 s2 a : ss -> do
+    If t s1 s2 a _ : ss -> do
 
       -- generate the labels for the blocks to come
       thenL <- genLabel  "then"
@@ -38,29 +38,29 @@ translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts 
       endL  <- genLabelI "contif"
 
       -- push this block to the AST
-      tell [(thisL , (thisF, thisB, IfTo t thenL elseL))]
+      tell [(thisL , (thisF, thisB, IfTo t thenL elseL (0,0)))]
 
       -- translate the bodies and fetch the end block labels
-      tl <- translateS thenL (From thisL) (Goto endL)  s1
-      el <- translateS elseL (From thisL) (Goto endL)  s2
+      tl <- translateS thenL (From thisL (0,0)) (Goto endL (0,0))  s1
+      el <- translateS elseL (From thisL (0,0)) (Goto endL (0,0))  s2
 
       -- generate the next sequence of blocks
-      translateS endL  (Fi a tl el) thisT ss
+      translateS endL  (Fi a tl el (0,0)) thisT ss
 
-    Until a s t : ss -> do
+    Until a s t _ : ss -> do
 
       -- generate the labels for the blocks to come
       loopL <- genLabel  "loop"
       endL  <- genLabelI "contloop"
 
       -- push this block to the AST
-      tell [(thisL , (thisF, thisB, Goto loopL))]
+      tell [(thisL , (thisF, thisB, Goto loopL (0,0)))]
 
       -- translate the body and fetch the end block label
-      ll <- translateS loopL (Fi a thisL loopL) (IfTo t endL loopL) s
+      ll <- translateS loopL (Fi a thisL loopL (0,0)) (IfTo t endL loopL (0,0)) s
 
       -- generate the next sequence of blocks
-      translateS endL (From ll) thisT ss
+      translateS endL (From ll (0,0)) thisT ss
 
     _ -> fail "Something went very wrong."
 

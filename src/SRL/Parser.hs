@@ -15,16 +15,17 @@ statements :: Parser [Stmt]
 statements = many1 statement
 
 statement :: Parser Stmt
-statement = try updateStmt
+statement = pos >>= \p -> (\s->s p)
+        <$> (try updateStmt
         <|> swapStmt
         <|> skipStmt
         <|> pushStmt
         <|> popStmt
         -- srl
         <|> ifStmt
-        <|> untilStmt
+        <|> untilStmt)
 
-ifStmt :: Parser Stmt
+ifStmt :: Parser (Pos -> Stmt)
 ifStmt = do
   reserved "if"
   t <- expression
@@ -36,7 +37,7 @@ ifStmt = do
   a <- expression
   return $ If t s1 s2 a
 
-untilStmt :: Parser Stmt
+untilStmt :: Parser (Pos -> Stmt)
 untilStmt = do
   reserved "from"
   a <- expression

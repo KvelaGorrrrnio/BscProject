@@ -22,24 +22,27 @@ block = do
   return (l, (f,s,t))
 
 from :: Parser From
-from = (reserved "from"  >> From <$> identifier)
+from = pos >>= \p-> (\s->s p)
+   <$> ((reserved "from"  >> From <$> identifier)
    <|> (reserved "fi"    >> Fi <$> expression <*> identifier <*> identifier)
-   <|> (reserved "entry" >> return Entry)
+   <|> (reserved "entry" >> return Entry))
 
 to :: Parser To
-to  = (reserved "goto"  >> Goto <$> identifier)
+to  = pos >>= \p -> (\s->s p)
+  <$> ((reserved "goto"  >> Goto <$> identifier)
   <|> (reserved "if"    >> IfTo <$> expression <*> identifier <*> identifier)
-  <|> (reserved "exit"  >> return Exit)
+  <|> (reserved "exit"  >> return Exit))
 
 statements :: Parser [Stmt]
 statements = many statement
 
 statement :: Parser Stmt
-statement = try updateStmt
+statement = pos >>= \p -> (\s->s p)
+        <$> (try updateStmt
         <|> swapStmt
         <|> skipStmt
         <|> pushStmt
-        <|> popStmt
+        <|> popStmt)
 
 parseSrc :: String -> Either ParseError AST
 parseSrc = parse rlParser ""
