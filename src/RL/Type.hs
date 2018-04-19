@@ -16,7 +16,7 @@ typecheck ast = case runTypecheck ast typecheckBlocks of
 
 typecheckBlocks :: AST -> TypeState ()
 typecheckBlocks [] = return ()
-typecheckBlocks ((_,(f,stmts,t)):ast) = typecheckFrom f >> typecheckStmts stmts >> typecheckTo t
+typecheckBlocks ((_,(f,stmts,t)):ast) = typecheckFrom f >> typecheckStmts stmts >> typecheckTo t >> typecheckBlocks ast
 
 typecheckFrom :: From -> TypeState ()
 typecheckFrom (Fi exp _ _ p) = typeof exp >>= \case
