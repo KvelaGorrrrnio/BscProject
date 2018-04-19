@@ -1,6 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 module Common.Type
-( typecheck
+( runTypecheck
 , TypeTab
 , TypeState
 , typecheckStmts
@@ -8,20 +8,23 @@ module Common.Type
 , typeof
 , update
 , unify
+, typesToVarTab
+, showTab
 ) where
 
 import Control.Monad.State
-import Control.Monad.Reader
 import Control.Monad.Except
 import qualified Data.HashMap.Strict as M
 import Common.Error
 import Common.AST
+-- For showtab
+import Data.List
 
 type TypeTab   = M.HashMap Id Type
 type TypeState = StateT TypeTab (Except TypeError)
 
-typecheck :: a -> (a -> TypeState ()) -> Either TypeError TypeTab
-typecheck ast init = runExcept . (flip execStateT (M.fromList [])) $ init ast
+runTypecheck :: a -> (a -> TypeState ()) -> Either TypeError TypeTab
+runTypecheck ast init = runExcept . (flip execStateT (M.fromList [])) $ init ast
 
 -- ==========
 -- Statements
@@ -152,3 +155,14 @@ typeofVal :: Value -> TypeState Type
 typeofVal (IntV _)   = return IntT
 typeofVal (ListV []) = return $ ListT UnknownT
 typeofVal (ListV v)  = typeofVal (head v) >>= \t -> return $ ListT t
+
+-- Convert type table to variable table
+typesToVarTab :: TypeTab -> VarTab
+typesToVarTab ttab = map defaultVal (M.toList ttab)
+  where defaultVal (n,ListT _) = (n,ListV [])
+        defaultVal (n,_)       = (n,IntV 0)
+
+-- Show hashmap
+pad n = replicate (n-1) ' '
+showTab hm = let tab = M.toList hm; m = maximum (map (\(n,_) -> length n) tab)
+    in intercalate "\n" $ map (\(n,v) ->n++pad(m-(length n)+1)++" : "++show v) tab

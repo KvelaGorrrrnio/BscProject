@@ -8,6 +8,7 @@ import RL.HandleArgs
 import RL.Interp
 import RL.Inversion
 import RL.Parser
+import RL.Type
 import RL.Translation
 
 noFile = putStrLn "No .rl file provided."
@@ -20,8 +21,8 @@ main = do
 
       -- parse file and run
       ast <- parseFile f
-
-      let (res,log) = runProgram ast
+      ttab <- typecheck ast
+      let (res,log) = runProgramWith ast (typesToVarTab ttab)
 
       -- if -q is not set
       unless (q || ls) $ case res of
@@ -49,6 +50,7 @@ main = do
     Invert _ [] -> noFile
     Invert o f  -> do
       ast <- parseFile f
+      ttab <- typecheck ast
       let out = if null o
                 then replaceFileName f (takeBaseName f ++ "_inv.rl")
                 else o
@@ -57,9 +59,12 @@ main = do
     Translate _ [] -> noFile
     Translate o f  -> do
       ast <- parseFile f
+      ttab <- typecheck ast
       let out = if null o
                 then f -<.> "srl"
                 else o
       writeFile out . (++"\n") . translateToSRLSource $ ast
 
-    Typeof f -> print args
+    Typeof f -> do
+      ttab <- parseFile f >>= \ast -> typecheck ast
+      putStrLn $ showTab ttab

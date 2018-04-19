@@ -8,6 +8,7 @@ import SRL.HandleArgs
 import SRL.Parser
 import SRL.Translation
 import SRL.Inversion
+import SRL.Type
 import SRL.Interp
 
 noFile = putStrLn "No .srl file provided."
@@ -20,11 +21,13 @@ main = do
 
       -- parse file and run
       ast <- parseFile f
+      ttab <- typecheck ast
       putStrLn . showAST $ ast
 
     Invert _ [] -> noFile
     Invert o f  -> do
       ast <- parseFile f
+      ttab <- typecheck ast
       let out = if null o
                 then replaceFileName f (takeBaseName f ++ "_inv.srl")
                 else o
@@ -33,9 +36,12 @@ main = do
     Translate _ [] -> noFile
     Translate o f  -> do
       ast <- parseFile f
+      ttab <- typecheck ast
       let out = if null o
                 then f -<.> "rl"
                 else o
       writeFile out . (++"\n") . translateToRLSource $ ast
 
-    Typeof f -> print args
+    Typeof f -> do
+      ttab <- parseFile f >>= \ast -> typecheck ast
+      putStrLn $ showTab ttab

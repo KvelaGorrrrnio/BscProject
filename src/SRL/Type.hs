@@ -1,14 +1,15 @@
 {-# LANGUAGE LambdaCase #-}
 module SRL.Type
 ( typecheck
+, module Common.Type
 ) where
 
 import SRL.AST
 import SRL.Error
-import qualified Common.Type as T
+import Common.Type
 
-typecheck :: AST -> IO T.TypeTab
-typecheck ast = case T.typecheck ast T.typecheckStmts of
+typecheck :: AST -> IO TypeTab
+typecheck ast = case runTypecheck ast typecheckStmts of
   Left err  -> print err >> fail "type error"
   Right tab -> return tab
 

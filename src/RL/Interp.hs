@@ -44,9 +44,11 @@ logError err = do
 -- ==================
 
 runProgram :: AST -> (Either RuntimeError VarTab, Log)
-runProgram ast = do
-  let entry = getEntry  ast
-      vtab  = buildVTab ast
+runProgram ast = runProgramWith ast (buildVTab ast)
+
+runProgramWith :: AST -> VarTab -> (Either RuntimeError VarTab, Log)
+runProgramWith ast vtab = do
+  let entry = getEntry ast
   runWriter . runExceptT . flip execStateT vtab . runReaderT (interp entry) $ ast
 
 -- ======

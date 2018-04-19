@@ -1,30 +1,31 @@
 {-# LANGUAGE LambdaCase #-}
 module RL.Type
 ( typecheck
+, module Common.Type
 ) where
 
 import RL.AST
 import RL.Error
-import qualified Common.Type as T
+import Common.Type
 import Control.Monad.Except
 
-typecheck :: AST -> IO T.TypeTab
-typecheck ast = case T.typecheck ast typecheckBlocks of
+typecheck :: AST -> IO TypeTab
+typecheck ast = case runTypecheck ast typecheckBlocks of
   Left err  -> print err >> fail "type error"
   Right tab -> return tab
 
-typecheckBlocks :: AST -> T.TypeState ()
+typecheckBlocks :: AST -> TypeState ()
 typecheckBlocks [] = return ()
-typecheckBlocks ((_,(f,stmts,t)):ast) = typecheckFrom f >> T.typecheckStmts stmts >> typecheckTo t
+typecheckBlocks ((_,(f,stmts,t)):ast) = typecheckFrom f >> typecheckStmts stmts >> typecheckTo t
 
-typecheckFrom :: From -> T.TypeState ()
-typecheckFrom (Fi exp _ _ p) = T.typeof exp >>= \case
+typecheckFrom :: From -> TypeState ()
+typecheckFrom (Fi exp _ _ p) = typeof exp >>= \case
   IntT -> return ()
   t    -> throwError $ IncompatibleTypes IntT t p -- TODO: Exp not eval to Int
 typecheckFrom _ = return ()
 
-typecheckTo :: To -> T.TypeState ()
-typecheckTo (IfTo exp _ _ p) = T.typeof exp >>= \case
+typecheckTo :: To -> TypeState ()
+typecheckTo (IfTo exp _ _ p) = typeof exp >>= \case
   IntT -> return ()
   t    -> throwError $ IncompatibleTypes IntT t p
 typecheckTo _ = return ()
