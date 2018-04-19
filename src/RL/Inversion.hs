@@ -24,11 +24,11 @@ invertOp DivEq   = MultEq
 invertOp op      = op
 
 invertTo :: To -> From
-invertTo (Goto l)     = From l
-invertTo (IfTo e l1 l2) = Fi e l1 l2
-invertTo Exit         = Entry
+invertTo (Goto l p)       = From l p
+invertTo (IfTo e l1 l2 p) = Fi e l1 l2 p
+invertTo (Exit p)         = Entry p
 
 invertFrom :: From -> To
-invertFrom (From l)     = Goto l
-invertFrom (Fi e l1 l2) = IfTo e l1 l2
-invertFrom Entry        = Exit
+invertFrom (From l p)     = Goto l p
+invertFrom (Fi e l1 l2 p) = IfTo e l1 l2 p
+invertFrom (Entry p)      = Exit p

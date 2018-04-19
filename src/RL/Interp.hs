@@ -62,9 +62,9 @@ interp l = do
       lift $ execStmts ss
       tell [MsgEndOfBlock t]
       case t of
-        Exit       -> return ()
-        Goto l     -> interp l
-        IfTo t l1 l2 -> do
+        Exit _     -> return ()
+        Goto l _     -> interp l
+        IfTo t l1 l2 _ -> do
           t' <- lift $ valToBool <$> eval t
           if t' then interp l1 else interp l2
     Nothing -> lift $ logError $ Debug $ ("Label '" ++ l ++ "' not defined.")

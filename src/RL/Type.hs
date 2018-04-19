@@ -5,7 +5,7 @@ module RL.Type
 
 import RL.AST
 import RL.Error
-import Common.Error (Error(..),TypeError(..))
+import Common.Error (CError(..),TypeError(..))
 import qualified Common.Type as T
 import Control.Monad.Except
 
@@ -20,13 +20,13 @@ typecheckBlocks [] = return ()
 typecheckBlocks ((_,(f,stmts,t)):ast) = typecheckFrom f >> T.typecheckStmts stmts >> typecheckTo t
 
 typecheckFrom :: From -> T.TypeState ()
-typecheckFrom (Fi exp _ _) = T.typeof exp >>= \case
+typecheckFrom (Fi exp _ _ p) = T.typeof exp >>= \case
   IntT -> return ()
-  t    -> throwError $ TypeError $ IncompatibleTypes IntT t
+  t    -> throwError $ TypeError $ IncompatibleTypes IntT t -- TODO: Exp not eval to Int
 typecheckFrom _ = return ()
 
 typecheckTo :: To -> T.TypeState ()
-typecheckTo (IfTo exp _ _) = T.typeof exp >>= \case
+typecheckTo (IfTo exp _ _ p) = T.typeof exp >>= \case
   IntT -> return ()
   t    -> throwError $ TypeError $ IncompatibleTypes IntT t
 typecheckTo _ = return ()

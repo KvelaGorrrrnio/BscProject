@@ -49,7 +49,7 @@ showAST  = intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ showB b)
 getEntry ast = do
   let entries = (map fst . filter
           (\case
-              (_, (Entry,_,_)) -> True
+              (_, (Entry _,_,_)) -> True
               _                -> False
           )) ast
   if length entries == 1 then head entries else error "Exactly one entry must be defined"
@@ -59,22 +59,22 @@ showB (f,s,t) = show f ++ "\n  "
   ++ (intercalate "\n  " . map show) s ++ "\n"
   ++ show t
 
-data From = From Label
-          | Fi Exp Label Label
-          | Entry
+data From = From Label Pos
+          | Fi Exp Label Label Pos
+          | Entry Pos
 instance Show From where
-  show (From l)     = "from " ++ l
-  show (Fi e l1 l2) = case e of
+  show (From l _)     = "from " ++ l
+  show (Fi e l1 l2 _) = case e of
     Parens _ _ -> "fi " ++ show e ++ " " ++ l1 ++ " " ++ l2
     _        -> "fi (" ++ show e ++ ") " ++ l1 ++ " " ++ l2
-  show Entry        = "entry"
+  show (Entry _)      = "entry"
 
-data To = Goto Label
-        | IfTo Exp Label Label
-        | Exit
+data To = Goto Label Pos
+        | IfTo Exp Label Label Pos
+        | Exit Pos
 instance Show To where
-  show (Goto l)     = "goto " ++ l
-  show (IfTo e l1 l2) = case e of
+  show (Goto l _)      = "goto " ++ l
+  show (IfTo e l1 l2 _) = case e of
     Parens _ _ -> "if "  ++ show e ++ " "  ++ l1 ++ " " ++ l2
     _        -> "if (" ++ show e ++ ") " ++ l1 ++ " " ++ l2
-  show Exit         = "exit"
+  show (Exit _)         = "exit"
