@@ -1,6 +1,5 @@
 module SRL.Error
-( Error
-, StaticError (..)
+( StaticError (..)
 , module Common.Error
 ) where
 
@@ -11,9 +10,7 @@ import Common.Error
 -- Errors
 -- =====
 
-type Error = CError StaticError
-
 data StaticError
   = SelfAbuse Id
-  | StaticVoid -- Used for converting between common and SRL error in Type
+  | StaticVoid -- Used for converting between common and RL error in Type
   deriving Show

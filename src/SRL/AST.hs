@@ -24,7 +24,7 @@ logToJSON = intercalate ",\n\n" . map show
 
 data Message = MsgStmt    Stmt
              | MsgState   VarTab
-             | MsgError   Error
+             | MsgError   RuntimeError
 instance Show Message where
   show (MsgStmt s)           = "> " ++ show s
   show (MsgState vtab)       = show vtab

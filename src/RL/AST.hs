@@ -27,7 +27,7 @@ data Message = MsgStmt       Stmt
              | MsgState      VarTab
              | MsgEndOfBlock To
              | MsgNewBlock   Label
-             | MsgError      Error
+             | MsgError      RuntimeError
 instance Show Message where
   show (MsgStmt s)           = "> " ++ show s
   show (MsgState vtab)       = show vtab

@@ -17,13 +17,13 @@ import Control.Monad.Except
 
 -- ProgState is the outer state that must read from AST
 type ProgState = ReaderT AST VarState
-type VarState  = StateT VarTab (ExceptT Error (Writer Log))
+type VarState  = StateT VarTab (ExceptT RuntimeError (Writer Log))
 rd :: Id -> VarState Value
 rd id  = do
   ast <- get
   case lookup id ast of
     Just v  -> return v
-    Nothing -> logError $ Debug $ "Variable '" ++ id ++ "' not defined."
+    Nothing -> logError $ CustomRT $ "Variable '" ++ id ++ "' not defined."
 
 logStmt :: Stmt -> VarState ()
 logStmt (Skip p) = tell [MsgStmt (Skip p)]
@@ -33,7 +33,7 @@ logStmt s = do
   vtab <- get
   tell [MsgState vtab]
 
-logError :: Error -> VarState a
+logError :: RuntimeError -> VarState a
 logError err = do
   tell [MsgError err]
   throwError err
@@ -43,7 +43,7 @@ logError err = do
 -- Running the program
 -- ==================
 
-runProgram :: AST -> (Either Error VarTab, Log)
+runProgram :: AST -> (Either RuntimeError VarTab, Log)
 runProgram ast = do
   let entry = getEntry  ast
       vtab  = buildVTab ast
@@ -67,7 +67,7 @@ interp l = do
         IfTo t l1 l2 _ -> do
           t' <- lift $ valToBool <$> eval t
           if t' then interp l1 else interp l2
-    Nothing -> lift $ logError $ Debug $ ("Label '" ++ l ++ "' not defined.")
+    Nothing -> lift $ logError $ CustomRT $ ("Label '" ++ l ++ "' not defined.")
 
 
 -- ==========
@@ -86,10 +86,10 @@ exec (Update id op e p) = do
   case op of
     DivEq -> case (v1,v2) of
       (IntV n, IntV m) | mod n m == 0 -> return ()
-        | otherwise -> logError $ Debug $ "Division has rest in update."
+        | otherwise -> logError $ CustomRT $ "Division has rest in update."
     MultEq -> case (v1,v2) of
       (IntV n, IntV m) | n /= 0 && m /= 0 -> return ()
-        | otherwise -> logError $ Debug $ "An operand in mult update is zero."
+        | otherwise -> logError $ CustomRT $ "An operand in mult update is zero."
     _      -> return ()
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
   modify $ insert id res
@@ -121,13 +121,13 @@ exec (Push id1 id2 p) = do
 
 exec (Pop id1 id2 p) = do
   v1 <- rd id1
-  unless (isClear v1) $ logError $ Debug $ ("Popping into non-clear variable '" ++ id1 ++ "'.")
+  unless (isClear v1) $ logError $ CustomRT $ ("Popping into non-clear variable '" ++ id1 ++ "'.")
   v2 <- rd id2
   case v2 of
     ListV (t:ls) -> do
       modify $ insert id1 t
       modify $ insert id2 $ ListV ls
-    ListV [] -> logError $ Debug $ "Popping from empty list '" ++ id2 ++ "'."
+    ListV [] -> logError $ CustomRT $ "Popping from empty list '" ++ id2 ++ "'."
 
 -- swapping variables
 exec (Swap id1 id2 p) = do
@@ -154,7 +154,7 @@ eval (Var id _) = rd id
 eval (Binary op l r p) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> eval r
 -- binary div and mod
                      | op <= Mod = eval r >>= \rv -> case rv of
-  IntV 0 -> logError $ Debug $ "Dividing by zero."
+  IntV 0 -> logError $ CustomRT $ "Dividing by zero."
   IntV _ -> eval l >>= \lv -> return $ applyABinOp (mapABinOp op) lv rv
 -- binary relational
                      | op <= Geq = applyRBinOp (mapRBinOp op) <$> eval l <*> eval r
@@ -170,7 +170,7 @@ eval (Unary op exp p) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (ma
 -- unary list
                     | otherwise   = eval exp >>= \(ListV lv) -> case op of
   Top   -> case lv of
-    []   -> logError $ Debug $ "Accessing top of empty list."
+    []   -> logError $ CustomRT $ "Accessing top of empty list."
     t:ts -> return t
   Empty -> return $ boolToVal . null  $ lv
   Size  -> return $ intToVal . length $ lv

@@ -1,6 +1,5 @@
 module RL.Error
-( Error
-, StaticError (..)
+( StaticError (..)
 , module Common.Error
 ) where
 
@@ -10,8 +9,6 @@ import Common.Error
 -- =====
 -- Errors
 -- =====
-
-type Error = CError StaticError
 
 data StaticError
   = SelfAbuse Id
