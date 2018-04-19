@@ -1,6 +1,12 @@
 {-# LANGUAGE LambdaCase #-}
 module Common.Type
-( update
+( typecheck
+, TypeTab
+, TypeState
+, typecheckStmts
+, typecheckStmt
+, typeof
+, update
 , unify
 ) where
 
@@ -12,15 +18,22 @@ import Common.Error
 import Common.AST
 
 type TypeTab   = M.HashMap Id Type
-type TypeState = StateT TypeTab (Except (Error ()))
+type TypeState = StateT TypeTab (Except (CError ()))
+
+typecheck :: a -> (a -> TypeState ()) -> Either (CError ()) TypeTab
+typecheck ast init = runExcept . (flip execStateT (M.fromList [])) $ init ast
 
 -- ==========
 -- Statements
 -- ==========
+-- Iterate over statements
+typecheckStmts :: [Stmt] -> TypeState ()
+typecheckStmts [] = return ()
+typecheckStmts (s:stmts) = typecheckStmt s >> typecheckStmts stmts
 
 -- Update
-typeCheckStmt :: Stmt -> TypeState ()
-typeCheckStmt (Update id op exp)         = do
+typecheckStmt :: Stmt -> TypeState ()
+typecheckStmt (Update id op exp)         = do
   typeofId id >>= \case
     IntT     -> return ()
     UnknownT -> update id IntT
@@ -30,19 +43,43 @@ typeCheckStmt (Update id op exp)         = do
   typeof exp >>= \case
     IntT -> return ()
     t    -> throwError $ TypeError $ IncompatibleTypes IntT t
-
 -- Push
-typeCheckStmt (Push id lid)              = return ()
--- Push
-typeCheckStmt (Pop id lid)               = return ()
+typecheckStmt (Push id lid)              = typeofId id >>= \t -> do
+  typeofId lid >>= \case
+    UnknownT -> update lid (ListT t)
+    ListT lt -> case unify lt t of
+      Nothing -> throwError $ TypeError $ IncompatibleTypes t lt -- TODO: Custom Push error
+      Just t' -> update id t' >> update lid (ListT t')
+    lt       -> throwError $ TypeError $ IncompatibleTypes t lt -- TODO: Custom Stack error
 -- Pop
-typeCheckStmt (Swap id1 id2)             = return ()
+typecheckStmt (Pop id lid)               = typeofId id >>= \t -> do
+  typeofId id >>= \case
+    UnknownT -> update lid (ListT t)
+    ListT lt -> case unify lt t of
+      Nothing -> throwError $ TypeError $ IncompatibleTypes t lt -- TODO: Custom Push error
+      Just t' -> update id t' >> update lid (ListT t')
+    lt       -> throwError $ TypeError $ IncompatibleTypes t lt -- TODO: Custom Stack error
+-- Pop
+typecheckStmt (Swap id1 id2)             = do
+  t1 <- typeofId id1
+  t2 <- typeofId id2
+  case unify t1 t2 of
+    Nothing -> throwError $ TypeError $ IncompatibleTypes t1 t2
+    _       -> return ()
 -- If
-typeCheckStmt (If iexp tstmt fstmt fexp) = return ()
+typecheckStmt (If ifexp tstmts fstmts fiexp) = typeof ifexp >>= \case
+  IntT -> typecheckStmts tstmts >> typecheckStmts fstmts >> typeof fiexp >>= \case
+    IntT -> return ()
+    fit  -> throwError $ TypeError $ IncompatibleTypes IntT fit
+  ift  -> throwError $ TypeError $ IncompatibleTypes IntT ift
 -- Until
-typeCheckStmt (Until fexp stmt uexp)     = return ()
+typecheckStmt (Until fexp stmts uexp)        = typeof fexp >>= \case
+  IntT -> typecheckStmts stmts >> typeof uexp >>= \case
+    IntT -> return ()
+    ut  -> throwError $ TypeError $ IncompatibleTypes IntT ut
+  ft  -> throwError $ TypeError $ IncompatibleTypes IntT ft
 -- Skip
-typeCheckStmt _                          = return ()
+typecheckStmt Skip                       = return ()
 
 -- =======
 -- Helpers
@@ -77,14 +114,32 @@ typeof (Binary op l r) = typeofBinOp op >>= \(lit,rit,t) -> do
     (Nothing,_) -> throwError $ TypeError $ BinOpTypes op (lit,rit) (lt,rt)
     (_,Nothing) -> throwError $ TypeError $ BinOpTypes op (lit,rit) (lt,rt)
     _           -> return t
-typeof _     = return IntT
+--  unary arithmetic and logical
+typeof (Unary op exp) | op < Size  = typeofUnOp op >>= \(it,t) -> do
+  typeof exp >>= \et -> case unify it et of
+    Nothing -> throwError $ TypeError $ UnOpType op it et
+    _       -> return t
+-- unary stack operations
+                      | otherwise = typeofUnOp op >>= \case
+  (ListT it,t) -> typeof exp >>= \case
+    ListT et -> case op of
+      Top -> case unify t et of
+        Nothing -> throwError $ TypeError $ IncompatibleTypes t et
+        Just t' -> return t'
+      _   -> return t
+    et       -> throwError $ TypeError $ UnOpType op (ListT it) et
+
+typeof (Parens exp)               = typeof exp
 
 -- Operator types
 typeofBinOp :: BinOp -> TypeState (Type,Type,Type)
 typeofBinOp _ = return (IntT, IntT, IntT)
 
 typeofUnOp :: UnOp -> TypeState (Type,Type)
-typeofUnOp _ = return (IntT,IntT)
+typeofUnOp Size  = return (ListT UnknownT, IntT)
+typeofUnOp Empty = return (ListT UnknownT, IntT)
+typeofUnOp Top   = return (ListT UnknownT, UnknownT)
+typeofUnOp _     = return (IntT,IntT)
 
 -- Get type of id
 typeofId :: Id -> TypeState Type

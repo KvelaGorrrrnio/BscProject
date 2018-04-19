@@ -23,17 +23,17 @@ logToString = intercalate "\n\n" . map show
 logToJSON :: Log -> String
 logToJSON = intercalate ",\n\n" . map show
 
-data Message = Stmt       Stmt
-             | State      VarTab
-             | EndOfBlock To
-             | NewBlock   Label
-             | Error      Error
+data Message = MsgStmt       Stmt
+             | MsgState      VarTab
+             | MsgEndOfBlock To
+             | MsgNewBlock   Label
+             | MsgError      Error
 instance Show Message where
-  show (Stmt s)           = "> " ++ show s
-  show (State vtab)       = show vtab
-  show (EndOfBlock t)     = show t
-  show (NewBlock l)       = ">> " ++ l
-  show (Error err)        = "*** Error: " ++ err
+  show (MsgStmt s)           = "> " ++ show s
+  show (MsgState vtab)       = show vtab
+  show (MsgEndOfBlock t)     = show t
+  show (MsgNewBlock l)       = ">> " ++ l
+  show (MsgError err)        = "*** Error: " ++show err
 
 
 -- ===

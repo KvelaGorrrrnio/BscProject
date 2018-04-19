@@ -24,7 +24,7 @@ main = do
 
       -- if -q is not set
       unless (q || ls) $ case res of
-        Left  err  -> putStrLn $ "*** Error: " ++ err
+        Left  err  -> putStrLn $ "*** Error: " ++ show err
         Right vtab -> putStrLn $ showVTab vtab
 
       -- if -l flag is set

@@ -1,15 +1,16 @@
 module Common.Error
-( Error        (..)
+( CError       (..)
 , RuntimeError (..)
 , TypeError    (..)
 ) where
 
 import Common.AST
 
-data Error e
+data CError e
   = RuntimeError RuntimeError
   | TypeError    TypeError
   | StaticError  e
+  | Debug        String
   deriving Show
 
 data RuntimeError = RTE deriving Show

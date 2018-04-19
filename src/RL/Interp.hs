@@ -23,19 +23,19 @@ rd id  = do
   ast <- get
   case lookup id ast of
     Just v  -> return v
-    Nothing -> logError $ "Variable '" ++ id ++ "' not defined."
+    Nothing -> logError $ Debug $ "Variable '" ++ id ++ "' not defined."
 
 logStmt :: Stmt -> VarState ()
-logStmt Skip = tell [Stmt Skip]
+logStmt Skip = tell [MsgStmt Skip]
 logStmt s = do
-  tell [Stmt s]
+  tell [MsgStmt s]
   exec s
   vtab <- get
-  tell [State vtab]
+  tell [MsgState vtab]
 
 logError :: Error -> VarState a
 logError err = do
-  tell [Error err]
+  tell [MsgError err]
   throwError err
 
 
@@ -55,19 +55,19 @@ runProgram ast = do
 
 interp :: Label -> ProgState ()
 interp l = do
-  tell [NewBlock l]
+  tell [MsgNewBlock l]
   ast <- ask
   case lookup l ast of
     Just (_,ss,t) -> do
       lift $ execStmts ss
-      tell [EndOfBlock t]
+      tell [MsgEndOfBlock t]
       case t of
         Exit       -> return ()
         Goto l     -> interp l
         IfTo t l1 l2 -> do
           t' <- lift $ valToBool <$> eval t
           if t' then interp l1 else interp l2
-    Nothing -> lift $ logError ("Label '" ++ l ++ "' not defined.")
+    Nothing -> lift $ logError $ Debug $ ("Label '" ++ l ++ "' not defined.")
 
 
 -- ==========
@@ -86,10 +86,10 @@ exec (Update id op e) = do
   case op of
     DivEq -> case (v1,v2) of
       (IntV n, IntV m) | mod n m == 0 -> return ()
-        | otherwise -> logError "Division has rest in update."
+        | otherwise -> logError $ Debug $ "Division has rest in update."
     MultEq -> case (v1,v2) of
       (IntV n, IntV m) | n /= 0 && m /= 0 -> return ()
-        | otherwise -> logError "An operand in mult update is zero."
+        | otherwise -> logError $ Debug $ "An operand in mult update is zero."
     _      -> return ()
   res <- eval $ mapUpdOp op (Lit v1) (Lit v2)
   modify $ insert id res
@@ -121,13 +121,13 @@ exec (Push id1 id2) = do
 
 exec (Pop id1 id2) = do
   v1 <- rd id1
-  unless (isClear v1) $ logError ("Popping into non-clear variable '" ++ id1 ++ "'.")
+  unless (isClear v1) $ logError $ Debug $ ("Popping into non-clear variable '" ++ id1 ++ "'.")
   v2 <- rd id2
   case v2 of
     ListV (t:ls) -> do
       modify $ insert id1 t
       modify $ insert id2 $ ListV ls
-    ListV [] -> logError $ "Popping from empty list '" ++ id2 ++ "'."
+    ListV [] -> logError $ Debug $ "Popping from empty list '" ++ id2 ++ "'."
 
 -- swapping variables
 exec (Swap id1 id2) = do
@@ -154,7 +154,7 @@ eval (Var id) = rd id
 eval (Binary op l r) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> eval r
 -- binary div and mod
                      | op <= Mod = eval r >>= \rv -> case rv of
-  IntV 0 -> logError "Dividing by zero."
+  IntV 0 -> logError $ Debug $ "Dividing by zero."
   IntV _ -> eval l >>= \lv -> return $ applyABinOp (mapABinOp op) lv rv
 -- binary relational
                      | op <= Geq = applyRBinOp (mapRBinOp op) <$> eval l <*> eval r
@@ -170,7 +170,7 @@ eval (Unary op exp) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (mapA
 -- unary list
                     | otherwise   = eval exp >>= \(ListV lv) -> case op of
   Top   -> case lv of
-    []   -> logError "Accessing top of empty list."
+    []   -> logError $ Debug $ "Accessing top of empty list."
     t:ts -> return t
   Empty -> return $ boolToVal . null  $ lv
   Size  -> return $ intToVal . length $ lv
