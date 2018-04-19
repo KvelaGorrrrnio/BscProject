@@ -50,18 +50,22 @@ languageDef =
                                       ]
            }
 
+-- get position
+pos :: Parser Pos
+pos = getPosition >>= \s->return (sourceLine s,sourceColumn s)
+
 lexer = Token.makeTokenParser languageDef
 
 identifier    = Token.identifier    lexer
 reserved      = Token.reserved      lexer
-reservedOp    = Token.reservedOp    lexer
+reservedOp n  = Token.reservedOp    lexer n >> pos
 parens        = Token.parens        lexer
 integer       = Token.integer       lexer
 colon         = Token.colon         lexer
 whiteSpace    = Token.whiteSpace    lexer
 
 -- statements
-updateStmt :: Parser Stmt
+updateStmt :: Parser (Pos -> Stmt)
 updateStmt = do
   var  <- identifier
   op   <- update
@@ -74,16 +78,16 @@ update = (reservedOp "+=" >> return PlusEq)
      <|> (reservedOp "*=" >> return MultEq)
      <|> (reservedOp "/=" >> return DivEq)
 
-skipStmt :: Parser Stmt
+skipStmt :: Parser (Pos -> Stmt)
 skipStmt = (reserved "skip" <|> reserved ".") >> return Skip
 
-swapStmt :: Parser Stmt
+swapStmt :: Parser (Pos -> Stmt)
 swapStmt = reserved "swap" >> Swap <$> identifier <*> identifier
 
-pushStmt :: Parser Stmt
+pushStmt :: Parser (Pos -> Stmt)
 pushStmt = reserved "push" >> Push <$> identifier <*> identifier
 
-popStmt :: Parser Stmt
+popStmt :: Parser (Pos -> Stmt)
 popStmt = reserved "pop" >> Pop <$> identifier <*> identifier
 
 -- expressions
@@ -91,36 +95,37 @@ expression :: Parser Exp
 expression = buildExpressionParser operators term <?> "expression"
 
 operators = [
-              [Prefix ((reservedOp "^"  <|> reserved "top"  )
-                                         >> return (Unary     Top      ))           ]
-            , [Prefix ((reservedOp "#"  <|> reserved "size" )
-                                         >> return (Unary     Size     ))           ]
-            , [Prefix ((reservedOp "?"  <|> reserved "empty")
-                                         >> return (Unary     Empty    ))           ]
-            , [Prefix ((reservedOp "-"  <|> reserved "neg"  )
-                                         >> return (Unary     Neg      ))           ]
-            , [Prefix ((reservedOp "~"  <|> reserved "sig"  )
-                                         >> return (Unary     Sign     ))           ]
-            , [Prefix ((reservedOp "!"  <|> reserved "not"  )
-                                         >> return (Unary     Not      ))           ]
-            , [Infix  ( reservedOp "**"  >> return (Binary    Pow      )) AssocRight]
-            , [Infix  ( reservedOp "%"   >> return (Binary    Mod      )) AssocLeft ]
-            , [Infix  ( reservedOp "*"   >> return (Binary    Mult     )) AssocLeft ]
-            , [Infix  ( reservedOp "/"   >> return (Binary    Div      )) AssocLeft ]
-            , [Infix  ( reservedOp "+"   >> return (Binary    Plus     )) AssocLeft ]
-            , [Infix  ( reservedOp "-"   >> return (Binary    Minus    )) AssocLeft ]
-            , [Infix  ( reservedOp "<"   >> return (Binary    Less     )) AssocNone ]
-            , [Infix  ( reservedOp "<="  >> return (Binary    Leq      )) AssocNone ]
-            , [Infix  ( reservedOp ">"   >> return (Binary    Greater  )) AssocNone ]
-            , [Infix  ( reservedOp ">="  >> return (Binary    Geq      )) AssocNone ]
-            , [Infix  ( reservedOp "="   >> return (Binary    Equal    )) AssocNone ]
-            , [Infix  ( reservedOp "!="  >> return (Binary    Neq      )) AssocNone ]
-            , [Infix  ((reservedOp "&&" <|> reserved "and")
-                                         >> return (Binary    And      )) AssocLeft ]
-            , [Infix  ((reservedOp "||" <|> reserved "or")
-                                         >> return (Binary    Or       )) AssocLeft ]
+              [Prefix ((reservedOp "^"  <|> (reserved "top">>pos) )
+                                         >>= \p -> return (\e->  Unary     Top      e   p))           ]
+            , [Prefix ((reservedOp "#"  <|> (reserved "size">>pos) )
+                                         >>= \p -> return (\e->  Unary     Size     e   p))           ]
+            , [Prefix ((reservedOp "?"  <|> (reserved "empty">>pos) )
+                                         >>= \p -> return (\e->  Unary     Empty    e   p))           ]
+            , [Prefix ((reservedOp "-"  <|> (reserved "neg">>pos)  )
+                                         >>= \p -> return (\e->  Unary     Neg      e   p))           ]
+            , [Prefix ((reservedOp "~"  <|> (reserved "sig">>pos) )
+                                         >>= \p -> return (\e->  Unary     Sign     e   p))           ]
+            , [Prefix ((reservedOp "!"  <|> (reserved "not">>pos) )
+                                         >>= \p -> return (\e->  Unary     Not      e   p))           ]
+            , [Infix  ( reservedOp "**"  >>= \p -> return (\l r->Binary    Pow      l r p)) AssocRight]
+            , [Infix  ( reservedOp "%"   >>= \p -> return (\l r->Binary    Mod      l r p)) AssocLeft ]
+            , [Infix  ( reservedOp "*"   >>= \p -> return (\l r->Binary    Mult     l r p)) AssocLeft ]
+            , [Infix  ( reservedOp "/"   >>= \p -> return (\l r->Binary    Div      l r p)) AssocLeft ]
+            , [Infix  ( reservedOp "+"   >>= \p -> return (\l r->Binary    Plus     l r p)) AssocLeft ]
+            , [Infix  ( reservedOp "-"   >>= \p -> return (\l r->Binary    Minus    l r p)) AssocLeft ]
+            , [Infix  ( reservedOp "<"   >>= \p -> return (\l r->Binary    Less     l r p)) AssocNone ]
+            , [Infix  ( reservedOp "<="  >>= \p -> return (\l r->Binary    Leq      l r p)) AssocNone ]
+            , [Infix  ( reservedOp ">"   >>= \p -> return (\l r->Binary    Greater  l r p)) AssocNone ]
+            , [Infix  ( reservedOp ">="  >>= \p -> return (\l r->Binary    Geq      l r p)) AssocNone ]
+            , [Infix  ( reservedOp "="   >>= \p -> return (\l r->Binary    Equal    l r p)) AssocNone ]
+            , [Infix  ( reservedOp "!="  >>= \p -> return (\l r->Binary    Neq      l r p)) AssocNone ]
+            , [Infix  ((reservedOp "&&" <|> (reserved "and">>pos))
+                                         >>= \p -> return (\l r->Binary    And      l r p)) AssocLeft ]
+            , [Infix  ((reservedOp "||" <|> (reserved "or">>pos))
+                                         >>= \p -> return (\l r->Binary    Or       l r p)) AssocLeft ]
             ]
-term = Parens <$> parens expression
+term = pos >>= \p ->(\s->s p)
+   <$> (Parens <$> parens expression
    <|> Var    <$> identifier
-   <|> Lit . IntV <$> integer
+   <|> Lit . IntV <$> integer)
    <?> "expression, identifier or value"

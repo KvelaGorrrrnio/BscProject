@@ -26,7 +26,7 @@ rd id  = do
     Nothing -> logError $ Debug $ "Variable '" ++ id ++ "' not defined."
 
 logStmt :: Stmt -> VarState ()
-logStmt Skip = tell [MsgStmt Skip]
+logStmt (Skip p) = tell [MsgStmt (Skip p)]
 logStmt s = do
   tell [MsgStmt s]
   exec s
@@ -80,7 +80,7 @@ execStmts = mapM_ logStmt
 exec :: Stmt -> VarState ()
 
 -- variable updates
-exec (Update id op e) = do
+exec (Update id op e p) = do
   v1 <- rd id
   v2 <- eval e
   case op of
@@ -91,24 +91,24 @@ exec (Update id op e) = do
       (IntV n, IntV m) | n /= 0 && m /= 0 -> return ()
         | otherwise -> logError $ Debug $ "An operand in mult update is zero."
     _      -> return ()
-  res <- eval $ mapUpdOp op (Lit v1) (Lit v2)
+  res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
   modify $ insert id res
 
 -- control flow
--- exec (If t s1 s2 a) = do
+-- exec (If t s1 s2 a p) = do
 --   t' <- valToBool <$> eval t
 --   if t' then exec s1
 --         else exec s2
 --   when (t' /= valToBool <$> eval a)
 --     $ logError TestAndAssertNotCoherent
 --
--- exec (DoUntil d a s t) = do -- if d is true we are coming from the outside
+-- exec (DoUntil d a s t p) = do -- if d is true we are coming from the outside
 --   if (valToBool <$> eval a == d) then exec s
 --   else logError AssertNotConsistent
 --   when (valToBool <$> eval t) $ exec (DoUntil False a s t)
 
 -- list modification
-exec (Push id1 id2) = do
+exec (Push id1 id2 p) = do
   v1 <- rd id1
   v2 <- rd id2
   case v2 of
@@ -119,7 +119,7 @@ exec (Push id1 id2) = do
           clear (IntV _)  = IntV 0
           clear (ListV _) = ListV []
 
-exec (Pop id1 id2) = do
+exec (Pop id1 id2 p) = do
   v1 <- rd id1
   unless (isClear v1) $ logError $ Debug $ ("Popping into non-clear variable '" ++ id1 ++ "'.")
   v2 <- rd id2
@@ -130,7 +130,7 @@ exec (Pop id1 id2) = do
     ListV [] -> logError $ Debug $ "Popping from empty list '" ++ id2 ++ "'."
 
 -- swapping variables
-exec (Swap id1 id2) = do
+exec (Swap id1 id2 p) = do
   v1 <- rd id1
   v2 <- rd id2
   modify $ insert id1 v2
@@ -147,11 +147,11 @@ exec _ = return ()
 eval :: Exp -> VarState Value
 
 -- terminals
-eval (Lit v)  = return v
-eval (Var id) = rd id
+eval (Lit v _)  = return v
+eval (Var id _) = rd id
 
 -- binary arithmetic
-eval (Binary op l r) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> eval r
+eval (Binary op l r p) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> eval r
 -- binary div and mod
                      | op <= Mod = eval r >>= \rv -> case rv of
   IntV 0 -> logError $ Debug $ "Dividing by zero."
@@ -164,7 +164,7 @@ eval (Binary op l r) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> eval
   IntV v | v/=0 && op==Or -> return $ IntV 1
   IntV _ -> norm <$> eval r
 -- unary arithmetic
-eval (Unary op exp) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (mapAUnOp op) v
+eval (Unary op exp p) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (mapAUnOp op) v
 -- unary logical
                     | op < Size    = eval exp >>= \(IntV v) -> return $ boolToVal $ (mapLUnOp op) $ v/=0
 -- unary list
@@ -176,7 +176,7 @@ eval (Unary op exp) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (mapA
   Size  -> return $ intToVal . length $ lv
 
 -- paranthesis
-eval (Parens e) = eval e
+eval (Parens e p) = eval e
 
 -- =======
 -- helpers

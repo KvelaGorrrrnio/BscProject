@@ -8,7 +8,7 @@ import Common.AST
 
 data CError e
   = RuntimeError RuntimeError
-  | TypeError    TypeError
+  | TypeError    Pos TypeError
   | StaticError  e
   | Debug        String
   deriving Show

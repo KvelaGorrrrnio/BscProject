@@ -65,7 +65,7 @@ data From = From Label
 instance Show From where
   show (From l)     = "from " ++ l
   show (Fi e l1 l2) = case e of
-    Parens _ -> "fi " ++ show e ++ " " ++ l1 ++ " " ++ l2
+    Parens _ _ -> "fi " ++ show e ++ " " ++ l1 ++ " " ++ l2
     _        -> "fi (" ++ show e ++ ") " ++ l1 ++ " " ++ l2
   show Entry        = "entry"
 
@@ -75,6 +75,6 @@ data To = Goto Label
 instance Show To where
   show (Goto l)     = "goto " ++ l
   show (IfTo e l1 l2) = case e of
-    Parens _ -> "if "  ++ show e ++ " "  ++ l1 ++ " " ++ l2
+    Parens _ _ -> "if "  ++ show e ++ " "  ++ l1 ++ " " ++ l2
     _        -> "if (" ++ show e ++ ") " ++ l1 ++ " " ++ l2
   show Exit         = "exit"

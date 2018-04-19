@@ -19,7 +19,7 @@ translateToRLSource :: SRL.AST -> String
 translateToRLSource ast = RL.showAST $ flip evalState 1 . execWriterT $ translateS "init" Entry Exit ast
 
 translateS :: Label -> From -> To -> [Stmt] -> WriterT RL.AST (State Int) Label
-translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts =
+translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip (0,0)] else stmts =
 
   -- the next must be either an if, a loop or nothing
   case r of
@@ -30,7 +30,7 @@ translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts 
 
       >> return thisL
 
-    If t s1 s2 a : ss -> do
+    If t s1 s2 a _ : ss -> do
 
       -- generate the labels for the blocks to come
       thenL <- genLabel  "then"
@@ -47,7 +47,7 @@ translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip] else stmts 
       -- generate the next sequence of blocks
       translateS endL  (Fi a tl el) thisT ss
 
-    Until a s t : ss -> do
+    Until a s t _ : ss -> do
 
       -- generate the labels for the blocks to come
       loopL <- genLabel  "loop"

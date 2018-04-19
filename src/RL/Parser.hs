@@ -35,11 +35,12 @@ statements :: Parser [Stmt]
 statements = many statement
 
 statement :: Parser Stmt
-statement = try updateStmt
+statement = pos >>= \p -> (\s->s p)
+        <$> (try updateStmt
         <|> swapStmt
         <|> skipStmt
         <|> pushStmt
-        <|> popStmt
+        <|> popStmt)
 
 parseSrc :: String -> Either ParseError AST
 parseSrc = parse rlParser ""
