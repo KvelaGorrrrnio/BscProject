@@ -1,6 +1,4 @@
-module SRL.Inversion
-( invert
-) where
+module SRL.Inversion where
 
 import SRL.AST
 
