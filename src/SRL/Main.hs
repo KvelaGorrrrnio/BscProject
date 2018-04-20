@@ -22,7 +22,30 @@ main = do
       -- parse file and run
       ast <- parseFile f
       ttab <- typecheck ast
-      putStrLn . showAST $ ast
+      let (res,log) = runProgramWith ast (typesToVarTab ttab)
+
+      -- if -q is not set
+      unless (q || ls) $ case res of
+        Left  err  -> putStrLn $ "*** Error: " ++ show err
+        Right vtab -> putStrLn $ showVTab vtab
+
+      -- if -l flag is set
+      when l $ do
+        let logname = f -<.> "srlog"
+        writeFile logname . (++"\n") . logToString $ log
+        unless q $ putStrLn ("\nThe log was written to " ++ logname)
+
+      -- if --log-stdout flag is set
+      when ls $ putStrLn (logToString log)
+
+      -- if -j flag is set
+      when j $ do
+        let logname = f -<.> "json"
+        writeFile logname . (++"\n") . logToJSON $ log
+        unless q $ putStrLn ("\nThe log was written to " ++ logname)
+
+      -- if --json-stdout flag is set
+      when js $ putStrLn (logToJSON log)
 
     Invert _ [] -> noFile
     Invert o f  -> do
@@ -43,5 +66,5 @@ main = do
       writeFile out . (++"\n") . translateToRLSource $ ast
 
     Typeof f -> do
-      ttab <- parseFile f >>= \ast -> typecheck ast
+      ttab <- typecheck =<< parseFile f
       putStrLn $ showTab ttab

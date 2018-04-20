@@ -37,7 +37,7 @@ data Stmt = Update Id UpdOp Exp Pos
           | Skip Pos
           -- unique for SRL
           | If Exp [Stmt] [Stmt] Exp Pos
-          | Until Exp [Stmt] Exp Pos
+          | Until Bool Exp [Stmt] Exp Pos
 instance Show Stmt where
   show (Update id op e _) = id ++ show op ++ show e
   show (Push id1 id2 _)   = "push " ++ id1 ++ " " ++ id2
@@ -68,8 +68,8 @@ data Exp
 instance Show Exp where
   show (Lit v _)         = show v
   show (Var id _)        = id
-  show (Binary op l r _) = ""
-  show (Unary  op exp _) = show op++show exp
+  show (Binary op l r _) = show l ++ show op ++ show r
+  show (Unary  op exp _) = show op ++ show exp
   show (Parens exp _)    = "("++show exp++")"
 
 data BinOp
@@ -93,7 +93,24 @@ data BinOp
   -- v Logical
   | Or
   | And
-  deriving (Show,Eq,Ord)
+  deriving (Eq,Ord)
+instance Show BinOp where
+  show Plus    = " + "
+  show Minus   = " - "
+  show Xor     = " ^ "
+  show Pow     = " ** "
+  show Mult    = " * "
+  show Div     = " / "
+  show Mod     = " % "
+  show Equal   = " = "
+  show Neq     = " != "
+  show Less    = " < "
+  show Leq     = " <= "
+  show Greater = " > "
+  show Geq     = " >= "
+  show Or      = " || "
+  show And     = " && "
+
 
 
 data UnOp
@@ -107,7 +124,14 @@ data UnOp
   | Size
   | Empty
   | Top
-  deriving (Show,Eq,Ord)
+  deriving (Eq,Ord)
+instance Show UnOp where
+  show Neg   = "- "
+  show Sign  = "~ "
+  show Not   = "not "
+  show Size  = "# "
+  show Empty = "? "
+  show Top   = "^ "
 
 -- ====
 -- Type

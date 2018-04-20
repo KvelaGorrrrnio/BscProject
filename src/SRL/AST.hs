@@ -7,29 +7,7 @@ import Data.Bits (xor)
 import Data.List (intercalate)
 
 import Common.AST
-
 import SRL.Error
-
--- ===
--- Log
--- ===
-
-type Log = [Message]
-
-logToString :: Log -> String
-logToString = intercalate "\n\n" . map show
-
-logToJSON :: Log -> String
-logToJSON = intercalate ",\n\n" . map show
-
-data Message = MsgStmt    Stmt
-             | MsgState   VarTab
-             | MsgError   RuntimeError
-instance Show Message where
-  show (MsgStmt s)           = "> " ++ show s
-  show (MsgState vtab)       = show vtab
-  show (MsgError err)        = "*** Error: " ++show err
-
 
 -- ===
 -- AST
@@ -52,7 +30,7 @@ showStmt lvl s = case s of
                ++ showAST' (lvl+1) s2 ++ "\n"
                ++ indent ++ "fi " ++ show a
 
-  Until t s a _ -> indent ++ "from "  ++ show t ++ " do\n"
+  Until _ t s a _ -> indent ++ "from "  ++ show t ++ " do\n"
                ++ showAST' (lvl + 1) s ++ "\n"
                ++ indent ++ "until " ++ show a
 

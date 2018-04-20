@@ -76,7 +76,7 @@ typecheckStmt (If ifexp tstmts fstmts fiexp p) = typeof ifexp >>= \case
     fit  -> throwError $ IncompatibleTypes IntT fit p
   ift  -> throwError $ IncompatibleTypes IntT ift p
 -- Until
-typecheckStmt (Until fexp stmts uexp p)        = typeof fexp >>= \case
+typecheckStmt (Until _ fexp stmts uexp p)      = typeof fexp >>= \case
   IntT -> typecheckStmts stmts >> typeof uexp >>= \case
     IntT -> return ()
     ut  -> throwError $ IncompatibleTypes IntT ut p

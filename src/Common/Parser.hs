@@ -26,11 +26,8 @@ languageDef =
                                       , "swap"
                                       , "push"
                                       , "pop"
-                                      , "if"
                                       , "then"
                                       , "else"
-                                      , "fi"
-                                      , "from"
                                       , "do"
                                       , "until"
                                       -- expressions
