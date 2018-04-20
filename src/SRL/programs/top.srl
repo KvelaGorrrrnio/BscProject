@@ -1,20 +1,11 @@
 // Just a quick program to
 // test nested top-expressions
 
-  int   a
-  int   b
- [int]  l
-[[int]] l'
+a += 5
+push a l
+push l l'
 
-procedure main:
-  a += 5
-  push a l
-  push l l' !! l'   // debug print l'
+b += top (top l') // this should be 5
 
-  b += top (top l') // this should be 5
-  error "b should be 5." if not (b = 5)
-
-  pop l l'
-  pop a l
-  ! a ! b
-end
+pop l l'
+pop a l
