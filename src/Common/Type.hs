@@ -124,13 +124,16 @@ typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) -> do
     _       -> return t
 -- unary stack operations
                       | otherwise = typeofUnOp op >>= \case
-  (ListT it,t) -> typeof exp >>= \case
-    ListT et -> case op of
+  (ListT it,t) -> do
+    et <- typeof exp >>= \case
+      ListT et -> return et
+      UnknownT -> return $ ListT UnknownT
+      et       -> throwError $ UnOpType op (ListT it) et p
+    case op of
       Top -> case unify t et of
         Nothing -> throwError $ IncompatibleTypes t et p
         Just t' -> return t'
       _   -> return t
-    et       -> throwError $ UnOpType op (ListT it) et p
 
 typeof (Parens exp _)               = typeof exp
 
