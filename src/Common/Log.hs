@@ -22,5 +22,5 @@ data Message = MsgStmt       Stmt
              | MsgError      RuntimeError
 instance Show Message where
   show (MsgStmt s)           = "> " ++ show s
-  show (MsgState vtab)       = show vtab
+  show (MsgState vtab)       = showVTab vtab
   show (MsgError err)        = "*** Error: " ++show err
