@@ -10,7 +10,7 @@ invert :: AST -> AST
 invert = reverse . map (\(l,b) -> (l, invertBlock b))
 
 invertBlock :: Block -> Block
-invertBlock (f,s,t) = (invertTo t, (map invertStmt . reverse) s, invertFrom f)
+invertBlock (f,s,t) = (invertTo t, invertStmts s, invertFrom f)
 
 invertOp :: UpdOp -> UpdOp
 invertOp PlusEq  = MinusEq
