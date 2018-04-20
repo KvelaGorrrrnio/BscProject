@@ -55,12 +55,12 @@ typecheckStmt (Push id lid p)              = typeofId id >>= \t -> do
     lt       -> throwError $ IncompatibleTypes t lt p -- TODO: Custom Stack error
 -- Pop
 typecheckStmt (Pop id lid p)               = typeofId id >>= \t -> do
-  typeofId id >>= \case
+  typeofId lid >>= \case
     UnknownT -> update lid (ListT t) p
     ListT lt -> case unify lt t of
-      Nothing -> throwError $ IncompatibleTypes t lt p -- TODO: Custom Push error
+      Nothing -> throwError $ IncompatibleTypes t lt (-1,1) -- TODO: Custom Push error
       Just t' -> update id t' p >> update lid (ListT t') p
-    lt       -> throwError $ IncompatibleTypes t lt p -- TODO: Custom Stack error
+    lt       -> throwError $ IncompatibleTypes t lt (-1,2) -- TODO: Custom Stack error
 -- Pop
 typecheckStmt (Swap id1 id2 p)             = do
   t1 <- typeofId id1

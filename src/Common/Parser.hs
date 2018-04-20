@@ -14,7 +14,7 @@ languageDef =
            , Token.commentEnd       = "*/"
            , Token.commentLine      = "//"
            , Token.identStart       = letter
-           , Token.identLetter      = alphaNum
+           , Token.identLetter      = alphaNum <|> oneOf ['_', '\'']
            , Token.reservedNames    = [ "entry"
                                       , "from"
                                       , "fi"
