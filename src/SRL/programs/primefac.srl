@@ -1,6 +1,6 @@
 v += 2
 n += 315
-from (empty p && v = 2) do
+from ((empty p) && v = 2) do
   if (n % v = 0) then
     n /= v
     push v p

@@ -24,15 +24,14 @@ type TypeTab   = M.HashMap Id Type
 type TypeState = StateT TypeTab (Except TypeError)
 
 runTypecheck :: a -> (a -> TypeState ()) -> Either TypeError TypeTab
-runTypecheck ast init = runExcept . (flip execStateT (M.fromList [])) $ init ast
+runTypecheck ast init = runExcept . flip execStateT M.empty $ init ast
 
 -- ==========
 -- Statements
 -- ==========
 -- Iterate over statements
 typecheckStmts :: [Stmt] -> TypeState ()
-typecheckStmts [] = return ()
-typecheckStmts (s:stmts) = typecheckStmt s >> typecheckStmts stmts
+typecheckStmts = mapM_ typecheckStmt
 
 -- Update
 typecheckStmt :: Stmt -> TypeState ()
@@ -154,7 +153,7 @@ typeofId id = get >>= \tab -> case M.lookup id tab of
 typeofVal :: Value -> TypeState Type
 typeofVal (IntV _)   = return IntT
 typeofVal (ListV []) = return $ ListT UnknownT
-typeofVal (ListV v)  = typeofVal (head v) >>= \t -> return $ ListT t
+typeofVal (ListV v)  = ListT <$> typeofVal (head v)
 
 -- Convert type table to variable table
 typesToVarTab :: TypeTab -> VarTab
