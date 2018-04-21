@@ -23,7 +23,7 @@ optStmt (If t s1 s2 a p) = do
   case rmPar t' of
     Lit (IntV 0) _ -> optStmts s2
     Lit (IntV _) _ -> optStmts s1
-    _              -> [If (rmPar t') (optStmts s1) (optStmts s2) (optExp a) p]
+    _              -> [If (rmPar t') (optStmts s1) (optStmts s2) (rmPar . optExp $ a) p]
 optStmt (Until a s t p)  = case rmPar (optExp t) of
   Lit (IntV n) _ | n/=0 -> optStmts s
   t'             -> [Until (rmPar . optExp $ a) (optStmts s) t' p]
@@ -60,11 +60,37 @@ optExp e = case e of
   Unary Neg e' p -> case rmPar e' of
     Unary Neg e'' _ -> rmPar $ optExp e''
     _               -> Unary Neg (optExp e') p
-  Binary Neq l r p -> case (rmPar (optExp l), rmPar (optExp r)) of
-    (e', Lit (IntV 0) _) -> e'
-    (Lit (IntV 0) _, e') -> e'
-    (l',r') -> Binary Neq l' r' p
-  Binary op l r p -> Binary op (optExp l) (optExp r) p
+  Binary op l r p -> case op of
+    Mult -> case (rmPar (optExp l), rmPar (optExp r)) of
+      (Lit (IntV 0) p', _) -> Lit (IntV 0) p'
+      (Lit (IntV 1) _, _)  -> optExp r
+      (_, Lit (IntV 0) p') -> Lit (IntV 0) p'
+      (_, Lit (IntV 1) _)  -> optExp l
+      _                    -> Binary op (optExp l) (optExp r) p
+    Div -> case (rmPar (optExp l), rmPar (optExp r)) of
+      (Lit (IntV 0) p', _) -> Lit (IntV 0) p'
+      (_, Lit (IntV 1) _)  -> optExp l
+      _                    -> Binary op (optExp l) (optExp r) p
+    Plus -> case (rmPar (optExp l), rmPar (optExp r)) of
+      (_, Unary Neg e' p') -> Binary Minus (optExp l) e' p'
+      _                    -> Binary op (optExp l) (optExp r) p
+    Minus -> case (rmPar (optExp l), rmPar (optExp r)) of
+      (_, Unary Neg e' p') -> Binary Plus (optExp l) e' p'
+      _                    -> Binary op (optExp l) (optExp r) p
+    Pow -> case (rmPar (optExp l), rmPar (optExp r)) of
+      (Lit (IntV 0) p', _) -> Lit (IntV 0) p'
+      (_, Lit (IntV 1) _)  -> optExp l
+      (_, Lit (IntV 0) p') -> Lit (IntV 1) p'
+      _                    -> Binary op (optExp l) (optExp r) p
+    Neq -> case (rmPar (optExp l), rmPar (optExp r)) of
+      (e', Lit (IntV 0) _) -> e'
+      (Lit (IntV 0) _, e') -> e'
+      _                    -> Binary Neq (optExp l) (optExp r) p
+    Equal -> case (rmPar (optExp l), rmPar (optExp r)) of
+      (Unary Size e p, Lit (IntV 0) _) -> Unary Empty e p
+      (Lit (IntV 0) _, Unary Size e p) -> Unary Empty e p
+      _                                -> Binary Equal (optExp l) (optExp r) p
+    _ -> Binary op (optExp l) (optExp r) p
   Parens e' p -> case e' of
     Parens{} -> optExp e'
     _        -> Parens (optExp e') p
