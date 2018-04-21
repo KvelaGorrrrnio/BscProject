@@ -1,0 +1,13 @@
+skip
+skip
+n ^= 0
+if (n = 0) then skip skip skip
+else v += 1 fi (n = 0)
+skip
+skip
+skip
+swap v n
+skip
+skip
+swap n n
+skip

@@ -10,6 +10,7 @@ import SRL.Translation
 import SRL.Inversion
 import SRL.Type
 import SRL.Interp
+import SRL.Optimise
 
 noFile = putStrLn "No .srl file provided."
 
@@ -20,7 +21,7 @@ main = do
     Run l ls j js q f -> do
 
       -- parse file and run
-      ast <- parseFile f
+      ast  <- optimise <$> parseFile f
       ttab <- typecheck ast
       let (res,log) = runProgramWith ast (typesToVarTab ttab)
 
