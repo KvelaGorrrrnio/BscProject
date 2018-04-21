@@ -11,6 +11,7 @@ import Data.Bits (xor)
 import Control.Monad.State
 import Control.Monad.Writer
 import Control.Monad.Except
+import Control.Monad.Loops
 
 -- ======================================
 -- Monad transformer : The variable state
@@ -25,14 +26,17 @@ rd id  = do
   ast <- get
   case lookup id ast of
     Just v  -> return v
+    Nothing -> throwError $ CustomRT "Variable not defined."
 
 logStmt :: Stmt -> VarState ()
-logStmt (Skip p) = tell [MsgStmt (Skip p)]
-logStmt s = do
-  tell [MsgStmt s]
-  exec s
-  vtab <- get
-  tell [MsgState vtab]
+logStmt s = case s of
+  Skip{}  -> tell [MsgStmt s]
+  If{}    -> tell [MsgStmt s] >> exec s
+  Until{} -> tell [MsgStmt s] >> exec s
+  s    -> do
+    tell [MsgStmt s] >> exec s
+    vtab <- get
+    tell [MsgState vtab]
 
 logError :: RuntimeError -> VarState a
 logError err = do
@@ -56,15 +60,15 @@ exec (Update id op e p) = do
   case op of
     DivEq -> case (v1,v2) of
       (IntV n, IntV m) | mod n m == 0 -> return ()
-        | otherwise -> logError $ CustomRT $ "Division has rest in update."
+        | otherwise -> logError $ CustomRT "Division has rest in update."
     MultEq -> case (v1,v2) of
       (IntV n, IntV m) | n /= 0 && m /= 0 -> return ()
-        | otherwise -> logError $ CustomRT $ "An operand in mult update is zero."
+        | otherwise -> logError $ CustomRT "An operand in mult update is zero."
     _      -> return ()
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
   modify $ insert id res
 
--- control flow
+-- control flow : unique for SRL
 exec (If t s1 s2 a p) = do
   t' <- valToBool <$> eval t
   if t' then execStmts s1
@@ -73,12 +77,14 @@ exec (If t s1 s2 a p) = do
   when (t' /= a')
     $ logError $ CustomRT "Assert and such"
 
-exec (Until d a s t p) = do -- if d is true we are coming from the outside
-  a' <- valToBool <$> eval a
-  if a' == d then execStmts s
-  else throwError $ CustomRT "Assert"
-  t' <- valToBool <$> eval t
-  unless t' $ exec (Until False a s t p)
+exec (Until a s t p) = do
+  aout <- valToBool <$> eval a
+  unless aout $ logError $ CustomRT "Assert"
+  execStmts s
+  whileM_ (not . valToBool <$> eval t) $ do
+      ain <- valToBool <$> eval a ; when ain
+        $ throwError $ CustomRT "Assert not good"
+      execStmts s;
 
 -- list modification
 exec (Push id1 id2 p) = do
@@ -95,7 +101,7 @@ exec (Push id1 id2 p) = do
 exec (Pop id1 id2 p) = do
   v1 <- rd id1
   unless (isClear v1) $
-    logError $ CustomRT $ ("Popping into non-clear variable '" ++ id1 ++ "'.")
+    logError $ CustomRT ("Popping into non-clear variable '" ++ id1 ++ "'.")
   v2 <- rd id2
   case v2 of
     ListV (t:ls) -> do
@@ -130,7 +136,7 @@ eval (Binary op l r p) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> ev
                      | op <= Mod = do
   rv <- eval r
   case rv of
-    IntV 0 -> logError $ CustomRT $ "Dividing by zero."
+    IntV 0 -> logError $ CustomRT "Dividing by zero."
     IntV _ -> return ()
   lv <- eval l
   return $ applyABinOp (mapABinOp op) lv rv
@@ -144,14 +150,14 @@ eval (Binary op l r p) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> ev
 -- unary arithmetic
 eval (Unary op exp p) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (mapAUnOp op) v
 -- unary logical
-                    | op < Size    = eval exp >>= \(IntV v) -> return $ boolToVal $ (mapLUnOp op) $ v/=0
+                      | op < Size    = eval exp >>= \(IntV v)  -> return $ boolToVal $ mapLUnOp op (v/=0)
 -- unary list
-                    | otherwise   = eval exp >>= \(ListV lv) -> case op of
+                      | otherwise   = eval exp >>= \(ListV lv) -> case op of
   Top   -> case lv of
-    []   -> logError $ CustomRT $ "Accessing top of empty list."
+    []   -> logError $ CustomRT "Accessing top of empty list."
     t:ts -> return t
   Empty -> return $ boolToVal . null  $ lv
-  Size  -> return $ intToVal . length $ lv
+  Size  -> return $ IntV . fromIntegral . length $ lv
 
 -- paranthesis
 eval (Parens e p) = eval e
@@ -200,6 +206,3 @@ boolToVal b = IntV $ if b then 1 else 0
 -- converting val to bool
 valToBool :: Value -> Bool
 valToBool (IntV p) = p /= 0
--- int to val
-intToVal :: Int -> Value
-intToVal = IntV . fromIntegral

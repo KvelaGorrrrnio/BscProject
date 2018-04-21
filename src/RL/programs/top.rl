@@ -1,7 +1,7 @@
 init: entry
-  n ^= 3
-  push n q
-  n ^= 9
-  push n q
-  v += ^q
+  no ^= 3
+  push no q
+  no ^= 9
+  push no q
+  van += ^q
 exit

@@ -1,7 +1,6 @@
 module Common.AST where
 
-import Data.List
-import Data.Bits
+import Data.List (intercalate)
 
 -- values
 data Value = IntV Integer | ListV [Value]
@@ -20,12 +19,9 @@ type Id = String
 type Pos = (Int,Int)
 
 type VarTab = [(Id,Value)]
-showVTab =
-    (\vt -> if null vt
-            then "null"
-            else (intercalate "\n" . map (\(k,v) -> k ++ " -> " ++ show v)) vt
-    )
-  . filter (not . isClear . snd)
+showVTab tab = let m = maximum (map (\(n,_) -> length n) tab)
+      in intercalate "\n" $ map (\(n,v) ->n++pad(m-length n+1)++" : "++show v) tab
+   where pad n = replicate (n-1) ' '
 insert id val = map (\(id',v) -> if id'==id then (id,val) else (id',v))
 adjust op id  = map (\(id',v) -> if id'==id then (id,op v) else (id',v))
 
@@ -37,13 +33,16 @@ data Stmt = Update Id UpdOp Exp Pos
           | Skip Pos
           -- unique for SRL
           | If Exp [Stmt] [Stmt] Exp Pos
-          | Until Bool Exp [Stmt] Exp Pos
+          | Until Exp [Stmt] Exp Pos
 instance Show Stmt where
   show (Update id op e _) = id ++ show op ++ show e
   show (Push id1 id2 _)   = "push " ++ id1 ++ " " ++ id2
   show (Pop id1 id2 _)    = "pop "  ++ id1 ++ " " ++ id2
   show (Swap id1 id2 _)   = "swap " ++ id1 ++ " " ++ id2
   show (Skip _)           = "skip"
+  -- unique for SRL
+  show (If t s1 s2 a _)   = "if " ++ show t ++ " then [s1] else [s2]"
+  show (Until a s t _)    = "from " ++ show a ++ " do [s] until " ++ show t
 
 data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq
 instance Show UpdOp where
@@ -66,11 +65,13 @@ data Exp
   | Unary  UnOp  Exp Pos
   | Parens Exp Pos
 instance Show Exp where
-  show (Lit v _)         = show v
-  show (Var id _)        = id
-  show (Binary op l r _) = show l ++ show op ++ show r
-  show (Unary  op exp _) = show op ++ show exp
-  show (Parens exp _)    = "("++show exp++")"
+  show (Lit v _)          = show v
+  show (Var id _)         = id
+  show (Binary op l r _)  = show l ++ show op ++ show r
+  show (Unary  op exp _)  = show op ++ show exp
+  show (Parens -- ignore double parantheses
+        (Parens exp _) _) = show exp
+  show (Parens exp _)     = "("++show exp++")"
 
 data BinOp
   = Plus

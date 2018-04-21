@@ -15,6 +15,8 @@ Overvej - og måske implementer - stadig følgende ting:
   - Generer VarTab fra TypeTab
   - Lidt i samme boldgade; Vil vi tillade at fortolke programmet step-by-step, så man kan se tilstanden til hver en tid? - Og hvordan vil man i så fald gøre det?
 
+!! Log til SRL virker ikke, da vi bruger show til statements
+
 ## Gør ting fælles
 - invertStmt (Inversion.hs)
 - Error

@@ -75,7 +75,7 @@ typecheckStmt (If ifexp tstmts fstmts fiexp p) = typeof ifexp >>= \case
     fit  -> throwError $ IncompatibleTypes IntT fit p
   ift  -> throwError $ IncompatibleTypes IntT ift p
 -- Until
-typecheckStmt (Until _ fexp stmts uexp p)      = typeof fexp >>= \case
+typecheckStmt (Until fexp stmts uexp p)      = typeof fexp >>= \case
   IntT -> typecheckStmts stmts >> typeof uexp >>= \case
     IntT -> return ()
     ut  -> throwError $ IncompatibleTypes IntT ut p
@@ -99,11 +99,11 @@ unify t1 t2 | t1 == t2      = Just t1
 
 -- Assign type to id (if compatible with earlier assigned type)
 update :: Id -> Type -> Pos -> TypeState ()
-update id t p = get >>= \tab -> typeofId id >>= \case
-  UnknownT -> put $ M.insert id t tab
+update id t p = typeofId id >>= \case
+  UnknownT -> modify $ M.insert id t
   t' -> case unify t t' of
     Nothing -> throwError $ IncompatibleTypes t t' p
-    Just ct -> put $ M.insert id ct tab
+    Just ct -> modify $ M.insert id ct
 
 -- Get type of exp
 typeof :: Exp -> TypeState Type
@@ -165,6 +165,5 @@ typesToVarTab ttab = map defaultVal (M.toList ttab)
         defaultVal (n,_)       = (n,IntV 0)
 
 -- Show hashmap
-pad n = replicate (n-1) ' '
-showTab hm = let tab = M.toList hm; m = maximum (map (\(n,_) -> length n) tab)
-    in intercalate "\n" $ map (\(n,v) ->n++pad(m-(length n)+1)++" : "++show v) tab
+showTab :: Show a => M.HashMap Id a -> String
+showTab = showVTab . M.toList

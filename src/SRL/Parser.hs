@@ -45,7 +45,7 @@ untilStmt = do
   s <- statements
   reserved "until"
   t <- expression
-  return $ Until True a s t
+  return $ Until a s t
 
 parseSrc :: String -> Either ParseError AST
 parseSrc = parse srlParser ""

@@ -23,4 +23,4 @@ data Message = MsgStmt       Stmt
 instance Show Message where
   show (MsgStmt s)           = "> " ++ show s
   show (MsgState vtab)       = showVTab vtab
-  show (MsgError err)        = "*** Error: " ++show err
+  show (MsgError err)        = "*** Error: " ++ show err

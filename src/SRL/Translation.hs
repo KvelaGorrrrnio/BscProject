@@ -50,7 +50,7 @@ translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip (0,0)] else 
       -- generate the next sequence of blocks
       translateS endL  (Fi a tl el (0,0)) thisT ss
 
-    Until _ a s t _ : ss -> do
+    Until a s t _ : ss -> do
 
       -- generate the labels for the blocks to come
       loopL <- genLabel  "loop"
