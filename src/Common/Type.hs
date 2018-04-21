@@ -117,7 +117,7 @@ typeof (Binary op l r p) = typeofBinOp op >>= \(lit,rit,t) -> do
     (_,Nothing) -> throwError $ BinOpTypes op (lit,rit) (lt,rt) p
     _           -> return t
 --  unary arithmetic and logical
-typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) -> do
+typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) ->
   typeof exp >>= \et -> case unify it et of
     Nothing -> throwError $ UnOpType op it et p
     _       -> return t
@@ -126,7 +126,7 @@ typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) -> do
   (ListT it,t) -> do
     et <- typeof exp >>= \case
       ListT et -> return et
-      UnknownT -> return $ ListT UnknownT
+      UnknownT -> return UnknownT -- $ ListT UnknownT
       et       -> throwError $ UnOpType op (ListT it) et p
     case op of
       Top -> case unify t et of

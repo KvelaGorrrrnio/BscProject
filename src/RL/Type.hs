@@ -15,8 +15,9 @@ typecheck ast = case runTypecheck ast typecheckBlocks of
   Right tab -> return tab
 
 typecheckBlocks :: AST -> TypeState ()
-typecheckBlocks [] = return ()
-typecheckBlocks ((_,(f,stmts,t)):ast) = typecheckFrom f >> typecheckStmts stmts >> typecheckTo t >> typecheckBlocks ast
+typecheckBlocks = mapM_ typecheckBlock
+
+typecheckBlock (_,(f,stmts,t)) = typecheckFrom f >> typecheckStmts stmts >> typecheckTo t
 
 typecheckFrom :: From -> TypeState ()
 typecheckFrom (Fi exp _ _ p) = typeof exp >>= \case
