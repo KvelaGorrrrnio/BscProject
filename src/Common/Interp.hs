@@ -26,7 +26,7 @@ rd id  = do
   ast <- get
   case lookup id ast of
     Just v  -> return v
-    Nothing -> throwError $ CustomRT "Variable not defined."
+    Nothing -> throwError $ CustomRT ("Variable '" ++ id ++ "' not defined.")
 
 logStmt :: Stmt -> VarState ()
 logStmt s = case s of

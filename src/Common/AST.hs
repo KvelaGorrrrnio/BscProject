@@ -69,9 +69,9 @@ instance Show Exp where
   show (Var id _)         = id
   show (Binary op l r _)  = show l ++ show op ++ show r
   show (Unary  op exp _)  = show op ++ show exp
-  show (Parens -- ignore double parantheses
-        (Parens exp _) _) = show exp
-  show (Parens exp _)     = "("++show exp++")"
+  show (Parens exp _)     = case exp of
+    Parens exp' _ -> show exp
+    _           -> "("++show exp++")"
 
 data BinOp
   = Plus

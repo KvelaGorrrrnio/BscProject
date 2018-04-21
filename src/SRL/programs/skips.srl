@@ -1,13 +1,19 @@
-skip
-skip
+. . ..
 n ^= 0
-if (n = 0) then skip skip skip
-else v += 1 fi (n = 0)
-skip
-skip
-skip
+. . .
+if (not (not (-(-n) != ~(~8)))) then . . .
+else v += 1 fi not (n != 0)
+
+if 0 then v += 1 else . fi 0 // gets discarded
+
+n += (neg (neg (~ (~ (~ n)))))
+. .
 swap v n
-skip
-skip
+.
 swap n n
-skip
+. .
+from not (a = b) do
+  n += neg (neg (~a))
+  n += - (~ a + -(-b))
+  n -=   (-8)
+until (1)

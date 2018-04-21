@@ -22,6 +22,7 @@ main = do
 
       -- parse file and run
       ast  <- optimise <$> parseFile f
+      putStrLn $ showAST ast ++ "\n"
       ttab <- typecheck ast
       let (res,log) = runProgramWith ast (typesToVarTab ttab)
 
