@@ -26,3 +26,10 @@ from not (not (a = c) && not (0)) || (1 && 0) do
   n += (5+2)**2
   n += not (a && (1 && 0))
 until (size b = 0 || 0)
+
+push o l
+push l p
+push p q
+push q b
+
+o += 1

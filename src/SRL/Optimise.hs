@@ -17,6 +17,12 @@ optimise ast | ast' <- optStmts ast =
   else optStmts ast'
 
 optStmts :: [Stmt] -> [Stmt]
+-- optStmts (s1:s2:ss) = case (s1,s2) of
+--   (Update id op1 e1 p, Update id2 op2 e2 _) | id==id2 ->
+--     optStmts $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss -- TODO: please reduce expression
+--   _ -> optStmt s1 ++ optStmts (s2:ss)
+-- optStmts (s:ss) = optStmt s ++ optStmts ss
+-- optStmts [] = []
 optStmts  = concatMap optStmt
 
 optStmt :: Stmt -> [Stmt]
