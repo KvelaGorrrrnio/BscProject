@@ -1,6 +1,6 @@
 module SRL.Optimise where
 
-import SRL.AST
+import SRL.AST (AST)
 
 import Common.Optimise
 
