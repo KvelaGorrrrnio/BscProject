@@ -137,7 +137,7 @@ typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) -> do
                       | otherwise = typeofUnOp op >>= \case
   (ListT it,t) -> do
     case exp of
-      Var id p' -> update id it p'
+      Var id p' -> update id (ListT it) p'
       _         -> return ()
     et <- typeof exp >>= \case
       ListT et -> return et
