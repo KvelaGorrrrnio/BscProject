@@ -33,6 +33,7 @@ showB (f,s,t) = show f ++ "\n  "
 data From = From Label Pos
           | Fi Exp Label Label Pos
           | Entry Pos
+          deriving Eq
 instance Show From where
   show (From l _)     = "from " ++ l
   show (Fi e l1 l2 _) = case e of
@@ -43,6 +44,7 @@ instance Show From where
 data To = Goto Label Pos
         | IfTo Exp Label Label Pos
         | Exit Pos
+        deriving Eq
 instance Show To where
   show (Goto l _)      = "goto " ++ l
   show (IfTo e l1 l2 _) = case e of

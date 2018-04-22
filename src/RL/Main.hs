@@ -10,6 +10,7 @@ import RL.Inversion
 import RL.Parser
 import RL.Type
 import RL.Translation
+import RL.Optimise
 
 noFile = putStrLn "No .rl file provided."
 
@@ -20,7 +21,8 @@ main = do
     Run l ls j js q f -> do
 
       -- parse file and run
-      ast <- parseFile f
+      ast <- optimise <$> parseFile f
+      putStrLn $ showAST ast ++ "\n"
       ttab <- typecheck ast
       let (res,log) = runProgramWith ast (typesToVarTab ttab)
 
