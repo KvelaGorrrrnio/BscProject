@@ -46,7 +46,7 @@ typecheckStmt (Update id op exp p)         = do
     IntT -> return ()
     t    -> throwError $ IncompatibleTypes IntT t p
 -- Push
-typecheckStmt (Push id lid p)              = typeofId id >>= \t -> do
+typecheckStmt (Push id lid p)              = typeofId id >>= \t ->
   typeofId lid >>= \case
     UnknownT -> update lid (ListT t) p
     ListT lt -> case unify lt t of
@@ -54,7 +54,7 @@ typecheckStmt (Push id lid p)              = typeofId id >>= \t -> do
       Just t' -> update id t' p >> update lid (ListT t') p
     lt       -> throwError $ IncompatibleTypes t lt p -- TODO: Custom Stack error
 -- Pop
-typecheckStmt (Pop id lid p)               = typeofId id >>= \t -> do
+typecheckStmt (Pop id lid p)               = typeofId id >>= \t ->
   typeofId lid >>= \case
     UnknownT -> update lid (ListT t) p
     ListT lt -> case unify lt t of
@@ -108,7 +108,7 @@ update id t p = typeofId id >>= \case
 -- Get type of exp
 typeof :: Exp -> TypeState Type
 typeof (Lit v _)         = typeofVal v
-typeof (Var id _)        = typeofId id
+typeof (Var id p)        = update id UnknownT p >> typeofId id
 typeof (Binary op l r p) = typeofBinOp op >>= \(lit,rit,t) -> do
   lt <- typeof l
   rt <- typeof r
