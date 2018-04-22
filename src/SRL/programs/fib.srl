@@ -1,6 +1,6 @@
 // Program for computing the n'th fibonacci pair
 
-n ^= 16
+n ^= 100000
 w ^= 1
 from (v = 0) do
   v += w

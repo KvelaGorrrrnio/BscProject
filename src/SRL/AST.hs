@@ -20,7 +20,7 @@ showAST = showAST' 0
 doIndent lvl = replicate (2 * lvl) ' '
 
 showAST' :: Int -> AST -> String
-showAST' lvl = intercalate "\n" . map (showStmt lvl)
+showAST' lvl ast = if null ast then showStmt lvl (Skip (0,0)) else intercalate "\n" . map (showStmt lvl) $ ast
 
 showStmt :: Int -> Stmt -> String
 showStmt lvl s = case s of

@@ -9,4 +9,3 @@ from (v = 0) do
 until (n = 0)
 
 swap n v
-

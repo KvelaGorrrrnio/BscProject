@@ -3,7 +3,7 @@ module Common.AST where
 import Data.List (intercalate)
 
 -- values
-data Value = IntV Integer | ListV [Value]
+data Value = IntV Integer | ListV [Value] deriving Eq
 instance Show Value where
   show (IntV n)    = show n
   show (ListV ls)  = show ls
@@ -34,6 +34,7 @@ data Stmt = Update Id UpdOp Exp Pos
           -- unique for SRL
           | If Exp [Stmt] [Stmt] Exp Pos
           | Until Exp [Stmt] Exp Pos
+          deriving Eq
 instance Show Stmt where
   show (Update id op e _) = id ++ show op ++ show e
   show (Push id1 id2 _)   = "push " ++ id1 ++ " " ++ id2
@@ -44,7 +45,7 @@ instance Show Stmt where
   show (If t s1 s2 a _)   = "if " ++ show t ++ " then [s1] else [s2]"
   show (Until a s t _)    = "from " ++ show a ++ " do [s] until " ++ show t
 
-data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq
+data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq deriving Eq
 instance Show UpdOp where
   show PlusEq  = " += "
   show MinusEq = " -= "
@@ -64,6 +65,7 @@ data Exp
   | Binary BinOp Exp Exp Pos
   | Unary  UnOp  Exp Pos
   | Parens Exp Pos
+  deriving Eq
 instance Show Exp where
   show (Lit v _)          = show v
   show (Var id _)         = id
