@@ -12,7 +12,10 @@ import Control.Monad.Except
 typecheck :: AST -> IO TypeTab
 typecheck ast = case runTypecheck ast typecheckBlocks of
   Left err  -> print err >> fail "type error"
-  Right tab -> return tab
+  Right tab -> case runTypecheckWith ast typecheckBlocks tab of
+    Left err  -> print err >> fail "type error"
+    Right tab -> return tab
+
 
 typecheckBlocks :: AST -> TypeState ()
 typecheckBlocks = mapM_ typecheckBlock

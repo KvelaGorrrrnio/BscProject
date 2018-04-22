@@ -1,6 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 module Common.Type
 ( runTypecheck
+, runTypecheckWith
 , TypeTab
 , TypeState
 , typecheckStmts
@@ -24,7 +25,10 @@ type TypeTab   = M.HashMap Id Type
 type TypeState = StateT TypeTab (Except TypeError)
 
 runTypecheck :: a -> (a -> TypeState ()) -> Either TypeError TypeTab
-runTypecheck ast init = runExcept . flip execStateT M.empty $ init ast
+runTypecheck ast init = runTypecheckWith ast init M.empty
+
+runTypecheckWith :: a -> (a -> TypeState ()) -> TypeTab -> Either TypeError TypeTab
+runTypecheckWith ast init tab = runExcept . flip execStateT tab $ init ast
 
 -- ==========
 -- Statements
@@ -41,10 +45,11 @@ typecheckStmt (Update id op exp p)         = do
     UnknownT -> update id IntT p
     t        -> case unify IntT t of
       Just _  -> update id IntT p
-      Nothing -> throwError $ IncompatibleTypes IntT t p
+      Nothing -> throwError $ IncompatibleTypes IntT t (-1,1)
   typeof exp >>= \case
-    IntT -> return ()
-    t    -> throwError $ IncompatibleTypes IntT t p
+    IntT     -> return ()
+    UnknownT -> return ()
+    t        -> throwError $ IncompatibleTypes IntT t (-1,2)
 -- Push
 typecheckStmt (Push id lid p)              = typeofId id >>= \t ->
   typeofId lid >>= \case
@@ -111,23 +116,29 @@ typeof (Lit v _)         = typeofVal v
 typeof (Var id p)        = update id UnknownT p >> typeofId id
 typeof (Binary op l r p) = typeofBinOp op >>= \(lit,rit,t) -> do
   lt <- case l of
-    Var id p' -> update id lit p' >> return lit
+    Var id p' -> update id lit p' >> typeof l
     _         -> typeof l
   rt <- case r of
-    Var id p' -> update id rit p' >> return rit
+    Var id p' -> update id rit p' >> typeof r
     _         -> typeof r
   case (unify lit lt, unify rit rt) of
     (Nothing,_) -> throwError $ BinOpTypes op (lit,rit) (lt,rt) p
     (_,Nothing) -> throwError $ BinOpTypes op (lit,rit) (lt,rt) p
     _           -> return t
 --  unary arithmetic and logical
-typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) ->
-  typeof exp >>= \et -> case unify it et of
+typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) -> do
+  et <- case exp of
+    Var id p' -> update id it p' >> typeof exp
+    _         -> typeof exp
+  case unify it et of
     Nothing -> throwError $ UnOpType op it et p
     _       -> return t
 -- unary stack operations
                       | otherwise = typeofUnOp op >>= \case
   (ListT it,t) -> do
+    case exp of
+      Var id p' -> update id it p'
+      _         -> return ()
     et <- typeof exp >>= \case
       ListT et -> return et
       UnknownT -> return UnknownT -- $ ListT UnknownT
