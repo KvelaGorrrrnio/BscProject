@@ -110,8 +110,12 @@ typeof :: Exp -> TypeState Type
 typeof (Lit v _)         = typeofVal v
 typeof (Var id p)        = update id UnknownT p >> typeofId id
 typeof (Binary op l r p) = typeofBinOp op >>= \(lit,rit,t) -> do
-  lt <- typeof l
-  rt <- typeof r
+  lt <- case l of
+    Var id p' -> update id lit p' >> return lit
+    _         -> typeof l
+  rt <- case r of
+    Var id p' -> update id rit p' >> return rit
+    _         -> typeof r
   case (unify lit lt, unify rit rt) of
     (Nothing,_) -> throwError $ BinOpTypes op (lit,rit) (lt,rt) p
     (_,Nothing) -> throwError $ BinOpTypes op (lit,rit) (lt,rt) p
