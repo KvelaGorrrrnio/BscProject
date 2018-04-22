@@ -148,9 +148,9 @@ eval (Binary op l r p) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> ev
   IntV v | v/=0 && op==Or -> return $ IntV 1
   IntV _ -> norm <$> eval r
 -- unary arithmetic
-eval (Unary op exp p) | op <= Sign  = eval exp >>= \v -> return $ applyAUnOp (mapAUnOp op) v
+eval (Unary op exp p) | op <= Sign  = applyAUnOp (mapAUnOp op) <$> eval exp
 -- unary logical
-                      | op < Size    = eval exp >>= \(IntV v)  -> return $ boolToVal $ mapLUnOp op (v/=0)
+                      | op < Size   = eval exp >>= \(IntV v)  -> return $ boolToVal $ mapLUnOp op (v/=0)
 -- unary list
                       | otherwise   = eval exp >>= \(ListV lv) -> case op of
   Top   -> case lv of
