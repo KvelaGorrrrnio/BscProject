@@ -1,7 +1,7 @@
 . . ..
 n ^= 0
 . . .
-if (not (not (-(-n) != ~(~8)))) then . . .
+if not (not (not (-(-n) != ~(~8)))) then . . .
 else v += 1 fi not (n != 0)
 
 if 0 then v += 1 else . fi 0 // gets discarded
@@ -12,11 +12,14 @@ swap v n
 .
 swap n n
 . .
-from not (a = b) do
+from not (a = b) && not (0 || 0) do
   n += neg (neg (~a))
   n += - (~ a + -(-b))
   n -=   (-8)
   n += 4 * (1 * 0)
+  n += neg 0
+  n += 0 - 93
+  n += 93 + 0
   n -= - ((5 + 2) / 1 - -(a - b))
   n += (5+2)**0
   n += (5+2)**1

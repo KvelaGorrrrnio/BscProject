@@ -32,6 +32,11 @@ optStmt (Swap id1 id2 p) | id1 == id2 = []
 optStmt (Update id op e p) = case (op, rmPar . optExp $ e) of
   (PlusEq, Unary Neg e' _)  -> [Update id MinusEq (rmPar e') p]
   (MinusEq, Unary Neg e' _) -> [Update id PlusEq (rmPar e') p]
+  (PlusEq, Lit (IntV 0) _)  -> []
+  (MinusEq, Lit (IntV 0) _) -> []
+  (XorEq, Lit (IntV 0) _)   -> []
+  (DivEq, Lit (IntV 1) _)   -> []
+  (MultEq, Lit (IntV 1) _)  -> []
   (_,e')                    -> [Update id op e' p]
 optStmt s                    = [s]
 
@@ -47,18 +52,22 @@ optExp :: Exp -> Exp
 optExp e = case e of
   Unary Not e' p -> case rmPar e' of
     Unary Not e'' _      -> optExp e''
-    Binary Equal l r p   -> Binary Neq (optExp l) (optExp r) p
-    Binary Neq l r p     -> Binary Equal (optExp l) (optExp r) p
-    Binary Geq l r p     -> Binary Less (optExp l) (optExp r) p
-    Binary Leq l r p     -> Binary Greater (optExp l) (optExp r) p
-    Binary Greater l r p -> Binary Leq (optExp l) (optExp r) p
-    Binary Less l r p    -> Binary Geq (optExp l) (optExp r) p
-    _ -> Unary Not (optExp e') p
+    _ -> case rmPar (optExp e') of
+      Binary Equal l r p'   -> Binary Neq (optExp l) (optExp r) p'
+      Binary Neq l r p'     -> Binary Equal (optExp l) (optExp r) p'
+      Binary Geq l r p'     -> Binary Less (optExp l) (optExp r) p'
+      Binary Leq l r p'     -> Binary Greater (optExp l) (optExp r) p'
+      Binary Greater l r p' -> Binary Leq (optExp l) (optExp r) p'
+      Binary Less l r p'    -> Binary Geq (optExp l) (optExp r) p'
+      Lit (IntV 0) p'       -> Lit (IntV 1) p'
+      Lit (IntV _) p'       -> Lit (IntV 0) p'
+      _ -> Unary Not (optExp e') p
   Unary Sign e' p -> case rmPar e' of
     Unary Sign e'' _ -> optExp e'
     _                -> Unary Sign (optExp e') p
   Unary Neg e' p -> case rmPar e' of
     Unary Neg e'' _ -> rmPar $ optExp e''
+    Lit (IntV 0) p' -> Lit (IntV 0) p'
     _               -> Unary Neg (optExp e') p
   Binary op l r p -> case op of
     Mult -> case (rmPar (optExp l), rmPar (optExp r)) of
@@ -73,9 +82,13 @@ optExp e = case e of
       _                    -> Binary op (optExp l) (optExp r) p
     Plus -> case (rmPar (optExp l), rmPar (optExp r)) of
       (_, Unary Neg e' p') -> Binary Minus (optExp l) e' p'
+      (_, Lit (IntV 0) p') -> optExp l
+      (Lit (IntV 0) p', _) -> optExp r
       _                    -> Binary op (optExp l) (optExp r) p
     Minus -> case (rmPar (optExp l), rmPar (optExp r)) of
       (_, Unary Neg e' p') -> Binary Plus (optExp l) e' p'
+      (_, Lit (IntV 0) p') -> optExp l
+      (Lit (IntV 0) p', _) -> optExp (Unary Neg r p')
       _                    -> Binary op (optExp l) (optExp r) p
     Pow -> case (rmPar (optExp l), rmPar (optExp r)) of
       (Lit (IntV 0) p', _) -> Lit (IntV 0) p'
@@ -90,6 +103,16 @@ optExp e = case e of
       (Unary Size e p, Lit (IntV 0) _) -> Unary Empty e p
       (Lit (IntV 0) _, Unary Size e p) -> Unary Empty e p
       _                                -> Binary Equal (optExp l) (optExp r) p
+    And -> case (rmPar (optExp l), rmPar (optExp r)) of
+      (Lit (IntV 0) p', _) -> Lit (IntV 0) p'
+      (_, Lit (IntV 0) p') -> Lit (IntV 0) p'
+      (Lit (IntV n) p', Lit (IntV m) _) | n/=0 && m/=0 -> Lit (IntV 1) p'
+      _                    -> Binary op (optExp l) (optExp r) p
+    Or -> case (rmPar (optExp l), rmPar (optExp r)) of
+      (Lit (IntV 1) p', _) -> Lit (IntV 1) p'
+      (_, Lit (IntV 1) p') -> Lit (IntV 1) p'
+      (Lit (IntV 0) p', Lit (IntV 0) _) -> Lit (IntV 0) p'
+      _                    -> Binary op (optExp l) (optExp r) p
     _ -> Binary op (optExp l) (optExp r) p
   Parens e' p -> case e' of
     Parens{} -> optExp e'
