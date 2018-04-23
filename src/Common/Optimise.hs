@@ -52,8 +52,8 @@ optStmt (Update id op e p) = case (op, rmPar . optExp $ e) of
   (XorEq, Lit (IntV 0) _)   -> []
   (DivEq, Lit (IntV 1) _)   -> []
   (MultEq, Lit (IntV 1) _)  -> []
-  (PlusEq, Unary Neg e' _)  -> [Update id MinusEq (rmPar e') p]
-  (MinusEq, Unary Neg e' _) -> [Update id PlusEq (rmPar e') p]
+--  (PlusEq, Unary Neg e' _)  -> [Update id MinusEq (rmPar e') p]
+--  (MinusEq, Unary Neg e' _) -> [Update id PlusEq (rmPar e') p]
   (_,e')                    -> [Update id op e' p]
 optStmt Skip{}               = []
 optStmt s                    = [s]
@@ -105,11 +105,11 @@ optExp' e = case e of
     Unary Sign e'' _ -> optExp' e'
     _                -> Unary Sign (optExp' e') p
   Unary Neg e' p -> case rmPar e' of
-    Unary Neg e'' p' -> optExp' e''
+    Unary Neg e'' _ -> optExp' e''
     _ -> let e'' = optExp' e' in
       case rmPar e'' of
-        Lit (IntV 0) _ -> Lit (IntV 0) p'
-        _              -> Unary Neg e'' p'
+        Lit (IntV 0) p' -> Lit (IntV 0) p'
+        _               -> Unary Neg e'' p
   Binary op l r p ->
     let l' = optExp' l
         r' = optExp' r in
@@ -191,6 +191,7 @@ compExp e = case e of
     case rmPar e'' of
       Lit v _ -> Lit (applyAUnOp (mapAUnOp Sign) v) p
       _       -> Unary Sign e'' p
+  Unary Neg e' p -> Unary Neg (compExp e') p
   Parens e' p -> case e' of
     Parens{} -> compExp e'
     Var id _ -> Var id p
