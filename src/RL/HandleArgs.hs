@@ -16,7 +16,7 @@ data RevL
               , quiet :: Bool,     code :: Bool }
   deriving (Data,Typeable,Show,Eq)
 
-helpOutput = help "Output file."
+helpOutput = help "Write the output to a file."
 
 typeof = Typeof
   { file   = def &= args &= typFile
@@ -40,7 +40,7 @@ invert_ = Invert
   } &= help "Invert a RevL program"
 
 interpret = Run
-  { log     = def &= help "Output is program interpretation log instead of final state."
+  { log     = def &= help "Output log instead of final state."
   , json    = def &= help "Format output as JSON."
   , out     = def &= typFile &= helpOutput
   , quiet   = def &= help "Hide the result of the program."
