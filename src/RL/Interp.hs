@@ -15,7 +15,7 @@ type ProgState = ReaderT AST VarState
 -- Running the program
 -- ==================
 
-runProgramWith :: AST -> VarTab -> (Either RuntimeError VarTab, Log)
+runProgramWith :: AST -> VarTab -> (Either Error VarTab, Log)
 runProgramWith ast vtab = do
   let entry = getEntry ast
   execVarState vtab . runReaderT (interp entry) $ ast
@@ -25,15 +25,11 @@ runProgramWith ast vtab = do
 -- ======
 
 interp :: Label -> ProgState ()
-interp l = do
-  ast <- ask
-  case lookup l ast of
-    Just (_,ss,t) -> do
-      lift $ execStmts ss
-      case t of
-        Exit _     -> return ()
-        Goto l _     -> interp l
-        IfTo t l1 l2 _ -> do
-          t' <- lift $ valToBool <$> eval t
-          if t' then interp l1 else interp l2
-    Nothing -> lift $ logError $ CustomRT $ ("Label '" ++ l ++ "' not defined.")
+interp l = ask >>= \ast -> let (Just (_,ss,t)) = lookup l ast in do
+  lift $ execStmts ss
+  case t of
+    Exit _     -> return ()
+    Goto l _     -> interp l
+    IfTo t l1 l2 p -> do
+      t' <- lift $ valToBool <$> eval t
+      if t' then interp l1 else interp l2

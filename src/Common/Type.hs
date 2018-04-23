@@ -11,6 +11,7 @@ module Common.Type
 , unify
 , typesToVarTab
 , showTab
+, showTabL
 ) where
 
 import Control.Monad.State
@@ -22,12 +23,12 @@ import Common.AST
 import Data.List
 
 type TypeTab   = M.HashMap Id Type
-type TypeState = StateT TypeTab (Except TypeError)
+type TypeState = StateT TypeTab (Except Error)
 
-runTypecheck :: a -> (a -> TypeState ()) -> Either TypeError TypeTab
+runTypecheck :: a -> (a -> TypeState ()) -> Either Error TypeTab
 runTypecheck ast init = runTypecheckWith ast init M.empty
 
-runTypecheckWith :: a -> (a -> TypeState ()) -> TypeTab -> Either TypeError TypeTab
+runTypecheckWith :: a -> (a -> TypeState ()) -> TypeTab -> Either Error TypeTab
 runTypecheckWith ast init tab = runExcept . flip execStateT tab $ init ast
 
 -- ==========
@@ -45,46 +46,46 @@ typecheckStmt (Update id op exp p)         = do
     UnknownT -> update id IntT p
     t        -> case unify IntT t of
       Just _  -> update id IntT p
-      Nothing -> throwError $ IncompatibleTypes IntT t (-1,1)
+      Nothing -> throwError $ TypeError p $ IncompatibleTypes IntT t
   typeof exp >>= \case
     IntT     -> return ()
     UnknownT -> return ()
-    t        -> throwError $ IncompatibleTypes IntT t (-1,2)
+    t        -> throwError $ TypeError p $ IncompatibleTypes IntT t
 -- Push
 typecheckStmt (Push id lid p)              = typeofId id >>= \t ->
   typeofId lid >>= \case
     UnknownT -> update lid (ListT t) p
     ListT lt -> case unify lt t of
-      Nothing -> throwError $ IncompatibleTypes t lt p -- TODO: Custom Push error
+      Nothing -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Push error
       Just t' -> update id t' p >> update lid (ListT t') p
-    lt       -> throwError $ IncompatibleTypes t lt p -- TODO: Custom Stack error
+    lt       -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Stack error
 -- Pop
 typecheckStmt (Pop id lid p)               = typeofId id >>= \t ->
   typeofId lid >>= \case
     UnknownT -> update lid (ListT t) p
     ListT lt -> case unify lt t of
-      Nothing -> throwError $ IncompatibleTypes t lt (-1,1) -- TODO: Custom Push error
+      Nothing -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Push error
       Just t' -> update id t' p >> update lid (ListT t') p
-    lt       -> throwError $ IncompatibleTypes t lt (-1,2) -- TODO: Custom Stack error
+    lt       -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Stack error
 -- Pop
 typecheckStmt (Swap id1 id2 p)             = do
   t1 <- typeofId id1
   t2 <- typeofId id2
   case unify t1 t2 of
-    Nothing -> throwError $ IncompatibleTypes t1 t2 p
+    Nothing -> throwError $ TypeError p $ IncompatibleTypes t1 t2
     _       -> return ()
 -- If
 typecheckStmt (If ifexp tstmts fstmts fiexp p) = typeof ifexp >>= \case
   IntT -> typecheckStmts tstmts >> typecheckStmts fstmts >> typeof fiexp >>= \case
     IntT -> return ()
-    fit  -> throwError $ IncompatibleTypes IntT fit p
-  ift  -> throwError $ IncompatibleTypes IntT ift p
+    fit  -> throwError $ TypeError p $ IncompatibleTypes IntT fit
+  ift  -> throwError $ TypeError p $ IncompatibleTypes IntT ift
 -- Until
 typecheckStmt (Until fexp stmts uexp p)      = typeof fexp >>= \case
   IntT -> typecheckStmts stmts >> typeof uexp >>= \case
     IntT -> return ()
-    ut  -> throwError $ IncompatibleTypes IntT ut p
-  ft  -> throwError $ IncompatibleTypes IntT ft p
+    ut  -> throwError $ TypeError p $ IncompatibleTypes IntT ut
+  ft  -> throwError $ TypeError p $ IncompatibleTypes IntT ft
 -- Skip
 typecheckStmt (Skip _)                         = return ()
 
@@ -107,7 +108,7 @@ update :: Id -> Type -> Pos -> TypeState ()
 update id t p = typeofId id >>= \case
   UnknownT -> modify $ M.insert id t
   t' -> case unify t t' of
-    Nothing -> throwError $ IncompatibleTypes t t' p
+    Nothing -> throwError $ TypeError p $ IncompatibleTypes t t'
     Just ct -> modify $ M.insert id ct
 
 -- Get type of exp
@@ -122,8 +123,8 @@ typeof (Binary op l r p) = typeofBinOp op >>= \(lit,rit,t) -> do
     Var id p' -> update id rit p' >> typeof r
     _         -> typeof r
   case (unify lit lt, unify rit rt) of
-    (Nothing,_) -> throwError $ BinOpTypes op (lit,rit) (lt,rt) p
-    (_,Nothing) -> throwError $ BinOpTypes op (lit,rit) (lt,rt) p
+    (Nothing,_) -> throwError $ TypeError p $ BinOpTypes op (lit,rit) (lt,rt)
+    (_,Nothing) -> throwError $ TypeError p $ BinOpTypes op (lit,rit) (lt,rt)
     _           -> return t
 --  unary arithmetic and logical
 typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) -> do
@@ -131,7 +132,7 @@ typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) -> do
     Var id p' -> update id it p' >> typeof exp
     _         -> typeof exp
   case unify it et of
-    Nothing -> throwError $ UnOpType op it et p
+    Nothing -> throwError $ TypeError p $ UnOpType op it et
     _       -> return t
 -- unary stack operations
                       | otherwise = typeofUnOp op >>= \case
@@ -142,10 +143,10 @@ typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) -> do
     et <- typeof exp >>= \case
       ListT et -> return et
       UnknownT -> return UnknownT -- $ ListT UnknownT
-      et       -> throwError $ UnOpType op (ListT it) et p
+      et       -> throwError $ TypeError p $ UnOpType op (ListT it) et
     case op of
       Top -> case unify t et of
-        Nothing -> throwError $ IncompatibleTypes t et p
+        Nothing -> throwError $ TypeError p $ IncompatibleTypes t et
         Just t' -> return t'
       _   -> return t
 
@@ -182,3 +183,6 @@ typesToVarTab ttab = map defaultVal (M.toList ttab)
 -- Show hashmap
 showTab :: Show a => M.HashMap Id a -> String
 showTab = showVTab . M.toList
+
+showTabL :: Show a => [(Id,a)] -> String
+showTabL tab = showTab $ M.fromList tab

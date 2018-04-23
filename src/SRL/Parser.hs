@@ -1,11 +1,14 @@
 module SRL.Parser
   ( parseFile
+  , errorPos
   ) where
 
 import System.IO
-import Text.ParserCombinators.Parsec
+import Text.Parsec
+import Text.Parsec.String (Parser)
 
 import Common.Parser
+import Common.Error
 import SRL.AST
 
 srlParser :: Parser AST
@@ -47,12 +50,10 @@ untilStmt = do
   t <- expression
   return $ Until a s t
 
-parseSrc :: String -> Either ParseError AST
-parseSrc = parse srlParser ""
+parseSrc :: String -> Either Error AST
+parseSrc s = case parse srlParser "" s of
+  Left err  -> Left $ convertParseError err
+  Right ast -> Right ast
 
-parseFile :: String -> IO AST
-parseFile path = do
-  program <- readFile path
-  case parseSrc program of
-    Left e  -> print e >> fail "parser error"
-    Right r -> return r
+parseFile :: String -> IO (Either Error AST)
+parseFile path = parseSrc <$> readFile path

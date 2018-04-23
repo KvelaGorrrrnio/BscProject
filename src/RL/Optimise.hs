@@ -1,14 +1,16 @@
 module RL.Optimise where
 
 import RL.AST
+import RL.Error
 
 import Common.Optimise
 
-optimise :: AST -> AST
-optimise ast | ast' <- optBlocks ast =
+optimise :: Either Error AST -> Either Error AST
+optimise (Left err) = Left err
+optimise (Right ast) | ast' <- optBlocks ast =
   if ast' == ast
-  then ast'
-  else optBlocks ast'
+  then Right ast'
+  else Right $ optBlocks ast'
 
 optBlocks :: AST -> AST
 optBlocks = map $ \(l,b) -> (l,optBlock b)
