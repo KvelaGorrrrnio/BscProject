@@ -1,5 +1,6 @@
 module Common.AST where
 
+import Data.Bits (xor)
 import Data.List (intercalate)
 
 -- values
@@ -152,3 +153,49 @@ instance Show Type where
   show IntT      = "int"
   show (ListT t) = "["++show t++"]"
   show UnknownT  = "?"
+
+
+-- =======
+-- helpers
+-- =======
+mapABinOp Plus    = (+)
+mapABinOp Minus   = (-)
+mapABinOp Xor     = xor
+mapABinOp Pow     = (^)
+mapABinOp Mult    = (*)
+mapABinOp Div     = div
+mapABinOp Mod     = mod
+
+mapRBinOp Equal   = (==)
+mapRBinOp Neq     = (/=)
+mapRBinOp Less    = (<)
+mapRBinOp Leq     = (<=)
+mapRBinOp Greater = (>)
+mapRBinOp Geq     = (>=)
+
+mapAUnOp Neg  = negate
+mapAUnOp Sign = signum
+
+mapLUnOp Not  = not
+
+-- apply arithmetic binary operator
+applyABinOp :: (Integer -> Integer -> Integer) -> Value -> Value -> Value
+applyABinOp op (IntV n) (IntV m) = IntV $ op n m
+-- apply relational operator
+applyRBinOp :: (Integer -> Integer -> Bool) -> Value -> Value -> Value
+applyRBinOp op (IntV n) (IntV m) = boolToVal $ op n m
+-- apply arithmetic unary operator
+applyAUnOp :: (Integer -> Integer) -> Value -> Value
+applyAUnOp op (IntV n) = IntV $ op n
+
+-- normalise to bool
+norm :: Value -> Value
+norm (IntV 0) = IntV 0
+norm (IntV _) = IntV 1
+
+-- converting bool to val
+boolToVal :: Bool -> Value
+boolToVal b = IntV $ if b then 1 else 0
+-- converting val to bool
+valToBool :: Value -> Bool
+valToBool (IntV p) = p /= 0

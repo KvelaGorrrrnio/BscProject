@@ -10,7 +10,7 @@ optimise (Left err) = Left err
 optimise (Right ast) | ast' <- optBlocks ast =
   if ast' == ast
   then Right ast'
-  else Right $ optBlocks ast'
+  else optimise $ Right ast'
 
 optBlocks :: AST -> AST
 optBlocks = map $ \(l,b) -> (l,optBlock b)

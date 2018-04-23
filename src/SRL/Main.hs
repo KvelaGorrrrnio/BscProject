@@ -15,6 +15,8 @@ import SRL.Optimise
 import SRL.Error
 import Common.JSON
 
+import SRL.AST
+
 noFile = putStrLn "No .srl file provided."
 
 eout :: Bool -> String -> Error -> IO ()
