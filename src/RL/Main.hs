@@ -32,13 +32,13 @@ main = do
        Right ast -> case typecheck ast of
         Left err   -> eout' err
         Right ttab -> case runProgramWith ast (typesToVarTab ttab) of
-          (_,log)        | l && j && null o -> putStrLn $ logToJSON log
+          (_,log)        | l && j && null o -> unless q $ putStrLn $ logToJSON log
           (_,log)        | l && j           -> writeFile o $ logToJSON log
-          (_,log)        | l && null o      -> putStrLn $ logToString log
+          (_,log)        | l && null o      -> unless q $ putStrLn $ logToString log
           (_,log)        | l                -> writeFile o $ logToString log
-          (Right vtab,_) | j && null o      -> putStrLn $ jsonTabL "variable" vtab
+          (Right vtab,_) | j && null o      -> unless q $ putStrLn $ jsonTabL "variable" vtab
           (Right vtab,_) | j                -> writeFile o $ jsonTabL "variable" vtab
-          (Right vtab,_) | null o           -> putStrLn $ showTabL vtab
+          (Right vtab,_) | null o           -> unless q $ putStrLn $ showTabL vtab
           (Right vtab,_)                    -> writeFile o $ showTabL vtab
           (Left err,_)                      -> eout' err
     Invert f o j -> let eout' = eout j o in
