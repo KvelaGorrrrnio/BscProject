@@ -21,8 +21,7 @@ main = do
     Run l ls j js q f -> do
 
       -- parse file and run
-      ast <- optimise <$> parseFile f
-      putStrLn $ showAST ast ++ "\n"
+      ast <- parseFile f
       ttab <- typecheck ast
       let (res,log) = runProgramWith ast (typesToVarTab ttab)
 

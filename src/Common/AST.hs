@@ -42,8 +42,8 @@ instance Show Stmt where
   show (Swap id1 id2 _)   = "swap " ++ id1 ++ " " ++ id2
   show (Skip _)           = "skip"
   -- unique for SRL
-  show (If t s1 s2 a _)   = "if " ++ show t ++ " then [s1] else [s2]"
-  show (Until a s t _)    = "from " ++ show a ++ " do [s] until " ++ show t
+  show (If t s1 s2 a _)   = "if " ++ showPar t ++ " then [s1] else [s2]"
+  show (Until a s t _)    = "from " ++ showPar a ++ " do [s] until " ++ showPar t
 
 data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq deriving Eq
 instance Show UpdOp where
@@ -74,6 +74,10 @@ instance Show Exp where
   show (Parens exp _)     = case exp of
     Parens exp' _ -> show exp
     _           -> "("++show exp++")"
+showPar :: Exp -> String
+showPar e = case e of
+  Parens _ _ -> show e
+  _          -> "(" ++ show e ++ ")"
 
 data BinOp
   = Plus

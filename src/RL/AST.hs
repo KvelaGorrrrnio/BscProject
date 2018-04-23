@@ -27,7 +27,7 @@ getEntry ast = do
 
 type Block = (From, [Stmt], To)
 showB (f,s,t) = show f ++ "\n  "
-  ++ (intercalate "\n  " . map show) s ++ "\n"
+  ++ (if null s then show (Skip (0,0)) else (intercalate "\n  " . map show) s) ++ "\n"
   ++ show t
 
 data From = From Label Pos
@@ -36,9 +36,7 @@ data From = From Label Pos
           deriving Eq
 instance Show From where
   show (From l _)     = "from " ++ l
-  show (Fi e l1 l2 _) = case e of
-    Parens _ _ -> "fi " ++ show e ++ " " ++ l1 ++ " " ++ l2
-    _        -> "fi (" ++ show e ++ ") " ++ l1 ++ " " ++ l2
+  show (Fi e l1 l2 _) = "fi " ++ showPar e ++ " " ++ l1 ++ " " ++ l2
   show (Entry _)      = "entry"
 
 data To = Goto Label Pos
@@ -46,8 +44,6 @@ data To = Goto Label Pos
         | Exit Pos
         deriving Eq
 instance Show To where
-  show (Goto l _)      = "goto " ++ l
-  show (IfTo e l1 l2 _) = case e of
-    Parens _ _ -> "if "  ++ show e ++ " "  ++ l1 ++ " " ++ l2
-    _        -> "if (" ++ show e ++ ") " ++ l1 ++ " " ++ l2
+  show (Goto l _)       = "goto " ++ l
+  show (IfTo e l1 l2 _) = "if "  ++ showPar e ++ " "  ++ l1 ++ " " ++ l2
   show (Exit _)         = "exit"
