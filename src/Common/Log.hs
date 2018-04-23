@@ -30,8 +30,9 @@ instance Show Message where
   show (MsgStmt s vtab)  = case s of
     If{}    -> "> " ++ show s
     Until{} -> "> " ++ show s
-    _       -> "> " ++ show s ++"\n\n> "++show vtab
-  show (MsgError err)    = "*** Error: " ++ show err
+    Skip{}  -> "> " ++ show s
+    _       -> "> " ++ show s ++"\n"++showVTab vtab
+  show (MsgError err) = "*** Error: " ++ show err
 
 instance JSON Message where
   stringify (MsgStmt  s vtab) = ""
