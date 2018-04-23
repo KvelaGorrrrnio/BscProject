@@ -1,9 +1,11 @@
 module RL.Parser (parseFile) where
 
 import System.IO
-import Text.ParserCombinators.Parsec
+import Text.Parsec
+import Text.Parsec.String (Parser)
 
 import Common.Parser
+import Common.Error
 import RL.AST
 
 rlParser :: Parser AST
@@ -44,12 +46,11 @@ statement = pos >>= \p -> (\s->s p)
         <|> pushStmt
         <|> popStmt)
 
-parseSrc :: String -> Either ParseError AST
-parseSrc = parse rlParser ""
 
-parseFile :: String -> IO AST
-parseFile path = do
-  program <- readFile path
-  case parseSrc program of
-    Left e  -> print e >> fail "parser error"
-    Right r -> return r
+parseSrc :: String -> Either Error AST
+parseSrc s = case parse rlParser "" s of
+  Left err  -> Left $ convertParseError err
+  Right ast -> Right ast
+
+parseFile :: String -> IO (Either Error AST)
+parseFile path = parseSrc <$> readFile path

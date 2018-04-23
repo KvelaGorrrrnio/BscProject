@@ -9,12 +9,12 @@ import RL.Error
 import Common.Type
 import Control.Monad.Except
 
-typecheck :: AST -> IO TypeTab
+typecheck :: AST -> Either Error TypeTab
 typecheck ast = case runTypecheck ast typecheckBlocks of
-  Left err  -> print err >> fail "type error"
+  Left err  -> Left err
   Right tab -> case runTypecheckWith ast typecheckBlocks tab of
-    Left err  -> print err >> fail "type error"
-    Right tab -> return tab
+    Left err  -> Left err
+    Right tab -> Right tab
 
 
 typecheckBlocks :: AST -> TypeState ()
@@ -25,11 +25,11 @@ typecheckBlock (_,(f,stmts,t)) = typecheckFrom f >> typecheckStmts stmts >> type
 typecheckFrom :: From -> TypeState ()
 typecheckFrom (Fi exp _ _ p) = typeof exp >>= \case
   IntT -> return ()
-  t    -> throwError $ IncompatibleTypes IntT t p -- TODO: Exp not eval to Int
+  t    -> throwError $ TypeError p $ IncompatibleTypes IntT t -- TODO: Exp not eval to Int
 typecheckFrom _ = return ()
 
 typecheckTo :: To -> TypeState ()
 typecheckTo (IfTo exp _ _ p) = typeof exp >>= \case
   IntT -> return ()
-  t    -> throwError $ IncompatibleTypes IntT t p
+  t    -> throwError $ TypeError p $ IncompatibleTypes IntT t
 typecheckTo _ = return ()

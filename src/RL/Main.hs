@@ -1,72 +1,75 @@
-module Main (main) where
+{-# LANGUAGE LambdaCase #-}
+module Main where
 
 import System.FilePath.Posix ((-<.>), takeBaseName, replaceFileName)
 
 import Control.Monad (when, unless)
 
 import RL.HandleArgs
-import RL.Interp
-import RL.Inversion
 import RL.Parser
-import RL.Type
 import RL.Translation
+import RL.Inversion
+import RL.Type
+import RL.Interp
 import RL.Optimise
+import RL.Error
+import Common.JSON
 
-noFile = putStrLn "No .rl file provided."
+noFile = putStrLn "No .srl file provided."
+
+eout :: Bool -> String -> Error -> IO ()
+eout True "" msg = putStrLn $ stringify msg
+eout True o  msg = writeFile o $ stringify msg
+eout False _ msg = print msg
 
 main = do
   args <- handleArgs
   case args of
-    Run _ _ _ _ _ []  -> noFile
-    Run l ls j js q f -> do
+    Run [] _ _ _ _ -> noFile
+    Run f o l j q  -> let eout' = eout j o in
+      (if l then id else optimise) <$> parseFile f >>= \case
+       Left err  -> eout' err
+       Right ast -> case typecheck ast of
+        Left err   -> eout' err
+        Right ttab -> case runProgramWith ast (typesToVarTab ttab) of
+          (_,log)        | l && j && null o -> unless q $ putStrLn $ logToJSON log
+          (_,log)        | l && j           -> writeFile o $ logToJSON log
+          (_,log)        | l && null o      -> unless q $ putStrLn $ logToString log
+          (_,log)        | l                -> writeFile o $ logToString log
+          (Right vtab,_) | j && null o      -> unless q $ putStrLn $ jsonTabL "variable" vtab
+          (Right vtab,_) | j                -> writeFile o $ jsonTabL "variable" vtab
+          (Right vtab,_) | null o           -> unless q $ putStrLn $ showTabL vtab
+          (Right vtab,_)                    -> writeFile o $ showTabL vtab
+          (Left err,_)                      -> eout' err
+    Invert f o j -> let eout' = eout j o in
+      parseFile f >>= \case
+       Left err  -> eout' err
+       Right ast -> do
+        let code = (++"\n") . showAST . invert $ ast
+        case typecheck ast of
+          Left err   -> eout' err
+          Right _ | j && null o -> putStrLn $ jsonCode code
+          Right _ | j           -> writeFile o $ jsonCode code
+          Right _ | null o      -> putStrLn code
+          Right _               -> writeFile o code
+    Translate f o j -> let eout' = eout j o in
+      parseFile f >>= \case
+       Left err  -> eout' err
+       Right ast -> do
+        let code = (++"\n") . translateToSRLSource $ ast
+        case typecheck ast of
+          Left err   -> eout' err
+          Right _ | j && null o -> putStrLn $ jsonCode code
+          Right _ | j           -> writeFile o $ jsonCode code
+          Right _ | null o      -> putStrLn code
+          Right _               -> writeFile o code
+    Typeof f o j -> let eout' = eout j o in
+      parseFile f >>= \case
+       Left err  -> eout' err
+       Right ast -> case typecheck ast of
+        Left err   -> eout' err
+        Right ttab | j && null o -> putStrLn $ jsonTab "type" ttab
+        Right ttab | j           -> writeFile o $ jsonTab "type" ttab
+        Right ttab | null o      -> putStrLn $ showTab ttab
+        Right ttab               -> writeFile o $ showTab ttab
 
-      -- parse file and run
-      ast  <- (if l || ls || j || js then id else optimise) <$> parseFile f
-      -- putStrLn $ showAST ast ++ "\n"
-      ttab <- typecheck ast
-      let (res,log) = runProgramWith ast (typesToVarTab ttab)
-
-      -- if -q is not set
-      unless (q || ls) $ case res of
-        Left  err  -> putStrLn $ "*** Error: " ++ show err
-        Right vtab -> putStrLn $ showVTab vtab
-
-      -- if -l flag is set
-      when l $ do
-        let logname = f -<.> "rlog"
-        writeFile logname . (++"\n") . logToString $ log
-        unless q $ putStrLn ("\nThe log was written to " ++ logname)
-
-      -- if --log-stdout flag is set
-      when ls $ putStrLn (logToString log)
-
-      -- if -j flag is set
-      when j $ do
-        let logname = f -<.> "json"
-        writeFile logname . (++"\n") . logToJSON $ log
-        unless q $ putStrLn ("\nThe log was written to " ++ logname)
-
-      -- if --json-stdout flag is set
-      when js $ putStrLn (logToJSON log)
-
-    Invert _ [] -> noFile
-    Invert o f  -> do
-      ast <- parseFile f
-      ttab <- typecheck ast
-      let out = if null o
-                then replaceFileName f (takeBaseName f ++ "_inv.rl")
-                else o
-      writeFile out . (++"\n") . showAST . invert $ ast
-
-    Translate _ [] -> noFile
-    Translate o f  -> do
-      ast <- parseFile f
-      ttab <- typecheck ast
-      let out = if null o
-                then f -<.> "srl"
-                else o
-      writeFile out . (++"\n") . translateToSRLSource $ ast
-
-    Typeof f -> do
-      ttab <- parseFile f >>= \ast -> typecheck ast
-      putStrLn $ showTab ttab

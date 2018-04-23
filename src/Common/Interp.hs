@@ -17,28 +17,22 @@ import Control.Monad.Loops
 -- Monad transformer : The variable state
 -- ======================================
 
-type VarState = StateT VarTab (ExceptT RuntimeError (Writer Log))
-execVarState :: VarTab -> VarState () -> (Either RuntimeError VarTab, Log)
+type VarState = StateT VarTab (ExceptT Error (Writer Log))
+execVarState :: VarTab -> VarState () -> (Either Error VarTab, Log)
 execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 
 rd :: Id -> VarState Value
-rd id  = do
-  ast <- get
-  case lookup id ast of
-    Just v  -> return v
-    Nothing -> throwError $ CustomRT ("Variable '" ++ id ++ "' not defined.")
+rd id = get >>= \ast -> let (Just v) = lookup id ast in return v
+--  case lookup id ast of
+--    Just v  -> return v
+--    Nothing -> throwError $ RuntimeError p $ CustomRT ("Variable '" ++ id ++ "' not defined.")
 
 logStmt :: Stmt -> VarState ()
-logStmt s = case s of
-  Skip{}  -> tell [MsgStmt s]
-  If{}    -> tell [MsgStmt s] >> exec s
-  Until{} -> tell [MsgStmt s] >> exec s
-  s    -> do
-    tell [MsgStmt s] >> exec s
-    vtab <- get
-    tell [MsgState vtab]
+logStmt s = get >>= \vtab -> case s of
+  Skip{}  -> tell [MsgStmt s vtab]
+  s    -> tell [MsgStmt s vtab] >> exec s
 
-logError :: RuntimeError -> VarState a
+logError :: Error -> VarState a
 logError err = do
   tell [MsgError err]
   throwError err
@@ -60,10 +54,10 @@ exec (Update id op e p) = do
   case op of
     DivEq -> case (v1,v2) of
       (IntV n, IntV m) | mod n m == 0 -> return ()
-        | otherwise -> logError $ CustomRT "Division has rest in update."
+        | otherwise -> logError $ RuntimeError p $ CustomRT "Division has rest in update."
     MultEq -> case (v1,v2) of
       (IntV n, IntV m) | n /= 0 && m /= 0 -> return ()
-        | otherwise -> logError $ CustomRT "An operand in mult update is zero."
+        | otherwise -> logError $ RuntimeError p $ CustomRT "An operand in mult update is zero."
     _      -> return ()
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
   modify $ insert id res
@@ -75,15 +69,15 @@ exec (If t s1 s2 a p) = do
         else execStmts s2
   a' <- valToBool <$> eval a
   when (t' /= a')
-    $ logError $ CustomRT "Assert and such"
+    $ logError $ RuntimeError p $ CustomRT "Assert and such"
 
 exec (Until a s t p) = do
   aout <- valToBool <$> eval a
-  unless aout $ logError $ CustomRT "Assert"
+  unless aout $ logError $ RuntimeError p $ CustomRT "Assert"
   execStmts s
   whileM_ (not . valToBool <$> eval t) $ do
       ain <- valToBool <$> eval a ; when ain
-        $ throwError $ CustomRT "Assert not good"
+        $ throwError $ RuntimeError p $ CustomRT "Assert not good"
       execStmts s;
 
 -- list modification
@@ -101,13 +95,13 @@ exec (Push id1 id2 p) = do
 exec (Pop id1 id2 p) = do
   v1 <- rd id1
   unless (isClear v1) $
-    logError $ CustomRT ("Popping into non-clear variable '" ++ id1 ++ "'.")
+    logError $ RuntimeError p $ CustomRT ("Popping into non-clear variable '" ++ id1 ++ "'.")
   v2 <- rd id2
   case v2 of
     ListV (t:ls) -> do
       modify $ insert id1 t
       modify $ insert id2 $ ListV ls
-    ListV [] -> logError $ CustomRT $ "Popping from empty list '" ++ id2 ++ "'."
+    ListV [] -> logError $ RuntimeError p $ CustomRT $ "Popping from empty list '" ++ id2 ++ "'."
 
 -- swapping variables
 exec (Swap id1 id2 p) = do
@@ -136,7 +130,7 @@ eval (Binary op l r p) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> ev
                      | op <= Mod = do
   rv <- eval r
   case rv of
-    IntV 0 -> logError $ CustomRT "Dividing by zero."
+    IntV 0 -> logError $ RuntimeError p $ CustomRT "Dividing by zero."
     IntV _ -> return ()
   lv <- eval l
   return $ applyABinOp (mapABinOp op) lv rv
@@ -154,7 +148,7 @@ eval (Unary op exp p) | op <= Sign  = applyAUnOp (mapAUnOp op) <$> eval exp
 -- unary list
                       | otherwise   = eval exp >>= \(ListV lv) -> case op of
   Top   -> case lv of
-    []   -> logError $ CustomRT "Accessing top of empty list."
+    []   -> logError $ RuntimeError p $ CustomRT "Accessing top of empty list."
     t:ts -> return t
   Empty -> return $ boolToVal . null  $ lv
   Size  -> return $ IntV . fromIntegral . length $ lv
