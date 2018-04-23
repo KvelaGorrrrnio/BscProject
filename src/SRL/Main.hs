@@ -24,12 +24,14 @@ eout True "" msg = putStrLn $ stringify msg
 eout True o  msg = writeFile o $ stringify msg
 eout False _ msg = print msg
 
+getAST c = if c then (return . parseSrc) else parseFile
+
 main = do
   args <- handleArgs
   case args of
-    Run [] _ _ _ _ -> noFile
-    Run f o l j q  -> let eout' = eout j o in
-      (if l then id else optimise) <$> parseFile f >>= \case
+    Run [] _ _ _ _ _ -> noFile
+    Run f o l j q c  -> let eout' = eout j o in
+      (if l then id else optimise) <$> getAST c f >>= \case
        Left err  -> eout' err
        Right ast -> case typecheck ast of
         Left err   -> eout' err
@@ -43,8 +45,8 @@ main = do
           (Right vtab,_) | null o           -> unless q $ putStrLn $ showTabL vtab
           (Right vtab,_)                    -> writeFile o $ showTabL vtab
           (Left err,_)                      -> eout' err
-    Invert f o j -> let eout' = eout j o in
-      parseFile f >>= \case
+    Invert f o j c -> let eout' = eout j o in
+      getAST c f >>= \case
        Left err  -> eout' err
        Right ast -> do
         let code = (++"\n") . showAST . invert $ ast
@@ -54,8 +56,8 @@ main = do
           Right _ | j           -> writeFile o $ jsonCode code
           Right _ | null o      -> putStrLn code
           Right _               -> writeFile o code
-    Translate f o j -> let eout' = eout j o in
-      parseFile f >>= \case
+    Translate f o j c -> let eout' = eout j o in
+      getAST c f >>= \case
        Left err  -> eout' err
        Right ast -> do
         let code = (++"\n") . translateToRLSource $ ast
@@ -65,8 +67,8 @@ main = do
           Right _ | j           -> writeFile o $ jsonCode code
           Right _ | null o      -> putStrLn code
           Right _               -> writeFile o code
-    Typeof f o j -> let eout' = eout j o in
-      parseFile f >>= \case
+    Typeof f o j c -> let eout' = eout j o in
+      getAST c f >>= \case
        Left err  -> eout' err
        Right ast -> case typecheck ast of
         Left err   -> eout' err

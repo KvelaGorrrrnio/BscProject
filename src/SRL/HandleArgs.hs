@@ -6,14 +6,14 @@ import Prelude hiding (log)
 
 data SRevL
   = Typeof    { file  :: FilePath, out  :: FilePath
-              , json  :: Bool }
-  | Translate { file  :: FilePath, out :: FilePath
-              , json  :: Bool }
-  | Invert    { file  :: FilePath, out :: FilePath
-              , json  :: Bool }
-  | Run       { file  :: FilePath, out   :: FilePath
-              , log   :: Bool,     json  :: Bool
-              , quiet :: Bool }
+              , json  :: Bool,     code :: Bool }
+  | Translate { file  :: FilePath, out  :: FilePath
+              , json  :: Bool,     code :: Bool }
+  | Invert    { file  :: FilePath, out  :: FilePath
+              , json  :: Bool,     code :: Bool }
+  | Run       { file  :: FilePath, out  :: FilePath
+              , log   :: Bool,     json :: Bool
+              , quiet :: Bool,     code :: Bool }
   deriving (Data,Typeable,Show,Eq)
 
 helpOutput = help "Output file"
@@ -22,18 +22,21 @@ typeof = Typeof
   { file   = def &= args &= typFile
   , out    = def &= typFile &= helpOutput
   ,json    = def &= help "Format output as JSON."
+  , code   = def &= help "file-argument is treated as SRevL code."
   } &= help "Print the inferred types of the program."
 
 translate = Translate
   { file   = def &= args &= typFile
   , out    = def &= typFile &= helpOutput
   ,json    = def &= help "Format output as JSON."
+  , code   = def &= help "file-argument is treated as SRevL code."
   } &= help "Translate a SRevL program to its RevL counterpart."
 
 invert_ = Invert
   { file   = def &= args &= typFile
   , out    = def &= typFile &= helpOutput
   ,json    = def &= help "Format output as JSON."
+  , code   = def &= help "file-argument is treated as SRevL code."
   } &= help "Invert a SRevL program"
 
 interpret = Run
@@ -42,6 +45,7 @@ interpret = Run
   ,out     = def &= typFile &= helpOutput
   ,quiet   = def &= help "Hide the result of the program."
   ,file    = def &= args &= typFile
+  , code   = def &= help "file-argument is treated as SRevL code."
   } &= help "Interpret a SRevL program" &= auto
 
 mode = cmdArgsMode $ modes [interpret, invert_, translate, typeof]
