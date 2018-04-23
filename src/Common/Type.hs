@@ -52,7 +52,10 @@ typecheckStmt (Update id op exp p)         = do
     UnknownT -> return ()
     t        -> throwError $ TypeError p $ IncompatibleTypes IntT t
 -- Push
-typecheckStmt (Push id lid p)              = typeofId id >>= \t ->
+typecheckStmt (Push id lid p)              = do
+  t <- typeofId id >>= \case
+    UnknownT -> update id IntT p >> return IntT
+    t        -> return t
   typeofId lid >>= \case
     UnknownT -> update lid (ListT t) p
     ListT lt -> case unify lt t of

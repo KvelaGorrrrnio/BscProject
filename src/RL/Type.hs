@@ -23,13 +23,15 @@ typecheckBlocks = mapM_ typecheckBlock
 typecheckBlock (_,(f,stmts,t)) = typecheckFrom f >> typecheckStmts stmts >> typecheckTo t
 
 typecheckFrom :: From -> TypeState ()
-typecheckFrom (Fi exp _ _ p) = typeof exp >>= \case
-  IntT -> return ()
-  t    -> throwError $ TypeError p $ IncompatibleTypes IntT t -- TODO: Exp not eval to Int
+typecheckFrom (Fi exp _ _ p) = typeof exp >>= \et -> case unify IntT et of
+  Just IntT -> return ()
+  Just t    -> throwError $ TypeError p $ IncompatibleTypes IntT t
+  Nothing   -> throwError $ TypeError p $ IncompatibleTypes IntT et
 typecheckFrom _ = return ()
 
 typecheckTo :: To -> TypeState ()
-typecheckTo (IfTo exp _ _ p) = typeof exp >>= \case
-  IntT -> return ()
-  t    -> throwError $ TypeError p $ IncompatibleTypes IntT t
+typecheckTo (IfTo exp _ _ p) = typeof exp >>= \et -> case unify IntT et of
+  Just IntT -> return ()
+  Just t    -> throwError $ TypeError p $ IncompatibleTypes IntT t
+  Nothing   -> throwError $ TypeError p $ IncompatibleTypes IntT et
 typecheckTo _ = return ()
