@@ -12,6 +12,8 @@ import SRL.Type
 import SRL.Interp
 import SRL.Optimise
 
+import SRL.AST
+
 noFile = putStrLn "No .srl file provided."
 
 main = do
@@ -22,7 +24,6 @@ main = do
 
       -- parse file and run
       ast  <- (if l || ls || j || js then id else optimise) <$> parseFile f
-      -- putStrLn $ showAST ast ++ "\n"
       ttab <- typecheck ast
       let (res,log) = runProgramWith ast (typesToVarTab ttab)
 

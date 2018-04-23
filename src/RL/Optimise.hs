@@ -8,7 +8,7 @@ optimise :: AST -> AST
 optimise ast | ast' <- optBlocks ast =
   if ast' == ast
   then ast'
-  else optBlocks ast'
+  else optimise ast'
 
 optBlocks :: AST -> AST
 optBlocks = map $ \(l,b) -> (l,optBlock b)
