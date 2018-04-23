@@ -1,4 +1,8 @@
-module RL.Parser (parseFile) where
+module RL.Parser
+( parseFile
+, parseSrc
+, errorPos
+) where
 
 import System.IO
 import Text.Parsec

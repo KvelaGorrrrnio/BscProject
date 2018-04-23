@@ -16,10 +16,10 @@ optStmts  = concatMap optStmt
 
 ---------------------------------------------
 optUpd (s1:s2:ss) = case (s1,s2) of
-  (Update id op1 e1 p, Update id2 op2 e2 _) | (op1==PlusEq || op1==MinusEq)
+  (Update id op1 e1 p, Update id2 op2 e2 _) | id==id2
+                                           && (op1==PlusEq || op1==MinusEq)
                                            && (op2==PlusEq || op2==MinusEq)
-                                           -- && not (containsVar e1 || containsVar e2)
-                                           && id==id2 ->
+                                           && not (containsVar e1 || containsVar e2) ->
     optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
     -- if not (containsVar e2)
     -- then optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
@@ -52,8 +52,8 @@ optStmt (Update id op e p) = case (op, rmPar . optExp $ e) of
   (XorEq, Lit (IntV 0) _)   -> []
   (DivEq, Lit (IntV 1) _)   -> []
   (MultEq, Lit (IntV 1) _)  -> []
---  (PlusEq, Unary Neg e' _)  -> [Update id MinusEq (rmPar e') p]
---  (MinusEq, Unary Neg e' _) -> [Update id PlusEq (rmPar e') p]
+  (PlusEq, Unary Neg e' _)  -> [Update id MinusEq (rmPar e') p]
+  (MinusEq, Unary Neg e' _) -> [Update id PlusEq (rmPar e') p]
   (_,e')                    -> [Update id op e' p]
 optStmt Skip{}               = []
 optStmt s                    = [s]
@@ -192,6 +192,7 @@ compExp e = case e of
       Lit v _ -> Lit (applyAUnOp (mapAUnOp Sign) v) p
       _       -> Unary Sign e'' p
   Unary Neg e' p -> Unary Neg (compExp e') p
+  Lit (IntV n) p | n<0 -> Unary Neg (Lit (IntV $ abs n) p) p
   Parens e' p -> case e' of
     Parens{} -> compExp e'
     Var id _ -> Var id p

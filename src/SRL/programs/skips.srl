@@ -23,7 +23,7 @@ from not (not (a = c) && not (0)) || (1 && 0) do
   n += -4 + -2
   n += -4 - -2 // this behaves weirdly
   n += -4 - 2
-  //n += c-a
+  n += c-a
   n += 4 - 2
   n += 4 - -2
   //n += neg a
@@ -38,10 +38,9 @@ from not (not (a = c) && not (0)) || (1 && 0) do
 until (size b = 0 || 0)
 
 n += 4
-n += 8 * 9
-n += c - 4 / 2
-n -= 0
+n -= 8
 n += 50
+n -= 5
 n *= 2
 n += a * 0
 

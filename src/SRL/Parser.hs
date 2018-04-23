@@ -1,7 +1,8 @@
 module SRL.Parser
-  ( parseFile
-  , errorPos
-  ) where
+( parseFile
+, parseSrc
+, errorPos
+) where
 
 import System.IO
 import Text.Parsec
