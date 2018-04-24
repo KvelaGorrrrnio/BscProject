@@ -28,9 +28,12 @@ rd id = get >>= \ast -> let (Just v) = lookup id ast in return v
 --    Nothing -> throwError $ RuntimeError p $ CustomRT ("Variable '" ++ id ++ "' not defined.")
 
 logStmt :: Stmt -> VarState ()
-logStmt s = get >>= \vtab -> case s of
-  Skip{}  -> tell [MsgStmt s vtab]
-  s    -> tell [MsgStmt s vtab] >> exec s
+logStmt s = case s of
+  Skip{} -> tell [MsgStmt s []]
+  s      -> do
+    exec s
+    vtab <- get
+    tell [MsgStmt s vtab]
 
 logError :: Error -> VarState a
 logError err = do
@@ -153,5 +156,5 @@ eval (Unary op exp p) | op <= Sign  = applyAUnOp (mapAUnOp op) <$> eval exp
   Empty -> return $ boolToVal . null  $ lv
   Size  -> return $ IntV . fromIntegral . length $ lv
 
--- paranthesis
+-- parantheses
 eval (Parens e p) = eval e

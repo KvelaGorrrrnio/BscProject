@@ -15,25 +15,25 @@ optStmts :: [Stmt] -> [Stmt]
 optStmts  = concatMap optStmt
 
 ---------------------------------------------
-optUpd (s1:s2:ss) = case (s1,s2) of
-  (Update id op1 e1 p, Update id2 op2 e2 _) | (op1==PlusEq || op1==MinusEq)
-                                           && (op2==PlusEq || op2==MinusEq)
-                                           -- && not (containsVar e1 || containsVar e2)
-                                           && id==id2 ->
-    optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
-    -- if not (containsVar e2)
-    -- then optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
-    -- else s2 : optUpd (s1:ss)
-  _ -> s1 : optUpd (s2:ss)
-optUpd (s:ss) = s : optUpd ss
-optUpd [] = []
-
-containsVar :: Exp -> Bool
-containsVar (Var _ _)        = True
-containsVar (Lit _ _)        = False
-containsVar (Binary _ l r _) = containsVar l || containsVar r
-containsVar (Unary _ e _)    = containsVar e
-containsVar (Parens e _)     = containsVar e
+-- optUpd (s1:s2:ss) = case (s1,s2) of
+--   (Update id op1 e1 p, Update id2 op2 e2 _) | id==id2
+--                                            && (op1==PlusEq || op1==MinusEq)
+--                                            && (op2==PlusEq || op2==MinusEq)
+--                                            && not (containsVar e1 || containsVar e2) ->
+--     optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
+--     -- if not (containsVar e2)
+--     -- then optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
+--     -- else s2 : optUpd (s1:ss)
+--   _ -> s1 : optUpd (s2:ss)
+-- optUpd (s:ss) = s : optUpd ss
+-- optUpd [] = []
+--
+-- containsVar :: Exp -> Bool
+-- containsVar (Var _ _)        = True
+-- containsVar (Lit _ _)        = False
+-- containsVar (Binary _ l r _) = containsVar l || containsVar r
+-- containsVar (Unary _ e _)    = containsVar e
+-- containsVar (Parens e _)     = containsVar e
 ---------------------------------------------
 
 optStmt :: Stmt -> [Stmt]
@@ -105,7 +105,7 @@ optExp' e = case e of
     Unary Sign e'' _ -> optExp' e'
     _                -> Unary Sign (optExp' e') p
   Unary Neg e' p -> case rmPar e' of
-    Unary Neg e'' p' -> optExp' e''
+    Unary Neg e'' _ -> optExp' e''
     _ -> let e'' = optExp' e' in
       case rmPar e'' of
         Lit (IntV 0) _ -> Lit (IntV 0) p
@@ -191,6 +191,8 @@ compExp e = case e of
     case rmPar e'' of
       Lit v _ -> Lit (applyAUnOp (mapAUnOp Sign) v) p
       _       -> Unary Sign e'' p
+  Unary Neg e' p -> Unary Neg (compExp e') p
+  Lit (IntV n) p | n<0 -> Unary Neg (Lit (IntV $ abs n) p) p
   Parens e' p -> case e' of
     Parens{} -> compExp e'
     Var id _ -> Var id p
