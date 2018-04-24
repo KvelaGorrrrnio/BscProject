@@ -156,5 +156,5 @@ eval (Unary op exp p) | op <= Sign  = applyAUnOp (mapAUnOp op) <$> eval exp
   Empty -> return $ boolToVal . null  $ lv
   Size  -> return $ IntV . fromIntegral . length $ lv
 
--- paranthesis
+-- parantheses
 eval (Parens e p) = eval e
