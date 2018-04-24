@@ -25,7 +25,8 @@ test-srl:
 
 zip: clean
 	@echo "Compressing project into ${zipfile}..."
-	@zip -r ${zipfile} . > /dev/null
+	@rm -f ${zipfile}
+	@zip -r ${zipfile} bin RL SRL Common Makefile  # > /dev/null
 
 release: clean
 	@echo "Compressing release of project into release_${zipfile}..."
