@@ -15,25 +15,25 @@ optStmts :: [Stmt] -> [Stmt]
 optStmts  = concatMap optStmt
 
 ---------------------------------------------
-optUpd (s1:s2:ss) = case (s1,s2) of
-  (Update id op1 e1 p, Update id2 op2 e2 _) | id==id2
-                                           && (op1==PlusEq || op1==MinusEq)
-                                           && (op2==PlusEq || op2==MinusEq)
-                                           && not (containsVar e1 || containsVar e2) ->
-    optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
-    -- if not (containsVar e2)
-    -- then optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
-    -- else s2 : optUpd (s1:ss)
-  _ -> s1 : optUpd (s2:ss)
-optUpd (s:ss) = s : optUpd ss
-optUpd [] = []
-
-containsVar :: Exp -> Bool
-containsVar (Var _ _)        = True
-containsVar (Lit _ _)        = False
-containsVar (Binary _ l r _) = containsVar l || containsVar r
-containsVar (Unary _ e _)    = containsVar e
-containsVar (Parens e _)     = containsVar e
+-- optUpd (s1:s2:ss) = case (s1,s2) of
+--   (Update id op1 e1 p, Update id2 op2 e2 _) | id==id2
+--                                            && (op1==PlusEq || op1==MinusEq)
+--                                            && (op2==PlusEq || op2==MinusEq)
+--                                            && not (containsVar e1 || containsVar e2) ->
+--     optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
+--     -- if not (containsVar e2)
+--     -- then optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
+--     -- else s2 : optUpd (s1:ss)
+--   _ -> s1 : optUpd (s2:ss)
+-- optUpd (s:ss) = s : optUpd ss
+-- optUpd [] = []
+--
+-- containsVar :: Exp -> Bool
+-- containsVar (Var _ _)        = True
+-- containsVar (Lit _ _)        = False
+-- containsVar (Binary _ l r _) = containsVar l || containsVar r
+-- containsVar (Unary _ e _)    = containsVar e
+-- containsVar (Parens e _)     = containsVar e
 ---------------------------------------------
 
 optStmt :: Stmt -> [Stmt]

@@ -1,10 +1,11 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-module RL.HandleArgs where
+module Common.HandleArgs where
 
+import Data.Char
 import System.Console.CmdArgs
 import Prelude hiding (log)
 
-data RevL
+data Prog
   = Typeof    { file  :: FilePath, out  :: FilePath
               , json  :: Bool,     code :: Bool }
   | Translate { file  :: FilePath, out  :: FilePath
@@ -18,39 +19,40 @@ data RevL
 
 helpOutput = help "Write the output to the specified file"
 
-typeof = Typeof
+typeof lang = Typeof
   { file   = def &= args &= typFile
   , out    = def &= typFile &= helpOutput
   , json   = def &= help "Format output as JSON"
-  , code   = def &= help "String argument treated as RevL code"
+  , code   = def &= help ("String argument treated as " ++ lang ++ " code")
   } &= help "Print the inferred types of the program"
 
-translate = Translate
+translate lang clang = Translate
   { file   = def &= args &= typFile
   , out    = def &= typFile &= helpOutput
   , json    = def &= help "Format output as JSON"
-  , code   = def &= help "String argument treated as RevL code"
-  } &= help "Translate a RevL program to its SRevL counterpart"
+  , code   = def &= help ("String argument treated as " ++ lang ++ " code")
+  } &= help ("Translate a " ++ lang ++ " program to its " ++ clang ++ " counterpart")
 
-invert_ = Invert
+invert_ lang = Invert
   { file   = def &= args &= typFile
   , out    = def &= typFile &= helpOutput
   , json   = def &= help "Format output as JSON"
-  , code   = def &= help "String argument treated as RevL code"
-  } &= help "Invert a RevL program"
+  , code   = def &= help ("String argument treated as " ++ lang ++ " code")
+  } &= help ("Invert a " ++ lang ++ " program")
 
-interpret = Run
+interpret lang = Run
   { log     = def &= help "Output log instead of final state"
   , json    = def &= help "Format output as JSON"
   , out     = def &= typFile &= helpOutput
   , quiet   = def &= help "Hide the result of the program"
   , file    = def &= args &= typFile
-  , code    = def &= help "String argument treated as RevL code"
-  } &= help "Interpret a RevL program" &= auto
+  , code    = def &= help ("String argument treated as " ++ lang ++ " code")
+  } &= help ("Interpret a " ++ lang ++ " program" &= auto)
 
-mode = cmdArgsMode $ modes [interpret, invert_, translate, typeof]
-  &= help    "Interpret, invert or translate a RevL program"
-  &= summary "The Glorious RevL Interpreter System, version 1.0.0"
+mode lang clang = cmdArgsMode $ modes [interpret lang, invert_ lang, translate lang clang, typeof lang]
+  &= help    ("Interpret, invert or translate a " ++ lang ++ " program")
+  &= summary ("The Glorious " ++ lang ++ " Interpreter System, version 1.0.0")
+  &= program (map toLower lang)
 
-handleArgs :: IO RevL
-handleArgs = cmdArgsRun mode
+handleArgs :: String -> String -> IO Prog
+handleArgs lang clang = cmdArgsRun $ mode lang clang
