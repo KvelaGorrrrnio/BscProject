@@ -17,37 +17,39 @@ data Prog
               , quiet :: Bool,     code :: Bool }
   deriving (Data,Typeable,Show,Eq)
 
-helpOutput = help "Write the output to the specified file"
+helpOutput    = help "Write the output to the specified file"
+helpCode lang = help $ "String argument treated as " ++ lang ++ " code"
+helpJSON      = help "Format outpus as JSON"
 
 typeof lang = Typeof
   { file   = def &= args &= typFile
   , out    = def &= typFile &= helpOutput
-  , json   = def &= help "Format output as JSON"
-  , code   = def &= help ("String argument treated as " ++ lang ++ " code")
+  , json   = def &= helpJSON
+  , code   = def &= helpCode lang
   } &= help "Print the inferred types of the program"
 
 translate lang clang = Translate
   { file   = def &= args &= typFile
   , out    = def &= typFile &= helpOutput
-  , json    = def &= help "Format output as JSON"
-  , code   = def &= help ("String argument treated as " ++ lang ++ " code")
+  , json   = def &= helpJSON
+  , code   = def &= helpCode lang
   } &= help ("Translate a " ++ lang ++ " program to its " ++ clang ++ " counterpart")
 
 invert_ lang = Invert
   { file   = def &= args &= typFile
   , out    = def &= typFile &= helpOutput
-  , json   = def &= help "Format output as JSON"
-  , code   = def &= help ("String argument treated as " ++ lang ++ " code")
+  , json   = def &= helpJSON
+  , code   = def &= helpCode lang
   } &= help ("Invert a " ++ lang ++ " program")
 
 interpret lang = Run
   { log     = def &= help "Output log instead of final state"
-  , json    = def &= help "Format output as JSON"
+  , json    = def &= helpJSON
   , out     = def &= typFile &= helpOutput
   , quiet   = def &= help "Hide the result of the program"
   , file    = def &= args &= typFile
-  , code    = def &= help ("String argument treated as " ++ lang ++ " code")
-  } &= help ("Interpret a " ++ lang ++ " program" &= auto)
+  , code    = def &= helpCode lang
+  } &= help ("Interpret a " ++ lang ++ " program") &= auto
 
 mode lang clang = cmdArgsMode $ modes [interpret lang, invert_ lang, translate lang clang, typeof lang]
   &= help    ("Interpret, invert or translate a " ++ lang ++ " program")
