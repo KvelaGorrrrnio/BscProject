@@ -1,5 +1,5 @@
 {-# LANGUAGE LambdaCase #-}
-module Main where
+module SRL.Main (main) where
 
 import System.FilePath.Posix ((-<.>), takeBaseName, replaceFileName)
 
