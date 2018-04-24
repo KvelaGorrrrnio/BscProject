@@ -43,14 +43,13 @@ typecheckStmt :: Stmt -> TypeState ()
 typecheckStmt (Update id op exp p)         = do
   typeofId id >>= \case
     IntT     -> return ()
-    UnknownT -> update id IntT p
     t        -> case unify IntT t of
       Just _  -> update id IntT p
       Nothing -> throwError $ TypeError p $ IncompatibleTypes IntT t
   typeof exp >>= \case
     IntT     -> return ()
     UnknownT -> return ()
-    t        -> throwError $ TypeError p $ IncompatibleTypes IntT t
+    t        -> throwError $ TypeError p $ NonIntegerExp exp t
 -- Push
 typecheckStmt (Push id lid p)              = do
   t <- typeofId id >>= \case
@@ -61,7 +60,7 @@ typecheckStmt (Push id lid p)              = do
     ListT lt -> case unify lt t of
       Nothing -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Push error
       Just t' -> update id t' p >> update lid (ListT t') p
-    lt       -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Stack error
+    lt       -> throwError $ TypeError p $ PushToNonList lid lt
 -- Pop
 typecheckStmt (Pop id lid p)               = typeofId id >>= \t ->
   typeofId lid >>= \case
@@ -69,7 +68,7 @@ typecheckStmt (Pop id lid p)               = typeofId id >>= \t ->
     ListT lt -> case unify lt t of
       Nothing -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Push error
       Just t' -> update id t' p >> update lid (ListT t') p
-    lt       -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Stack error
+    lt       -> throwError $ TypeError p $ PopFromNonList lid lt
 -- Pop
 typecheckStmt (Swap id1 id2 p)             = do
   t1 <- typeofId id1

@@ -24,6 +24,9 @@ data TypeError
   = IncompatibleTypes Type Type
   | BinOpTypes BinOp (Type,Type) (Type,Type)
   | UnOpType   UnOp Type Type
+  | NonIntegerExp   Exp  Type
+  | PushToNonList   Id   Type
+  | PopFromNonList  Id   Type
 
 data StaticError
   = SelfAbuse Id
@@ -47,6 +50,9 @@ instance Show TypeError where
   show (IncompatibleTypes t t')          = "Couldn't find common type for "++show t++" and "++show t'++"."
   show (BinOpTypes op (lt,rt) (lt',rt')) = show op++" expected input of "++show lt++" * "++show rt++", but recieved "++show lt'++" * "++show rt'++"."
   show (UnOpType op t t')                = show op++" expected input of "++show t++", but recieved "++show t'++"."
+  show (NonIntegerExp exp t)             = show exp ++ " is of type " ++ show t ++ " instead of " ++ show IntT ++ "."
+  show (PushToNonList id t)              = "Tried pushing to non-list identifier " ++ id ++ " of type " ++ show t ++ "."
+  show (PopFromNonList id t)             = "Tried popping from non-list identifier " ++ id ++ " of type " ++ show t ++ "."
 
 -- =======
 -- Helpers

@@ -24,14 +24,12 @@ typecheckBlock (_,(f,stmts,t)) = typecheckFrom f >> typecheckStmts stmts >> type
 
 typecheckFrom :: From -> TypeState ()
 typecheckFrom (Fi exp _ _ p) = typeof exp >>= \et -> case unify IntT et of
-  Just IntT -> return ()
-  Just t    -> throwError $ TypeError p $ IncompatibleTypes IntT t
-  Nothing   -> throwError $ TypeError p $ IncompatibleTypes IntT et
+  Just _ -> return ()
+  Nothing   -> throwError $ TypeError p $ NonIntegerExp exp et
 typecheckFrom _ = return ()
 
 typecheckTo :: To -> TypeState ()
 typecheckTo (IfTo exp _ _ p) = typeof exp >>= \et -> case unify IntT et of
-  Just IntT -> return ()
-  Just t    -> throwError $ TypeError p $ IncompatibleTypes IntT t
-  Nothing   -> throwError $ TypeError p $ IncompatibleTypes IntT et
+  Just _ -> return ()
+  Nothing   -> throwError $ TypeError p $ NonIntegerExp exp et
 typecheckTo _ = return ()
