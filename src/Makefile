@@ -1,4 +1,3 @@
-zipfile=robin.zip
 nottest=Makefile SRL RL
 
 build: rl srl
@@ -22,11 +21,6 @@ test-rl:
 
 test-srl:
 	@./test/run_tests.sh SRL -d
-
-zip: clean
-	@echo "Compressing project into ${zipfile}..."
-	@rm -f ${zipfile}
-	@zip -r ${zipfile} bin RL SRL Common Makefile  # > /dev/null
 
 release: clean
 	@echo "Compressing release of project into release_${zipfile}..."

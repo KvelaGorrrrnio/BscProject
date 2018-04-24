@@ -1,6 +1,6 @@
 SRC = Main.hs
 HLP = *.hs ../Common/*.hs
-EXE = ../bin/srevl
+EXE = ../bin/srl
 HIDIR = hi
 ODIR  = o
 
