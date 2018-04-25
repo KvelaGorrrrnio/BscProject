@@ -18,6 +18,7 @@ import Common.HandleArgs
 import Common.JSON
 
 noFile = putStrLn "No .srl file provided."
+noCode = putStrLn "No string provided."
 
 eout :: Bool -> String -> Error -> IO ()
 eout True [] msg = putStrLn $ stringify msg
@@ -29,22 +30,23 @@ getAST c = if c then return . parseSrc else parseFile
 main = do
   args <- handleArgs
   case args of
-    Run [] _ _ _ _ _ -> noFile
-    Run f o j c l q  -> let eout' = eout j o in
+    Run [] _ _ c _ -> if c then noCode else noFile
+    Run f o j c l -> let eout' = eout j o in
       (if l then id else optimise . staticcheck) <$> getAST c f >>= \case
        Left err  -> eout' err
        Right ast -> case typecheck ast of
         Left err   -> eout' err
         Right ttab -> case runProgramWith ast (typesToVarTab ttab) of
-          (_,log)        | l && j && null o -> unless q $ putStrLn $ logToJSON log
+          (_,log)        | l && j && null o -> putStrLn $ logToJSON log
                          | l && j           -> writeFile o $ (++"\n") (logToJSON log)
-                         | l && null o      -> unless q $ putStrLn $ logToString log
+                         | l && null o      -> putStrLn $ logToString log
                          | l                -> writeFile o $ (++"\n") (logToString log)
-          (Right vtab,_) | j && null o      -> unless q $ putStrLn $ jsonTabL "variable" vtab
+          (Right vtab,_) | j && null o      -> putStrLn $ jsonTabL "variable" vtab
                          | j                -> writeFile o $ (++"\n") (jsonTabL "variable" vtab)
-                         | null o           -> unless q $ putStrLn $ showTabL vtab
+                         | null o           -> putStrLn $ showTabL vtab
                          | otherwise        -> writeFile o $ (++"\n") (showTabL vtab)
           (Left err,_)                      -> eout' err
+    Invert [] _ _ c -> if c then noCode else noFile
     Invert f o j c -> let eout' = eout j o in
       getAST c f >>= \case
        Left err  -> eout' err
@@ -56,6 +58,7 @@ main = do
                   | j           -> writeFile o $ (++"\n") (jsonCode code)
                   | null o      -> putStrLn code
                   | otherwise   -> writeFile o $ (++"\n") code
+    Translate [] _ _ c -> if c then noCode else noFile
     Translate f o j c -> let eout' = eout j o in
       getAST c f >>= \case
        Left err  -> eout' err
@@ -67,6 +70,7 @@ main = do
                   | j           -> writeFile o $ (++"\n") (jsonCode code)
                   | null o      -> putStrLn code
                   | otherwise   -> writeFile o $ (++"\n") code
+    Typeof [] _ _ c -> if c then noCode else noFile
     Typeof f o j c -> let eout' = eout j o in
       getAST c f >>= \case
        Left err  -> eout' err

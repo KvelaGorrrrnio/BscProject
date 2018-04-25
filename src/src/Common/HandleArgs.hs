@@ -14,11 +14,11 @@ data Prog
               , json  :: Bool,     code  :: Bool }
   | Run       { file  :: FilePath, out   :: FilePath
               , json  :: Bool,     code  :: Bool
-              , log   :: Bool,     quiet :: Bool}
+              , log   :: Bool                    }
   deriving (Data,Typeable,Show,Eq)
 
 helpOutput = help "Write the output to the specified file"
-helpCode   = help "String argument treated as (S)RL code"
+helpCode   = help "Give a string to be treated as (S)RL code"
 helpJSON   = help "Formats output as JSON"
 
 typeof    = record Typeof{} [
@@ -48,14 +48,14 @@ interpret = record Run{} [
   , json  := def                     += helpJSON
   , code  := def                     += helpCode
   , log   := def += help "Output log instead of final state"
-  , quiet := def += help "Hide the result of the program"
   ] += help "Interpret an (S)RL program" += auto
 
 mode = cmdArgsMode_ $ modes_ [interpret, invert_, translate, typeof]
-  += help    "Interpret, invert or translate a (S)RL program"
+  += help    "Interpret, invert or translate an (S)RL program"
   += summary "The Glorious (S)RL Interpreter System, version 1.0.0"
-  += program (map toLower "(s)rl")
-  += helpArg [explicit, name "help", name "h"]
+  += program "(s)rl"
+  += helpArg    [explicit, name "help", name "h"]
+  += versionArg [explicit, name "version", name "v"]
 
 handleArgs :: IO Prog
 handleArgs = cmdArgsRun mode
