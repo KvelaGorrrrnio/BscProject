@@ -23,18 +23,14 @@ staticcheckStmts = mapM_ staticcheckStmt
 
 -- Statements
 staticcheckStmt :: Stmt -> StaticState ()
-staticcheckStmt (Update id op exp p) | exp `contains` id = throwError $ StaticError p $ SelfAbuse id
-                                     | otherwise         = return ()
-staticcheckStmt (Push id lid p) | id == lid = throwError $ StaticError p $ SelfAbuse id
-                                | otherwise = return ()
-staticcheckStmt (Pop id lid p)  | id == lid = throwError $ StaticError p $ SelfAbuse id
-                                | otherwise = return ()
+staticcheckStmt (Update id op exp p) = when (exp `contains` id) $ throwError $ StaticError p $ SelfAbuse id
+staticcheckStmt (Push id lid p) = when (id == lid) $ throwError $ StaticError p $ SelfAbuse id
+staticcheckStmt (Pop id lid p) = when (id == lid) $ throwError $ StaticError p $ SelfAbuse id
 staticcheckStmt _ = return ()
 
 contains :: Exp -> Id -> Bool
-contains (Binary _ e1 e2 _) id    = contains e1 id && contains e2 id
-contains (Unary  _ e _) id        = contains e id
-contains (Parens e _) id          = contains e id
-contains (Var n _) id | n==id     = True
-                      | otherwise = False
-contains (Lit _ _) _              = False
+contains (Binary _ e1 e2 _) id = contains e1 id && contains e2 id
+contains (Unary  _ e _) id     = contains e id
+contains (Parens e _) id       = contains e id
+contains (Var id' _) id        = id'==id
+contains Lit{} id              = False
