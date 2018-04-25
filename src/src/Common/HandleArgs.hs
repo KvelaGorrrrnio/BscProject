@@ -44,9 +44,9 @@ invert_ lang = Invert
 
 interpret lang = Run
   { file    = def &= args &= typFile
+  , out     = def &= typFile &= helpOutput
   , log     = def &= help "Output log instead of final state"
   , json    = def &= helpJSON
-  , out     = def &= typFile &= helpOutput
   , quiet   = def &= help "Hide the result of the program"
   , code    = def &= helpCode lang
   } &= help ("Interpret a " ++ lang ++ " program") &= auto
