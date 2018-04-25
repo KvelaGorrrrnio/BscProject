@@ -19,7 +19,7 @@ class JSON a where
   stringify :: a -> String
 
 escStr :: String -> String
-escStr = foldl (\a c-> a++esc c) ""
+escStr = concatMap esc -- foldl (\a c-> a++esc c) ""
 
 esc :: Char -> String
 esc '\\' = "\\\\"
@@ -58,13 +58,3 @@ jsonCode :: String -> String
 jsonCode c = "{ \"type\" : \"code\", " ++
   "\"code\" : \"" ++ escStr c ++ "\"" ++
   " }"
-
--- Helpers
-getStmtPos :: Stmt -> Pos
-getStmtPos (Update _ _ _ p) = p
-getStmtPos (Push _ _ p)     = p
-getStmtPos (Pop _ _ p)      = p
-getStmtPos (Swap _ _ p)     = p
-getStmtPos (Skip p)         = p
-getStmtPos (If _ _ _ _ p)   = p
-getStmtPos (Until _ _ _ p)  = p

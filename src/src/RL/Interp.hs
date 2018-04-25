@@ -9,13 +9,6 @@ import Common.Log
 import Control.Monad.Reader
 import Control.Monad.Except
 
-
-
-import Debug.Trace
-
-
-
-
 -- The program state
 type ProgState = ReaderT AST VarState
 
