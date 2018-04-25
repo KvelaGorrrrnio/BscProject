@@ -27,7 +27,7 @@ eout False _ msg = print msg
 getAST c = if c then return . parseSrc else parseFile
 
 main = do
-  args <- handleArgs "SRevL" "RevL"
+  args <- handleArgs
   case args of
     Run [] _ _ _ _ _ -> noFile
     Run f o l j q c  -> let eout' = eout j o in

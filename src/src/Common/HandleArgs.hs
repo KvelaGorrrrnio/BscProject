@@ -6,55 +6,56 @@ import System.Console.CmdArgs
 import Prelude hiding (log)
 
 data Prog
-  = Typeof    { file  :: FilePath, out  :: FilePath
-              , json  :: Bool,     code :: Bool }
-  | Translate { file  :: FilePath, out  :: FilePath
-              , json  :: Bool,     code :: Bool }
-  | Invert    { file  :: FilePath, out  :: FilePath
-              , json  :: Bool,     code :: Bool }
-  | Run       { file  :: FilePath, out  :: FilePath
-              , log   :: Bool,     json :: Bool
-              , quiet :: Bool,     code :: Bool }
+  = Typeof    { file  :: FilePath, out   :: FilePath
+              , json  :: Bool,     code  :: Bool }
+  | Translate { file  :: FilePath, out   :: FilePath
+              , json  :: Bool,     code  :: Bool }
+  | Invert    { file  :: FilePath, out   :: FilePath
+              , json  :: Bool,     code  :: Bool }
+  | Run       { file  :: FilePath, out   :: FilePath
+              , json  :: Bool,     code  :: Bool
+              , log   :: Bool,     quiet :: Bool}
   deriving (Data,Typeable,Show,Eq)
 
-helpOutput    = help "Write the output to the specified file"
-helpCode lang = help $ "String argument treated as " ++ lang ++ " code"
-helpJSON      = help "Format outpus as JSON"
+helpOutput = help "Write the output to the specified file"
+helpCode   = help "String argument treated as (S)RL code"
+helpJSON   = help "Formats output as JSON"
 
-typeof lang = Typeof
-  { file   = def &= args &= typFile
-  , out    = def &= typFile &= helpOutput
-  , json   = def &= helpJSON
-  , code   = def &= helpCode lang
+typeof    = Typeof {
+    file  = def &= args &= typFile
+  , out   = def         &= typFile  &= helpOutput
+  , json  = def                     &= helpJSON
+  , code  = def                     &= helpCode
   } &= help "Print the inferred types of the program"
 
-translate lang clang = Translate
-  { file   = def &= args &= typFile
-  , out    = def &= typFile &= helpOutput
-  , json   = def &= helpJSON
-  , code   = def &= helpCode lang
-  } &= help ("Translate a " ++ lang ++ " program to its " ++ clang ++ " counterpart")
+translate = Translate {
+    file  = def &= args &= typFile
+  , out   = def         &= typFile  &= helpOutput
+  , json  = def                     &= helpJSON
+  , code  = def                     &= helpCode
+  } &= help "Translate an (S)RL program to its (S)RL counterpart"
 
-invert_ lang = Invert
-  { file   = def &= args &= typFile
-  , out    = def &= typFile &= helpOutput
-  , json   = def &= helpJSON
-  , code   = def &= helpCode lang
-  } &= help ("Invert a " ++ lang ++ " program")
+invert_   = Invert {
+    file  = def &= args &= typFile
+  , out   = def         &= typFile  &= helpOutput
+  , json  = def                     &= helpJSON
+  , code  = def                     &= helpCode
+  } &= help "Invert an (S)RL program"
 
-interpret lang = Run
-  { file    = def &= args &= typFile
-  , out     = def &= typFile &= helpOutput
-  , log     = def &= help "Output log instead of final state"
-  , json    = def &= helpJSON
-  , quiet   = def &= help "Hide the result of the program"
-  , code    = def &= helpCode lang
-  } &= help ("Interpret a " ++ lang ++ " program") &= auto
+interpret = Run {
+    file  = def &= args &= typFile
+  , out   = def         &= typFile  &= helpOutput
+  , json  = def                     &= helpJSON
+  , code  = def                     &= helpCode
+  , log   = def &= help "Output log instead of final state"
+  , quiet = def &= help "Hide the result of the program"
+  } &= help "Interpret an (S)RL program" &= auto
 
-mode lang clang = cmdArgsMode $ modes [interpret lang, invert_ lang, translate lang clang, typeof lang]
-  &= help    ("Interpret, invert or translate a " ++ lang ++ " program")
-  &= summary ("The Glorious " ++ lang ++ " Interpreter System, version 1.0.0")
-  &= program (map toLower lang)
+mode = cmdArgsMode $ modes [interpret, invert_, translate, typeof]
+  &= help    "Interpret, invert or translate a (S)RL program"
+  &= summary "The Glorious (S)RL Interpreter System, version 1.0.0"
+  &= program (map toLower "(s)rl")
+  &= helpArg [explicit, name "help", name "h"]
 
-handleArgs :: String -> String -> IO Prog
-handleArgs lang clang = cmdArgsRun $ mode lang clang
+handleArgs :: IO Prog
+handleArgs = cmdArgsRun mode
