@@ -29,7 +29,7 @@ staticcheckStmt (Pop id lid p) = when (id == lid) $ throwError $ StaticError p $
 staticcheckStmt _ = return ()
 
 contains :: Exp -> Id -> Bool
-contains (Binary _ e1 e2 _) id = contains e1 id && contains e2 id
+contains (Binary _ e1 e2 _) id = contains e1 id || contains e2 id
 contains (Unary  _ e _) id     = contains e id
 contains (Parens e _) id       = contains e id
 contains (Var id' _) id        = id'==id
