@@ -40,7 +40,7 @@ staticcheckBlock (l,(f,stmts,t)) = do
     Fi _ l _ p | null (lookup l lbls) -> throwError $ StaticError p $ NotDefinedLabel l
     Fi _ _ l p | null (lookup l lbls) -> throwError $ StaticError p $ NotDefinedLabel l
     _                                 -> return ()
-  case runStaticcheck stmts staticcheckStmts of
+  case runStaticcheck stmts of
     Left err -> throwError err
     Right _  -> return ()
   (sn,en,ex) <- get

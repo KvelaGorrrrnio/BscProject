@@ -9,6 +9,6 @@ import Common.Static
 
 staticcheck :: Either Error AST -> Either Error AST
 staticcheck (Left err)  = Left err
-staticcheck (Right ast) = case runStaticcheck ast staticcheckStmts of
+staticcheck (Right ast) = case runStaticcheck ast of
   Left err -> Left err
   Right _  -> Right ast
