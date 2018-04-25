@@ -11,8 +11,8 @@ import Control.Monad.Except
 
 type StaticState = Except Error
 
-runStaticcheck :: a -> (a -> StaticState ()) -> Either Error ()
-runStaticcheck ast init = runExcept $ init ast
+runStaticcheck :: [Stmt] Either Error ()
+runStaticcheck = runExcept staticcheckStmts
 
 -- ==========
 -- Statements
