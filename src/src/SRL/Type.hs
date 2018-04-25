@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module SRL.Type
 ( typecheck
 , module Common.Type

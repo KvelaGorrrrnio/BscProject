@@ -30,7 +30,10 @@ data TypeError
 
 data StaticError
   = SelfAbuse Id
-  deriving Show
+  | DuplicateLabel String Pos
+  | DuplicateEntry
+  | DuplicateExit
+  | NotDefinedLabel String
 
 instance Show Error where
   show (ParseError (l,c) e)   = e
@@ -45,6 +48,13 @@ instance JSON Error where
 
 instance Show RuntimeError where
   show (CustomRT s) = s
+
+instance Show StaticError where
+  show (SelfAbuse id) = id ++ " is abusing itself."
+  show (DuplicateLabel lbl (l,_)) = " Can't redefine " ++ lbl ++ " again. First defined at line " ++ show l ++ "."
+  show (NotDefinedLabel lbl) = "Block " ++ lbl ++ " is not defined."
+  show DuplicateEntry       = "Only one entry is allowed."
+  show DuplicateExit        = "Only one entry is allowed."
 
 instance Show TypeError where
   show (IncompatibleTypes t t')          = "Couldn't find common type for "++show t++" and "++show t'++"."

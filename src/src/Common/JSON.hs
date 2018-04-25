@@ -19,7 +19,7 @@ class JSON a where
   stringify :: a -> String
 
 escStr :: String -> String
-escStr str = foldl (\a c-> a++esc c) "" str
+escStr = foldl (\a c-> a++esc c) ""
 
 esc :: Char -> String
 esc '\\' = "\\\\"

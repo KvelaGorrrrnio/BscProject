@@ -9,6 +9,7 @@ import SRL.Parser
 import SRL.Translation
 import SRL.Inversion
 import SRL.Type
+import SRL.Static
 import SRL.Interp
 import SRL.Optimise
 import SRL.Error
@@ -30,7 +31,7 @@ main = do
   case args of
     Run [] _ _ _ _ _ -> noFile
     Run f o l j q c  -> let eout' = eout j o in
-      (if l then id else optimise) <$> getAST c f >>= \case
+      (if l then id else optimise . staticcheck) <$> getAST c f >>= \case
        Left err  -> eout' err
        Right ast -> case typecheck ast of
         Left err   -> eout' err
