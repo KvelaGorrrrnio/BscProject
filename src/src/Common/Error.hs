@@ -33,7 +33,9 @@ data StaticError
   | DuplicateLabel String Pos
   | DuplicateEntry
   | DuplicateExit
-  | NotDefinedLabel String
+  | NotDefinedLabel String
+  | NoEntry
+  | NoExit
 
 instance Show Error where
   show (ParseError (l,c) e)   = e
@@ -52,9 +54,11 @@ instance Show RuntimeError where
 instance Show StaticError where
   show (SelfAbuse id) = id ++ " is abusing itself."
   show (DuplicateLabel lbl (l,_)) = " Can't redefine " ++ lbl ++ " again. First defined at line " ++ show l ++ "."
-  show (NotDefinedLabel lbl) = "Block " ++ lbl ++ " is not defined."
-  show DuplicateEntry       = "Only one entry is allowed."
-  show DuplicateExit        = "Only one entry is allowed."
+  show (NotDefinedLabel lbl) = "Label " ++ lbl ++ " is not defined."
+  show DuplicateEntry        = "Only one entry-point is allowed."
+  show DuplicateExit         = "Only one exit-point is allowed."
+  show NoEntry               = "No entry-point is specified."
+  show NoExit                = "No exit-point is specified."
 
 instance Show TypeError where
   show (IncompatibleTypes t t')          = "Couldn't find common type for "++show t++" and "++show t'++"."
