@@ -30,7 +30,7 @@ main = do
   args <- handleArgs
   case args of
     Run [] _ _ _ _ _ -> noFile
-    Run f o l j q c  -> let eout' = eout j o in
+    Run f o j c l q  -> let eout' = eout j o in
       (if l then id else optimise . staticcheck) <$> getAST c f >>= \case
        Left err  -> eout' err
        Right ast -> case typecheck ast of
