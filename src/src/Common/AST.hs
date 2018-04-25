@@ -45,6 +45,14 @@ instance Show Stmt where
   -- unique for SRL
   show (If t s1 s2 a _)   = "if " ++ showPar t ++ " then [s1] else [s2]"
   show (Until a s t _)    = "from " ++ showPar a ++ " do [s] until " ++ showPar t
+getStmtPos :: Stmt -> Pos
+getStmtPos (Update _ _ _ p) = p
+getStmtPos (Push _ _ p)     = p
+getStmtPos (Pop _ _ p)      = p
+getStmtPos (Swap _ _ p)     = p
+getStmtPos (Skip p)         = p
+getStmtPos (If _ _ _ _ p)   = p
+getStmtPos (Until _ _ _ p)  = p
 
 data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq deriving Eq
 instance Show UpdOp where
@@ -53,12 +61,6 @@ instance Show UpdOp where
   show XorEq   = " ^= "
   show MultEq  = " *= "
   show DivEq   = " /= "
-mapUpdOp :: UpdOp -> Exp -> Exp -> Pos -> Exp
-mapUpdOp PlusEq  = Binary   Plus
-mapUpdOp MinusEq = Binary   Minus
-mapUpdOp XorEq   = Binary   Xor
-mapUpdOp MultEq  = Binary   Mult
-mapUpdOp DivEq   = Binary   Div
 
 data Exp
   = Lit    Value Pos
@@ -158,6 +160,13 @@ instance Show Type where
 -- =======
 -- helpers
 -- =======
+mapUpdOp :: UpdOp -> Exp -> Exp -> Pos -> Exp
+mapUpdOp PlusEq  = Binary Plus
+mapUpdOp MinusEq = Binary Minus
+mapUpdOp XorEq   = Binary Xor
+mapUpdOp MultEq  = Binary Mult
+mapUpdOp DivEq   = Binary Div
+
 mapABinOp Plus    = (+)
 mapABinOp Minus   = (-)
 mapABinOp Xor     = xor

@@ -22,18 +22,15 @@ execVarState :: VarTab -> VarState () -> (Either Error VarTab, Log)
 execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 
 rd :: Id -> VarState Value
-rd id = get >>= \ast -> let (Just v) = lookup id ast in return v
---  case lookup id ast of
---    Just v  -> return v
---    Nothing -> throwError $ RuntimeError p $ CustomRT ("Variable '" ++ id ++ "' not defined.")
+rd id = do
+  Just v <- gets (lookup id)
+  return v
 
 logStmt :: Stmt -> VarState ()
-logStmt s = case s of
-  Skip{} -> tell [MsgStmt s []]
-  s      -> do
+logStmt s = do
     exec s
-    vtab <- get
-    tell [MsgStmt s vtab]
+    msg <- gets (MsgStmt s)
+    tell [msg]
 
 logError :: Error -> VarState a
 logError err = do
@@ -56,10 +53,12 @@ exec (Update id op e p) = do
   v2 <- eval e
   case op of
     DivEq -> case (v1,v2) of
-      (IntV n, IntV m) | mod n m == 0 -> return ()
+      (IntV n, IntV m)
+        | mod n m == 0 -> return ()
         | otherwise -> logError $ RuntimeError p $ CustomRT "Division has rest in update."
     MultEq -> case (v1,v2) of
-      (IntV n, IntV m) | n /= 0 && m /= 0 -> return ()
+      (IntV n, IntV m)
+        | n /= 0 && m /= 0 -> return ()
         | otherwise -> logError $ RuntimeError p $ CustomRT "An operand in mult update is zero."
     _      -> return ()
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
@@ -68,8 +67,7 @@ exec (Update id op e p) = do
 -- control flow : unique for SRL
 exec (If t s1 s2 a p) = do
   t' <- valToBool <$> eval t
-  if t' then execStmts s1
-        else execStmts s2
+  execStmts $ if t' then  s1 else s2
   a' <- valToBool <$> eval a
   when (t' /= a')
     $ logError $ RuntimeError p $ CustomRT "Assert and such"
@@ -127,34 +125,34 @@ eval :: Exp -> VarState Value
 eval (Lit v _)  = return v
 eval (Var id _) = rd id
 
--- binary arithmetic
-eval (Binary op l r p) | op < Div = applyABinOp (mapABinOp op) <$> eval l <*> eval r
--- binary div and mod
-                     | op <= Mod = do
-  rv <- eval r
-  case rv of
-    IntV 0 -> logError $ RuntimeError p $ CustomRT "Dividing by zero."
-    IntV _ -> return ()
-  lv <- eval l
-  return $ applyABinOp (mapABinOp op) lv rv
--- binary relational
-                     | op <= Geq = applyRBinOp (mapRBinOp op) <$> eval l <*> eval r
--- binary logical
-                     | otherwise = eval l >>= \case
-  IntV 0 | op==And        -> return $ IntV 0
-  IntV v | v/=0 && op==Or -> return $ IntV 1
-  IntV _ -> norm <$> eval r
--- unary arithmetic
-eval (Unary op exp p) | op <= Sign  = applyAUnOp (mapAUnOp op) <$> eval exp
--- unary logical
-                      | op < Size   = eval exp >>= \(IntV v)  -> return $ boolToVal $ mapLUnOp op (v/=0)
--- unary list
-                      | otherwise   = eval exp >>= \(ListV lv) -> case op of
-  Top   -> case lv of
-    []   -> logError $ RuntimeError p $ CustomRT "Accessing top of empty list."
-    t:ts -> return t
-  Empty -> return $ boolToVal . null  $ lv
-  Size  -> return $ IntV . fromIntegral . length $ lv
+  -- binary arithmetic
+eval (Binary op l r p)
+  | op < Div  = applyABinOp (mapABinOp op) <$> eval l <*> eval r
+  -- binary div and mod
+  | op <= Mod = do
+    rv <- eval r
+    when (isClear rv) $ logError $ RuntimeError p $ CustomRT "Dividing by zero."
+    lv <- eval l
+    return $ applyABinOp (mapABinOp op) lv rv
+  -- binary relational
+  | op <= Geq = applyRBinOp (mapRBinOp op) <$> eval l <*> eval r
+  -- binary logical
+  | otherwise = eval l >>= \case
+    IntV 0 | op==And        -> return $ IntV 0
+    IntV v | v/=0 && op==Or -> return $ IntV 1
+    IntV _ -> norm <$> eval r
+  -- unary arithmetic
+eval (Unary op exp p)
+  | op <= Sign  = applyAUnOp (mapAUnOp op) <$> eval exp
+  -- unary logical
+  | op < Size   = eval exp >>= \(IntV v)  -> return $ boolToVal $ mapLUnOp op (v/=0)
+  -- unary list
+  | otherwise   = eval exp >>= \(ListV lv) -> case op of
+    Top   -> case lv of
+      []   -> logError $ RuntimeError p $ CustomRT "Accessing top of empty list."
+      t:ts -> return t
+    Empty -> return $ boolToVal . null  $ lv
+    Size  -> return $ IntV . fromIntegral . length $ lv
 
 -- parantheses
 eval (Parens e p) = eval e
