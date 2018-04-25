@@ -43,6 +43,7 @@ staticcheckBlock (l,(f,stmts,t)) = do
   case runStaticcheck stmts staticcheckStmts of
     Left err -> throwError err
     Right _  -> return ()
+  (sn,en,ex) <- get
   case t of
     Exit p | ex -> throwError $ StaticError p DuplicateExit
     Exit _      -> put (sn,en,True)
