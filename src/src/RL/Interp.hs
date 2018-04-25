@@ -40,11 +40,12 @@ interp from l = do
   case f of
     Entry _      -> return ()
     From l' p    -> unless (from == l') $
-      lift (logError $ RuntimeError p (CustomRT "From not consistent."))
+      lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l' ))
     Fi a l1 l2 p -> do
       a' <- lift $ valToBool <$> eval a
-      unless (from == (if a' then l1 else l2)) $
-        lift (logError $ RuntimeError p (CustomRT $ "From not consistent. Coming from " ++ from ++ "."))
+      let l' = if a' then l1 else l2
+      unless (from == l') $
+        lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l'))
 
   lift $ execStmts ss
 

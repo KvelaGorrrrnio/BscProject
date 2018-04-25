@@ -34,7 +34,7 @@ data StaticError
 
 instance Show Error where
   show (ParseError (l,c) e)   = e
-  show (RuntimeError (l,c) e) = "A runtime error occured at (line "++show l++", column "++show c++"): " ++ show e
+  show (RuntimeError (l,c) e) = "A runtime error occured at (line "++show l++", column "++show c++"):\n" ++ show e
   show (TypeError (l,c) e)    = "A type error occured at (line "++show l++", column "++show c++"): " ++ show e
   show (StaticError (l,c) e)  = "An error occured at (line "++show l++", column "++show c++"): " ++ show e
 instance JSON Error where
