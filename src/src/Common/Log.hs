@@ -27,11 +27,13 @@ logToJSON l = jsonLog $ intercalate ", " $ map jsonMsg l
 data Message = MsgStmt       Stmt VarTab
              | MsgError      Error
 instance Show Message where
-  show (MsgStmt s vtab)  = case s of
-    If{}    -> "> " ++ show s
-    Until{} -> "> " ++ show s
-    Skip{}  -> "> " ++ show s
-    _       -> "> " ++ show s ++"\n"++showVTab vtab
+  show (MsgStmt s vtab)  =
+    (show . fst . getStmtPos) s ++ " > " ++
+    case s of
+      If{}    -> show s
+      Until{} -> show s
+      Skip{}  -> show s
+      _       -> show s ++ "\n" ++ showVTab vtab
   show (MsgError err) = "*** Error: " ++ show err
 
 instance JSON Message where

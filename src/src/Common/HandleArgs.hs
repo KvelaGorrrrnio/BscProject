@@ -19,7 +19,7 @@ data Prog
 
 helpOutput = help "Write the output to the specified file"
 helpCode   = help "Give a string to be treated as (S)RL code"
-helpJSON   = help "Formats output as JSON"
+helpJSON   = help "Format the output as JSON"
 
 typeof    = record Typeof{} [
     file  := def += args += typFile
