@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE FlexibleContexts, LambdaCase #-}
 
 module Common.Interp (module Common.Interp, module Common.Log) where
 
@@ -27,7 +27,10 @@ rd id = do
   return v
 
 logStmt :: Stmt -> VarState ()
-logStmt s = do
+logStmt s = case s of
+  If{}    -> exec s
+  Until{} -> exec s
+  _ -> do
     exec s
     msg <- gets (MsgStmt s)
     tell [msg]
@@ -36,6 +39,9 @@ logError :: Error -> VarState a
 logError err = do
   tell [MsgError err]
   throwError err
+
+logMsg :: MonadWriter Log w => String -> w ()
+logMsg st = tell [MsgCustom st]
 
 
 -- ==========
@@ -67,19 +73,26 @@ exec (Update id op e p) = do
 -- control flow : unique for SRL
 exec (If t s1 s2 a p) = do
   t' <- valToBool <$> eval t
+
+  logMsg $ show (If t s1 s2 a p) ++ " -> " ++ if t' then "true" else "false"
   execStmts $ if t' then  s1 else s2
+  logMsg $ (if t' then "[s1]" else "[s2]") ++ " done"
+
   a' <- valToBool <$> eval a
   when (t' /= a')
     $ logError $ RuntimeError p $ CustomRT "Assert and such"
 
-exec (Until a s t p) = do
+exec (Until a s t p) = do -- log this
+  logMsg $ show (Until a s t p)
   aout <- valToBool <$> eval a
   unless aout $ logError $ RuntimeError p $ CustomRT "Assert"
   execStmts s
   whileM_ (not . valToBool <$> eval t) $ do
+      logMsg $ show t ++ " -> " ++ "false"
       ain <- valToBool <$> eval a ; when ain
         $ throwError $ RuntimeError p $ CustomRT "Assert not good"
       execStmts s;
+  logMsg $ show t ++ " -> " ++ "true"
 
 -- list modification
 exec (Push id1 id2 p) = do

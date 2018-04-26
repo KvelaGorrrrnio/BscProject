@@ -40,11 +40,14 @@ interp from l = do
       unless (from == l') $
         lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l'))
 
+  logMsg $ ">> " ++ l
   lift $ execStmts ss
 
+  let msg = show t
   case t of
-    Exit _         -> return ()
-    Goto l' _      -> interp l l'
-    IfTo t l1 l2 _ -> do
-      t' <- lift $ valToBool <$> eval t
-      if t' then interp l l1 else interp l l2
+    Exit _         -> logMsg msg
+    Goto l' _      -> logMsg msg >> interp l l'
+    IfTo c l1 l2 _ -> do
+      c' <- lift $ valToBool <$> eval c
+      logMsg $ msg ++ " -> " ++ if c' then "true" else "false" -- we want lower case
+      if c' then interp l l1 else interp l l2

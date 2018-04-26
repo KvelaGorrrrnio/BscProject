@@ -5,6 +5,7 @@ import Common.JSON
 import Common.Error
 
 import Data.List (intercalate)
+import Data.Char
 
 -- ===
 -- Log
@@ -17,15 +18,20 @@ logToString = intercalate "\n\n" . map show
 
 logToJSON :: Log -> String
 logToJSON l = jsonLog $ intercalate ", " $ map jsonMsg l
-  where jsonMsg (MsgStmt stmt vtab) = let (l,c) = getStmtPos stmt in "{ \"type\" : \"statement\", " ++
+  where jsonMsg (MsgStmt stmt vtab) = let (l,c) = getStmtPos stmt in
+          "{ \"type\" : \"statement\", " ++
           "\"position\" : { \"line\" : "++show l++", \"column\" : "++show c++" }, "++
           "\"statement\" : \"" ++ (escStr.show) stmt ++ "\", " ++
           "\"state\" : " ++ jsonTabL "vartab" vtab ++ " " ++
           "}"
+        jsonMsg (MsgCustom st) = "{ \"type\" : \"custom\", " ++
+          "\"message\" : " ++ dropWhile (not . isLetter) st ++ " " ++
+          "}"
         jsonMsg (MsgError e) = stringify e
 
-data Message = MsgStmt       Stmt VarTab
-             | MsgError      Error
+data Message = MsgStmt   Stmt VarTab
+             | MsgError  Error
+             | MsgCustom String
 instance Show Message where
   show (MsgStmt s vtab)  =
     "line " ++ (show . fst . getStmtPos) s ++ "\n> " ++
@@ -35,7 +41,4 @@ instance Show Message where
       Skip{}  -> show s
       _       -> show s ++ "\n" ++ showVTab vtab
   show (MsgError err) = "*** Error: " ++ show err
-
-instance JSON Message where
-  stringify (MsgStmt  s vtab) = ""
-  stringify (MsgError s)      = ""
+  show (MsgCustom st) = st
