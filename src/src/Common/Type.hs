@@ -11,16 +11,16 @@ module Common.Type
 , unify
 , typesToVarTab
 , showTab
-, showTabL
 ) where
 
 import Control.Monad.State
 import Control.Monad.Except
+
+import Data.List
 import qualified Data.HashMap.Strict as M
+
 import Common.Error
 import Common.AST
--- For showtab
-import Data.List
 
 type TypeTab   = M.HashMap Id Type
 type TypeState = StateT TypeTab (Except Error)
@@ -40,37 +40,37 @@ typecheckStmts = mapM_ typecheckStmt
 
 -- Update
 typecheckStmt :: Stmt -> TypeState ()
-typecheckStmt (Update id op exp p)         = do
+typecheckStmt (Update id op exp p) = do
   typeofId id >>= \case
     IntT     -> return ()
     t        -> case unify IntT t of
-      Just _  -> update id IntT p
-      Nothing -> throwError $ TypeError p $ IncompatibleTypes IntT t
+      Just _   -> update id IntT p
+      Nothing  -> throwError $ TypeError p $ IncompatibleTypes IntT t
   typeof exp >>= \case
     IntT     -> return ()
     UnknownT -> return ()
     t        -> throwError $ TypeError p $ NonIntegerExp exp t
 -- Push
-typecheckStmt (Push id lid p)              = do
+typecheckStmt (Push id lid p) = do
   t <- typeofId id >>= \case
     UnknownT -> update id IntT p >> return IntT
     t        -> return t
   typeofId lid >>= \case
     UnknownT -> update lid (ListT t) p
     ListT lt -> case unify lt t of
-      Nothing -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Push error
-      Just t' -> update id t' p >> update lid (ListT t') p
+      Nothing  -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Push error
+      Just t'  -> update id t' p >> update lid (ListT t') p
     lt       -> throwError $ TypeError p $ PushToNonList lid lt
 -- Pop
 typecheckStmt (Pop id lid p)               = typeofId id >>= \t ->
   typeofId lid >>= \case
     UnknownT -> update lid (ListT t) p
     ListT lt -> case unify lt t of
-      Nothing -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Push error
-      Just t' -> update id t' p >> update lid (ListT t') p
+      Nothing  -> throwError $ TypeError p $ IncompatibleTypes t lt -- TODO: Custom Push error
+      Just t'  -> update id t' p >> update lid (ListT t') p
     lt       -> throwError $ TypeError p $ PopFromNonList lid lt
 -- Pop
-typecheckStmt (Swap id1 id2 p)             = do
+typecheckStmt (Swap id1 id2 p) = do
   t1 <- typeofId id1
   t2 <- typeofId id2
   case unify t1 t2 of
@@ -83,13 +83,13 @@ typecheckStmt (If ifexp tstmts fstmts fiexp p) = typeof ifexp >>= \case
     fit  -> throwError $ TypeError p $ IncompatibleTypes IntT fit
   ift  -> throwError $ TypeError p $ IncompatibleTypes IntT ift
 -- Until
-typecheckStmt (Until fexp stmts uexp p)      = typeof fexp >>= \case
+typecheckStmt (Until fexp stmts uexp p) = typeof fexp >>= \case
   IntT -> typecheckStmts stmts >> typeof uexp >>= \case
     IntT -> return ()
     ut  -> throwError $ TypeError p $ IncompatibleTypes IntT ut
   ft  -> throwError $ TypeError p $ IncompatibleTypes IntT ft
 -- Skip
-typecheckStmt (Skip _)                         = return ()
+typecheckStmt (Skip _) = return ()
 
 -- =======
 -- Helpers
@@ -144,7 +144,7 @@ typeof (Unary op exp p) | op < Size  = typeofUnOp op >>= \(it,t) -> do
       _         -> return ()
     et <- typeof exp >>= \case
       ListT et -> return et
-      UnknownT -> return UnknownT -- $ ListT UnknownT
+      UnknownT -> return UnknownT
       et       -> throwError $ TypeError p $ UnOpType op (ListT it) et
     case op of
       Top -> case unify t et of
@@ -166,9 +166,11 @@ typeofUnOp _     = return (IntT,IntT)
 
 -- Get type of id
 typeofId :: Id -> TypeState Type
-typeofId id = get >>= \tab -> case M.lookup id tab of
-  Just t  -> return t
-  Nothing -> return UnknownT
+typeofId id = do
+  ttab <- get
+  case M.lookup id ttab of
+    Just t  -> return t
+    Nothing -> return UnknownT
 
 -- Get type of value
 typeofVal :: Value -> TypeState Type
@@ -185,6 +187,3 @@ typesToVarTab ttab = map defaultVal (M.toList ttab)
 -- Show hashmap
 showTab :: Show a => M.HashMap Id a -> String
 showTab = showVTab . M.toList
-
-showTabL :: Show a => [(Id,a)] -> String
-showTabL tab = showTab $ M.fromList tab

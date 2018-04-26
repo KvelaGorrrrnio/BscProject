@@ -4,46 +4,41 @@ import Common.AST
 
 import Data.HashMap.Strict (HashMap, lookup, insert, adjust)
 
--- import Control.Monad.State
---
--- type ConstTab = HashMap Id Int
---
--- type ConstState = State (HashMap Id Int)
-
-
 optStmts :: [Stmt] -> [Stmt]
-optStmts  = concatMap optStmt
+optStmts  = optUpd .
+  concatMap optStmt
 
 ---------------------------------------------
--- optUpd (s1:s2:ss) = case (s1,s2) of
---   (Update id op1 e1 p, Update id2 op2 e2 _) | id==id2
---                                            && (op1==PlusEq || op1==MinusEq)
---                                            && (op2==PlusEq || op2==MinusEq)
---                                            && not (containsVar e1 || containsVar e2) ->
---     optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
---     -- if not (containsVar e2)
---     -- then optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
---     -- else s2 : optUpd (s1:ss)
---   _ -> s1 : optUpd (s2:ss)
--- optUpd (s:ss) = s : optUpd ss
--- optUpd [] = []
---
--- containsVar :: Exp -> Bool
--- containsVar (Var _ _)        = True
--- containsVar (Lit _ _)        = False
--- containsVar (Binary _ l r _) = containsVar l || containsVar r
--- containsVar (Unary _ e _)    = containsVar e
--- containsVar (Parens e _)     = containsVar e
+-- fuse sequential updates of the same variable
+optUpd (s1:s2:ss) = case (s1,s2) of
+  (Update id op1 e1 p, Update id2 op2 e2 _) | id==id2
+                                           && (op1==PlusEq || op1==MinusEq)
+                                           && (op2==PlusEq || op2==MinusEq)
+                                           && (not . containsVar) e1 ->
+    if not (containsVar e2)
+    then if op1==PlusEq then optUpd $ Update id op1 (mapUpdOp op2 (Parens e1 p) (Parens e2 p) p) p : ss
+                        else optUpd $ Update id PlusEq (mapUpdOp op2 (Parens (Unary Neg e1 p) p) (Parens e2 p) p) p : ss
+    else s2 : optUpd (s1:ss)
+  _ -> s1 : optUpd (s2:ss)
+optUpd (s:ss) = s : optUpd ss
+optUpd [] = []
+
+containsVar :: Exp -> Bool
+containsVar (Var _ _)        = True
+containsVar (Lit _ _)        = False
+containsVar (Binary _ l r _) = containsVar l || containsVar r
+containsVar (Unary _ e _)    = containsVar e
+containsVar (Parens e _)     = containsVar e
 ---------------------------------------------
 
 optStmt :: Stmt -> [Stmt]
-optStmt (If t s1 s2 a p) = case rmPar . optCond . optExp $ t of
+optStmt (If t s1 s2 a p) = case rmPar . optExp $ t of
   Lit (IntV 0) _ -> optStmts s2
   Lit (IntV _) _ -> optStmts s1
-  t'             -> [If t' (optStmts s1) (optStmts s2) (rmPar . optCond . optExp $ a) p]
-optStmt (Until a s t p)  = case rmPar . optCond . optExp $ t of
+  t'             -> [If t' (optStmts s1) (optStmts s2) (rmPar . optExp $ a) p]
+optStmt (Until a s t p)  = case rmPar . optExp $ t of
   Lit (IntV n) _ | n/=0 -> optStmts s
-  t'             -> [Until (rmPar . optCond . optExp $ a) (optStmts s) t' p]
+  t'             -> [Until (rmPar . optExp $ a) (optStmts s) t' p]
 optStmt (Swap id1 id2 p) | id1 == id2 = []
   | otherwise = [Swap id1 id2 p]
 optStmt (Update id op e p) = case (op, rmPar . optExp $ e) of
@@ -68,19 +63,23 @@ optStmt s                    = [s]
 
 optCond :: Exp -> Exp
 optCond e = case e of
-  Unary Not e' p  -> Unary Not e' p
+  Unary Not e' p  -> case rmPar e' of
+    Lit (IntV 0) p' -> Lit (IntV 1) p'
+    Lit (IntV _) p' -> Lit (IntV 0) p'
+    _               -> Unary Not (optCond e') p
   Binary And l r p -> case (rmPar l, rmPar r) of
-    (Lit (IntV n) _, r') -> r'
+    (Lit (IntV 0) p', _) -> Lit (IntV 0) p'
+    (Lit (IntV _) _, r') -> r'
+    (_, Lit (IntV 0) p') -> Lit (IntV 0) p'
     (l', Lit (IntV _) _) -> l'
-    _                    -> Binary And l r p
+    _                    -> Binary And (optCond l) (optCond r) p
   Binary Or l r p -> case (rmPar l, rmPar r) of
-    (Lit (IntV n) _, r') -> r'
-    (l', Lit (IntV _) _) -> l'
-    _                    -> Binary Or l r p
-  Binary op l r p -> Binary op (optCond l) (optCond r) p
-  Parens e' p -> case e' of
-    Parens{} -> optCond e'
-    _        -> Parens (optCond e') p
+    (Lit (IntV 0) _, r') -> r'
+    (Lit (IntV _) p', _) -> Lit (IntV 0) p'
+    (l', Lit (IntV 0) _) -> l'
+    (_, Lit (IntV _) p') -> Lit (IntV 0) p'
+    _                    -> Binary Or (optCond l) (optCond r) p
+  Parens e' p     -> Parens (optCond e') p
   _ -> e
 
 optExp :: Exp -> Exp
@@ -88,22 +87,19 @@ optExp = compExp . optExp'
 
 optExp' :: Exp -> Exp
 optExp' e = case e of
-  Unary Not e' p -> case rmPar e' of
-    Unary Not e'' _      -> optExp' e''
-    Binary Neq l r p'    -> Binary Equal (optExp' l) (optExp' r) p'
-    _ -> let e'' = optCond . optExp' $ e' in
-      case rmPar e'' of
-        Binary Equal l r p'   -> Binary Neq (optExp' l) (optExp' r) p'
-        Binary Geq l r p'     -> Binary Less (optExp' l) (optExp' r) p'
-        Binary Leq l r p'     -> Binary Greater (optExp' l) (optExp' r) p'
-        Binary Greater l r p' -> Binary Leq (optExp' l) (optExp' r) p'
-        Binary Less l r p'    -> Binary Geq (optExp' l) (optExp' r) p'
-        Lit (IntV 0) p'       -> Lit (IntV 1) p'
-        Lit (IntV _) p'       -> Lit (IntV 0) p'
-        _ -> Unary Not e'' p
+  Unary Not e' p ->
+    case rmPar e' of
+      Unary Not e'' _       -> optExp' e''
+      Binary Neq l r p'     -> Binary Equal (optExp' l) (optExp' r) p'
+      Binary Equal l r p'   -> Binary Neq (optExp' l) (optExp' r) p'
+      Binary Geq l r p'     -> Binary Less (optExp' l) (optExp' r) p'
+      Binary Leq l r p'     -> Binary Greater (optExp' l) (optExp' r) p'
+      Binary Greater l r p' -> Binary Leq (optExp' l) (optExp' r) p'
+      Binary Less l r p'    -> Binary Geq (optExp' l) (optExp' r) p'
+      _                     -> optCond (Unary Not (optExp' e') p)
   Unary Sign e' p -> case rmPar e' of
-    Unary Sign e'' _ -> optExp' e'
-    _                -> Unary Sign (optExp' e') p
+    Unary Sign _ _ -> optExp' e'
+    _              -> Unary Sign (optExp' e') p
   Unary Neg e' p -> case rmPar e' of
     Unary Neg e'' _ -> optExp' e''
     _ -> let e'' = optExp' e' in
@@ -149,28 +145,10 @@ optExp' e = case e of
         (Unary Size e p, Lit (IntV 0) _) -> Unary Empty e p
         (Lit (IntV 0) _, Unary Size e p) -> Unary Empty e p
         _                                -> Binary Equal l' r' p
-      And ->
-        let l'' = optCond l'
-            r'' = optCond r' in
-        case (rmPar l'', rmPar r'') of
-          (Lit (IntV 0) p', _) -> Lit (IntV 0) p'
-          (_, Lit (IntV 0) p') -> Lit (IntV 0) p'
-          (Lit (IntV n) p', Lit (IntV m) _) | n/=0 && m/=0 -> Lit (IntV 1) p'
-          _                    -> Binary op l'' r'' p
-      Or ->
-        let l'' = optCond l'
-            r'' = optCond r' in
-        case (rmPar l', rmPar r') of
-          (Lit (IntV 1) p', _) -> Lit (IntV 1) p'
-          (_, Lit (IntV 1) p') -> Lit (IntV 1) p'
-          (Lit (IntV 0) p', Lit (IntV 0) _) -> Lit (IntV 0) p'
-          _                    -> Binary op l'' r'' p
-      _ -> Binary op l' r' p
-  Parens e' p -> case e' of
-    Parens{} -> optExp' e'
-    Var id _ -> Var id p
-    Lit v p  -> Lit v p
-    _        -> Parens (optExp' e') p
+      And -> optCond $ Binary op l' r' p
+      Or  -> optCond $ Binary op l' r' p
+      _   -> Binary op l' r' p
+  Parens e' p -> Parens (optExp' e') p
   _ -> e
 
 compExp :: Exp -> Exp
@@ -182,8 +160,8 @@ compExp e = case e of
       (Lit v1 _, Lit v2 _)
         | op < Div  -> Lit (applyABinOp (mapABinOp op) v1 v2) p
         | op <= Mod -> case v2 of
-               IntV 0 -> Binary op l' r' p
-               _      -> Lit (applyABinOp (mapABinOp op) v1 v2) p
+           IntV 0 -> Binary op l' r' p -- let a runtime error handle this
+           _      -> Lit (applyABinOp (mapABinOp op) v1 v2) p
         | op <= Geq -> Lit (applyRBinOp (mapRBinOp op) v1 v2) p
       _ -> Binary op l' r' p
   Unary Sign e' p ->
@@ -194,9 +172,9 @@ compExp e = case e of
   Unary Neg e' p -> Unary Neg (compExp e') p
   Lit (IntV n) p | n<0 -> Unary Neg (Lit (IntV $ abs n) p) p
   Parens e' p -> case e' of
-    Parens{} -> compExp e'
-    Var id _ -> Var id p
-    Lit v p  -> Lit v p
+    Parens{} -> compExp e'  -- remove a pair of parentheses when we have two
+    Var id _ -> Var id p    -- remove parentheses from terminal
+    Lit v p  -> Lit v p     -- ^
     _        -> Parens (compExp e') p
   _ -> e
 

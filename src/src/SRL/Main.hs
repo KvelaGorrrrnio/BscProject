@@ -17,7 +17,7 @@ import SRL.Error
 import Common.HandleArgs
 import Common.JSON
 
-noFile = putStrLn "No .srl file provided."
+noFile = putStrLn "No file provided."
 noCode = putStrLn "No string provided."
 
 eout :: Bool -> String -> Error -> IO ()
@@ -31,7 +31,7 @@ main = do
   args <- handleArgs
   case args of
     Run [] _ _ c _ -> if c then noCode else noFile
-    Run f o j c l -> let eout' = eout j o in
+    Run f o j c l  -> let eout' = eout j o in
       (if l then id else optimise . staticcheck) <$> getAST c f >>= \case
        Left err  -> eout' err
        Right ast -> case typecheck ast of
@@ -43,8 +43,8 @@ main = do
                          | l                -> writeFile o $ (++"\n") (logToString log)
           (Right vtab,_) | j && null o      -> putStrLn $ jsonTabL "variable" vtab
                          | j                -> writeFile o $ (++"\n") (jsonTabL "variable" vtab)
-                         | null o           -> putStrLn $ showTabL vtab
-                         | otherwise        -> writeFile o $ (++"\n") (showTabL vtab)
+                         | null o           -> putStrLn $ showVTab vtab
+                         | otherwise        -> writeFile o $ (++"\n") (showVTab vtab)
           (Left err,_)                      -> eout' err
     Invert [] _ _ c -> if c then noCode else noFile
     Invert f o j c -> let eout' = eout j o in

@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module RL.Type
 ( typecheck
 , module Common.Type
@@ -23,13 +22,17 @@ typecheckBlocks = mapM_ typecheckBlock
 typecheckBlock (_,(f,stmts,t)) = typecheckFrom f >> typecheckStmts stmts >> typecheckTo t
 
 typecheckFrom :: From -> TypeState ()
-typecheckFrom (Fi exp _ _ p) = typeof exp >>= \et -> case unify IntT et of
-  Just _ -> return ()
-  Nothing   -> throwError $ TypeError p $ NonIntegerExp exp et
+typecheckFrom (Fi exp _ _ p) = do
+  et <- typeof exp
+  case unify IntT et of
+    Just _  -> return ()
+    Nothing -> throwError $ TypeError p $ NonIntegerExp exp et
 typecheckFrom _ = return ()
 
 typecheckTo :: To -> TypeState ()
-typecheckTo (IfTo exp _ _ p) = typeof exp >>= \et -> case unify IntT et of
-  Just _ -> return ()
-  Nothing   -> throwError $ TypeError p $ NonIntegerExp exp et
+typecheckTo (IfTo exp _ _ p) = do
+  et <- typeof exp
+  case unify IntT et of
+    Just _  -> return ()
+    Nothing -> throwError $ TypeError p $ NonIntegerExp exp et
 typecheckTo _ = return ()

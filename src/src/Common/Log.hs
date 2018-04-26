@@ -5,7 +5,7 @@ import Common.JSON
 import Common.Error
 
 import Data.List (intercalate)
-import Data.Char
+import Data.Char (isLetter)
 
 -- ===
 -- Log
@@ -18,15 +18,15 @@ logToString = intercalate "\n\n" . map show
 
 logToJSON :: Log -> String
 logToJSON l = jsonLog $ intercalate ", " $ map jsonMsg l
-  where jsonMsg (MsgStmt stmt vtab) = let (l,c) = getStmtPos stmt in
-          "{ \"type\" : \"statement\", " ++
-          "\"position\" : { \"line\" : "++show l++", \"column\" : "++show c++" }, "++
-          "\"statement\" : \"" ++ (escStr.show) stmt ++ "\", " ++
-          "\"state\" : " ++ jsonTabL "vartab" vtab ++ " " ++
-          "}"
-        jsonMsg (MsgCustom st) = "{ \"type\" : \"custom\", " ++
-          "\"message\" : " ++ dropWhile (not . isLetter) st ++ " " ++
-          "}"
+  where jsonMsg (MsgStmt stmt vtab) =
+          let (l,c) = getStmtPos stmt in
+             "{ \"type\" : \"statement\", "
+          ++ "\"position\" : { \"line\" : "++ show l ++ ", \"column\" : " ++ show c ++ " }, "
+          ++ "\"statement\" : \"" ++ (escStr . show) stmt ++ "\", "
+          ++ "\"state\" : " ++ jsonTabL "vartab" vtab ++ " }"
+        jsonMsg (MsgCustom st) =
+             "{ \"type\" : \"custom\", "
+          ++ "\"message\" : " ++ dropWhile (not . isLetter) st ++ " }"
         jsonMsg (MsgError e) = stringify e
 
 data Message = MsgStmt   Stmt VarTab

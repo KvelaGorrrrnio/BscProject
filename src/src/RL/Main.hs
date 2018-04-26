@@ -43,8 +43,8 @@ main = do
                          | l                -> writeFile o $ (++"\n") (logToString log)
           (Right vtab,_) | j && null o      -> putStrLn $ jsonTabL "variable" vtab
                          | j                -> writeFile o $ (++"\n") (jsonTabL "variable" vtab)
-                         | null o           -> putStrLn $ showTabL vtab
-                         | otherwise        -> writeFile o $ (++"\n") (showTabL vtab)
+                         | null o           -> putStrLn $ showVTab vtab
+                         | otherwise        -> writeFile o $ (++"\n") (showVTab vtab)
           (Left err,_)                      -> eout' err
     Invert [] _ _ c -> if c then noCode else noFile
     Invert f o j c -> let eout' = eout j o in

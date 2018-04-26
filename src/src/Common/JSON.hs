@@ -19,7 +19,7 @@ class JSON a where
   stringify :: a -> String
 
 escStr :: String -> String
-escStr = concatMap esc -- foldl (\a c-> a++esc c) ""
+escStr = concatMap esc
 
 esc :: Char -> String
 esc '\\' = "\\\\"
@@ -29,32 +29,29 @@ esc c    = [c]
 
 -- Error
 jsonError :: String -> Pos -> String
-jsonError msg (l,c) = "{ "++
-  "\"type\" : \"error\", "++
-  "\"position\" : { \"line\" : "++show l++", \"column\" : "++show c++" }, "++
-  "\"message\" : \""++escStr msg++"\" "++
-  "}"
+jsonError msg (l,c) =
+     "{ \"type\" : \"error\", "
+  ++ "\"position\" : { \"line\" : " ++ show l ++ ", \"column\" : " ++ show c ++ " }, "
+  ++ "\"message\" : \"" ++ escStr msg ++ "\" }"
 
 -- Log
 jsonLog :: String -> String
-jsonLog l =  "{ "++
-  "\"type\" : \"log\", "++
-  "\"log\" : ["++l++"] "++
-  "}"
+jsonLog l =
+     "{ \"type\" : \"log\", "
+  ++ "\"log\" : ["++l++"] }"
 
 -- JSON
 jsonTab :: Show a => String -> M.HashMap Id a -> String
-jsonTab t tab = "{ " ++
-  "\"type\" : \"" ++ t ++ "\", " ++
-  "\"table\" : [" ++ intercalate ", " (map f (M.toList tab)) ++ "] " ++
-  "}"
-  where f (n,t) = "{ \"id\" : \"" ++ n ++ "\", \"value\" : \"" ++ show t ++ "\" }"
+jsonTab t = jsonTabL t . M.toList
 
 jsonTabL :: Show a => String -> [(Id,a)] -> String
-jsonTabL t tab = jsonTab t $ M.fromList tab
+jsonTabL t tab =
+     "{ \"type\" : \"" ++ t ++ "\", "
+  ++ "\"table\" : [" ++ (intercalate ", " . map f) tab ++ "] }"
+  where f (n,t) = "{ \"id\" : \"" ++ n ++ "\", \"value\" : \"" ++ show t ++ "\" }"
 
 -- Code
 jsonCode :: String -> String
-jsonCode c = "{ \"type\" : \"code\", " ++
-  "\"code\" : \"" ++ escStr c ++ "\"" ++
-  " }"
+jsonCode c =
+     "{ \"type\" : \"code\", "
+  ++ "\"code\" : \"" ++ escStr c ++ "\" }"
