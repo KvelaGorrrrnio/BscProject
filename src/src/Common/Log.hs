@@ -28,7 +28,7 @@ data Message = MsgStmt       Stmt VarTab
              | MsgError      Error
 instance Show Message where
   show (MsgStmt s vtab)  =
-    (show . fst . getStmtPos) s ++ " > " ++
+    "line " ++ (show . fst . getStmtPos) s ++ "\n> " ++
     case s of
       If{}    -> show s
       Until{} -> show s
