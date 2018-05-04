@@ -1,15 +1,17 @@
+{-# LANGUAGE LambdaCase #-}
 module Common.AST where
 
 import Data.Bits (xor)
 import Data.List (intercalate)
+import qualified Data.HashMap.Strict as M
 
 -- values
-data Value = IntV Integer | ListV [Value] deriving Eq
+data Value = IntV Integer | ListV [Value] Type deriving Eq
 instance Show Value where
-  show (IntV n)    = show n
-  show (ListV ls)  = show ls
-isClear (IntV n)   = n == 0
-isClear (ListV ls) = null ls
+  show (IntV n)       = show n
+  show (ListV ls _)   = show ls
+isClear (IntV n)      = n == 0
+isClear (ListV ls _)  = null ls
 
 -- ======
 -- VarTab
@@ -19,12 +21,15 @@ isClear (ListV ls) = null ls
 type Id = String
 type Pos = (Int,Int)
 
-type VarTab = [(Id,Value)]
-showVTab tab = let m = maximum (map (\(n,_) -> length n) tab)
-      in intercalate "\n" $ map (\(n,v) ->n++pad(m-length n+1)++" : "++show v) tab
-   where pad n = replicate (n-1) ' '
-insert id val = map (\(id',v) -> if id'==id then (id,val) else (id',v))
-adjust op id  = map (\(id',v) -> if id'==id then (id,op v) else (id',v))
+type VarTab = M.HashMap Id Value
+showTab mtab =
+  let tab = M.toList mtab
+      m   = maximum . map (\(n,_) -> length n) $ tab
+    in intercalate "\n" $ map (\(n,v) -> n ++ pad (m-length n+1) ++ " : " ++ show v) tab
+  where pad n = replicate (n-1) ' '
+insert id val = M.insert id val -- map (\(id',v) -> if id'==id then (id,val) else (id',v))
+adjust op id  = M.adjust op id  -- map (\(id',v) -> if id'==id then (id,op v) else (id',v))
+mLookup id    = M.lookup id
 
 -- Statements
 data Stmt = Update Id UpdOp Exp Pos
@@ -34,7 +39,7 @@ data Stmt = Update Id UpdOp Exp Pos
           | Skip Pos
           -- unique for SRL
           | If Exp [Stmt] [Stmt] Exp Pos
-          | Until Exp [Stmt] Exp Pos
+          | Until Bool Exp [Stmt] Exp Pos
           deriving Eq
 instance Show Stmt where
   show (Update id op e _) = id ++ show op ++ show e
@@ -44,7 +49,7 @@ instance Show Stmt where
   show (Skip _)           = "skip"
   -- unique for SRL
   show (If t s1 s2 a _)   = "if " ++ showPar t ++ " then [s1] else [s2]"
-  show (Until a s t _)    = "from " ++ showPar a ++ " do [s] until " ++ showPar t
+  show (Until _ a s t _)    = "from " ++ showPar a ++ " do [s] until " ++ showPar t
 getStmtPos :: Stmt -> Pos
 getStmtPos (Update _ _ _ p) = p
 getStmtPos (Push _ _ p)     = p
@@ -52,7 +57,7 @@ getStmtPos (Pop _ _ p)      = p
 getStmtPos (Swap _ _ p)     = p
 getStmtPos (Skip p)         = p
 getStmtPos (If _ _ _ _ p)   = p
-getStmtPos (Until _ _ _ p)  = p
+getStmtPos (Until _ _ _ _ p)  = p
 
 data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq deriving Eq
 instance Show UpdOp where
@@ -88,9 +93,6 @@ data BinOp
   | Xor
   | Pow
   | Mult
-  -- v Non-zero right arithmetic
-  | Div
-  | Mod
   -- ^ Arithmetic
   -- v Relational
   | Equal
@@ -100,6 +102,10 @@ data BinOp
   | Greater
   | Geq
   -- ^ Relational
+  -- v Non-zero right arithmetic
+  | Div
+  | Mod
+  -- ^ Arithmetic
   -- v Logical
   | Or
   | And
@@ -144,18 +150,37 @@ instance Show UnOp where
   show Top   = "^ "
 
 -- ====
--- Type
+-- Type Inference
 -- ====
-data Type
-  = IntT
-  | ListT Type
-  | UnknownT
-  deriving Eq
-instance Show Type where
-  show IntT      = "int"
-  show (ListT t) = "["++show t++"]"
-  show UnknownT  = "?"
+-- data Type
+--  = IntT
+--  | ListT Type
+--  | UnknownT
+--  deriving Eq
+--instance Show Type where
+--  show IntT      = "int"
+--  show (ListT t) = "["++show t++"]"
+--  show UnknownT  = "?"
 
+-- ================
+-- Type declaration
+-- ================
+
+type TypeTab = M.HashMap Id Type
+data Type = IntT
+          | ListT Type
+          deriving (Eq)
+instance Show Type where
+  show IntT = "int"
+  show (ListT tp) = "list  " ++ show tp
+buildVTab :: TypeTab -> VarTab
+buildVTab = M.map (\case
+    IntT  -> IntV 0
+    listt -> ListV [] listt
+  )
+getType :: Value -> Type
+getType (IntV _)    = IntT
+getType (ListV _ t) = t
 
 -- =======
 -- helpers
@@ -167,44 +192,42 @@ mapUpdOp XorEq   = Binary Xor
 mapUpdOp MultEq  = Binary Mult
 mapUpdOp DivEq   = Binary Div
 
-mapABinOp Plus    = (+)
-mapABinOp Minus   = (-)
-mapABinOp Xor     = xor
-mapABinOp Pow     = (^)
-mapABinOp Mult    = (*)
-mapABinOp Div     = div
-mapABinOp Mod     = mod
+mapBinOp Plus    = (+)
+mapBinOp Minus   = (-)
+mapBinOp Xor     = xor
+mapBinOp Pow     = (^)
+mapBinOp Mult    = (*)
+mapBinOp Div     = div
+mapBinOp Mod     = mod
+mapBinOp Equal   = \n -> boolToInt . (n==)
+mapBinOp Neq     = \n -> boolToInt . (n/=)
+mapBinOp Less    = \n -> boolToInt . (n<)
+mapBinOp Leq     = \n -> boolToInt . (n<=)
+mapBinOp Greater = \n -> boolToInt . (n>)
+mapBinOp Geq     = \n -> boolToInt . (n>=)
 
-mapRBinOp Equal   = (==)
-mapRBinOp Neq     = (/=)
-mapRBinOp Less    = (<)
-mapRBinOp Leq     = (<=)
-mapRBinOp Greater = (>)
-mapRBinOp Geq     = (>=)
+mapUnOp Neg  = negate
+mapUnOp Sign = signum
+mapUnOp Not  = boolToInt . not . intToBool
 
-mapAUnOp Neg  = negate
-mapAUnOp Sign = signum
-
-mapLUnOp Not  = not
-
--- apply arithmetic binary operator
-applyABinOp :: (Integer -> Integer -> Integer) -> Value -> Value -> Value
-applyABinOp op (IntV n) (IntV m) = IntV $ op n m
--- apply relational operator
-applyRBinOp :: (Integer -> Integer -> Bool) -> Value -> Value -> Value
-applyRBinOp op (IntV n) (IntV m) = boolToVal $ op n m
--- apply arithmetic unary operator
-applyAUnOp :: (Integer -> Integer) -> Value -> Value
-applyAUnOp op (IntV n) = IntV $ op n
+-- -- apply arithmetic binary operator
+-- applyABinOp :: (Integer -> Integer -> Integer) -> Value -> Value -> Value
+-- applyABinOp op (IntV n) (IntV m) = IntV $ op n m
+-- -- apply relational operator
+-- applyRBinOp :: (Integer -> Integer -> Bool) -> Value -> Value -> Value
+-- applyRBinOp op (IntV n) (IntV m) = boolToVal $ op n m
+-- -- apply arithmetic unary operator
+-- applyAUnOp :: (Integer -> Integer) -> Value -> Value
+-- applyAUnOp op (IntV n) = IntV $ op n
 
 -- normalise to bool
-norm :: Value -> Value
-norm (IntV 0) = IntV 0
-norm (IntV _) = IntV 1
+norm :: Integer -> Integer
+norm 0 = 0
+norm _ = 1
 
 -- converting bool to val
-boolToVal :: Bool -> Value
-boolToVal b = IntV $ if b then 1 else 0
+boolToInt :: Bool -> Integer
+boolToInt b = if b then 1 else 0
 -- converting val to bool
-valToBool :: Value -> Bool
-valToBool (IntV p) = p /= 0
+intToBool :: Integer -> Bool
+intToBool = (/=0)

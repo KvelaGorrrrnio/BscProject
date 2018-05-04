@@ -1,0 +1,10 @@
+push a b // a [TypeOf "a"]
+push c a // c [TypeOf "c"]
+push d c // d [TypeOf "d"]
+
+// -----------------------
+
+push a b // a [TypeOf "a"]
+push b a // [TypeOf "a"] a
+
+// -----

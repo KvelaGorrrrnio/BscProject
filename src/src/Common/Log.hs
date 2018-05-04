@@ -23,7 +23,7 @@ logToJSON l = jsonLog $ intercalate ", " $ map jsonMsg l
              "{ \"type\" : \"statement\", "
           ++ "\"position\" : { \"line\" : "++ show l ++ ", \"column\" : " ++ show c ++ " }, "
           ++ "\"statement\" : \"" ++ (escStr . show) stmt ++ "\", "
-          ++ "\"state\" : " ++ jsonTabL "vartab" vtab ++ " }"
+          ++ "\"state\" : " ++ jsonTab "vartab" vtab ++ " }"
         jsonMsg (MsgCustom st) =
              "{ \"type\" : \"custom\", "
           ++ "\"message\" : " ++ dropWhile (not . isLetter) st ++ " }"
@@ -39,6 +39,6 @@ instance Show Message where
       If{}    -> show s
       Until{} -> show s
       Skip{}  -> show s
-      _       -> show s ++ "\n" ++ showVTab vtab
+      _       -> show s ++ "\n" ++ showTab vtab
   show (MsgError err) = "*** Error: " ++ show err
   show (MsgCustom st) = st

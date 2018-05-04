@@ -6,7 +6,7 @@ module Common.JSON
 , jsonError
 , jsonLog
 , jsonTab
-, jsonTabL
+--, jsonTabL
 , jsonCode
 , getStmtPos
 ) where
@@ -41,13 +41,13 @@ jsonLog l =
   ++ "\"log\" : ["++l++"] }"
 
 -- JSON
-jsonTab :: Show a => String -> M.HashMap Id a -> String
-jsonTab t = jsonTabL t . M.toList
+-- jsonTab :: Show a => String -> M.HashMap Id a -> String
+-- jsonTab t = jsonTabL t . M.toList
 
-jsonTabL :: Show a => String -> [(Id,a)] -> String
-jsonTabL t tab =
+jsonTab :: Show a => String -> M.HashMap Id a -> String
+jsonTab t tab =
      "{ \"type\" : \"" ++ t ++ "\", "
-  ++ "\"table\" : [" ++ (intercalate ", " . map f) tab ++ "] }"
+  ++ "\"table\" : [" ++ (intercalate ", " . map f . M.toList) tab ++ "] }"
   where f (n,t) = "{ \"id\" : \"" ++ n ++ "\", \"value\" : \"" ++ show t ++ "\" }"
 
 -- Code

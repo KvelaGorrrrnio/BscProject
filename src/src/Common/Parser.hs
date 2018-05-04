@@ -6,6 +6,8 @@ import Text.ParserCombinators.Parsec.Language
 
 import qualified Text.ParserCombinators.Parsec.Token as Token
 
+import qualified Data.HashMap.Strict as M
+
 import Common.AST
 
 -- specifying the language
@@ -49,7 +51,9 @@ languageDef =
 
 -- get position
 pos :: Parser Pos
-pos = getPosition >>= \s->return (sourceLine s,sourceColumn s)
+pos = do
+  s <- getPosition
+  return (sourceLine s,sourceColumn s)
 
 lexer = Token.makeTokenParser languageDef
 
@@ -57,9 +61,25 @@ identifier    = Token.identifier    lexer
 reserved      = Token.reserved      lexer
 reservedOp n  = Token.reservedOp    lexer n >> pos
 parens        = Token.parens        lexer
+brackets      = Token.brackets      lexer
 integer       = Token.integer       lexer
 colon         = Token.colon         lexer
 whiteSpace    = Token.whiteSpace    lexer
+
+-- type declarations
+typedecs :: Parser TypeTab
+typedecs = M.fromList <$> many typedec
+
+typedec :: Parser (Id, Type)
+typedec = do
+  tp  <- typet
+  var <- identifier --many1 identifier
+  return (var, tp) -- $ map (\id -> (id,tp)) vars
+
+typet :: Parser Type
+typet = (reserved "int" >> return IntT)
+    <|> (reserved "list" >> ListT <$> typet)
+    <|> (ListT <$> brackets typet)
 
 -- statements
 updateStmt :: Parser (Pos -> Stmt)
