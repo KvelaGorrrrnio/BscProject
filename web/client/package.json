@@ -38,6 +38,8 @@
     "react": "^16.0.0",
     "react-codemirror2": "^5.0.1",
     "react-dom": "^16.0.0",
-    "react-router-dom": "^4.2.2"
+    "react-redux": "^5.0.7",
+    "react-router-dom": "^4.2.2",
+    "redux": "^4.0.0"
   }
 }

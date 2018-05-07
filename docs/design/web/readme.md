@@ -17,3 +17,24 @@ The purpose of the web interface is to give an easy way to interact with the RL 
 UI:
 - Code-area (with syntax hi (+ autocomplete?))
 - Store
+
+#
+Run
+	- Execute
+	- Step-execute
+		- Next
+		- Stop step-execution
+		- (Prev) 
+		- (Auto)
+			- Speed
+			- Debug marks
+			
+Invert/ Translate
+	- Execute
+
+Common
+	- Save
+	- Open
+	- Export
+	- Import
+	- Share
