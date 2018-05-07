@@ -18,9 +18,7 @@ isClear (ListV ls _)  = null ls
 -- ======
 
 -- ids
-data Id = Id String [Exp]
-instance Show Id where
-  show (Id id is) = id ++ concatMap (\e -> "[" ++ show e ++ "]") is
+type Id = String
 type Pos = (Int,Int)
 
 type VarTab = M.HashMap Id Value
