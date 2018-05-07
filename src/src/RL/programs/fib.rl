@@ -3,6 +3,10 @@
   Written in RL
 */
 
+int n
+int v
+int w
+
 // Initialisation
 init: entry
   n ^= 16

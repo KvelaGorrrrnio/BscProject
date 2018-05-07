@@ -12,8 +12,12 @@ import Common.Parser
 import Common.Error
 import RL.AST
 
-rlParser :: Parser AST
-rlParser = whiteSpace >> blocks
+rlParser :: Parser (TypeTab,AST)
+rlParser = do
+  whiteSpace
+  decs <- typedecs
+  blks <- blocks
+  return (decs,blks)
 
 blocks :: Parser [(Label, Block)]
 blocks = many1 block
@@ -51,10 +55,10 @@ statement = pos >>= \p -> (\s->s p)
         <|> popStmt)
 
 
-parseSrc :: String -> Either Error AST
+parseSrc :: String -> Either Error (TypeTab, AST)
 parseSrc s = case parse rlParser "" s of
   Left err  -> Left $ convertParseError err
   Right ast -> Right ast
 
-parseFile :: String -> IO (Either Error AST)
+parseFile :: String -> IO (Either Error (TypeTab, AST))
 parseFile path = parseSrc <$> readFile path

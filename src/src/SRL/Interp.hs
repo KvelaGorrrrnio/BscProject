@@ -12,6 +12,7 @@ import Control.Monad.Reader
 -- Running the program
 -- ==================
 
-runProgramWith :: AST -> VarTab -> (Either Error VarTab, Log)
-runProgramWith ast vtab = execVarState vtab . execStmts $ ast
+runProgram :: AST -> TypeTab -> (Either Error VarTab, Log)
+runProgram ast ttab = execVarState vtab . execStmts $ ast
+  where vtab = buildVTab ttab
 

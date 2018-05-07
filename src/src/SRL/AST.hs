@@ -30,11 +30,11 @@ showStmt lvl s = case s of
                  ++ showAST' (lvl+1) s2 ++ "\n"
                  ++ indent ++ "fi " ++ showPar a
 
-  Until t s a _ -> indent ++ "from "  ++ showPar t ++ " do\n"
-                ++ showAST' (lvl + 1) s ++ "\n"
-                ++ indent ++ "until " ++ showPar a
+  Until _ t s a _ -> indent ++ "from "  ++ showPar t ++ " do\n"
+                  ++ showAST' (lvl + 1) s ++ "\n"
+                  ++ indent ++ "until " ++ showPar a
 
-  s            -> indent ++ show s
+  s               -> indent ++ show s
 
   where indent = doIndent lvl
 

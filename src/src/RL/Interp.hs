@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 module RL.Interp (module RL.Interp, module Common.Log, module RL.AST) where
 
 import RL.Error
@@ -16,9 +17,10 @@ type ProgState = ReaderT AST VarState
 -- Running the program
 -- ==================
 
-runProgramWith :: AST -> VarTab -> (Either Error VarTab, Log)
-runProgramWith ast vtab = do
+runProgram :: AST -> TypeTab -> (Either Error VarTab, Log)
+runProgram ast ttab = do
   let entry = getEntry ast
+      vtab  = buildVTab ttab
   execVarState vtab . runReaderT (interp [] entry) $ ast
 
 -- ======
@@ -35,19 +37,28 @@ interp from l = do
     From l' p    -> unless (from == l') $
       lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l' ))
     Fi a l1 l2 p -> do
-      a' <- lift $ valToBool <$> eval a
-      let l' = if a' then l1 else l2
+      q <- lift $ eval a >>= \case
+        IntV q -> return $ intToBool q
+        _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+
+      let l' = if q then l1 else l2
+
       unless (from == l') $
         lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l'))
 
   logMsg $ ">> " ++ l
+
   lift $ execStmts ss
 
   let msg = show t
+
   case t of
     Exit _         -> logMsg msg
     Goto l' _      -> logMsg msg >> interp l l'
-    IfTo c l1 l2 _ -> do
-      c' <- lift $ valToBool <$> eval c
-      logMsg $ msg ++ " -> " ++ if c' then "true" else "false" -- we want lower case
-      if c' then interp l l1 else interp l l2
+    IfTo c l1 l2 p -> do
+      q <- lift $ eval c >>= \case
+        IntV q -> return $ intToBool q
+        _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+      logMsg $ msg ++ " -> " ++ if q then "true" else "false" -- we want lower case
+
+      if q then interp l l1 else interp l l2

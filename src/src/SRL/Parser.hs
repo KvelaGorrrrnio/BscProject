@@ -12,8 +12,12 @@ import Common.Parser
 import Common.Error
 import SRL.AST
 
-srlParser :: Parser AST
-srlParser = whiteSpace >> statements
+srlParser :: Parser (TypeTab,AST)
+srlParser = do
+  whiteSpace
+  decs  <- typedecs
+  stmts <- statements
+  return (decs,stmts)
 
 statements :: Parser [Stmt]
 statements = many1 statement
@@ -49,12 +53,12 @@ untilStmt = do
   s <- statements
   reserved "until"
   t <- expression
-  return $ Until a s t
+  return $ Until True a s t
 
-parseSrc :: String -> Either Error AST
+parseSrc :: String -> Either Error (TypeTab, AST)
 parseSrc s = case parse srlParser "" s of
   Left err  -> Left $ convertParseError err
   Right ast -> Right ast
 
-parseFile :: String -> IO (Either Error AST)
+parseFile :: String -> IO (Either Error (TypeTab, AST))
 parseFile path = parseSrc <$> readFile path
