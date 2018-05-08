@@ -49,6 +49,7 @@ instance JSON Error where
   stringify (RuntimeError p e)     = jsonError (show $ RuntimeError p e) p
   stringify (TypeError p e)        = jsonError (show $ TypeError p e) p
   stringify (StaticError p e)      = jsonError (show e) p
+  stringify (Custom e)             = jsonError e (0,0)
 
 instance Show RuntimeError where
   show (CustomRT s) = s

@@ -48,11 +48,11 @@ main = do
     Invert f o j c -> let eout' = eout j o in
       getAST c f >>= \case
         Left err  -> eout' err
-        Right (_,ast) | code <- translateToRLSource ast -> case ast of
-          _ | j && null o -> putStrLn $ jsonCode code
-            | j           -> writeFile o $ (++"\n") (jsonCode code)
-            | null o      -> putStrLn code
-            | otherwise   -> writeFile o $ (++"\n") code
+        Right (_,ast) -> case (showAST. invert $ ast) of
+            code | j && null o -> putStrLn $ jsonCode code
+                 | j           -> writeFile o $ (++"\n") (jsonCode code)
+                 | null o      -> putStrLn code
+                 | otherwise   -> writeFile o $ (++"\n") code
     Translate [] o j c -> if c then noCode j o else noFile j o
     Translate f o j c -> let eout' = eout j o in
       getAST c f >>= \case
