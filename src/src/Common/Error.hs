@@ -16,6 +16,7 @@ data Error
   | ParseError   Pos String
   | TypeError    Pos TypeError
   | StaticError  Pos StaticError
+  | Custom       String
 
 data RuntimeError
   = CustomRT String
@@ -42,11 +43,13 @@ instance Show Error where
   show (RuntimeError (l,c) e) = "A runtime error occured at (line "++show l++", column "++show c++"):\n" ++ show e
   show (TypeError (l,c) e)    = "A type error occured at (line "++show l++", column "++show c++"): " ++ show e
   show (StaticError (l,c) e)  = "An error occured at (line "++show l++", column "++show c++"): " ++ show e
+  show (Custom e)             = e
 instance JSON Error where
   stringify (ParseError p e)       = jsonError e p
   stringify (RuntimeError p e)     = jsonError (show $ RuntimeError p e) p
   stringify (TypeError p e)        = jsonError (show $ TypeError p e) p
   stringify (StaticError p e)      = jsonError (show e) p
+  stringify (Custom e)             = jsonError e (0,0)
 
 instance Show RuntimeError where
   show (CustomRT s) = s

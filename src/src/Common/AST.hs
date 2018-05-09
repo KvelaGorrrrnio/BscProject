@@ -42,10 +42,10 @@ data Stmt = Update Id UpdOp Exp Pos
           | Until Bool Exp [Stmt] Exp Pos
           deriving Eq
 instance Show Stmt where
-  show (Update id op e _) = show id ++ show op ++ show e
-  show (Push id1 id2 _)   = "push " ++ show id1 ++ " " ++ show id2
-  show (Pop id1 id2 _)    = "pop "  ++ show id1 ++ " " ++ show id2
-  show (Swap id1 id2 _)   = "swap " ++ show id1 ++ " " ++ show id2
+  show (Update id op e _) = id ++ show op ++ show e
+  show (Push id1 id2 _)   = "push " ++ id1 ++ " " ++ id2
+  show (Pop id1 id2 _)    = "pop "  ++ id1 ++ " " ++ id2
+  show (Swap id1 id2 _)   = "swap " ++ id1 ++ " " ++ id2
   show (Skip _)           = "skip"
   -- unique for SRL
   show (If t s1 s2 a _)   = "if " ++ showPar t ++ " then [s1] else [s2]"
@@ -76,7 +76,7 @@ data Exp
   deriving Eq
 instance Show Exp where
   show (Lit v _)          = show v
-  show (Var id _)         = show id
+  show (Var id _)         = id
   show (Binary op l r _)  = show l ++ show op ++ show r
   show (Unary  op exp _)  = show op ++ show exp
   show (Parens exp _)     = case exp of

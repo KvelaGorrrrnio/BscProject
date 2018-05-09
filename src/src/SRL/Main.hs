@@ -17,8 +17,8 @@ import SRL.Error
 import Common.HandleArgs
 import Common.JSON
 
-noFile = putStrLn "No file provided."
-noCode = putStrLn "No string provided."
+noFile j o = eout j o $ Custom "No file provided."
+noCode j o = eout j o $ Custom "No string provided."
 
 eout :: Bool -> String -> Error -> IO ()
 eout True [] msg = putStrLn $ stringify msg
@@ -30,7 +30,7 @@ getAST c = if c then return . parseSrc else parseFile
 main = do
   args <- handleArgs
   case args of
-    Run [] _ _ c _ -> if c then noCode else noFile
+    Run [] o j c _ -> if c then noCode j o else noFile j o
     Run f o j c l  -> let eout' = eout j o in
       getAST c f >>= \case
         Left err  -> eout' err
@@ -44,16 +44,16 @@ main = do
                          | null o           -> putStrLn $ showTab vtab
                          | otherwise        -> writeFile o $ (++"\n") (showTab vtab)
           (Left err,_)                      -> eout' err
-    Invert [] _ _ c -> if c then noCode else noFile
+    Invert [] o j c -> if c then noCode j o else noFile j o
     Invert f o j c -> let eout' = eout j o in
       getAST c f >>= \case
         Left err  -> eout' err
-        Right (_,ast) | code <- translateToRLSource ast -> case ast of
-          _ | j && null o -> putStrLn $ jsonCode code
-            | j           -> writeFile o $ (++"\n") (jsonCode code)
-            | null o      -> putStrLn code
-            | otherwise   -> writeFile o $ (++"\n") code
-    Translate [] _ _ c -> if c then noCode else noFile
+        Right (_,ast) -> case (showAST. invert $ ast) of
+            code | j && null o -> putStrLn $ jsonCode code
+                 | j           -> writeFile o $ (++"\n") (jsonCode code)
+                 | null o      -> putStrLn code
+                 | otherwise   -> writeFile o $ (++"\n") code
+    Translate [] o j c -> if c then noCode j o else noFile j o
     Translate f o j c -> let eout' = eout j o in
       getAST c f >>= \case
        Left err  -> eout' err
@@ -62,7 +62,7 @@ main = do
            | j           -> writeFile o $ (++"\n") (jsonCode code)
            | null o      -> putStrLn code
            | otherwise   -> writeFile o $ (++"\n") code
-    Typeof [] _ _ c -> if c then noCode else noFile
+    Typeof [] o j c -> if c then noCode j o else noFile j o
     Typeof f o j c -> let eout' = eout j o in
       getAST c f >>= \case
         Left err  -> eout' err
