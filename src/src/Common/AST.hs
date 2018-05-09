@@ -4,12 +4,13 @@ module Common.AST where
 import Data.Bits (xor)
 import Data.List (intercalate)
 import qualified Data.HashMap.Strict as M
+import qualified Data.IntMap.Strict as I
 
 -- values
-data Value = IntV Integer | ListV [Value] Type deriving Eq
+data Value = IntV Integer | ListV (I.IntMap Value) Type deriving Eq
 instance Show Value where
   show (IntV n)       = show n
-  show (ListV ls _)   = show ls
+  show (ListV ls _)   = show . (map snd) . I.toList $ ls
 isClear (IntV n)      = n == 0
 isClear (ListV ls _)  = null ls
 
@@ -18,17 +19,18 @@ isClear (ListV ls _)  = null ls
 -- ======
 
 -- ids
-type Id = String
+data Id = Id String [Exp] deriving Eq
+instance Show Id where
+  show (Id id exps) = id ++ concatMap (\e-> "[" ++ show e ++ "]") exps
 type Pos = (Int,Int)
 
-type VarTab = M.HashMap Id Value
+type VarTab = M.HashMap String Value
 showTab mtab =
   let tab = M.toList mtab
       m   = maximum . map (\(n,_) -> length n) $ tab
     in intercalate "\n" $ map (\(n,v) -> n ++ pad (m-length n+1) ++ " : " ++ show v) tab
   where pad n = replicate (n-1) ' '
 insert id val = M.insert id val -- map (\(id',v) -> if id'==id then (id,val) else (id',v))
-adjust op id  = M.adjust op id  -- map (\(id',v) -> if id'==id then (id,op v) else (id',v))
 mLookup id    = M.lookup id
 
 -- Statements
@@ -42,10 +44,10 @@ data Stmt = Update Id UpdOp Exp Pos
           | Until Bool Exp [Stmt] Exp Pos
           deriving Eq
 instance Show Stmt where
-  show (Update id op e _) = id ++ show op ++ show e
-  show (Push id1 id2 _)   = "push " ++ id1 ++ " " ++ id2
-  show (Pop id1 id2 _)    = "pop "  ++ id1 ++ " " ++ id2
-  show (Swap id1 id2 _)   = "swap " ++ id1 ++ " " ++ id2
+  show (Update id op e _) = show id ++ show op ++ show e
+  show (Push id1 id2 _)   = "push " ++ show id1 ++ " " ++ show id2
+  show (Pop id1 id2 _)    = "pop "  ++ show id1 ++ " " ++ show id2
+  show (Swap id1 id2 _)   = "swap " ++ show id1 ++ " " ++ show id2
   show (Skip _)           = "skip"
   -- unique for SRL
   show (If t s1 s2 a _)   = "if " ++ showPar t ++ " then [s1] else [s2]"
@@ -76,7 +78,7 @@ data Exp
   deriving Eq
 instance Show Exp where
   show (Lit v _)          = show v
-  show (Var id _)         = id
+  show (Var id _)         = show id
   show (Binary op l r _)  = show l ++ show op ++ show r
   show (Unary  op exp _)  = show op ++ show exp
   show (Parens exp _)     = case exp of
@@ -166,7 +168,7 @@ instance Show UnOp where
 -- Type declaration
 -- ================
 
-type TypeTab = M.HashMap Id Type
+type TypeTab = M.HashMap String Type
 data Type = IntT
           | ListT Type
           deriving (Eq)
@@ -176,11 +178,15 @@ instance Show Type where
 buildVTab :: TypeTab -> VarTab
 buildVTab = M.map (\case
     IntT  -> IntV 0
-    listt -> ListV [] listt
+    listt -> ListV I.empty listt
   )
 getType :: Value -> Type
 getType (IntV _)    = IntT
 getType (ListV _ t) = t
+
+getDefaultValue :: Type -> Value
+getDefaultValue IntT      = IntV 0
+getDefaultValue (ListT t) = ListV I.empty t
 
 -- =======
 -- helpers

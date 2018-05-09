@@ -69,21 +69,21 @@ whiteSpace    = Token.whiteSpace    lexer
 -- identifier
 identifier :: Parser Id
 identifier = do
-  id <- identifer'
+  id <- identifier'
   is <- many index
-  return (id,is)
+  return $ Id id is
 
-index :: Parser Expression
+index :: Parser Exp
 index = brackets expression
 
 -- type declarations
 typedecs :: Parser TypeTab
 typedecs = M.fromList <$> many typedec
 
-typedec :: Parser (Id, Type)
+typedec :: Parser (String, Type)
 typedec = do
   tp  <- typet
-  var <- identifier --many1 identifier
+  var <- identifier' --many1 identifier
   return (var, tp) -- $ map (\id -> (id,tp)) vars
 
 typet :: Parser Type

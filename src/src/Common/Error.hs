@@ -55,7 +55,7 @@ instance Show RuntimeError where
   show (CustomRT s) = s
 
 instance Show StaticError where
-  show (SelfAbuse id) = id ++ " is abusing itself."
+  show (SelfAbuse id) = show id ++ " is abusing itself."
   show (DuplicateLabel lbl (l,_)) = " Can't redefine " ++ lbl ++ " again. First defined at line " ++ show l ++ "."
   show (NotDefinedLabel lbl) = "Label " ++ lbl ++ " is not defined."
   show DuplicateEntry        = "Only one entry-point is allowed."
@@ -68,8 +68,8 @@ instance Show TypeError where
   show (BinOpTypes op (lt,rt) (lt',rt')) = show op++" expected input of "++show lt++" * "++show rt++", but recieved "++show lt'++" * "++show rt'++"."
   show (UnOpType op t t')                = show op++" expected input of "++show t++", but recieved "++show t'++"."
   show (NonIntegerExp exp t)             = show exp ++ " is of type " ++ show t ++ " instead of " ++ show IntT ++ "."
-  show (PushToNonList id t)              = "Tried pushing to non-list identifier " ++ id ++ " of type " ++ show t ++ "."
-  show (PopFromNonList id t)             = "Tried popping from non-list identifier " ++ id ++ " of type " ++ show t ++ "."
+  show (PushToNonList id t)              = "Tried pushing to non-list identifier " ++ show id ++ " of type " ++ show t ++ "."
+  show (PopFromNonList id t)             = "Tried popping from non-list identifier " ++ show id ++ " of type " ++ show t ++ "."
 
 -- =======
 -- Helpers
