@@ -57,7 +57,7 @@ pos = do
 
 lexer = Token.makeTokenParser languageDef
 
-identifier    = Token.identifier    lexer
+identifier'   = Token.identifier    lexer
 reserved      = Token.reserved      lexer
 reservedOp n  = Token.reservedOp    lexer n >> pos
 parens        = Token.parens        lexer
@@ -65,6 +65,16 @@ brackets      = Token.brackets      lexer
 integer       = Token.integer       lexer
 colon         = Token.colon         lexer
 whiteSpace    = Token.whiteSpace    lexer
+
+-- identifier
+identifier :: Parser Id
+identifier = do
+  id <- identifer'
+  is <- many index
+  return (id,is)
+
+index :: Parser Expression
+index = brackets expression
 
 -- type declarations
 typedecs :: Parser TypeTab
