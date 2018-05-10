@@ -1,0 +1,3 @@
+init: entry
+  a += 1
+exit
