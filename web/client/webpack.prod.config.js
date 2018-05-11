@@ -6,7 +6,7 @@ const webpack = require('webpack');
 
 module.exports = {
   devtool: 'cheap-module-source-map',
-  entry: './src/index.js',
+  entry: './src/index.jsx',
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'bundle.js',
@@ -61,7 +61,7 @@ module.exports = {
         })
       },
       {
-        test: /\.(png|jpe?g|gif)$/,
+        test: /\.(png|jpe?g|gif|svg)$/,
         loader: 'url-loader?limit=8000&name=images/[name].[ext]',
       },
     ],
@@ -74,5 +74,8 @@ module.exports = {
     }),
     new ExtractTextPlugin('style.css'),
     new webpack.optimize.UglifyJsPlugin(),
+    new webpack.DefinePlugin({
+      'API_URL' : JSON.stringify('http://localhost:3001/api')
+    }),
   ],
 };

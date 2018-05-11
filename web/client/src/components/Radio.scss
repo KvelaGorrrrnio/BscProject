@@ -1,0 +1,11 @@
+@import 'colors';
+
+ul.radio-wrapper li {
+  padding: 15px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+ul.radio-wrapper li.current {
+  background-color: $fg;
+}

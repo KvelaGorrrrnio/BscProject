@@ -1,7 +1,18 @@
-.redish .CodeMirror-linenumber {
- background-color: #660000;
- color: #ff5555;
+@charset 'UTF-8';
+@import 'reset';
+@import 'colors';
+
+html, body {
+  height: 100%;
 }
-.redish {
-  background-color: red;
+
+.root, .app-wrapper {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  background-color: $bg;
+  color: white;
+  font-size: 17px;
+  font-family: 'helvetica neue', helvetica;
+  font-weight: lighter;
 }

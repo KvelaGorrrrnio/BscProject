@@ -1,0 +1,17 @@
+@charset 'utf-8';
+@import 'colors';
+
+.result-wrapper {
+  position: fixed;
+  right: 0; width: 50%;
+  top: 50px; bottom: 0;
+  border-left: 1px solid $bg;
+}
+
+.CodeMirror {
+  height: 100%;
+}
+
+.react-codemirror2 {
+  height: 100%;
+}

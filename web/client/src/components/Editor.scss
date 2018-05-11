@@ -1,0 +1,38 @@
+@charset 'utf-8';
+@import 'colors';
+
+.editor-wrapper {
+  position: fixed;
+  left: 0; width: 50%;
+  top: 50px; bottom: 0;
+  border-right: 1px solid $fg;
+}
+
+.CodeMirror {
+  height: 100%;
+}
+
+.editor-wrapper .react-codemirror2 {
+  height: 100%;
+}
+
+.editor-wrapper.has-error .react-codemirror2 {
+  height: calc(100% - 120px);
+}
+
+.error-wrapper {
+  position: absolute;
+  padding: 10px 20px 10px 40px;
+  height: 100px;
+  left: 0; right: 0;
+  bottom: 0;
+  background-color: $fg;
+}
+
+.editor-wrapper .error .CodeMirror-linenumber {
+  background-color: $fgError;
+}
+.editor-wrapper .error {
+  background-color: $bgError;
+}
+

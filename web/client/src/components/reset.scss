@@ -1,0 +1,25 @@
+@charset "UTF-8";
+
+/* Reset */
+body, html, div, span,
+h1, h2, h3, h4, h5, h6,
+p, q, pre, blockquote,
+a, b, i, strong, em, ul,
+li, ol form, label, sub,
+sup, table, caption, tbody,
+tfoot, thead, tr, th, td 
+{
+border: 0;
+font-family: inherit;
+font-size: 100%;
+margin: 0;
+outline: 0;
+padding: 0;
+vertical-align: baseline;
+text-decoration: none;
+list-style: none;
+color: inherit;
+}
+
+/** HTML BODY fullscreen size **/
+html, body { height: 100%; }

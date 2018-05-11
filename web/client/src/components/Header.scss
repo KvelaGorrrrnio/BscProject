@@ -1,0 +1,43 @@
+@charset 'UTF-8';
+@import 'colors';
+
+.header-wrapper {
+  position: fixed;
+  left: 0; right: 0;
+  top: 0; height: 50px;
+  border-bottom: 1px solid $fg;
+  z-index: 1000;
+}
+
+.header-wrapper .controls {
+  position: absolute;
+  left: 0; right: 50%;
+  top: 0; bottom: 0;
+}
+
+.header-wrapper .controls .radio-wrapper {
+  float: left;
+}
+.header-wrapper .controls .actions {
+  padding-right: 20px;
+  float: right;
+}
+
+.header-wrapper .mode-controls {
+  position: absolute;
+  left: 50%; right: 0;
+  top: 0; bottom: 0;
+}
+
+.header-wrapper .mode-controls .actions {
+  padding-left: 20px;
+  float: left;
+}
+
+.header-wrapper .mode-controls .modes {
+  float: right;
+}
+
+.header-wrapper .button img {
+  height: 20px;
+}
