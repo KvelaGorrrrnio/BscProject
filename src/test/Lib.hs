@@ -109,14 +109,14 @@ runSuite' file (OutFile o m) = do
       (mode, e, j, l) = getModeFlags m
       flags = (if j || l then "-" else "") ++ (hasF j "j" ++ hasF l "l")
   (exitcode,stdout,stderr) <- lift $ readProcessWithExitCode "stack" ["exec", lng, "--", mode, flags, bdir ++ "/" ++ file] ""
+  exp <- lift $ readFile $ bdir ++ "/" ++ o
   out <- case exitcode of
-    ExitSuccess   | e     -> throwError $ "'" ++ o ++ "' should fail, but didn't."
+    ExitSuccess   | e     -> throwError $ "'" ++ o ++ "' should have failed with:\n" ++ exp ++ "  , but succeeded with:\n" ++ stdout
     ExitSuccess   | not e -> return stdout
     ExitFailure _ | e     -> return stderr
-    ExitFailure _ | not e -> throwError $ "'" ++ o ++ "' failed but shouldn't."
-  exp <- lift $ readFile $ bdir ++ "/" ++ o
+    ExitFailure _ | not e -> throwError $ "'" ++ o ++ "' should have succeeded with:\n" ++ exp ++ "  , but failed with:\n" ++ stderr
   if trim out == trim exp then return ()
-    else throwError $ "Output from '" ++ o ++ "' did not meet expectation:\n" ++ trim exp ++ "\n" ++ replicate (max (length out) (length exp)) '-' ++ "\n" ++ trim out
+    else throwError $ "Output from '" ++ o ++ "' did not meet expectation:\n" ++ trim exp ++ "\n" ++ replicate (max (length out) (length exp)) '-' ++ "\n" ++ trim out ++ "\n"
   where hasF f s = if f then s else ""
 
 runSuites :: [Suite] -> IO [(String,[(Bool,String)])]
