@@ -7,5 +7,5 @@ import SRL.AST as SRL
 
 import Control.Monad.Writer
 
-translateToSRLSource :: RL.AST -> String
-translateToSRLSource ast = "hej"
+translateToSRLSource :: TypeTab -> RL.AST -> String
+translateToSRLSource ttab ast = showTypeDecs ttab ++ "hej"

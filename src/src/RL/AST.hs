@@ -15,8 +15,8 @@ import RL.Error
 type Label = String
 
 type AST = [(Label, Block)]
-showAST :: AST -> String
-showAST  = intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ showB b)
+showAST :: TypeTab -> AST -> String
+showAST ttab ast = showTypeDecs ttab ++ (intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ showB b)) ast
 getEntry ast = do
   let entries = (map fst . filter
           (\case

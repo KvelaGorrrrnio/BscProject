@@ -18,8 +18,8 @@ genLabelI lab = genLabel lab <* modify (+1)
 push :: MonadWriter RL.AST m => RL.Label -> RL.Block -> m ()
 push l b = tell [(l, b)]
 
-translateToRLSource :: SRL.AST -> String
-translateToRLSource ast = RL.showAST $ flip evalState 1 . execWriterT $ translateS "init" (Entry (0,0)) (Exit (0,0)) ast
+translateToRLSource :: TypeTab -> SRL.AST -> String
+translateToRLSource ttab ast = RL.showAST ttab $ flip evalState 1 . execWriterT $ translateS "init" (Entry (0,0)) (Exit (0,0)) ast
 
 translateS :: Label -> From -> To -> [Stmt] -> WriterT RL.AST (State Int) Label
 translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip (0,0)] else stmts =

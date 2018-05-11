@@ -14,8 +14,8 @@ import SRL.Error
 -- ===
 
 type AST   = [Stmt]
-showAST :: AST -> String
-showAST = showAST' 0
+showAST :: TypeTab -> AST -> String
+showAST ttab ast = showTypeDecs ttab ++ showAST' 0 ast
 
 doIndent lvl = replicate (2 * lvl) ' '
 

@@ -2,7 +2,8 @@
 module Common.AST where
 
 import Data.Bits (xor)
-import Data.List (intercalate)
+import Data.List (intercalate, sortBy)
+import Data.Function (on)
 import qualified Data.HashMap.Strict as M
 import qualified Data.IntMap.Strict as I
 
@@ -26,12 +27,18 @@ type Pos = (Int,Int)
 
 type VarTab = M.HashMap String Value
 showTab mtab =
-  let tab = M.toList mtab
+  let tab = sort' (M.toList mtab)
       m   = maximum . map (\(n,_) -> length n) $ tab
     in intercalate "\n" $ map (\(n,v) -> n ++ pad (m-length n+1) ++ " : " ++ show v) tab
   where pad n = replicate (n-1) ' '
 insert id val = M.insert id val -- map (\(id',v) -> if id'==id then (id,val) else (id',v))
 mLookup id    = M.lookup id
+
+showTypeDecs :: TypeTab -> String
+showTypeDecs = (++"\n") . concatMap (\(id,t) -> show t ++ " " ++ id ++ "\n") . sort' . M.toList
+
+sort' :: Ord a => [(a, b)] -> [(a, b)]
+sort' = sortBy (compare `on` fst)
 
 -- Statements
 data Stmt = Update Id UpdOp Exp Pos

@@ -47,8 +47,8 @@ jsonLog l =
 jsonTab :: Show a => String -> M.HashMap String a -> String
 jsonTab t tab =
      "{ \"type\" : \"" ++ t ++ "\", "
-  ++ "\"table\" : [" ++ (intercalate ", " . map f . M.toList) tab ++ "] }"
-  where f (n,t) = "{ \"id\" : \"" ++ show n ++ "\", \"value\" : \"" ++ show t ++ "\" }"
+  ++ "\"table\" : [" ++ (intercalate ", " . map f . sort' . M.toList) tab ++ "] }"
+  where f (n,t) = "{ \"id\" : \"" ++ n ++ "\", \"value\" : \"" ++ show t ++ "\" }"
 
 -- Code
 jsonCode :: String -> String
