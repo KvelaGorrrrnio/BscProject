@@ -5,13 +5,12 @@ import Data.Bits (xor)
 import Data.List (intercalate, sortBy)
 import Data.Function (on)
 import qualified Data.HashMap.Strict as M
-import qualified Data.IntMap.Strict as I
 
 -- values
-data Value = IntV Integer | ListV (I.IntMap Value) Type deriving Eq
+data Value = IntV Integer | ListV [Value] Type deriving Eq
 instance Show Value where
   show (IntV n)       = show n
-  show (ListV ls _)   = show . (map snd) . I.toList $ ls
+  show (ListV ls _)   = show ls
 isClear (IntV n)      = n == 0
 isClear (ListV ls _)  = null ls
 
@@ -183,17 +182,14 @@ instance Show Type where
   show IntT = "int"
   show (ListT tp) = "list  " ++ show tp
 buildVTab :: TypeTab -> VarTab
-buildVTab = M.map (\case
-    IntT  -> IntV 0
-    listt -> ListV I.empty listt
-  )
+buildVTab = M.map getDefaultValue
 getType :: Value -> Type
 getType (IntV _)    = IntT
 getType (ListV _ t) = t
 
 getDefaultValue :: Type -> Value
 getDefaultValue IntT      = IntV 0
-getDefaultValue (ListT t) = ListV I.empty t
+getDefaultValue listt = ListV [] listt
 
 -- =======
 -- helpers

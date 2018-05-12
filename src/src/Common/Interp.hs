@@ -15,6 +15,9 @@ import Control.Monad.Loops
 import qualified Data.HashMap.Strict as M
 import qualified Data.IntMap.Strict as I
 
+-- debugging
+import Debug.Trace
+
 -- ======================================
 -- Monad transformer : The variable state
 -- ======================================
@@ -25,31 +28,19 @@ execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 
 rd :: Id -> Pos -> VarState Value
 rd (Id id exps) p = gets (mLookup id) >>= \case
-  Just v  -> foldM getIdx v exps
-  Nothing -> logError $ RuntimeError p $ CustomRT ("Variable '" ++ id ++ "' is not defined.")
-  where getIdx (IntV _) _              = logError $ RuntimeError p $ CustomRT "Too many indices."
-        getIdx (ListV v (ListT t)) idx = eval idx >>= \case
-          ListV _ _ -> logError $ RuntimeError p $ CustomRT "Cant't use list as index."
-          IntV i    -> case I.lookup (fromIntegral i) v of
-            Just v' -> return v'
-            Nothing -> return $ getDefaultValue t
+  Just v  -> foldM (getIdx p) v exps
+  Nothing -> logError $ RuntimeError p $ CustomRT ("Variable '" ++ id ++ "' is not declared.")
 
-
-  --case mLookup id vtab of --case gets (mLookup id) of
-  --  Just v  -> foldM getIdx v exps
-  --  Nothing -> logError $ RuntimeError p $ CustomRT ("Variable '" ++ id ++ "' is not defined.")
-  --  where getIdx (IntV _) _      = logError $ RuntimeError p $ CustomRT "Too many indices."
-  --        getIdx (ListV v t) idx = eval idx >>= \case
-  --          ListV _ _ -> logError $ RuntimeError p $ CustomRT "Cant't use list as index."
-  --          IntV i    -> return v
-
-  ----where getIdx (IntV _) idx = logError $ RuntimeError p $ CustomRT "Too many indices."
-  --      getIdx (ListV v t) idx        = eval idx >>= \case
-  --        ListV _ _ -> logError $ RuntimeError p $ CustomRT "Cant't use list as index."
-  --        IntV i     -> case I.lookup (fromIntegral i) v of
-  --          Just v' -> return v'
-  --          Nothing -> return $ getDefaultValue t
-
+getIdx :: Pos -> Value -> Exp -> VarState Value
+getIdx p (IntV _) _ = logError $ RuntimeError p $ CustomRT "Too many indices."
+getIdx p (ListV lst _) idx = eval idx >>= \case
+  IntV i | i < 0     -> logError $ RuntimeError p $ CustomRT "Index must be non-negative."
+    | otherwise -> case index lst i of
+      Just v  -> return v
+      Nothing -> logError $ RuntimeError p $ CustomRT "Index out of bounds."
+  _ -> logError $ RuntimeError p $ CustomRT "Index must be an integer."
+  where index :: [Value] -> Integer -> Maybe Value
+        index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
 
 logStmt :: Stmt -> VarState ()
 logStmt s = case s of
@@ -68,39 +59,26 @@ logError err = do
 logMsg :: MonadWriter Log w => String -> w ()
 logMsg st = tell [MsgCustom st]
 
-replace :: [Exp] -> Value -> Value -> Pos -> VarState Value
-replace [] vn vo p | getType vn /= getType vo = logError $ RuntimeError p $ CustomRT "Couldn't update different values"
-                   | otherwise                = return vn
-replace (e:es) vn vo p = eval e >>= \case
-  IntV i -> case vo of
-    IntV _ -> logError $ RuntimeError p $ CustomRT "Too many indices."
-    ListV im t -> case I.lookup (fromIntegral i) im of
-      Just vi -> do
-        vi' <- replace es vn vi p
-        return $ ListV (I.insert (fromIntegral i) vi' im) t
-      Nothing  -> return $ getDefaultValue t
-  _      -> logError $ RuntimeError p $ CustomRT "Couldn't index with non-scalar"
+adjust :: (Value -> Value) -> Id -> Pos -> VarState ()
+adjust op (Id id []) p = modify $ M.adjust op id
+adjust op (Id id exps) p = do
+  v <- rd (Id id []) p
+  mn <- adjust' op exps p v
+  modify $ M.insert id mn
 
-adjust :: (Value -> Value) -> Id -> Pos -> VarTab -> VarState VarTab
-adjust op (Id id []) p m   = return $ M.adjust op id m
-adjust op (Id id exps) p m = case mLookup id m of
-  Just (IntV _) -> logError $ RuntimeError p $ CustomRT "Too many indices."
-  Just vo -> do
-    mn <- adjust' op exps vo p
-    return $ M.insert id mn m
-adjust' :: (Value -> Value) -> [Exp] -> Value -> Pos -> VarState Value
-adjust' op [] vo p = return $ op vo
-adjust' op (e:es) vo p =  eval e >>= \case
-  IntV i -> case vo of
-    IntV _ -> logError $ RuntimeError p $ CustomRT "Too many indices."
-    ListV im t -> case I.lookup (fromIntegral i) im of
-      Just vi -> do
-        vi' <- adjust' op es vi p
-        return $ ListV (I.insert (fromIntegral i) vi' im) t
-      Nothing  -> let ls = ListV (I.insert (fromIntegral i) (getDefaultValue t) im) t
-        in adjust' op (e:es) ls p
-  _      -> logError $ RuntimeError p $ CustomRT "Couldn't index with non-scalar"
+adjust' :: (Value -> Value) -> [Exp] -> Pos -> Value -> VarState Value
+adjust' op [] p vo = return $ op vo
+adjust' op (e:es) p vo = do
+  v <- getIdx p vo e
+  vi <- adjust' op es p v
+  case vo of
+    ListV lst t -> eval e >>= \case
+      IntV i -> return $ ListV (replace lst i vi) t
+      _     -> logError $ RuntimeError p $ CustomRT "Index must be an integer."
+    _ -> logError $ RuntimeError p $ CustomRT "Too many indices."
 
+replace :: [Value] -> Integer -> Value -> [Value]
+replace lst i v = take (fromIntegral i) lst ++ [v] ++ drop (fromIntegral (i + 1)) lst
 
 -- ==========
 -- Statements
@@ -131,9 +109,7 @@ exec (Update (Id id exps) op e p) = do
     _ -> return ()
 
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
-  lst <- rd (Id id []) p
-  rep <- replace exps res lst p
-  modify $ insert id rep
+  adjust (const res) (Id id exps) p
 
 -- control flow : unique for SRL
 exec (If t s1 s2 a p) = do
@@ -171,27 +147,6 @@ exec (Until d a s t p) = do -- log this
 
   logMsg $ show t ++ " -> " ++ "true"
 
-  -- q <- eval a >>= \case
-  --   IntV q -> return $ intToBool q
-  --   _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-  -- unless q $ logError $ RuntimeError p $ CustomRT "Assert"
-
-  -- execStmts s
-
-  -- whileM_ (cond t) $ do
-  --     logMsg $ show t ++ " -> " ++ "false"
-  --     r <- eval a >>= \case
-  --       IntV r -> return $ intToBool r
-  --       _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-  --     when r $ throwError $ RuntimeError p $ CustomRT "Assert not good"
-  --     execStmts s;
-
-  --   where cond t = eval t >>= \case
-  --                     IntV q -> not . intToBool $ q
-  --                     _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-
 -- list modification
 exec (Push id1 id2 p) = do
   v1 <- rd id1 p
@@ -199,15 +154,14 @@ exec (Push id1 id2 p) = do
   case v2 of
     ListV ls (ListT t)
       | t == getType v1 -> do
-        vtab <- get
-        vtab' <- adjust clear id1 p vtab
-        put =<< adjust (push v1) id2 p vtab'
+        adjust clear id1 p
+        adjust (push v1) id2 p
       | otherwise ->
         logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
-    where push v (ListV ls t) = let i = (+1) . maximum . I.keys $ ls
-            in ListV (I.insert i v ls) t
+    _ -> logError $ RuntimeError p $ CustomRT $ "Pushing onto non-list. " ++ show v2 ++ " " ++ (show . getType) v2 -- TODO: mere nøjagtig
+    where push v (ListV ls t) = ListV (v:ls) t
           clear (IntV _)    = IntV 0
-          clear (ListV _ t) = ListV I.empty t
+          clear (ListV _ t) = ListV [] t
 
 exec (Pop id1 id2 p) = do
   v1 <- rd id1 p
@@ -216,14 +170,11 @@ exec (Pop id1 id2 p) = do
 
   v2 <- rd id2 p
   case v2 of
-    ListV ls (ListT t)
-      | I.null ls -> logError $ RuntimeError p $ CustomRT $ "Popping from empty list '" ++ show id2 ++ "'."
+    ListV [] _ -> logError $ RuntimeError p $ CustomRT $ "Popping from empty list '" ++ show id2 ++ "'."
+    ListV (v:ls) (ListT t)
       | t == getType v1 -> do
-        let i = (maximum . I.keys) ls
-            v = ls I.! i
-        vtab <- get
-        vtab' <- adjust (const v) id1 p vtab
-        put =<<  adjust (const $ ListV (I.delete i ls) t) id2 p vtab'
+        adjust (const v) id1 p
+        adjust (const $ ListV ls t) id2 p
       | otherwise ->
         logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
     _  -> logError $ RuntimeError p $ CustomRT "Popping from non-list"
@@ -232,9 +183,11 @@ exec (Pop id1 id2 p) = do
 exec (Swap id1 id2 p) = do
   v1 <- rd id1 p
   v2 <- rd id2 p
-  vtab <- get
-  vtab' <- adjust (const v2) id1 p vtab
-  put =<< adjust (const v1) id2 p vtab'
+
+  unless (getType v1 == getType v2)
+    $ logError $ RuntimeError p $ CustomRT "Variables being swapped must be of the same type."
+
+  adjust (const v2) id1 p >> adjust (const v1) id2 p
 
 -- skip
 exec _ = return ()
@@ -293,10 +246,10 @@ eval (Unary op exp p)
   | otherwise = eval exp >>= \case
     ListV ls t -> case op of
       Top   -> case ls of
-        ls | I.null ls  -> logError $ RuntimeError p $ CustomRT "Accessing top of empty list."
-           | otherwise  -> let i = (maximum . I.keys) ls in return $ ls I.! i
-      Empty -> return $ IntV (boolToInt . I.null $ ls)
-      Size  -> return $ IntV (fromIntegral . I.size $ ls)
+        []    -> logError $ RuntimeError p $ CustomRT "Accessing top of empty list."
+        v:_   -> return v
+      Empty -> return $ IntV (boolToInt . null $ ls)
+      Size  -> return $ IntV (fromIntegral . length $ ls)
     _  -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
 
 -- parantheses
