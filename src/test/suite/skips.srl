@@ -47,9 +47,10 @@ n -= 5
 n *= 2
 n += a * 0
 
+o += 1
 push o l
 push l p
 push p q
 push q b
+a += b[(1 + 3) * 0][0][0][0]
 
-o += 1
