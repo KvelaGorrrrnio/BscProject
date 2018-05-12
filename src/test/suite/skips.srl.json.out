@@ -1,0 +1,1 @@
+{ "type" : "error", "position" : { "line" : 2, "column" : 1 }, "message" : "A runtime error occured at (line 2, column 1):\nVariable 'n' is not declared." }

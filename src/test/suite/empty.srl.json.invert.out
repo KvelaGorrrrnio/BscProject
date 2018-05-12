@@ -1,0 +1,1 @@
+{ "type" : "error", "position" : { "line" : 1, "column" : 1 }, "message" : "(line 1, column 1):\nunexpected end of input\nexpecting \"int\", \"list\", \"[\", identifier, \"swap\", \"skip\", \".\", \"push\", \"pop\", \"if\" or \"from\"" }

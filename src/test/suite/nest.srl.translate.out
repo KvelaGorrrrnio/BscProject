@@ -1,0 +1,18 @@
+int a
+int n
+int v
+
+init: entry
+  n ^= 11
+  v += 1
+goto loop1
+
+loop1: fi (v = 1) init loop1
+  a += v
+  v += 2
+  n -= 1
+if (n = 0) contloop1 loop1
+
+contloop1: from loop1
+  skip
+exit

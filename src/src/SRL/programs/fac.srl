@@ -1,8 +1,0 @@
-// Reversible factorial program
-
-n ^= 5
-v ^= 1
-from (v = 1) do
-  v *= n
-  n -= 1
-until (n = 0)

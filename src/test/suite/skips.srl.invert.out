@@ -1,0 +1,63 @@
+
+o -= 1
+pop q b
+pop p q
+pop l p
+pop o l
+n -= a * 0
+n /= 2
+n += 5
+n -= 50
+n += 8
+n -= 4
+from (# b = 0 || 0) do
+  n -= not (a && (1 && 0))
+  n -= (5 + 2) ** 2
+  n -= (5 + 2) ** 1
+  n -= (5 + 2) ** 0
+  n -= - 2
+  n += - ((5 + 2) / 1 - - (0 - 9))
+  n -= 93 + 0
+  n -= 0 - 93
+  n -= 4 - - 2
+  n -= 4 - 2
+  n -= c - a
+  n -= - 4 - 2
+  n -= - 4 - - 2
+  n -= - 4 + - 2
+  n -= 4 * (1 * 0)
+  n += (- 8)
+  n /= 1
+  n -= - (~ 9 + - (- 33))
+  n /= 5
+until (not (not (a >= c) && not (0)) || (1 && 0))
+n += (- (8))
+skip
+skip
+swap n n
+skip
+swap v n
+skip
+skip
+n -= (- (- (~ (~ (~ a)))))
+if (0) then
+  v -= 1
+else
+  skip
+  skip
+fi (0)
+if (not (n != 0) && a) then
+  skip
+  skip
+  skip
+else
+  v -= 1
+fi (not (not (not (- (- n) != ~ (~ 8)))))
+skip
+skip
+skip
+n ^= 0
+skip
+skip
+skip
+skip

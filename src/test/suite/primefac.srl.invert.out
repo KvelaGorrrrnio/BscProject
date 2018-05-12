@@ -1,0 +1,17 @@
+int n
+list  int p
+int v
+
+n += 1
+v += ^ p
+from (n = 1) do
+  if (not (? p) && ^ p = v) then
+    v ^= ^ p
+    pop v p
+    n *= v
+  else
+    v -= 1
+  fi (n % v = 0)
+until ((? p) && v = 2)
+v -= 2
+n -= 315

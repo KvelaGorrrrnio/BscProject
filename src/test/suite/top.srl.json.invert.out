@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int a\nint b\nlist  int l\nlist  list  int l'\n\npush a l\npush l l'\nb -= ^ (^ l')\npop l l'\npop a l\na -= 5" }

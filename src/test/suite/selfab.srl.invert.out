@@ -1,0 +1,9 @@
+list  int a
+int n
+
+a[1] -= 3 * a[1] + 2
+a[0] -= a[1] - 92
+a[2] -= 5 * ^ a
+pop n a
+pop n a
+pop n a

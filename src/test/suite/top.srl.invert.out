@@ -1,0 +1,11 @@
+int a
+int b
+list  int l
+list  list  int l'
+
+push a l
+push l l'
+b -= ^ (^ l')
+pop l l'
+pop a l
+a -= 5
