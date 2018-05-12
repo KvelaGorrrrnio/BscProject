@@ -1,0 +1,17 @@
+
+end: entry
+  skip
+goto test
+
+count: from test
+  pop n q
+  n -= 10 - # q
+goto test
+
+test: fi (? q || (^ q != 1)) count end
+  skip
+if (? q) init count
+
+init: from test
+  skip
+exit

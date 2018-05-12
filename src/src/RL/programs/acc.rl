@@ -1,3 +1,6 @@
+int n
+int v
+
 init: entry
   n ^= 10
 goto loop

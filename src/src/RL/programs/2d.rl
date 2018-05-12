@@ -1,3 +1,7 @@
+int n
+list int q
+list list int p
+
 init : entry
   n += 1
   push n q

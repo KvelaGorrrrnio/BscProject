@@ -188,7 +188,7 @@ exec (Pop id1 id2 p) = do
     ListV (v:ls) (ListT t)
       | t == getType v1 -> do
         adjust (const v) id1 p
-        adjust (const $ ListV ls t) id2 p
+        adjust (const $ ListV ls (ListT t)) id2 p
       | otherwise ->
         logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
     _  -> logError $ RuntimeError p $ CustomRT "Popping from non-list"

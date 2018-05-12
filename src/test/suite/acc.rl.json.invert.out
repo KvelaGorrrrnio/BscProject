@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "\nend: entry\n  skip\ngoto loop\n\nloop: fi (n) loop end\n  n += 1\n  v -= n\nif (v = 0) init loop\n\ninit: from loop\n  n ^= 10\nexit" }
