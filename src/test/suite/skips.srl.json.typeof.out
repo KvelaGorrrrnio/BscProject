@@ -1,1 +1,1 @@
-{ "type" : "type", "table" : [] }
+{ "type" : "type", "table" : [{ "id" : "a", "value" : "int" }, { "id" : "b", "value" : "list  list  list  list  int" }, { "id" : "c", "value" : "int" }, { "id" : "l", "value" : "list  int" }, { "id" : "n", "value" : "int" }, { "id" : "o", "value" : "int" }, { "id" : "p", "value" : "list  list  int" }, { "id" : "q", "value" : "list  list  list  int" }, { "id" : "v", "value" : "int" }] }

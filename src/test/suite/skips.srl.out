@@ -1,2 +1,9 @@
-A runtime error occured at (line 2, column 1):
-Variable 'n' is not declared.
+a : 0
+b : [[[[0]]]]
+c : 0
+l : []
+n : 216
+o : 1
+p : []
+q : []
+v : 0
