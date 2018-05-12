@@ -1,0 +1,15 @@
+int a
+int n
+
+init: entry
+  n ^= 10
+goto loop1
+
+loop1: fi (a = 0) init loop1
+  a += n
+  n -= 1
+if (n = 0) contloop1 loop1
+
+contloop1: from loop1
+  skip
+exit

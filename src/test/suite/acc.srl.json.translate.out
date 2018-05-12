@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int a\nint n\n\ninit: entry\n  n ^= 10\ngoto loop1\n\nloop1: fi (a = 0) init loop1\n  a += n\n  n -= 1\nif (n = 0) contloop1 loop1\n\ncontloop1: from loop1\n  skip\nexit" }

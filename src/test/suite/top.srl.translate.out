@@ -1,0 +1,13 @@
+int a
+int b
+list  int l
+list  list  int l'
+
+init: entry
+  a += 5
+  push a l
+  push l l'
+  b += ^ (^ l')
+  pop l l'
+  pop a l
+exit

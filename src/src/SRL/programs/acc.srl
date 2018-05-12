@@ -1,8 +1,0 @@
-// Compute the accumulated sum
-
-n ^= 10
-from (a = 0) do
-  a += n
-  n -= 1
-until (n = 0)
-

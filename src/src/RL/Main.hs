@@ -8,10 +8,9 @@ import Control.Monad (when, unless)
 import RL.Parser
 import RL.Translation
 import RL.Inversion
--- import RL.Type
 import RL.Static
 import RL.Interp
--- import RL.Optimise
+import RL.Optimise
 import RL.Error
 
 import Common.HandleArgs
@@ -32,7 +31,7 @@ main = do
   case args of
     Run [] o j c _ -> if c then noCode j o else noFile j o
     Run f o j c l  -> let eout' = eout j o in
-      getAST c f >>= \case
+      ((if l then id else optimise) <$> getAST c f) >>= \case
         Left err  -> eout' err
         Right (ttab,ast) -> case runProgram ast ttab of
           (_,log)        | l && j && null o -> putStrLn $ logToJSON log

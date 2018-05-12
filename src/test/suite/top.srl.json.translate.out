@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int a\nint b\nlist  int l\nlist  list  int l'\n\ninit: entry\n  a += 5\n  push a l\n  push l l'\n  b += ^ (^ l')\n  pop l l'\n  pop a l\nexit" }

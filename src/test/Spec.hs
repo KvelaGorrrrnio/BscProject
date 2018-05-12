@@ -14,8 +14,7 @@ main = do
 
 processResults :: [(String, [(Bool,String)])] -> (Bool,String)
 processResults results = let m = map processResult results in
-  (null $ filter (not . fst) m, concatMap snd m)
+  (all fst m, concatMap snd m)
   where processResult (file,outfiles) =
-          ( null $ filter (not . fst) outfiles
-          , scriptColor (file ++ ": ") ++ concatMap snd outfiles ++ "\n" )
-
+          ( all fst outfiles
+          , file ++ ":" ++ concatMap snd outfiles ++ "\n" )

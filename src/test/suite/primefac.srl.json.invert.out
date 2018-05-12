@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int n\nlist  int p\nint v\n\nn += 1\nv += ^ p\nfrom (n = 1) do\n  if (not (? p) && ^ p = v) then\n    v ^= ^ p\n    pop v p\n    n *= v\n  else\n    v -= 1\n  fi (n % v = 0)\nuntil ((? p) && v = 2)\nv -= 2\nn -= 315" }

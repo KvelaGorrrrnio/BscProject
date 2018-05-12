@@ -1,0 +1,9 @@
+// Compute the accumulated sum
+
+int n int a
+
+n ^= 10
+from (a = 0) do
+  a += n
+  n -= 1
+until (n = 0)

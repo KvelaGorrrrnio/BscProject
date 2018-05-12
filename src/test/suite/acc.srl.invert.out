@@ -1,0 +1,8 @@
+int a
+int n
+
+from (n = 0) do
+  n += 1
+  a -= n
+until (a = 0)
+n ^= 10

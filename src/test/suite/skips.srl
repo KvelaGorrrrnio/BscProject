@@ -1,0 +1,55 @@
+int n int v int a int c int o
+list int l
+list list int p
+list list list int q
+list list list list int b
+. . ..
+n ^= 0
+. . .
+if not (not (not (-(-n) != ~(~8)))) then . . .
+else v += 1 fi not (n != 0) && a
+
+if 0 then v += 1 else .. fi 0 // gets discarded
+
+n += (neg (neg (~ (~ (~ a)))))
+. .
+swap v n
+.
+swap n n
+. .
+n -=   ((-(8)))
+from not (not (a >= c) && not (0)) || (1 && 0) do
+  n *= 5
+  n += - (~ 9 + -(-33))
+  n *= 1
+  n -=   (-8)
+  n += 4 * (1 * 0)
+  n += -4 + -2
+  n += -4 - -2
+  n += -4 - 2
+  n += c-a
+  n += 4 - 2
+  n += 4 - -2
+  n += 0 - 93
+  n += 93 + 0
+  n -= - ((5 + 2) / 1 - -(0 - 9))
+  n += -2
+  n += (5+2)**0
+  n += (5+2)**1
+  n += (5+2)**2
+  n += not (a && (1 && 0))
+until (size b = 0 || 0)
+
+n += 4
+n -= 8
+n += 50
+n -= 5
+n *= 2
+n += a * 0
+
+push o l
+push l p
+push p q
+push q b
+
+o += 1

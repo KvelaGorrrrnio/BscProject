@@ -1,0 +1,11 @@
+int a
+int n
+int v
+
+from (n = 0) do
+  n += 1
+  v -= 2
+  a -= v
+until (v = 1)
+v -= 1
+n ^= 11
