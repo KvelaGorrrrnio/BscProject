@@ -4,3 +4,6 @@ main.pdf
 o/
 hi/
 bin/
+*.aux
+*.log
+*.out

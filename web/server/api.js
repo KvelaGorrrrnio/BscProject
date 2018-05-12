@@ -10,7 +10,41 @@ api.post('/run/:lng',       (req,res) => { runMode('run',req,res) });
 api.post('/run/log/:lng',   (req,res) => { runMode('run',req,res,true) });
 api.post('/invert/:lng',    (req,res) => { runMode('invert',req,res) });
 api.post('/translate/:lng', (req,res) => { runMode('translate',req,res) });
-
+api.get('/template/list',   (req,res) => {
+  exec('find templates -maxdepth 1 -type f \\( -iname "*.srl" -o -iname "*.rl"  \\)', (err,stdout) => {
+    if (err) {
+      res.json({
+        type: 'error',
+        message: 'Couldn\'t find templates: ' + err
+      });
+      return;
+    }
+    const files = stdout.trim().split("\n").map(s => s.replace('templates/',''))
+    const rl    = files.filter(s => s.match(".*\\.rl"))
+    const srl   = files.filter(s => s.match(".*\\.srl"))
+    res.json({
+      type: 'templates',
+      rl,
+      srl
+    });
+  });
+});
+api.get('/template/:file',   (req,res) => {
+  exec('cat "templates/' + encodeURIComponent(req.params.file) + '"', (err,stdout) => {
+    if (err) {
+      res.json({
+        type: 'error',
+        message: 'Couldn\'t fetch template ' + req.params.file + ': ' + err
+      });
+      return;
+    }
+    res.json({
+      type: 'template',
+        file: req.params.file,
+      code: stdout
+    });
+  });
+});
 
 // Helpers
 function verifyLng(lng) {
@@ -37,6 +71,7 @@ function runMode(mode, req, res, log=false) {
       type: 'error',
       message: '\'' + mode + '\' is an illegal mode.'
     });
+    return;
   }
   const lng = req.params.lng;
   // Verify that lng is either rl or srl
@@ -66,6 +101,7 @@ function runMode(mode, req, res, log=false) {
         type: 'error',
         message: 'Execution of code failed, with error: ' + err
       });
+      return;
     }
     res.send(stdout);
   });
