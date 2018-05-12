@@ -1,0 +1,13 @@
+int n
+list  list  int p
+list  int q
+
+init: entry
+  n -= ^ (^ p)
+  pop q p
+  pop n q
+  n -= 1
+  pop q p
+  pop n q
+  n -= 1
+exit

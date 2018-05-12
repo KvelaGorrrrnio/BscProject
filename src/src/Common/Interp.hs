@@ -220,7 +220,7 @@ eval (Var id p) = rd id p
 
   -- binary arithmetic and relational
 eval (Binary op l r p)
-  | op < Geq  = do
+  | op <= Geq  = do
     vl <- eval l
     vr <- eval r
     case (vl, vr) of

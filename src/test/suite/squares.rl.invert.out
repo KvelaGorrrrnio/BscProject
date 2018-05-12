@@ -1,0 +1,17 @@
+int n
+list  int q
+int w
+
+end: entry
+  skip
+goto loop
+
+loop: fi (n = 0) end loop
+  n += 1
+  pop w q
+  w -= n * n
+if (n = 10) init loop
+
+init: from loop
+  n ^= 10
+exit

@@ -1,0 +1,26 @@
+int i
+int n
+list  int q
+
+end: entry
+  i += # q
+goto loop
+
+loop: fi (i = # q) end loop
+  i -= 1
+  n -= (2 * q[# q - i - 1]) ** i
+if (i = 0) init loop
+
+init: from loop
+  pop n q
+  n -= 1
+  pop n q
+  pop n q
+  pop n q
+  n -= 1
+  pop n q
+  n -= 1
+  pop n q
+  pop n q
+  n -= 1
+exit

@@ -1,7 +1,5 @@
-int n
+int n int i
 list int q
-list int p
-int v
 
 init: entry
   n += 1
@@ -11,27 +9,17 @@ init: entry
   push n q
   n += 1
   push n q
-  n += 1
-  push n q
-  push n q
-  n += 1
-  push n q
-  push n q
-  n += 1
-  push n q
-  n += 1
   push n q
   push n q
   n += 1
   push n q
 goto loop
 
-loop: fi (v = 0) init loop
-  pop n q
-  v += (2 * n) ** (# p)
-  push n p
-if (? q) end loop
+loop: fi (i = 0) init loop
+  n += (2 * q[#q - i - 1]) ** i
+  i += 1
+if (i = #q) end loop
 
 end: from loop
-  .
+  i -= #q
 exit

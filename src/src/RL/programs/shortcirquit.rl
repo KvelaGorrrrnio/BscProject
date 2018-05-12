@@ -1,7 +1,10 @@
 /*
   This program should throw an error if short
-  cirquiting is not implemented correctrly
+  cirquiting is not implemented correctly
 */
+
+list int q
+int n
 
 init: entry
 goto test

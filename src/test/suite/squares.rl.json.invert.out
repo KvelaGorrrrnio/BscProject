@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int n\nlist  int q\nint w\n\nend: entry\n  skip\ngoto loop\n\nloop: fi (n = 0) end loop\n  n += 1\n  pop w q\n  w -= n * n\nif (n = 10) init loop\n\ninit: from loop\n  n ^= 10\nexit" }
