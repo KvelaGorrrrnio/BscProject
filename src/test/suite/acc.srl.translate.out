@@ -1,15 +1,58 @@
 int a
 int n
 
-init: entry
+lab0: entry
+  skip
+goto lab1
+
+lab1: from lab0
   n ^= 10
-goto loop1
+goto lab4
 
-loop1: fi (a = 0) init loop1
+lab4: from lab1
+  skip
+goto lab5
+
+lab5: fi (a = 0) lab4 lab6
+  skip
+goto lab8
+
+lab8: from lab5
   a += n
-  n -= 1
-if (n = 0) contloop1 loop1
+goto lab10
 
-contloop1: from loop1
+lab10: from lab8
+  skip
+goto lab11
+
+lab11: from lab10
+  n -= 1
+goto lab12
+
+lab12: from lab11
+  skip
+goto lab13
+
+lab13: from lab12
+  skip
+goto lab9
+
+lab9: from lab13
+  skip
+goto lab6
+
+lab6: from lab9
+  skip
+if (n = 0) lab7 lab5
+
+lab7: from lab6
+  skip
+goto lab2
+
+lab2: from lab7
+  skip
+goto lab3
+
+lab3: from lab2
   skip
 exit

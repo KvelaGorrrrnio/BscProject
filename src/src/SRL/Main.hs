@@ -31,7 +31,7 @@ main = do
   case args of
     Run [] o j c _ -> if c then noCode j o else noFile j o
     Run f o j c l  -> let eout' = eout j o in
-      (if l then id else optimise) <$> getAST c f >>= \case
+      getAST c f >>= \case --((if l then id else optimise) <$> getAST c f) >>= \case
         Left err  -> eout' err
         Right (ttab,ast) -> case runProgram ast ttab of
           (_,log)        | l && j && null o -> putStrLn $ logToJSON log
@@ -56,7 +56,7 @@ main = do
     Translate f o j c -> let eout' = eout j o in
       getAST c f >>= \case
        Left err  -> eout' err
-       Right (ttab,ast) | code <- translateToRLSource ttab ast -> case ast of
+       Right (ttab,ast) | code <- translate ttab ast -> case ast of
          _ | j && null o -> putStrLn $ jsonCode code
            | j           -> writeFile o $ (++"\n") (jsonCode code)
            | null o      -> putStrLn code

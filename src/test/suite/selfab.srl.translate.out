@@ -1,11 +1,66 @@
 list  int a
 int n
 
-init: entry
+lab0: entry
+  skip
+goto lab1
+
+lab1: from lab0
   push n a
+goto lab4
+
+lab4: from lab1
+  skip
+goto lab5
+
+lab5: from lab4
   push n a
+goto lab6
+
+lab6: from lab5
+  skip
+goto lab7
+
+lab7: from lab6
   push n a
+goto lab8
+
+lab8: from lab7
+  skip
+goto lab9
+
+lab9: from lab8
   a[2] += 5 * ^ a
+goto lab10
+
+lab10: from lab9
+  skip
+goto lab11
+
+lab11: from lab10
   a[0] += a[1] - 92
+goto lab12
+
+lab12: from lab11
+  skip
+goto lab13
+
+lab13: from lab12
   a[1] += 3 * a[1] + 2
+goto lab14
+
+lab14: from lab13
+  skip
+goto lab15
+
+lab15: from lab14
+  skip
+goto lab2
+
+lab2: from lab15
+  skip
+goto lab3
+
+lab3: from lab2
+  skip
 exit

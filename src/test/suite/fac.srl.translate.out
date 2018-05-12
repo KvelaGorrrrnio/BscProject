@@ -1,16 +1,66 @@
 int n
 int v
 
-init: entry
+lab0: entry
+  skip
+goto lab1
+
+lab1: from lab0
   n ^= 5
+goto lab4
+
+lab4: from lab1
+  skip
+goto lab5
+
+lab5: from lab4
   v ^= 1
-goto loop1
+goto lab6
 
-loop1: fi (v = 1) init loop1
+lab6: from lab5
+  skip
+goto lab7
+
+lab7: fi (v = 1) lab6 lab8
+  skip
+goto lab10
+
+lab10: from lab7
   v *= n
-  n -= 1
-if (n = 0) contloop1 loop1
+goto lab12
 
-contloop1: from loop1
+lab12: from lab10
+  skip
+goto lab13
+
+lab13: from lab12
+  n -= 1
+goto lab14
+
+lab14: from lab13
+  skip
+goto lab15
+
+lab15: from lab14
+  skip
+goto lab11
+
+lab11: from lab15
+  skip
+goto lab8
+
+lab8: from lab11
+  skip
+if (n = 0) lab9 lab7
+
+lab9: from lab8
+  skip
+goto lab2
+
+lab2: from lab9
+  skip
+goto lab3
+
+lab3: from lab2
   skip
 exit
