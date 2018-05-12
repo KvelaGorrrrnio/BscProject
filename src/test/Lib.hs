@@ -41,7 +41,7 @@ bdir = "test/suite"
 listFiles :: String -> [String] -> IO [[String]]
 listFiles dir pats = do
   paths <- globDir (map compile pats) dir
-  dir'  <- if null dir then getCurrentDirectory else return $ dir
+  dir'  <- if null dir then getCurrentDirectory else return dir
   return $ map (map (removePrefix dir)) paths
   where removePrefix pf str = case stripPrefix pf str of
           Just str' -> dropWhile (=='/') str'
