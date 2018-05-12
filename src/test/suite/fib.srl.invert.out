@@ -2,7 +2,7 @@ int n
 int v
 int w
 
-from (n <= 1) do
+from (n = 0) do
   n += 1
   swap v w
   v -= w

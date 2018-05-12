@@ -6,7 +6,7 @@ end: entry
   skip
 goto loop
 
-loop: fi (n > 1) loop end
+loop: fi (n = 0) end loop
   n += 1
   swap v w
   v -= w
@@ -16,5 +16,3 @@ init: from loop
   w ^= 1
   n ^= 16
 exit
-
-

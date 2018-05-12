@@ -11,7 +11,7 @@ loop1: fi (v = 0) init loop1
   v += w
   swap v w
   n -= 1
-if (n <= 1) contloop1 loop1
+if (n = 0) contloop1 loop1
 
 contloop1: from loop1
   skip
