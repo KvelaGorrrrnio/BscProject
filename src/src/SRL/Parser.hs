@@ -17,6 +17,7 @@ srlParser = do
   whiteSpace
   decs  <- typedecs
   stmts <- statements
+  eof
   return (decs,stmts)
 
 statements :: Parser [Stmt]

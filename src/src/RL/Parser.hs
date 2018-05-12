@@ -17,6 +17,7 @@ rlParser = do
   whiteSpace
   decs <- typedecs
   blks <- blocks
+  eof
   return (decs,blks)
 
 blocks :: Parser [(Label, Block)]
