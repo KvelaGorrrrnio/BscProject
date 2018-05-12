@@ -1,2 +1,3 @@
 n : int
 q : list  int
+w : int

@@ -1,12 +1,15 @@
 // Computing the n first squares
 
+int n int w
+list int q
+
 // Initialisation
 init: entry
-  n ^= 20
+  n ^= 10
 goto loop
 
 // Loop
-loop: fi (n = 20) init loop
+loop: fi (n = 10) init loop
   w += n * n
   push w q
   n -= 1

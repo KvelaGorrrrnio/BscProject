@@ -1,2 +1,2 @@
-A runtime error occured at (line 2, column 3):
-Variable 'n' is not declared.
+n : 0
+v : 55
