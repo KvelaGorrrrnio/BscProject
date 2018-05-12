@@ -1,0 +1,4 @@
+lst  : list  int
+lst' : list  list  int
+n    : int
+v    : int
