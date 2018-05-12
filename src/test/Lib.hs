@@ -116,13 +116,13 @@ runSuite' file (OutFile o m) = do
     ExitFailure _ | e     -> return stderr
     ExitFailure _ | not e -> throwError $ "'" ++ o ++ "' should have succeeded with:\n" ++ expColor exp ++ "  , but failed with:\n" ++ errColor stderr
   if trim out == trim exp then return ()
-    else throwError $ "Output from '" ++ o ++ "' did not meet expectation:\n" ++ expColor (trim exp) ++ "\n" ++ replicate (max (length out) (length exp)) '-' ++ "\n" ++ errColor (trim out) ++ "\n"
+    else throwError $ "Output from '" ++ o ++ "' did not meet expectation:\n" ++ expColor (trim exp) ++ "\n" ++ maxDash out exp ++ "\n" ++ errColor (trim out) ++ "\n"
   when (mode == "translate" && not j) $ do
     (ec1,so1,se1) <- lift $ readProcessWithExitCode "stack" ["exec", lng, "--", bdir ++ "/" ++ file] ""
     (ec2,so2,se2) <- lift $ readProcessWithExitCode "stack" ["exec", swapInterpreter lng, "--", bdir ++ "/" ++ o] ""
     case (ec1,ec2) of
       (ExitSuccess, ExitSuccess) -> if trim so1 == trim so2 then return ()
-        else throwError $ "Execution of '" ++ file ++ "' and '" ++ o ++ "' have different output:\n" ++ expColor (trim so1) ++ "\n" ++ replicate (max (length out) (length exp)) '-' ++ "\n" ++ errColor (trim so2) ++ "\n"
+        else throwError $ "Execution of '" ++ file ++ "' and '" ++ o ++ "' have different output:\n" ++ expColor (trim so1) ++ "\n" ++ maxDash out exp ++ "\n" ++ errColor (trim so2) ++ "\n"
       _                          -> throwError $ "Either '" ++ file ++ "' and/or '" ++ o ++ "' wasn't executed."
   where hasF f s = if f then s else ""
         getInterpreter = tail . takeExtension
@@ -130,6 +130,9 @@ runSuite' file (OutFile o m) = do
         swapInterpreter "srl" = "rl"
         swapInterpreter s = s
 
+dash :: String -> String
+dash s = replicate ((min 80 . maximum . map length . lines) s) '-'
+maxDash s t = let ds = dash s; dt = dash t in if length ds > length dt then ds else dt
 
 runSuites :: [Suite] -> IO [(String,[(Bool,String)])]
 runSuites = mapM runSuite
