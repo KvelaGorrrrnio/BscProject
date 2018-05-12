@@ -8,10 +8,9 @@ import Control.Monad (when, unless)
 import SRL.Parser
 import SRL.Translation
 import SRL.Inversion
--- import SRL.Type
 import SRL.Static
 import SRL.Interp
--- import SRL.Optimise
+import SRL.Optimise
 import SRL.Error
 
 import Common.HandleArgs
@@ -32,7 +31,7 @@ main = do
   case args of
     Run [] o j c _ -> if c then noCode j o else noFile j o
     Run f o j c l  -> let eout' = eout j o in
-      getAST c f >>= \case
+      (if l then id else optimise) <$> getAST c f >>= \case
         Left err  -> eout' err
         Right (ttab,ast) -> case runProgram ast ttab of
           (_,log)        | l && j && null o -> putStrLn $ logToJSON log
@@ -48,7 +47,7 @@ main = do
     Invert f o j c -> let eout' = eout j o in
       getAST c f >>= \case
         Left err  -> eout' err
-        Right (ttab,ast) -> case ((showAST ttab) . invert) ast of
+        Right (ttab,ast) -> case (showAST ttab . invert) ast of
             code | j && null o -> putStrLn $ jsonCode code
                  | j           -> writeFile o $ (++"\n") (jsonCode code)
                  | null o      -> putStrLn code

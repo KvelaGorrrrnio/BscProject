@@ -219,16 +219,6 @@ mapUnOp Neg  = negate
 mapUnOp Sign = signum
 mapUnOp Not  = boolToInt . not . intToBool
 
--- -- apply arithmetic binary operator
--- applyABinOp :: (Integer -> Integer -> Integer) -> Value -> Value -> Value
--- applyABinOp op (IntV n) (IntV m) = IntV $ op n m
--- -- apply relational operator
--- applyRBinOp :: (Integer -> Integer -> Bool) -> Value -> Value -> Value
--- applyRBinOp op (IntV n) (IntV m) = boolToVal $ op n m
--- -- apply arithmetic unary operator
--- applyAUnOp :: (Integer -> Integer) -> Value -> Value
--- applyAUnOp op (IntV n) = IntV $ op n
-
 -- normalise to bool
 norm :: Integer -> Integer
 norm 0 = 0
