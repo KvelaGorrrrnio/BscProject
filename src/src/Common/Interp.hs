@@ -76,9 +76,8 @@ adjust' op (e:es) p vo = do
       IntV i -> return $ ListV (replace lst i vi) t
       _     -> logError $ RuntimeError p $ CustomRT "Index must be an integer."
     _ -> logError $ RuntimeError p $ CustomRT "Too many indices."
-
-replace :: [Value] -> Integer -> Value -> [Value]
-replace lst i v = take (fromIntegral i) lst ++ [v] ++ drop (fromIntegral (i + 1)) lst
+  where replace :: [Value] -> Integer -> Value -> [Value]
+        replace lst i v = take (fromIntegral i) lst ++ [v] ++ drop (fromIntegral (i + 1)) lst
 
 -- ==========
 -- Statements
@@ -91,6 +90,8 @@ exec :: Stmt -> VarState ()
 
 -- variable updates
 exec (Update (Id id exps) op e p) = do
+  abuse <- contains e (Id id exps) []
+  when abuse $ logError $ RuntimeError p $ CustomRT "Self-abuse in update."
   v1 <- rd (Id id exps) p
   n <- case v1 of
     IntV n -> return n
@@ -105,11 +106,24 @@ exec (Update (Id id exps) op e p) = do
     DivEq  | mod n m == 0 -> return ()
            | otherwise -> logError $ RuntimeError p $ CustomRT "Division has rest in update."
     MultEq | n /= 0 && m /= 0 -> return ()
-           | otherwise -> logError $ RuntimeError p $ CustomRT "An operand in mult update is zero."
+           | otherwise -> logError $ RuntimeError p $ CustomRT "An operand in multiplication update is zero."
     _ -> return ()
 
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
   adjust (const res) (Id id exps) p
+
+  where contains :: Exp -> Id -> [Exp] -> VarState Bool
+        contains Lit{} _ _ = return False
+        contains (Var (Id id2 exps2) _) (Id id1 exps1) is
+          | id1 == id2 = let exps2' = exps2 ++ is in
+            (&&) (length exps1 == length exps2') <$>
+            ( (==) <$> mapM eval exps1 <*> mapM eval exps2' )
+          | otherwise = return False
+        contains (Binary _ e1 e2 _) id is = (||) <$> contains e1 id is <*> contains e2 id is
+        contains (Unary Top e p) id is = contains e id (Lit (IntV 0) p : is)
+        contains (Unary Size _ _) _ _ = return False
+        contains (Unary _ e _) id is = contains e id is
+        contains (Parens e _) id is = contains e id is
 
 -- control flow : unique for SRL
 exec (If t s1 s2 a p) = do

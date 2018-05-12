@@ -1,4 +1,4 @@
-list int lst
+     list int lst
 list list int lst'
 int n int v
 
@@ -22,5 +22,5 @@ if size lst' = 5 end outloop
 end: from next
   swap lst'[0][3] lst'[2][0]
   pop lst lst'
-  lst += lst
+  lst'[2][0] += 5 * top lst'[2]
 exit
