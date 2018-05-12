@@ -18,7 +18,7 @@ loop: fi (v = 0) init loop
   v += w
   swap v w
   n -= 1
-if n > 1 loop end
+if n = 0 end loop
 
 // End
 end: from loop

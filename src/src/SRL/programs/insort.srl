@@ -1,0 +1,36 @@
+int i int j
+int n
+list int A
+
+n += 10
+push n A
+n -= 1
+push n A
+n -= 1
+push n A
+n -= 1
+push n A
+n -= 1
+push n A
+n -= 1
+push n A
+n -= 1
+push n A
+n -= 1
+push n A
+n -= 1
+push n A
+n -= 1
+push n A
+n -= 1
+push n A
+
+i += 1
+from i=1 do
+  j += i
+  from j = i do
+    swap A[j] A[j-1]
+    j -= 1
+  until j = 0 && A[j-1] <= A[j]
+  i += 1
+until i = size A

@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "int n\nint v\nint w\n\ninit: entry\n  n ^= 16\n  w ^= 1\ngoto loop1\n\nloop1: fi (v = 0) init loop1\n  v += w\n  swap v w\n  n -= 1\nif (n <= 1) contloop1 loop1\n\ncontloop1: from loop1\n  skip\nexit" }
+{ "type" : "code", "code" : "int n\nint v\nint w\n\ninit: entry\n  n ^= 16\n  w ^= 1\ngoto loop1\n\nloop1: fi (v = 0) init loop1\n  v += w\n  swap v w\n  n -= 1\nif (n = 0) contloop1 loop1\n\ncontloop1: from loop1\n  skip\nexit" }

@@ -1,11 +1,1 @@
-// Program for computing the n'th fibonacci pair
-int n
-int w
-int v
-n ^= 16
-w ^= 1
-from (v = 0) do
-  v += w
-  swap v w
-  n -= 1
-until (n <= 1)
+../../src/SRL/programs/fib.srl

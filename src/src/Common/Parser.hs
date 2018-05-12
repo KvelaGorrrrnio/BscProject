@@ -17,7 +17,9 @@ languageDef =
            , Token.commentLine      = "//"
            , Token.identStart       = letter
            , Token.identLetter      = alphaNum <|> oneOf ['_', '\'']
-           , Token.reservedNames    = [ "entry"
+           , Token.reservedNames    = [ "list"
+                                      , "int"
+                                      , "entry"
                                       , "from"
                                       , "fi"
                                       , "exit"
@@ -83,8 +85,8 @@ typedecs = M.fromList <$> many typedec
 typedec :: Parser (String, Type)
 typedec = do
   tp  <- typet
-  var <- identifier' --many1 identifier
-  return (var, tp) -- $ map (\id -> (id,tp)) vars
+  var <- identifier'
+  return (var, tp)
 
 typet :: Parser Type
 typet = (reserved "int" >> return IntT)
