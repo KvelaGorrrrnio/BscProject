@@ -23,4 +23,5 @@ end: from next
   swap lst'[0][3] lst'[2][0]
   pop lst lst'
   lst'[2][0] += 5 * top lst'[2]
+  n += 8 * n - 3
 exit
