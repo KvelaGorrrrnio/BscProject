@@ -7,6 +7,7 @@ module Lib
 , OutFile (..)
 , runSuite
 , runSuites
+, scriptColor
 ) where
 
 import System.FilePath.Glob (compile, globDir)
@@ -98,26 +99,37 @@ runSuite :: Suite -> IO (String,[(Bool,String)])
 runSuite (file,outfiles) = do
   result <- mapM (run file) outfiles
   return (file,map getDesc result)
-  --return (file,map getDesc result)
   where run file = runExceptT . runSuite' file
-        getDesc (Right _) = (True,".")
+        getDesc (Right _) = (True, trueColor ".")
         getDesc (Left e)  = (False,"\n  " ++ e)
 
 runSuite' :: String -> OutFile -> SuiteState ()
 runSuite' file (OutFile o m) = do
-  let lng = (tail . takeExtension) file
+  let lng = getInterpreter file
       (mode, e, j, l) = getModeFlags m
       flags = (if j || l then "-" else "") ++ (hasF j "j" ++ hasF l "l")
   (exitcode,stdout,stderr) <- lift $ readProcessWithExitCode "stack" ["exec", lng, "--", mode, flags, bdir ++ "/" ++ file] ""
   exp <- lift $ readFile $ bdir ++ "/" ++ o
   out <- case exitcode of
-    ExitSuccess   | e     -> throwError $ "'" ++ o ++ "' should have failed with:\n" ++ exp ++ "  , but succeeded with:\n" ++ stdout
+    ExitSuccess   | e     -> throwError $ "'" ++ o ++ "' should have failed with:\n" ++ expColor exp ++ "  , but succeeded with:\n" ++ errColor stdout
     ExitSuccess   | not e -> return stdout
     ExitFailure _ | e     -> return stderr
-    ExitFailure _ | not e -> throwError $ "'" ++ o ++ "' should have succeeded with:\n" ++ exp ++ "  , but failed with:\n" ++ stderr
+    ExitFailure _ | not e -> throwError $ "'" ++ o ++ "' should have succeeded with:\n" ++ expColor exp ++ "  , but failed with:\n" ++ errColor stderr
   if trim out == trim exp then return ()
-    else throwError $ "Output from '" ++ o ++ "' did not meet expectation:\n" ++ trim exp ++ "\n" ++ replicate (max (length out) (length exp)) '-' ++ "\n" ++ trim out ++ "\n"
+    else throwError $ "Output from '" ++ o ++ "' did not meet expectation:\n" ++ expColor (trim exp) ++ "\n" ++ replicate (max (length out) (length exp)) '-' ++ "\n" ++ errColor (trim out) ++ "\n"
+  when (mode == "translate" && not j) $ do
+    (ec1,so1,se1) <- lift $ readProcessWithExitCode "stack" ["exec", lng, "--", bdir ++ "/" ++ file] ""
+    (ec2,so2,se2) <- lift $ readProcessWithExitCode "stack" ["exec", swapInterpreter lng, "--", bdir ++ "/" ++ o] ""
+    case (ec1,ec2) of
+      (ExitSuccess, ExitSuccess) -> if trim so1 == trim so2 then return ()
+        else throwError $ "Execution of '" ++ file ++ "' and '" ++ o ++ "' have different output:\n" ++ expColor (trim so1) ++ "\n" ++ replicate (max (length out) (length exp)) '-' ++ "\n" ++ errColor (trim so2) ++ "\n"
+      _                          -> throwError $ "Either '" ++ file ++ "' and/or '" ++ o ++ "' wasn't executed."
   where hasF f s = if f then s else ""
+        getInterpreter = tail . takeExtension
+        swapInterpreter "rl" = "srl"
+        swapInterpreter "srl" = "rl"
+        swapInterpreter s = s
+
 
 runSuites :: [Suite] -> IO [(String,[(Bool,String)])]
 runSuites = mapM runSuite
@@ -131,3 +143,9 @@ getModeFlags (Typeof e j)    = ("typeof",e,j,False)
 trim :: String -> String
 trim = f . f
    where f = reverse . dropWhile isSpace
+--
+-- coloring
+expColor i    = "\x1b[36m" ++ i ++ "\x1b[0m"
+errColor i    = "\x1b[31m" ++ i ++ "\x1b[0m"
+scriptColor i = "\x1b[35m" ++ i ++ "\x1b[0m"
+trueColor i   = "\x1b[32m" ++ i ++ "\x1b[0m"
