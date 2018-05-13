@@ -32,13 +32,6 @@ containsVar (Parens e _)     = containsVar e
 ---------------------------------------------
 
 optStmt :: Stmt -> [Stmt]
-optStmt (If t s1 s2 a p) = case rmPar . optExp $ t of
-  Lit (IntV 0) _ -> optStmts s2
-  Lit (IntV _) _ -> optStmts s1
-  t'             -> [If t' (optStmts s1) (optStmts s2) (rmPar . optExp $ a) p]
-optStmt (Until d a s t p)  = case rmPar . optExp $ t of
-  Lit (IntV n) _ | n/=0 -> optStmts s
-  t'             -> [Until d (rmPar . optExp $ a) (optStmts s) t' p]
 optStmt (Swap id1 id2 p) | id1 == id2 = []
   | otherwise = [Swap (optId id1) (optId id2) p]
 optStmt (Update id op e p) = case (op, rmPar . optExp $ e) of

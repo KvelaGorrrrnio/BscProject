@@ -15,46 +15,43 @@ import SRL.AST
 srlParser :: Parser (TypeTab,AST)
 srlParser = do
   whiteSpace
-  decs  <- typedecs
-  stmts <- statements
+  decs <- typedecs
+  blk  <- block
   eof
-  return (decs,stmts)
+  return (decs,blk)
 
-statements :: Parser [Stmt]
-statements = many1 statement
+block :: Parser Block
+block = do
+  (b:seq) <- many1 block'
+  return $ foldl Seq b seq
 
-statement :: Parser Stmt
-statement = pos >>= \p -> (\s->s p)
-        <$> (try updateStmt
-        <|> swapStmt
-        <|> skipStmt
-        <|> pushStmt
-        <|> popStmt
-        -- srl
-        <|> ifStmt
-        <|> untilStmt)
+block' :: Parser Block
+block' = stmtBlock <|> ifBlock <|> untilBlock
 
-ifStmt :: Parser (Pos -> Stmt)
-ifStmt = do
+stmtBlock :: Parser Block
+stmtBlock = Atom <$> statement
+
+ifBlock :: Parser Block
+ifBlock = pos >>= \p -> (\s->s p) <$> do
   reserved "if"
   t <- expression
   reserved "then"
-  s1 <- statements
+  b1 <- block
   reserved "else"
-  s2 <- statements
+  b2 <- block
   reserved "fi"
   a <- expression
-  return $ If t s1 s2 a
+  return $ If t b1 b2 a
 
-untilStmt :: Parser (Pos -> Stmt)
-untilStmt = do
+untilBlock :: Parser Block
+untilBlock = pos >>= \p -> (\s->s p) <$> do
   reserved "from"
   a <- expression
   reserved "do"
-  s <- statements
+  b <- block
   reserved "until"
   t <- expression
-  return $ Until True a s t
+  return $ Until True a b t
 
 parseSrc :: String -> Either Error (TypeTab, AST)
 parseSrc s = case parse srlParser "" s of

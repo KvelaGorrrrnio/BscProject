@@ -36,8 +36,6 @@ instance Show Message where
   show (MsgStmt s vtab)  =
     "line " ++ (show . fst . getStmtPos) s ++ "\n> " ++
     case s of
-      If{}    -> show s
-      Until{} -> show s
       Skip{}  -> show s
       _       -> show s ++ "\n" ++ showTab vtab
   show (MsgError err) = "*** Error: " ++ show err

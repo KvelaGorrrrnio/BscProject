@@ -24,6 +24,6 @@ optBlock (f,s,t) = do
         _ -> f
   let s' = optStmts s
   let t' = case t of
-        IfTo t l1 l2 p -> IfTo (rmPar . optCond . optExp $ t) l1 l2 p
+        If t l1 l2 p -> If (rmPar . optCond . optExp $ t) l1 l2 p
         _ -> t
   (f',s',t')

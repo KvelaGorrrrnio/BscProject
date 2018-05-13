@@ -8,113 +8,81 @@ goto lab1
 
 lab1: from lab0
   n += 315
-goto lab4
-
-lab4: from lab1
-  skip
-goto lab5
-
-lab5: from lab4
-  v += 2
-goto lab6
-
-lab6: from lab5
-  skip
-goto lab7
-
-lab7: fi ((? p) && v = 2) lab6 lab8
-  skip
 goto lab10
 
-lab10: from lab7
-  skip
-if (n % v = 0) lab14 lab16
-
-lab14: from lab10
-  n /= v
-goto lab18
-
-lab18: from lab14
-  skip
-goto lab19
-
-lab19: from lab18
-  push v p
-goto lab20
-
-lab20: from lab19
-  skip
-goto lab21
-
-lab21: from lab20
-  v ^= ^ p
-goto lab22
-
-lab22: from lab21
-  skip
-goto lab23
-
-lab23: from lab22
-  skip
-goto lab15
-
-lab15: from lab23
-  skip
-goto lab12
-
-lab16: from lab10
-  v += 1
-goto lab24
-
-lab24: from lab16
-  skip
-goto lab25
-
-lab25: from lab24
-  skip
-goto lab17
-
-lab17: from lab25
-  skip
-goto lab12
-
-lab12: fi (not (? p) && ^ p = v) lab15 lab17
-  skip
-goto lab13
-
-lab13: from lab12
+lab10: from lab1
   skip
 goto lab11
 
-lab11: from lab13
-  skip
+lab11: from lab10
+  v += 2
 goto lab8
 
 lab8: from lab11
   skip
-if (n = 1) lab9 lab7
+goto lab9
 
-lab9: from lab8
+lab9: fi ((? p) && v = 2) lab8 lab6
+  skip
+goto lab12
+
+lab12: from lab9
+  skip
+if (n % v = 0) lab14 lab16
+
+lab14: from lab12
+  n /= v
+goto lab20
+
+lab20: from lab14
+  skip
+goto lab21
+
+lab21: from lab20
+  push v p
+goto lab18
+
+lab18: from lab21
+  skip
+goto lab19
+
+lab19: from lab18
+  v ^= ^ p
+goto lab15
+
+lab15: from lab19
+  skip
+goto lab13
+
+lab16: from lab12
+  v += 1
+goto lab17
+
+lab17: from lab16
+  skip
+goto lab13
+
+lab13: fi (not (? p) && ^ p = v) lab15 lab17
+  skip
+goto lab6
+
+lab6: from lab13
+  skip
+if (n = 1) lab7 lab9
+
+lab7: from lab6
   v -= ^ p
-goto lab26
+goto lab4
 
-lab26: from lab9
+lab4: from lab7
   skip
-goto lab27
+goto lab5
 
-lab27: from lab26
+lab5: from lab4
   n -= 1
-goto lab28
-
-lab28: from lab27
-  skip
-goto lab29
-
-lab29: from lab28
-  skip
 goto lab2
 
-lab2: from lab29
+lab2: from lab5
   skip
 goto lab3
 

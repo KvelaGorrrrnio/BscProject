@@ -25,10 +25,10 @@ getEntry ast = do
           )) ast
   if length entries == 1 then head entries else error "Exactly one entry must be defined"
 
-type Block = (From, [Stmt], To)
-showB (f,s,t) = show f ++ "\n  "
+type Block = (From, [Stmt], Jump)
+showB (f,s,j) = show f ++ "\n  "
   ++ (if null s then show (Skip (0,0)) else (intercalate "\n  " . map show) s) ++ "\n"
-  ++ show t
+  ++ show j
 
 data From = From Label Pos
           | Fi Exp Label Label Pos
@@ -39,11 +39,11 @@ instance Show From where
   show (Fi e l1 l2 _) = "fi " ++ showPar e ++ " " ++ l1 ++ " " ++ l2
   show (Entry _)      = "entry"
 
-data To = Goto Label Pos
-        | IfTo Exp Label Label Pos
-        | Exit Pos
+data Jump = Goto Label Pos
+          | If Exp Label Label Pos
+          | Exit Pos
         deriving Eq
-instance Show To where
+instance Show Jump where
   show (Goto l _)       = "goto " ++ l
-  show (IfTo e l1 l2 _) = "if "  ++ showPar e ++ " "  ++ l1 ++ " " ++ l2
+  show (If e l1 l2 _) = "if "  ++ showPar e ++ " "  ++ l1 ++ " " ++ l2
   show (Exit _)         = "exit"

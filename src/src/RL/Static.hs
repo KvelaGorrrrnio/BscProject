@@ -25,7 +25,7 @@ staticcheckBlocks :: AST -> BlockState ()
 staticcheckBlocks = mapM_ staticcheckBlock
 
 staticcheckBlock :: (Label, Block) -> BlockState ()
-staticcheckBlock (l,(f,stmts,t)) = do
+staticcheckBlock (l,(f,stmts,j)) = do
   lbls <- ask
   (sn,en,ex) <- get
   case lookup l sn of
@@ -39,12 +39,12 @@ staticcheckBlock (l,(f,stmts,t)) = do
     Fi _ _ l p | null (lookup l lbls) -> throwError $ StaticError p $ NotDefinedLabel l
     _                                 -> return ()
   (sn,en,ex) <- get
-  case t of
+  case j of
     Exit p | ex -> throwError $ StaticError p DuplicateExit
     Exit _      -> put (sn,en,True)
     Goto l p     | null (lookup l lbls) -> throwError $ StaticError p $ NotDefinedLabel l
-    IfTo _ l _ p | null (lookup l lbls) -> throwError $ StaticError p $ NotDefinedLabel l
-    IfTo _ _ l p | null (lookup l lbls) -> throwError $ StaticError p $ NotDefinedLabel l
+    If _ l _ p | null (lookup l lbls)   -> throwError $ StaticError p $ NotDefinedLabel l
+    If _ _ l p | null (lookup l lbls)   -> throwError $ StaticError p $ NotDefinedLabel l
     _                                   -> return ()
 
 getFromPos :: From -> Pos

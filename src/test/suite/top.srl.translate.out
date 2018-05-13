@@ -9,57 +9,49 @@ goto lab1
 
 lab1: from lab0
   a += 5
-goto lab4
+goto lab12
 
-lab4: from lab1
+lab12: from lab1
   skip
-goto lab5
+goto lab13
 
-lab5: from lab4
+lab13: from lab12
   push a l
-goto lab6
+goto lab10
 
-lab6: from lab5
+lab10: from lab13
   skip
-goto lab7
+goto lab11
 
-lab7: from lab6
+lab11: from lab10
   push l l'
 goto lab8
 
-lab8: from lab7
+lab8: from lab11
   skip
 goto lab9
 
 lab9: from lab8
   b += ^ (^ l')
-goto lab10
+goto lab6
 
-lab10: from lab9
+lab6: from lab9
   skip
-goto lab11
+goto lab7
 
-lab11: from lab10
+lab7: from lab6
   pop l l'
-goto lab12
+goto lab4
 
-lab12: from lab11
+lab4: from lab7
   skip
-goto lab13
+goto lab5
 
-lab13: from lab12
+lab5: from lab4
   pop a l
-goto lab14
-
-lab14: from lab13
-  skip
-goto lab15
-
-lab15: from lab14
-  skip
 goto lab2
 
-lab2: from lab15
+lab2: from lab5
   skip
 goto lab3
 

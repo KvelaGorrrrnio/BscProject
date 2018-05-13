@@ -13,45 +13,29 @@ lab4: from lab1
   skip
 goto lab5
 
-lab5: fi (a = 0) lab4 lab6
-  skip
-goto lab8
-
-lab8: from lab5
-  a += n
-goto lab10
-
-lab10: from lab8
-  skip
-goto lab11
-
-lab11: from lab10
-  n -= 1
-goto lab12
-
-lab12: from lab11
-  skip
-goto lab13
-
-lab13: from lab12
-  skip
-goto lab9
-
-lab9: from lab13
+lab5: fi (a = 0) lab4 lab2
   skip
 goto lab6
 
-lab6: from lab9
-  skip
-if (n = 0) lab7 lab5
+lab6: from lab5
+  a += n
+goto lab8
 
-lab7: from lab6
+lab8: from lab6
+  skip
+goto lab9
+
+lab9: from lab8
+  n -= 1
+goto lab7
+
+lab7: from lab9
   skip
 goto lab2
 
 lab2: from lab7
   skip
-goto lab3
+if (n = 0) lab3 lab5
 
 lab3: from lab2
   skip

@@ -33,34 +33,34 @@ trlProg ast = do
   l3 <- genLabel ()
 
   let fs = Entry p
-      ts = Goto l1 p
+      js = Goto l1 p
 
       fe = From l2 p
-      te = Exit p
+      je = Exit p
 
-  push l0 (fs,[],ts)
+  push l0 (fs,[],js)
   trlBlk ast (l0,l1,l2,l3)
-  push l3 (fe,[],te)
+  push l3 (fe,[],je)
 
 trlBlk :: SRL.AST -> Labels -> TrlMonad ()
-trlBlk blk (l0,l1,l4,l5) = case blk of
-  s:blk -> do
-    l2 <- genLabel ()
-    l3 <- genLabel ()
+trlBlk (Atom s) (l0,l1,l2,l3) = do
+  let fs = From l0 p
+      js = Goto l2 p
 
-    trlStmt s  (l0,l1,l2,l3)
-    trlBlk blk (l2,l3,l4,l5)
-  [] -> trlStmt (Skip p) (l0,l1,l4,l5)
+      fe = From l1 p
+      je = Goto l3 p
 
-trlStmt :: Stmt -> Labels -> TrlMonad ()
-trlStmt (If t b1 b2 a _) (l0,l1,l6,l7) = do
+  push l1 (fs,[s],js)
+  push l2 (fe,[ ],je)
+
+trlBlk (SRL.If t b1 b2 a _) (l0,l1,l6,l7) = do
   l2 <- genLabel ()
   l3 <- genLabel ()
   l4 <- genLabel ()
   l5 <- genLabel ()
 
   let fs = From l0 p
-      ts = IfTo t l2 l4 p
+      ts = RL.If t l2 l4 p
 
       fe = Fi a l3 l5 p
       te = Goto l7 p
@@ -70,7 +70,14 @@ trlStmt (If t b1 b2 a _) (l0,l1,l6,l7) = do
   trlBlk b2 (l1,l4,l5,l6)
   push l6 (fe,[],te)
 
-trlStmt (Until d a b t _) (l0,l1,l4,l5) = do
+trlBlk (Seq b1 b2) (l0,l1,l4,l5) = do
+  l2 <- genLabel ()
+  l3 <- genLabel ()
+
+  trlBlk b1 (l0,l1,l2,l3)
+  trlBlk b2 (l2,l3,l4,l5)
+
+trlBlk (Until d a b t p) (l0,l1,l4,l5) = do
   l2 <- genLabel ()
   l3 <- genLabel ()
 
@@ -78,18 +85,8 @@ trlStmt (Until d a b t _) (l0,l1,l4,l5) = do
       ts = Goto l2 p
 
       fe = From l3 p
-      te = IfTo t l5 l1 p
+      te = RL.If t l5 l1 p
 
   push l1 (fs,[],ts)
   trlBlk b (l1,l2,l3,l4)
   push l4 (fe,[],te)
-
-trlStmt s (l0,l1,l2,l3) = do
-  let fs = From l0 p
-      ts = Goto l2 p
-
-      fe = From l1 p
-      te = Goto l3 p
-
-  push l1 (fs,[s],ts)
-  push l2 (fe,[ ],te)

@@ -8,67 +8,51 @@ goto lab1
 
 lab1: from lab0
   n ^= 16
-goto lab4
-
-lab4: from lab1
-  skip
-goto lab5
-
-lab5: from lab4
-  w ^= 1
 goto lab6
 
-lab6: from lab5
+lab6: from lab1
   skip
 goto lab7
 
-lab7: fi (v = 0) lab6 lab8
-  skip
-goto lab10
+lab7: from lab6
+  w ^= 1
+goto lab4
 
-lab10: from lab7
+lab4: from lab7
+  skip
+goto lab5
+
+lab5: fi (v = 0) lab4 lab2
+  skip
+goto lab8
+
+lab8: from lab5
   v += w
 goto lab12
 
-lab12: from lab10
+lab12: from lab8
   skip
 goto lab13
 
 lab13: from lab12
   swap v w
-goto lab14
+goto lab10
 
-lab14: from lab13
-  skip
-goto lab15
-
-lab15: from lab14
-  n -= 1
-goto lab16
-
-lab16: from lab15
-  skip
-goto lab17
-
-lab17: from lab16
+lab10: from lab13
   skip
 goto lab11
 
-lab11: from lab17
-  skip
-goto lab8
+lab11: from lab10
+  n -= 1
+goto lab9
 
-lab8: from lab11
-  skip
-if (n = 0) lab9 lab7
-
-lab9: from lab8
+lab9: from lab11
   skip
 goto lab2
 
 lab2: from lab9
   skip
-goto lab3
+if (n = 0) lab3 lab5
 
 lab3: from lab2
   skip

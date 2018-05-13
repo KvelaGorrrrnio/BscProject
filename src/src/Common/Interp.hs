@@ -11,7 +11,6 @@ import Data.Bits (xor)
 import Control.Monad.State
 import Control.Monad.Writer
 import Control.Monad.Except
-import Control.Monad.Loops
 import qualified Data.HashMap.Strict as M
 import qualified Data.IntMap.Strict as I
 
@@ -43,10 +42,7 @@ getIdx p (ListV lst _) idx = eval idx >>= \case
         index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
 
 logStmt :: Stmt -> VarState ()
-logStmt s = case s of
-  If{}    -> exec s
-  Until{} -> exec s
-  _ -> do
+logStmt s = do
     exec s
     msg <- gets (MsgStmt s)
     tell [msg]
@@ -125,42 +121,6 @@ exec (Update (Id id exps) op e p) = do
         contains (Unary _ e _) id is = contains e id is
         contains (Parens e _) id is = contains e id is
 
--- control flow : unique for SRL
-exec (If t s1 s2 a p) = do
-  q  <- eval t >>= \case
-    IntV q -> return $ intToBool q
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-  logMsg $ show (If t s1 s2 a p) ++ " -> " ++ if q then "true" else "false"
-  execStmts $ if q then s1 else s2
-  logMsg $ (if q then "[s1]" else "[s2]") ++ " done"
-
-  r <- eval a >>= \case
-    IntV r -> return $ intToBool r
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-  when (q /= r)
-    $ logError $ RuntimeError p $ CustomRT "Assert and such"
-
-exec (Until d a s t p) = do -- log this
-  logMsg $ show (Until d a s t p)
-
-  q <- eval a >>= \case
-    IntV q -> return $ intToBool q
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-  unless (q == d) $ logError (RuntimeError p $ CustomRT "Assert")
-
-  execStmts s
-
-  r <- eval t >>= \case
-    IntV r -> return $ intToBool r
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-  unless r $ exec (Until False a s t p)
-
-  logMsg $ show t ++ " -> " ++ "true"
-
 -- list modification
 exec (Push id1 id2 p) = do
   v1 <- rd id1 p
@@ -172,7 +132,7 @@ exec (Push id1 id2 p) = do
         adjust (push v1) id2 p
       | otherwise ->
         logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
-    _ -> logError $ RuntimeError p $ CustomRT $ "Pushing onto non-list. " ++ show v2 ++ " " ++ (show . getType) v2 -- TODO: mere nøjagtig
+    _ -> logError $ RuntimeError p $ CustomRT "Pushing onto non-list. " -- TODO: mere nøjagtig
     where push v (ListV ls t) = ListV (v:ls) t
           clear (IntV _)    = IntV 0
           clear (ListV _ t) = ListV [] t

@@ -93,7 +93,14 @@ typet = (reserved "int" >> return IntT)
     <|> (reserved "list" >> ListT <$> typet)
     <|> (ListT <$> brackets typet)
 
--- statements
+statement :: Parser Stmt
+statement = pos >>= \p -> (\s->s p)
+        <$> (try updateStmt
+        <|> swapStmt
+        <|> skipStmt
+        <|> pushStmt
+        <|> popStmt)
+
 updateStmt :: Parser (Pos -> Stmt)
 updateStmt = do
   var  <- identifier

@@ -14,513 +14,465 @@ goto lab1
 
 lab1: from lab0
   skip
-goto lab4
+goto lab64
 
-lab4: from lab1
+lab64: from lab1
   skip
-goto lab5
+goto lab65
 
-lab5: from lab4
+lab65: from lab64
   skip
-goto lab6
+goto lab62
 
-lab6: from lab5
+lab62: from lab65
   skip
-goto lab7
+goto lab63
 
-lab7: from lab6
+lab63: from lab62
   skip
-goto lab8
+goto lab60
 
-lab8: from lab7
+lab60: from lab63
   skip
-goto lab9
+goto lab61
 
-lab9: from lab8
+lab61: from lab60
   skip
-goto lab10
+goto lab58
 
-lab10: from lab9
+lab58: from lab61
   skip
-goto lab11
+goto lab59
 
-lab11: from lab10
+lab59: from lab58
   n ^= 0
-goto lab12
-
-lab12: from lab11
-  skip
-goto lab13
-
-lab13: from lab12
-  skip
-goto lab14
-
-lab14: from lab13
-  skip
-goto lab15
-
-lab15: from lab14
-  skip
-goto lab16
-
-lab16: from lab15
-  skip
-goto lab17
-
-lab17: from lab16
-  skip
-goto lab18
-
-lab18: from lab17
-  skip
-goto lab19
-
-lab19: from lab18
-  skip
-if (not (not (not (- (- n) != ~ (~ 8))))) lab22 lab24
-
-lab22: from lab19
-  skip
-goto lab26
-
-lab26: from lab22
-  skip
-goto lab27
-
-lab27: from lab26
-  skip
-goto lab28
-
-lab28: from lab27
-  skip
-goto lab29
-
-lab29: from lab28
-  skip
-goto lab30
-
-lab30: from lab29
-  skip
-goto lab31
-
-lab31: from lab30
-  skip
-goto lab23
-
-lab23: from lab31
-  skip
-goto lab20
-
-lab24: from lab19
-  v += 1
-goto lab32
-
-lab32: from lab24
-  skip
-goto lab33
-
-lab33: from lab32
-  skip
-goto lab25
-
-lab25: from lab33
-  skip
-goto lab20
-
-lab20: fi (not (n != 0) && a) lab23 lab25
-  skip
-goto lab21
-
-lab21: from lab20
-  skip
-if (0) lab36 lab38
-
-lab36: from lab21
-  v += 1
-goto lab40
-
-lab40: from lab36
-  skip
-goto lab41
-
-lab41: from lab40
-  skip
-goto lab37
-
-lab37: from lab41
-  skip
-goto lab34
-
-lab38: from lab21
-  skip
-goto lab42
-
-lab42: from lab38
-  skip
-goto lab43
-
-lab43: from lab42
-  skip
-goto lab44
-
-lab44: from lab43
-  skip
-goto lab45
-
-lab45: from lab44
-  skip
-goto lab39
-
-lab39: from lab45
-  skip
-goto lab34
-
-lab34: fi (0) lab37 lab39
-  skip
-goto lab35
-
-lab35: from lab34
-  n += (- (- (~ (~ (~ a)))))
-goto lab46
-
-lab46: from lab35
-  skip
-goto lab47
-
-lab47: from lab46
-  skip
-goto lab48
-
-lab48: from lab47
-  skip
-goto lab49
-
-lab49: from lab48
-  skip
-goto lab50
-
-lab50: from lab49
-  skip
-goto lab51
-
-lab51: from lab50
-  swap v n
-goto lab52
-
-lab52: from lab51
-  skip
-goto lab53
-
-lab53: from lab52
-  skip
-goto lab54
-
-lab54: from lab53
-  skip
-goto lab55
-
-lab55: from lab54
-  swap n n
 goto lab56
 
-lab56: from lab55
+lab56: from lab59
   skip
 goto lab57
 
 lab57: from lab56
   skip
-goto lab58
+goto lab54
 
-lab58: from lab57
+lab54: from lab57
   skip
-goto lab59
+goto lab55
 
-lab59: from lab58
+lab55: from lab54
   skip
-goto lab60
+goto lab52
 
-lab60: from lab59
+lab52: from lab55
   skip
-goto lab61
+goto lab53
 
-lab61: from lab60
-  n -= (- (8))
-goto lab62
-
-lab62: from lab61
+lab53: from lab52
   skip
-goto lab63
+goto lab50
 
-lab63: fi (not (not (a >= c) && not (0)) || (1 && 0)) lab62 lab64
+lab50: from lab53
   skip
-goto lab66
+goto lab51
 
-lab66: from lab63
-  n *= 5
-goto lab68
-
-lab68: from lab66
+lab51: from lab50
   skip
-goto lab69
+if (not (not (not (- (- n) != ~ (~ 8))))) lab66 lab68
 
-lab69: from lab68
-  n += - (~ 9 + - (- 33))
-goto lab70
-
-lab70: from lab69
+lab66: from lab51
   skip
-goto lab71
-
-lab71: from lab70
-  n *= 1
 goto lab72
 
-lab72: from lab71
+lab72: from lab66
   skip
 goto lab73
 
 lab73: from lab72
-  n -= (- 8)
-goto lab74
-
-lab74: from lab73
   skip
+goto lab70
+
+lab70: from lab73
+  skip
+goto lab71
+
+lab71: from lab70
+  skip
+goto lab67
+
+lab67: from lab71
+  skip
+goto lab48
+
+lab68: from lab51
+  v += 1
+goto lab69
+
+lab69: from lab68
+  skip
+goto lab48
+
+lab48: fi (not (n != 0) && a) lab67 lab69
+  skip
+goto lab49
+
+lab49: from lab48
+  skip
+if (0) lab74 lab76
+
+lab74: from lab49
+  v += 1
 goto lab75
 
 lab75: from lab74
-  n += 4 * (1 * 0)
-goto lab76
-
-lab76: from lab75
   skip
-goto lab77
+goto lab46
 
-lab77: from lab76
-  n += - 4 + - 2
+lab76: from lab49
+  skip
 goto lab78
 
-lab78: from lab77
+lab78: from lab76
   skip
 goto lab79
 
 lab79: from lab78
-  n += - 4 - - 2
+  skip
+goto lab77
+
+lab77: from lab79
+  skip
+goto lab46
+
+lab46: fi (0) lab75 lab77
+  skip
+goto lab47
+
+lab47: from lab46
+  n += (- (- (~ (~ (~ a)))))
+goto lab44
+
+lab44: from lab47
+  skip
+goto lab45
+
+lab45: from lab44
+  skip
+goto lab42
+
+lab42: from lab45
+  skip
+goto lab43
+
+lab43: from lab42
+  skip
+goto lab40
+
+lab40: from lab43
+  skip
+goto lab41
+
+lab41: from lab40
+  swap v n
+goto lab38
+
+lab38: from lab41
+  skip
+goto lab39
+
+lab39: from lab38
+  skip
+goto lab36
+
+lab36: from lab39
+  skip
+goto lab37
+
+lab37: from lab36
+  swap n n
+goto lab34
+
+lab34: from lab37
+  skip
+goto lab35
+
+lab35: from lab34
+  skip
+goto lab32
+
+lab32: from lab35
+  skip
+goto lab33
+
+lab33: from lab32
+  skip
+goto lab30
+
+lab30: from lab33
+  skip
+goto lab31
+
+lab31: from lab30
+  n -= (- (8))
+goto lab28
+
+lab28: from lab31
+  skip
+goto lab29
+
+lab29: fi (not (not (a >= c) && not (0)) || (1 && 0)) lab28 lab26
+  skip
 goto lab80
 
-lab80: from lab79
-  skip
-goto lab81
+lab80: from lab29
+  n *= 5
+goto lab116
 
-lab81: from lab80
+lab116: from lab80
+  skip
+goto lab117
+
+lab117: from lab116
+  n += - (~ 9 + - (- 33))
+goto lab114
+
+lab114: from lab117
+  skip
+goto lab115
+
+lab115: from lab114
+  n *= 1
+goto lab112
+
+lab112: from lab115
+  skip
+goto lab113
+
+lab113: from lab112
+  n -= (- 8)
+goto lab110
+
+lab110: from lab113
+  skip
+goto lab111
+
+lab111: from lab110
+  n += 4 * (1 * 0)
+goto lab108
+
+lab108: from lab111
+  skip
+goto lab109
+
+lab109: from lab108
+  n += - 4 + - 2
+goto lab106
+
+lab106: from lab109
+  skip
+goto lab107
+
+lab107: from lab106
+  n += - 4 - - 2
+goto lab104
+
+lab104: from lab107
+  skip
+goto lab105
+
+lab105: from lab104
   n += - 4 - 2
-goto lab82
+goto lab102
 
-lab82: from lab81
+lab102: from lab105
   skip
-goto lab83
+goto lab103
 
-lab83: from lab82
+lab103: from lab102
   n += c - a
-goto lab84
+goto lab100
 
-lab84: from lab83
+lab100: from lab103
   skip
-goto lab85
+goto lab101
 
-lab85: from lab84
+lab101: from lab100
   n += 4 - 2
-goto lab86
+goto lab98
 
-lab86: from lab85
+lab98: from lab101
   skip
-goto lab87
+goto lab99
 
-lab87: from lab86
+lab99: from lab98
   n += 4 - - 2
-goto lab88
+goto lab96
 
-lab88: from lab87
+lab96: from lab99
   skip
-goto lab89
+goto lab97
 
-lab89: from lab88
+lab97: from lab96
   n += 0 - 93
-goto lab90
+goto lab94
 
-lab90: from lab89
+lab94: from lab97
   skip
-goto lab91
+goto lab95
 
-lab91: from lab90
+lab95: from lab94
   n += 93 + 0
 goto lab92
 
-lab92: from lab91
+lab92: from lab95
   skip
 goto lab93
 
 lab93: from lab92
   n -= - ((5 + 2) / 1 - - (0 - 9))
-goto lab94
+goto lab90
 
-lab94: from lab93
+lab90: from lab93
   skip
-goto lab95
+goto lab91
 
-lab95: from lab94
+lab91: from lab90
   n += - 2
-goto lab96
+goto lab88
 
-lab96: from lab95
+lab88: from lab91
   skip
-goto lab97
+goto lab89
 
-lab97: from lab96
+lab89: from lab88
   n += (5 + 2) ** 0
-goto lab98
+goto lab86
 
-lab98: from lab97
+lab86: from lab89
   skip
-goto lab99
+goto lab87
 
-lab99: from lab98
+lab87: from lab86
   n += (5 + 2) ** 1
-goto lab100
+goto lab84
 
-lab100: from lab99
+lab84: from lab87
   skip
-goto lab101
+goto lab85
 
-lab101: from lab100
+lab85: from lab84
   n += (5 + 2) ** 2
-goto lab102
+goto lab82
 
-lab102: from lab101
+lab82: from lab85
   skip
-goto lab103
+goto lab83
 
-lab103: from lab102
+lab83: from lab82
   n += not (a && (1 && 0))
-goto lab104
+goto lab81
 
-lab104: from lab103
+lab81: from lab83
   skip
-goto lab105
+goto lab26
 
-lab105: from lab104
+lab26: from lab81
   skip
-goto lab67
+if (# b = 0 || 0) lab27 lab29
 
-lab67: from lab105
-  skip
-goto lab64
-
-lab64: from lab67
-  skip
-if (# b = 0 || 0) lab65 lab63
-
-lab65: from lab64
+lab27: from lab26
   n += 4
-goto lab106
+goto lab24
 
-lab106: from lab65
+lab24: from lab27
   skip
-goto lab107
+goto lab25
 
-lab107: from lab106
+lab25: from lab24
   n -= 8
-goto lab108
+goto lab22
 
-lab108: from lab107
+lab22: from lab25
   skip
-goto lab109
+goto lab23
 
-lab109: from lab108
+lab23: from lab22
   n += 50
-goto lab110
+goto lab20
 
-lab110: from lab109
+lab20: from lab23
   skip
-goto lab111
+goto lab21
 
-lab111: from lab110
+lab21: from lab20
   n -= 5
-goto lab112
+goto lab18
 
-lab112: from lab111
+lab18: from lab21
   skip
-goto lab113
+goto lab19
 
-lab113: from lab112
+lab19: from lab18
   n *= 2
-goto lab114
+goto lab16
 
-lab114: from lab113
+lab16: from lab19
   skip
-goto lab115
+goto lab17
 
-lab115: from lab114
+lab17: from lab16
   n += a * 0
-goto lab116
+goto lab14
 
-lab116: from lab115
+lab14: from lab17
   skip
-goto lab117
+goto lab15
 
-lab117: from lab116
+lab15: from lab14
   o += 1
-goto lab118
+goto lab12
 
-lab118: from lab117
+lab12: from lab15
   skip
-goto lab119
+goto lab13
 
-lab119: from lab118
+lab13: from lab12
   push o l
-goto lab120
+goto lab10
 
-lab120: from lab119
+lab10: from lab13
   skip
-goto lab121
+goto lab11
 
-lab121: from lab120
+lab11: from lab10
   push l p
-goto lab122
+goto lab8
 
-lab122: from lab121
+lab8: from lab11
   skip
-goto lab123
+goto lab9
 
-lab123: from lab122
+lab9: from lab8
   push p q
-goto lab124
+goto lab6
 
-lab124: from lab123
+lab6: from lab9
   skip
-goto lab125
+goto lab7
 
-lab125: from lab124
+lab7: from lab6
   push q b
-goto lab126
+goto lab4
 
-lab126: from lab125
+lab4: from lab7
   skip
-goto lab127
+goto lab5
 
-lab127: from lab126
+lab5: from lab4
   a += b[(1 + 3) * 0][0][0][0]
-goto lab128
-
-lab128: from lab127
-  skip
-goto lab129
-
-lab129: from lab128
-  skip
 goto lab2
 
-lab2: from lab129
+lab2: from lab5
   skip
 goto lab3
 
