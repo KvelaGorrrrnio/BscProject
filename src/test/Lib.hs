@@ -117,7 +117,7 @@ runSuite' file (OutFile o m) = do
     ExitFailure _ | not e -> throwError $ "'" ++ o ++ "' should have succeeded with:\n" ++ expColor exp ++ "  , but failed with:\n" ++ errColor stderr
   if trim out == trim exp then return ()
     else throwError $ "Output from '" ++ o ++ "' did not meet expectation:\n" ++ expColor (trim exp) ++ "\n" ++ maxDash out exp ++ "\n" ++ errColor (trim out) ++ "\n"
-  when (mode == "translate" && not j) $ do
+  when (mode == "translate" && not j && not e) $ do
     (ec1,so1,se1) <- lift $ readProcessWithExitCode "stack" ["exec", lng, "--", bdir ++ "/" ++ file] ""
     (ec2,so2,se2) <- lift $ readProcessWithExitCode "stack" ["exec", swapInterpreter lng, "--", bdir ++ "/" ++ o] ""
     case (ec1,ec2) of
