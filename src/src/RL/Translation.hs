@@ -1,5 +1,5 @@
 module RL.Translation
-( translateToSRLSource
+( translate
 ) where
 
 import RL.AST as RL
@@ -7,5 +7,5 @@ import SRL.AST as SRL
 
 import Control.Monad.Writer
 
-translateToSRLSource :: TypeTab -> RL.AST -> String
-translateToSRLSource ttab ast = showTypeDecs ttab ++ "hej"
+translate :: TypeTab -> RL.AST -> String
+translate ttab ast = showTypeDecs ttab ++ "hej"

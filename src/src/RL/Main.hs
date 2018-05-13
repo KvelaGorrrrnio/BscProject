@@ -56,7 +56,7 @@ main = do
     Translate f o j c -> let eout' = eout j o in
       (staticcheck <$> getAST c f) >>= \case
        Left err  -> eout' err
-       Right (ttab,ast) | code <- translateToSRLSource ttab ast -> case ast of
+       Right (ttab,ast) | code <- translate ttab ast -> case ast of
          _ | j && null o -> putStrLn $ jsonCode code
            | j           -> writeFile o $ (++"\n") (jsonCode code)
            | null o      -> putStrLn code

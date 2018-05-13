@@ -1,23 +1,29 @@
 #!/bin/bash
 
-file="$2"
-if [[ ! -f "$file" ]] ; then
-    echo 'File "'$file'" does not exist.'
+# get source file
+if [[ ! -f "$1" ]] ; then
+    echo 'File "'$1'" does not exist.'
     exit
 fi
+file="$1"
 
-if [ ! -z "$3" -a "$3" != " " ]; then
-  destfile="$3/$(basename -- "$file")"
-else
-  destfile=$(basename -- "$file")
+# get destination directory
+if [[ ! -d "$2" ]] ; then
+    echo '"'$2'" is not a directory.'
+    exit
 fi
+destfile="$2/$(basename -- "$file")"
+
+# get interpreter
 interp="${file##*.}"
 
-# generate test data
+# run normally
 $(stack exec "$interp" -- "$file" > "$destfile.out")
 $(stack exec "$interp" -- -j "$file" > "$destfile.json.out")
 
-if [ "$1" != "err" ]
+# if the output should not be an error, we want
+# to have data for the other modes too
+if [ "$3" != "err" ]
 then
   $(stack exec "$interp" -- invert "$file" > "$destfile.invert.out")
   $(stack exec "$interp" -- invert -j "$file" > "$destfile.json.invert.out")
