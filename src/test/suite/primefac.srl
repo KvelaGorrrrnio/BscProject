@@ -5,13 +5,13 @@ list int p
 
 n += 315
 v += 2
-from ((empty p) && v = 2) do
+from ((empty p) and v = 2) do
   if (n % v = 0) then
     n /= v
     push v p
     v ^= top p
   else v += 1
-  fi (not (empty p) && top p = v)
+  fi (not (empty p) and top p = v)
 loop .
 until (n = 1)
 v -= top p

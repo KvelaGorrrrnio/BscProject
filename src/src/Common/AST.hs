@@ -22,6 +22,7 @@ isClear (ListV ls _)  = null ls
 data Id = Id String [Exp] deriving Eq
 instance Show Id where
   show (Id id exps) = id ++ concatMap (\e-> "[" ++ show e ++ "]") exps
+
 type Pos = (Int,Int)
 
 type VarTab = M.HashMap String Value
@@ -81,7 +82,7 @@ instance Show Exp where
   show (Unary  op exp _)  = show op ++ show exp
   show (Parens exp _)     = case exp of
     Parens exp' _ -> show exp
-    _           -> "("++show exp++")"
+    _             -> "("++show exp++")"
 showPar :: Exp -> String
 showPar e = case e of
   Parens _ _ -> show e
@@ -168,7 +169,7 @@ getType (IntV _)    = IntT
 getType (ListV _ t) = t
 
 getDefaultValue :: Type -> Value
-getDefaultValue IntT      = IntV 0
+getDefaultValue IntT  = IntV 0
 getDefaultValue listt = ListV [] listt
 
 -- =======
@@ -197,9 +198,9 @@ mapBinOp Geq     = \n -> boolToInt . (n>=)
 
 mapUnOp Neg  = negate
 mapUnOp Sign = signum
-mapUnOp Not  = boolToInt . not . intToBool
+mapUnOp Not  = boolToInt . (==0)
 
--- normalise to bool
+-- normalise
 norm :: Integer -> Integer
 norm 0 = 0
 norm _ = 1
@@ -207,6 +208,3 @@ norm _ = 1
 -- converting bool to val
 boolToInt :: Bool -> Integer
 boolToInt b = if b then 1 else 0
--- converting val to bool
-intToBool :: Integer -> Bool
-intToBool = (/=0)

@@ -18,7 +18,7 @@ data Prog
   deriving (Data,Typeable,Show,Eq)
 
 helpOutput = help "Write the output to the specified file"
-helpCode   = help "Give a string to be treated as (S)RL code"
+helpCode   = help "Give a string to be treated as [S]RL code"
 helpJSON   = help "Format the output as JSON"
 
 typeof    = record Typeof{} [
@@ -33,14 +33,14 @@ translate_ = record Translate{} [
   , out   := def         += typFile  += helpOutput
   , json  := def                     += helpJSON
   , code  := def                     += helpCode
-  ] += help "Translate an (S)RL program to its (S)RL counterpart"
+  ] += help "Translate a program in one language to a program in the other language"
 
 invert_   = record Invert{} [
     file  := def += args += typFile
   , out   := def         += typFile  += helpOutput
   , json  := def                     += helpJSON
   , code  := def                     += helpCode
-  ] += help "Invert an (S)RL program"
+  ] += help "Invert an [S]RL program"
 
 interpret = record Run{} [
     file  := def += args += typFile
@@ -48,12 +48,12 @@ interpret = record Run{} [
   , json  := def                     += helpJSON
   , code  := def                     += helpCode
   , log   := def += help "Output log instead of final state"
-  ] += help "Interpret an (S)RL program" += auto
+  ] += help "Interpret an [S]RL program" += auto
 
 mode = cmdArgsMode_ $ modes_ [interpret, invert_, translate_, typeof]
-  += help    "Interpret, invert or translate an (S)RL program"
-  += summary "The Glorious (S)RL Interpreter System, version 1.0.0"
-  += program "(s)rl"
+  += help    "Interpret, invert or translate an [S]RL program"
+  += summary "The Glorious [S]RL Interpreter System, version 1.0.0"
+  += program "[s]rl"
   += helpArg    [explicit, name "help", name "h"]
   += versionArg [explicit, name "version", name "v"]
 

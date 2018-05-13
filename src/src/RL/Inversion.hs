@@ -28,3 +28,6 @@ invertFrom :: From -> Jump
 invertFrom (From l p)     = Goto l p
 invertFrom (Fi e l1 l2 p) = If e l1 l2 p
 invertFrom (Entry p)      = Exit p
+
+invertStmts :: [Stmt] -> [Stmt]
+invertStmts = reverse . map invertStmt

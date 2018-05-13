@@ -40,10 +40,6 @@ jsonLog l =
      "{ \"type\" : \"log\", "
   ++ "\"log\" : ["++l++"] }"
 
--- JSON
--- jsonTab :: Show a => String -> M.HashMap Id a -> String
--- jsonTab t = jsonTabL t . M.toList
-
 jsonTab :: Show a => String -> M.HashMap String a -> String
 jsonTab t tab =
      "{ \"type\" : \"" ++ t ++ "\", "

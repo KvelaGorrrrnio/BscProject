@@ -104,11 +104,7 @@ statement = pos >>= \p -> (\s->s p)
         <|> popStmt)
 
 updateStmt :: Parser (Pos -> Stmt)
-updateStmt = do
-  var  <- identifier
-  op   <- update
-  expr <- expression
-  return $ Update var op expr
+updateStmt = Update <$> identifier <*> update <*> expression
 
 update = (reservedOp "+=" >> return PlusEq)
      <|> (reservedOp "-=" >> return MinusEq)
@@ -130,7 +126,7 @@ popStmt = reserved "pop" >> Pop <$> identifier <*> identifier
 
 -- expressions
 expression :: Parser Exp
-expression = buildExpressionParser operators term <?> "expression"
+expression = buildExpressionParser operators term
 
 operators = [
               [Prefix ((reservedOp "^"  <|> (reserved "top">>pos) )
@@ -163,7 +159,6 @@ operators = [
                                          >>= \p -> return (\l r->Binary    Or       l r p)) AssocLeft ]
             ]
 term = pos >>= \p ->(\s->s p)
-   <$> (Parens <$> parens expression
-   <|> Var    <$> identifier
+   <$> (Parens    <$> parens expression
+   <|> Var        <$> identifier
    <|> Lit . IntV <$> integer)
-   <?> "expression, identifier or value"

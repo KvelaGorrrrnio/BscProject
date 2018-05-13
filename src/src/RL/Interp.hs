@@ -38,7 +38,7 @@ interp from l = do
       lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l' ))
     Fi a l1 l2 p -> do
       q <- lift $ eval a >>= \case
-        IntV q -> return $ intToBool q
+        IntV q -> return $ q/=0
         _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
       let l' = if q then l1 else l2
@@ -57,7 +57,7 @@ interp from l = do
     Goto l' _      -> logMsg msg >> interp l l'
     If c l1 l2 p -> do
       q <- lift $ eval c >>= \case
-        IntV q -> return $ intToBool q
+        IntV q -> return $ q/=0
         _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
       logMsg $ msg ++ " -> " ++ if q then "true" else "false" -- we want lower case
 

@@ -39,12 +39,25 @@ from = pos >>= \p-> (\s->s p)
    <|> (reserved "entry" >> return Entry))
 
 jump :: Parser Jump
-jump  = pos >>= \p -> (\s->s p)
-  <$> (
-      (reserved "goto" >> Goto <$> identifier')
-  <|> (reserved "if"    >> If <$> expression <*> identifier' <*> identifier')
-  <|> (reserved "exit"  >> return Exit)
-  )
+jump = gotoJmp <|> ifJmp <|> exitJmp
+
+gotoJmp :: Parser Jump
+gotoJmp = pos >>= \p -> (\s->s p) <$> do
+  reserved "goto"
+  Goto <$> identifier'
+
+ifJmp :: Parser Jump
+ifJmp = pos >>= \p -> (\s->s p) <$> do
+  reserved "if"
+  t  <- expression
+  l1 <- identifier'
+  l2 <- identifier'
+  return $ If t l1 l2
+
+exitJmp :: Parser Jump
+exitJmp = pos >>= \p -> (\s->s p) <$> do
+  reserved "exit"
+  return Exit
 
 parseSrc :: String -> Either Error (TypeTab, AST)
 parseSrc s = case parse rlParser "" s of

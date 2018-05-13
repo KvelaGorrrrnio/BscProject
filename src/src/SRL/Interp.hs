@@ -19,10 +19,11 @@ runProgram ast ttab = execVarState vtab . interp $ ast
 
 
 interp :: Block -> VarState ()
-interp (Atom s)       = logStmt s
+interp (Atom s) = logStmt s
+
 interp (If t b1 b2 a p) = do
   q  <- eval t >>= \case
-    IntV q -> return $ intToBool q
+    IntV q -> return $ q/=0
     _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
   logMsg $ show (If t b1 b2 a p) ++ " -> " ++ if q then "[b1]" else "[b2]"
@@ -30,7 +31,7 @@ interp (If t b1 b2 a p) = do
   logMsg $ "if: " ++ (if q then "[b1]" else "[b2]") ++ " done"
 
   r <- eval a >>= \case
-    IntV r -> return $ intToBool r
+    IntV r -> return $ r/=0
     _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
   when (q /= r)
@@ -40,7 +41,7 @@ interp (Until d a b1 b2 t p) = do -- log this
   logMsg $ show (Until d a b1 b2 t p)
 
   q <- eval a >>= \case
-    IntV q -> return $ intToBool q
+    IntV q -> return $ q/=0
     _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
   unless (q == d) $ logError (RuntimeError p $ CustomRT "Assert")
@@ -48,7 +49,7 @@ interp (Until d a b1 b2 t p) = do -- log this
   interp b1
 
   r <- eval t >>= \case
-    IntV r -> return $ intToBool r
+    IntV r -> return $ r/=0
     _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
   logMsg $ "loop: " ++ show t ++ " -> " ++ if r then "true" else "false"

@@ -22,7 +22,6 @@ if n = 0 end loop
 
 // End
 end: from loop
-  .
 exit
 
 // End of program

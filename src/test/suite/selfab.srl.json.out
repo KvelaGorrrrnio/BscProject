@@ -1,1 +1,1 @@
-{ "type" : "error", "position" : { "line" : 10, "column" : 1 }, "message" : "A runtime error occured at (line 10, column 1):\nSelf-abuse in update." }
+{ "type" : "error", "position" : { "line" : 10, "column" : 1 }, "message" : "A runtime error occurred at (line 10, column 1):\nSelf-abuse in update." }

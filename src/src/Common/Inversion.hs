@@ -2,9 +2,6 @@ module Common.Inversion where
 
 import Common.AST
 
-invertStmts :: [Stmt] -> [Stmt]
-invertStmts = reverse . map invertStmt
-
 invertStmt :: Stmt -> Stmt
 invertStmt (Update id op e p) = Update id (invertOp op) e p
 invertStmt (Push id1 id2 p)   = Pop  id1 id2 p

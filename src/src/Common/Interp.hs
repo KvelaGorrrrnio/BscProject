@@ -14,9 +14,6 @@ import Control.Monad.Except
 import qualified Data.HashMap.Strict as M
 import qualified Data.IntMap.Strict as I
 
--- debugging
-import Debug.Trace
-
 -- ======================================
 -- Monad transformer : The variable state
 -- ======================================
@@ -130,9 +127,9 @@ exec (Push id1 id2 p) = do
       | otherwise ->
         logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
     _ -> logError $ RuntimeError p $ CustomRT "Pushing onto non-list. " -- TODO: mere nøjagtig
-    where push v (ListV ls t) = ListV (v:ls) t
-          clear (IntV _)    = IntV 0
-          clear (ListV _ t) = ListV [] t
+  where push v (ListV ls t) = ListV (v:ls) t
+        clear (IntV _)    = IntV 0
+        clear (ListV _ t) = ListV [] t
 
 exec (Pop id1 id2 p) = do
   v1 <- rd id1 p
@@ -147,8 +144,8 @@ exec (Pop id1 id2 p) = do
         adjust (const v) id1 p
         adjust (const $ ListV ls (ListT t)) id2 p
       | otherwise ->
-        logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
-    _  -> logError $ RuntimeError p $ CustomRT "Popping from non-list"
+        logError $ RuntimeError p $ CustomRT "Types do not match." -- TODO: mere nøjagtig
+    _  -> logError $ RuntimeError p $ CustomRT "Popping from non-list."
 
 -- swapping variables
 exec (Swap id1 id2 p) = do
@@ -174,8 +171,7 @@ eval :: Exp -> VarState Value
 eval (Lit v _)  = return v
 eval (Var id p) = rd id p
 
-
-  -- binary arithmetic and relational
+-- binary arithmetic and relational
 eval (Binary op l r p)
   | op <= Geq  = do
     vl <- eval l
@@ -193,6 +189,7 @@ eval (Binary op l r p)
         | m == 0    -> logError $ RuntimeError p $ CustomRT "Dividing by zero."
         | otherwise -> return $ IntV (mapBinOp op n m)
       _             -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+
   -- binary logical
   | otherwise = eval l >>= \case
     IntV 0 | op==And        -> return $ IntV 0
