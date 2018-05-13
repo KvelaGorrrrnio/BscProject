@@ -28,7 +28,7 @@ typeof    = record Typeof{} [
   , code  := def                     += helpCode
   ] += help "Print the inferred types of the program"
 
-translate = record Translate{} [
+translate_ = record Translate{} [
     file  := def += args += typFile
   , out   := def         += typFile  += helpOutput
   , json  := def                     += helpJSON
@@ -50,7 +50,7 @@ interpret = record Run{} [
   , log   := def += help "Output log instead of final state"
   ] += help "Interpret an (S)RL program" += auto
 
-mode = cmdArgsMode_ $ modes_ [interpret, invert_, translate, typeof]
+mode = cmdArgsMode_ $ modes_ [interpret, invert_, translate_, typeof]
   += help    "Interpret, invert or translate an (S)RL program"
   += summary "The Glorious (S)RL Interpreter System, version 1.0.0"
   += program "(s)rl"

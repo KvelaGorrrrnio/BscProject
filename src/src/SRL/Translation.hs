@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 module SRL.Translation
-( translateToRLSource
+( translate
 ) where
 
 import RL.AST as RL
@@ -10,66 +10,86 @@ import SRL.AST as SRL
 import Control.Monad.Writer
 import Control.Monad.State
 
-genLabel  :: MonadState Int m => String -> m RL.Label
-genLabel lab = (++) lab . show <$> get
-genLabelI :: MonadState Int m => String -> m RL.Label
-genLabelI lab = genLabel lab <* modify (+1)
+type Labels = (RL.Label, RL.Label, RL.Label, RL.Label)
+p = (0,0)
+
+type TrlMonad = WriterT RL.AST (State Int)
+
+genLabel :: MonadState Int m => () -> m RL.Label
+genLabel () = gets ((++) "lab" . show) <* modify (+1)
 
 push :: MonadWriter RL.AST m => RL.Label -> RL.Block -> m ()
 push l b = tell [(l, b)]
 
-translateToRLSource :: TypeTab -> SRL.AST -> String
-translateToRLSource ttab ast = RL.showAST ttab $ flip evalState 1 . execWriterT $ translateS "init" (Entry (0,0)) (Exit (0,0)) ast
+translate :: TypeTab -> SRL.AST -> String
+translate ttab ast =
+  RL.showAST ttab . evalState (execWriterT $ trlProg ast) $ 0
 
-translateS :: Label -> From -> To -> [Stmt] -> WriterT RL.AST (State Int) Label
-translateS thisL thisF thisT ss | thisB <- if null stmts then [Skip (0,0)] else stmts =
+trlProg :: SRL.AST -> TrlMonad ()
+trlProg ast = do
+  l0 <- genLabel ()
+  l1 <- genLabel ()
+  l2 <- genLabel ()
+  l3 <- genLabel ()
 
-  -- the next must be either an if, a loop or nothing
-  case r of
-    [] ->
+  let fs = Entry p
+      ts = Goto l1 p
 
-      -- push this block to the AST
-      push thisL (thisF, thisB, thisT)
+      fe = From l2 p
+      te = Exit p
 
-      >> return thisL
+  push l0 (fs,[],ts)
+  trlBlk ast (l0,l1,l2,l3)
+  push l3 (fe,[],te)
 
-    If t s1 s2 a _ : ss -> do
+trlBlk :: SRL.AST -> Labels -> TrlMonad ()
+trlBlk blk (l0,l1,l4,l5) = case blk of
+  s:blk -> do
+    l2 <- genLabel ()
+    l3 <- genLabel ()
 
-      -- generate the labels for the blocks to come
-      thenL <- genLabel  "then"
-      elseL <- genLabel  "else"
-      endL  <- genLabelI "contif"
+    trlStmt s  (l0,l1,l2,l3)
+    trlBlk blk (l2,l3,l4,l5)
+  [] -> trlStmt (Skip p) (l0,l1,l4,l5)
 
-      -- push this block to the AST
-      push thisL (thisF, thisB, IfTo t thenL elseL (0,0))
+trlStmt :: Stmt -> Labels -> TrlMonad ()
+trlStmt (If t b1 b2 a _) (l0,l1,l6,l7) = do
+  l2 <- genLabel ()
+  l3 <- genLabel ()
+  l4 <- genLabel ()
+  l5 <- genLabel ()
 
-      -- translate the bodies and fetch the end block labels
-      tl <- translateS thenL (From thisL (0,0)) (Goto endL (0,0))  s1
-      el <- translateS elseL (From thisL (0,0)) (Goto endL (0,0))  s2
+  let fs = From l0 p
+      ts = IfTo t l2 l4 p
 
-      -- generate the next sequence of blocks
-      translateS endL  (Fi a tl el (0,0)) thisT ss
+      fe = Fi a l3 l5 p
+      te = Goto l7 p
 
-    Until _ a s t _ : ss -> do
+  push l1 (fs,[],ts)
+  trlBlk b1 (l1,l2,l3,l6)
+  trlBlk b2 (l1,l4,l5,l6)
+  push l6 (fe,[],te)
 
-      -- generate the labels for the blocks to come
-      loopL <- genLabel  "loop"
-      endL  <- genLabelI "contloop"
+trlStmt (Until d a b t _) (l0,l1,l4,l5) = do
+  l2 <- genLabel ()
+  l3 <- genLabel ()
 
-      -- push this block to the AST
-      push thisL (thisF, thisB, Goto loopL (0,0))
+  let fs = Fi a l0 l4 p
+      ts = Goto l2 p
 
-      -- translate the body and fetch the end block label
-      ll <- translateS loopL (Fi a thisL loopL (0,0)) (IfTo t endL loopL (0,0)) s
+      fe = From l3 p
+      te = IfTo t l5 l1 p
 
-      -- generate the next sequence of blocks
-      translateS endL (From ll (0,0)) thisT ss
+  push l1 (fs,[],ts)
+  trlBlk b (l1,l2,l3,l4)
+  push l4 (fe,[],te)
 
-    _ -> fail "Something went very wrong."
+trlStmt s (l0,l1,l2,l3) = do
+  let fs = From l0 p
+      ts = Goto l2 p
 
-  where (stmts,r) = break isIfOrUntil ss
+      fe = From l1 p
+      te = Goto l3 p
 
-isIfOrUntil :: Stmt -> Bool
-isIfOrUntil If{}    = True
-isIfOrUntil Until{} = True
-isIfOrUntil _       = False
+  push l1 (fs,[s],ts)
+  push l2 (fe,[ ],te)
