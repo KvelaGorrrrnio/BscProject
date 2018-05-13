@@ -62,3 +62,7 @@ interp from l = do
       logMsg $ msg ++ " -> " ++ if q then "true" else "false" -- we want lower case
 
       if q then interp l l1 else interp l l2
+
+execStmts :: [Stmt] -> VarState ()
+execStmts = mapM_ logStmt
+

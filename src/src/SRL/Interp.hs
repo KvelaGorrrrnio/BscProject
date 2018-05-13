@@ -25,9 +25,9 @@ interp (If t b1 b2 a p) = do
     IntV q -> return $ intToBool q
     _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
-  logMsg $ show (If t b1 b2 a p) ++ " -> " ++ if q then "true" else "false"
+  logMsg $ show (If t b1 b2 a p) ++ " -> " ++ if q then "[b1]" else "[b2]"
   interp $ if q then b1 else b2
-  logMsg $ (if q then "[b1]" else "[b2]") ++ " done"
+  logMsg $ "if: " ++ (if q then "[b1]" else "[b2]") ++ " done"
 
   r <- eval a >>= \case
     IntV r -> return $ intToBool r
@@ -51,6 +51,7 @@ interp (Until d a b1 b2 t p) = do -- log this
     IntV r -> return $ intToBool r
     _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
+  logMsg $ "loop: " ++ show t ++ " -> " ++ if r then "true" else "false"
   unless r $ interp b2 >> interp (Until False a b1 b2 t p)
 
 interp (Seq b1 b2) = interp b1 >> interp b2

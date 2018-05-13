@@ -78,16 +78,13 @@ adjust' op (e:es) p vo = do
 -- ==========
 -- Statements
 -- ==========
-
-execStmts :: [Stmt] -> VarState ()
-execStmts = mapM_ logStmt
-
 exec :: Stmt -> VarState ()
 
 -- variable updates
 exec (Update (Id id exps) op e p) = do
   abuse <- contains e (Id id exps) []
   when abuse $ logError $ RuntimeError p $ CustomRT "Self-abuse in update."
+
   v1 <- rd (Id id exps) p
   n <- case v1 of
     IntV n -> return n

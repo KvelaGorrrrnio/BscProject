@@ -70,13 +70,6 @@ trlBlk (SRL.If t b1 b2 a _) (l0,l1,l6,l7) = do
   trlBlk b2 (l1,l4,l5,l6)
   push l6 (fe,[],te)
 
-trlBlk (Seq b1 b2) (l0,l1,l4,l5) = do
-  l2 <- genLabel ()
-  l3 <- genLabel ()
-
-  trlBlk b1 (l0,l1,l2,l3)
-  trlBlk b2 (l2,l3,l4,l5)
-
 trlBlk (Until d a b1 b2 t p) (l0,l1,l4,l7) = do
   l2 <- genLabel ()
   l3 <- genLabel ()
@@ -93,3 +86,10 @@ trlBlk (Until d a b1 b2 t p) (l0,l1,l4,l7) = do
   trlBlk b1 (l1,l2,l3,l4)
   trlBlk b2 (l4,l5,l6,l1)
   push l4 (fe,[],te)
+
+trlBlk (Seq b1 b2) (l0,l1,l4,l5) = do
+  l2 <- genLabel ()
+  l3 <- genLabel ()
+
+  trlBlk b1 (l0,l1,l2,l3)
+  trlBlk b2 (l2,l3,l4,l5)
