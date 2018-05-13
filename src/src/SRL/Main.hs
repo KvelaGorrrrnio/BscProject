@@ -8,7 +8,6 @@ import Control.Monad (when, unless)
 import SRL.Parser
 import SRL.Translation
 import SRL.Inversion
-import SRL.Static
 import SRL.Interp
 import SRL.Optimise
 import SRL.Error

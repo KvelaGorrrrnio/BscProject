@@ -1,11 +1,9 @@
 module RL.Static
 ( staticcheck
-, module Common.Static
 ) where
 
 import RL.AST
 import RL.Error
-import Common.Static
 import Data.List (group,sort)
 import Control.Monad
 import Control.Monad.State
@@ -40,9 +38,6 @@ staticcheckBlock (l,(f,stmts,t)) = do
     Fi _ l _ p | null (lookup l lbls) -> throwError $ StaticError p $ NotDefinedLabel l
     Fi _ _ l p | null (lookup l lbls) -> throwError $ StaticError p $ NotDefinedLabel l
     _                                 -> return ()
-  case runStaticcheck stmts of
-    Left err -> throwError err
-    Right _  -> return ()
   (sn,en,ex) <- get
   case t of
     Exit p | ex -> throwError $ StaticError p DuplicateExit
