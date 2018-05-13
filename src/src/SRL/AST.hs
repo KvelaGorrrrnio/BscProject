@@ -37,10 +37,10 @@ showBlock lvl b = case b of
 
 data Block = Atom Stmt
            | If Exp Block Block Exp Pos
-           | Until Bool Exp Block Block Exp Pos -- add the loop part?
-           | Seq Block Block -- [Block] -- Block Block
+           | Until Bool Exp Block Block Exp Pos
+           | Seq Block Block
 instance Show Block where
   show (Atom s)            = show s
-  show (If t _ _ a _)      = "if " ++ show t ++ " then [b1] else [b2] fi " ++ show a
-  show (Until _ a _ _ t _) = "from " ++ show a ++ " do [b1] loop [b2] until " ++ show t
+  show (If t _ _ a (l,_))      = "line " ++ show l ++ "\nif " ++ show t ++ " then [b1] else [b2] fi " ++ show a
+  show (Until _ a _ _ t (l,_)) = "line " ++ show l ++ "\nfrom " ++ show a ++ " do [b1] loop [b2] until " ++ show t
   show (Seq b1 b2)         = ""
