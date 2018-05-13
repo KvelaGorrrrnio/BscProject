@@ -6,4 +6,5 @@ v ^= 1
 from (v = 1) do
   v *= n
   n -= 1
+loop .
 until (n = 0)

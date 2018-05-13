@@ -12,6 +12,8 @@ from (n = 1) do
   else
     v -= 1
   fi (n % v = 0)
+loop
+  skip
 until ((? p) && v = 2)
 v -= 2
 n -= 315

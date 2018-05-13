@@ -36,8 +36,8 @@ interp (If t b1 b2 a p) = do
   when (q /= r)
     $ logError $ RuntimeError p $ CustomRT "Assert and such"
 
-interp (Until d a b t p) = do -- log this
-  logMsg $ show (Until d a b t p)
+interp (Until d a b1 b2 t p) = do -- log this
+  logMsg $ show (Until d a b1 b2 t p)
 
   q <- eval a >>= \case
     IntV q -> return $ intToBool q
@@ -45,14 +45,12 @@ interp (Until d a b t p) = do -- log this
 
   unless (q == d) $ logError (RuntimeError p $ CustomRT "Assert")
 
-  interp b
+  interp b1
 
   r <- eval t >>= \case
     IntV r -> return $ intToBool r
     _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
-  unless r $ interp (Until False a b t p)
-
-  logMsg $ show t ++ " -> " ++ "true"
+  unless r $ interp b2 >> interp (Until False a b1 b2 t p)
 
 interp (Seq b1 b2) = interp b1 >> interp b2

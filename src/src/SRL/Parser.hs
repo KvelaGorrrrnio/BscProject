@@ -48,10 +48,12 @@ untilBlock = pos >>= \p -> (\s->s p) <$> do
   reserved "from"
   a <- expression
   reserved "do"
-  b <- block
+  b1 <- block
+  reserved "loop"
+  b2 <- block
   reserved "until"
   t <- expression
-  return $ Until True a b t
+  return $ Until True a b1 b2 t
 
 parseSrc :: String -> Either Error (TypeTab, AST)
 parseSrc s = case parse srlParser "" s of

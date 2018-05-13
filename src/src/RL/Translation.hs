@@ -9,3 +9,6 @@ import Control.Monad.Writer
 
 translate :: TypeTab -> RL.AST -> String
 translate ttab ast = showTypeDecs ttab ++ "hej"
+
+--trlProg :: RL.AST -> SRL.AST
+

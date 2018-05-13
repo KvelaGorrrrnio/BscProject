@@ -22,53 +22,61 @@ l8: from l11
   skip
 goto l9
 
-l9: fi ((? p) && v = 2) l8 l6
+l9: fi ((? p) && v = 2) l8 l15
   skip
 goto l12
 
 l12: from l9
   skip
-if (n % v = 0) l14 l16
+if (n % v = 0) l16 l18
 
-l14: from l12
+l16: from l12
   n /= v
+goto l22
+
+l22: from l16
+  skip
+goto l23
+
+l23: from l22
+  push v p
 goto l20
 
-l20: from l14
+l20: from l23
   skip
 goto l21
 
 l21: from l20
-  push v p
-goto l18
+  v ^= ^ p
+goto l17
 
-l18: from l21
+l17: from l21
   skip
+goto l13
+
+l18: from l12
+  v += 1
 goto l19
 
 l19: from l18
-  v ^= ^ p
-goto l15
-
-l15: from l19
   skip
 goto l13
 
-l16: from l12
-  v += 1
-goto l17
-
-l17: from l16
-  skip
-goto l13
-
-l13: fi (not (? p) && ^ p = v) l15 l17
+l13: fi (not (? p) && ^ p = v) l17 l19
   skip
 goto l6
 
+l14: from l6
+  skip
+goto l15
+
+l15: from l14
+  skip
+goto l9
+
 l6: from l13
   skip
-if (n = 1) l7 l9
+if (n = 1) l7 l14
 
 l7: from l6
   v -= ^ p

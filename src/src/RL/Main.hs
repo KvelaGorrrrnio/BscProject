@@ -10,7 +10,6 @@ import RL.Translation
 import RL.Inversion
 import RL.Static
 import RL.Interp
-import RL.Optimise
 import RL.Error
 
 import Common.HandleArgs
@@ -31,7 +30,7 @@ main = do
   case args of
     Run [] o j c _ -> if c then noCode j o else noFile j o
     Run f o j c l  -> let eout' = eout j o in
-      ((if l then id else optimise) . staticcheck <$> getAST c f) >>= \case
+      (staticcheck <$> getAST c f) >>= \case
         Left err  -> eout' err
         Right (ttab,ast) -> case runProgram ast ttab of
           (_,log)        | l && j && null o -> putStrLn $ logToJSON log

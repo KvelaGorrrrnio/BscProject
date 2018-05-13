@@ -10,4 +10,5 @@ from (v = 1) do
   a += v
   v += 2
   n -= 1
+loop .
 until (n = 0)

@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "int a\nint n\nint v\n\nfrom (n = 0) do\n  n += 1\n  v -= 2\n  a -= v\nuntil (v = 1)\nv -= 1\nn ^= 11" }
+{ "type" : "code", "code" : "int a\nint n\nint v\n\nfrom (n = 0) do\n  n += 1\n  v -= 2\n  a -= v\nloop\n  skip\nuntil (v = 1)\nv -= 1\nn ^= 11" }

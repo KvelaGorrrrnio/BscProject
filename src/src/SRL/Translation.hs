@@ -77,16 +77,19 @@ trlBlk (Seq b1 b2) (l0,l1,l4,l5) = do
   trlBlk b1 (l0,l1,l2,l3)
   trlBlk b2 (l2,l3,l4,l5)
 
-trlBlk (Until d a b t p) (l0,l1,l4,l5) = do
+trlBlk (Until d a b1 b2 t p) (l0,l1,l4,l7) = do
   l2 <- genLabel ()
   l3 <- genLabel ()
+  l5 <- genLabel ()
+  l6 <- genLabel ()
 
-  let fs = Fi a l0 l4 p
+  let fs = Fi a l0 l6 p
       ts = Goto l2 p
 
       fe = From l3 p
-      te = RL.If t l5 l1 p
+      te = RL.If t l7 l5 p
 
   push l1 (fs,[],ts)
-  trlBlk b (l1,l2,l3,l4)
+  trlBlk b1 (l1,l2,l3,l4)
+  trlBlk b2 (l4,l5,l6,l1)
   push l4 (fe,[],te)
