@@ -13,9 +13,6 @@ else
 fi
 interp="${file##*.}"
 
-# generate symbolic link
-$(ln -sf "$file" "$destfile")
-
 # generate test data
 $(stack exec "$interp" -- "$file" > "$destfile.out")
 $(stack exec "$interp" -- -j "$file" > "$destfile.json.out")
