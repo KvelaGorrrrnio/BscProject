@@ -30,10 +30,9 @@ runProgram ast ttab = do
 interp :: Label -> Label -> ProgState ()
 interp from l = do
   blks <- ask
-
-  (f,ss,t) <- case lookup l blks of
-                Nothing -> fail $ "Label '" ++ l ++ "' is not defined."
-                Just b  -> return b
+  Just (f,ss,t) <- asks (lookup l) -- >>= \case
+--                Nothing -> fail $ "Label '" ++ l ++ "' is not defined."
+--                Just b  -> return b
 
   case f of
     Entry _      -> return ()
