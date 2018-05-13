@@ -26,7 +26,7 @@ typeof    = record Typeof{} [
   , out   := def         += typFile  += helpOutput
   , json  := def                     += helpJSON
   , code  := def                     += helpCode
-  ] += help "Print the inferred types of the program"
+  ] += help "Print the types of the variables in the program"
 
 translate_ = record Translate{} [
     file  := def += args += typFile

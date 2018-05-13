@@ -30,10 +30,6 @@ languageDef =
                                       , "swap"
                                       , "push"
                                       , "pop"
-                                      , "then"
-                                      , "else"
-                                      , "do"
-                                      , "until"
                                       -- expressions
                                       , "neg"
                                       , "sig"
@@ -43,6 +39,12 @@ languageDef =
                                       , "top"
                                       , "empty"
                                       , "size"
+                                      -- srl
+                                      , "then"
+                                      , "else"
+                                      , "do"
+                                      -- , "loop"
+                                      , "until"
                                       ]
            , Token.reservedOpNames  = [ "+=", "-=", "^=", "*=", "/="
                                       , "+", "-", "^", "*", "**", "/", "%"
