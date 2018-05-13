@@ -14,11 +14,11 @@ import Control.Monad.Except
 
 type BlockState = StateT ([(Label,Pos)],Bool,Bool) (ReaderT [(Label,Pos)] (Except Error))
 
-staticcheck :: Either Error AST -> Either Error AST
+staticcheck :: Either Error (TypeTab,AST) -> Either Error (TypeTab,AST)
 staticcheck (Left err)  = Left err
-staticcheck (Right ast) = case runExcept . (flip runReaderT $ getLabels ast) . (flip execStateT ([],False,False)) $ staticcheckBlocks ast of
+staticcheck (Right (ttab,ast)) = case runExcept . (flip runReaderT $ getLabels ast) . (flip execStateT ([],False,False)) $ staticcheckBlocks ast of
   Left err -> Left err
-  Right (_,True,True) -> Right ast
+  Right (_,True,True) -> Right (ttab,ast)
   Right (_,False,_)   -> Left $ StaticError (0,0) $ NoEntry
   Right (_,_,False)   -> Left $ StaticError (0,0) $ NoExit
   where getLabels = map (\(l,b) ->(l,getBlockPos b))
