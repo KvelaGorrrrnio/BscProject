@@ -2,58 +2,58 @@ int a
 int n
 int v
 
-lab0: entry
+l0: entry
   skip
-goto lab1
+goto l1
 
-lab1: from lab0
+l1: from l0
   n ^= 11
-goto lab6
+goto l6
 
-lab6: from lab1
+l6: from l1
   skip
-goto lab7
+goto l7
 
-lab7: from lab6
+l7: from l6
   v += 1
-goto lab4
+goto l4
 
-lab4: from lab7
+l4: from l7
   skip
-goto lab5
+goto l5
 
-lab5: fi (v = 1) lab4 lab2
+l5: fi (v = 1) l4 l2
   skip
-goto lab8
+goto l8
 
-lab8: from lab5
+l8: from l5
   a += v
-goto lab12
+goto l12
 
-lab12: from lab8
+l12: from l8
   skip
-goto lab13
+goto l13
 
-lab13: from lab12
+l13: from l12
   v += 2
-goto lab10
+goto l10
 
-lab10: from lab13
+l10: from l13
   skip
-goto lab11
+goto l11
 
-lab11: from lab10
+l11: from l10
   n -= 1
-goto lab9
+goto l9
 
-lab9: from lab11
+l9: from l11
   skip
-goto lab2
+goto l2
 
-lab2: from lab9
+l2: from l9
   skip
-if (n = 0) lab3 lab5
+if (n = 0) l3 l5
 
-lab3: from lab2
+l3: from l2
   skip
 exit

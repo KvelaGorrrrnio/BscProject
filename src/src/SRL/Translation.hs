@@ -16,7 +16,7 @@ p = (0,0)
 type TrlMonad = WriterT RL.AST (State Int)
 
 genLabel :: MonadState Int m => () -> m RL.Label
-genLabel () = gets ((++) "lab" . show) <* modify (+1)
+genLabel () = gets ((++) "l" . show) <* modify (+1)
 
 push :: MonadWriter RL.AST m => RL.Label -> RL.Block -> m ()
 push l b = tell [(l, b)]

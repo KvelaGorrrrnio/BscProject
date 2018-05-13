@@ -2,90 +2,90 @@ int n
 list  int p
 int v
 
-lab0: entry
+l0: entry
   skip
-goto lab1
+goto l1
 
-lab1: from lab0
+l1: from l0
   n += 315
-goto lab10
+goto l10
 
-lab10: from lab1
+l10: from l1
   skip
-goto lab11
+goto l11
 
-lab11: from lab10
+l11: from l10
   v += 2
-goto lab8
+goto l8
 
-lab8: from lab11
+l8: from l11
   skip
-goto lab9
+goto l9
 
-lab9: fi ((? p) && v = 2) lab8 lab6
+l9: fi ((? p) && v = 2) l8 l6
   skip
-goto lab12
+goto l12
 
-lab12: from lab9
+l12: from l9
   skip
-if (n % v = 0) lab14 lab16
+if (n % v = 0) l14 l16
 
-lab14: from lab12
+l14: from l12
   n /= v
-goto lab20
+goto l20
 
-lab20: from lab14
+l20: from l14
   skip
-goto lab21
+goto l21
 
-lab21: from lab20
+l21: from l20
   push v p
-goto lab18
+goto l18
 
-lab18: from lab21
+l18: from l21
   skip
-goto lab19
+goto l19
 
-lab19: from lab18
+l19: from l18
   v ^= ^ p
-goto lab15
+goto l15
 
-lab15: from lab19
+l15: from l19
   skip
-goto lab13
+goto l13
 
-lab16: from lab12
+l16: from l12
   v += 1
-goto lab17
+goto l17
 
-lab17: from lab16
+l17: from l16
   skip
-goto lab13
+goto l13
 
-lab13: fi (not (? p) && ^ p = v) lab15 lab17
+l13: fi (not (? p) && ^ p = v) l15 l17
   skip
-goto lab6
+goto l6
 
-lab6: from lab13
+l6: from l13
   skip
-if (n = 1) lab7 lab9
+if (n = 1) l7 l9
 
-lab7: from lab6
+l7: from l6
   v -= ^ p
-goto lab4
+goto l4
 
-lab4: from lab7
+l4: from l7
   skip
-goto lab5
+goto l5
 
-lab5: from lab4
+l5: from l4
   n -= 1
-goto lab2
+goto l2
 
-lab2: from lab5
+l2: from l5
   skip
-goto lab3
+goto l3
 
-lab3: from lab2
+l3: from l2
   skip
 exit
