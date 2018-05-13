@@ -39,7 +39,7 @@ interp from l = do
     Fi a l1 l2 p -> do
       q <- lift $ eval a >>= \case
         IntV q -> return $ q/=0
-        _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+        _      -> logError $ RuntimeError (getExpPos a) $ CustomRT "Type does not match in assertion." -- TODO: mere nøjagtig
 
       let l' = if q then l1 else l2
 
@@ -58,7 +58,7 @@ interp from l = do
     If c l1 l2 p -> do
       q <- lift $ eval c >>= \case
         IntV q -> return $ q/=0
-        _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+        _      -> logError $ RuntimeError (getExpPos c) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
       logMsg $ msg ++ " -> " ++ if q then "true" else "false" -- we want lower case
 
       if q then interp l l1 else interp l l2

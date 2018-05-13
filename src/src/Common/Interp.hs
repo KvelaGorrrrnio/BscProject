@@ -24,16 +24,16 @@ execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 
 rd :: Id -> Pos -> VarState Value
 rd (Id id exps) p = gets (mLookup id) >>= \case
-  Just v  -> foldM (getIdx p) v exps
+  Just v  -> foldM (\acc e -> getIdx (getExpPos e) acc e) v exps
   Nothing -> logError $ RuntimeError p $ CustomRT ("Variable '" ++ id ++ "' is not declared.")
 
 getIdx :: Pos -> Value -> Exp -> VarState Value
-getIdx p (IntV _) _ = logError $ RuntimeError p $ CustomRT "Too many indices."
+getIdx p (IntV _) _ = logError $ RuntimeError p $ CustomRT "Indexing on non-list."
 getIdx p (ListV lst _) idx = eval idx >>= \case
-  IntV i | i < 0     -> logError $ RuntimeError p $ CustomRT "Index must be non-negative."
+  IntV i | i < 0     -> logError $ RuntimeError (getExpPos idx) $ CustomRT "Index must be non-negative."
     | otherwise -> case index lst i of
       Just v  -> return v
-      Nothing -> logError $ RuntimeError p $ CustomRT "Index out of bounds."
+      Nothing -> logError $ RuntimeError (getExpPos idx) $ CustomRT "Index out of bounds."
   _ -> logError $ RuntimeError p $ CustomRT "Index must be an integer."
   where index :: [Value] -> Integer -> Maybe Value
         index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
@@ -67,8 +67,8 @@ adjust' op (e:es) p vo = do
   case vo of
     ListV lst t -> eval e >>= \case
       IntV i -> return $ ListV (replace lst i vi) t
-      _     -> logError $ RuntimeError p $ CustomRT "Index must be an integer."
-    _ -> logError $ RuntimeError p $ CustomRT "Too many indices."
+      _     -> logError $ RuntimeError (getExpPos e) $ CustomRT "Index must be an integer."
+    _ -> logError $ RuntimeError (getExpPos e) $ CustomRT "Indexing on non-list."
   where replace :: [Value] -> Integer -> Value -> [Value]
         replace lst i v = take (fromIntegral i) lst ++ [v] ++ drop (fromIntegral (i + 1)) lst
 

@@ -24,7 +24,7 @@ interp (Atom s) = logStmt s
 interp (If t b1 b2 a p) = do
   q  <- eval t >>= \case
     IntV q -> return $ q/=0
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+    _      -> logError $ RuntimeError (getExpPos t) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
   logMsg $ show (If t b1 b2 a p) ++ " -> " ++ if q then "[b1]" else "[b2]"
   interp $ if q then b1 else b2
@@ -32,7 +32,7 @@ interp (If t b1 b2 a p) = do
 
   r <- eval a >>= \case
     IntV r -> return $ r/=0
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+    _      -> logError $ RuntimeError (getExpPos a) $ CustomRT "Type does not match in assertion." -- TODO: mere nøjagtig
 
   when (q /= r)
     $ logError $ RuntimeError p $ CustomRT "Assert and such"
@@ -42,7 +42,7 @@ interp (Until d a b1 b2 t p) = do -- log this
 
   q <- eval a >>= \case
     IntV q -> return $ q/=0
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+    _      -> logError $ RuntimeError (getExpPos a) $ CustomRT "Type does not match in assertion." -- TODO: mere nøjagtig
 
   unless (q == d) $ logError (RuntimeError p $ CustomRT "Assert")
 
@@ -50,7 +50,7 @@ interp (Until d a b1 b2 t p) = do -- log this
 
   r <- eval t >>= \case
     IntV r -> return $ r/=0
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+    _      -> logError $ RuntimeError (getExpPos t) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
   logMsg $ "loop: " ++ show t ++ " -> " ++ if r then "true" else "false"
   unless r $ interp b2 >> interp (Until False a b1 b2 t p)

@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module Common.AST where
 
 import Data.Bits (xor)
@@ -83,6 +82,12 @@ instance Show Exp where
   show (Parens exp _)     = case exp of
     Parens exp' _ -> show exp
     _             -> "("++show exp++")"
+getExpPos :: Exp -> Pos
+getExpPos (Lit _ p)        = p
+getExpPos (Var _ p)        = p
+getExpPos (Binary _ _ _ p) = p
+getExpPos (Unary _ _ p)    = p
+getExpPos (Parens _ p)     = p
 showPar :: Exp -> String
 showPar e = case e of
   Parens _ _ -> show e
