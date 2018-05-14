@@ -134,7 +134,6 @@ instance Show BinOp where
   show And     = " && "
 
 
-
 data UnOp
   = Neg
   | Sign

@@ -14,6 +14,8 @@ import Control.Monad.Except
 import qualified Data.HashMap.Strict as M
 import qualified Data.IntMap.Strict as I
 
+import Debug.Trace
+
 -- ======================================
 -- Monad transformer : The variable state
 -- ======================================
@@ -70,7 +72,7 @@ adjust' op (e:es) p vo = do
       _     -> logError $ RuntimeError (getExpPos e) $ CustomRT "Index must be an integer."
     _ -> logError $ RuntimeError (getExpPos e) $ CustomRT "Indexing on non-list."
   where replace :: [Value] -> Integer -> Value -> [Value]
-        replace lst i v = take (fromIntegral i) lst ++ [v] ++ drop (fromIntegral (i + 1)) lst
+        replace lst i v | i' <- fromIntegral i = take i' lst ++ [v] ++ drop (i' + 1) lst
 
 -- ==========
 -- Statements
@@ -93,10 +95,11 @@ exec (Update (Id id exps) op e p) = do
     _      -> logError $ RuntimeError p $ CustomRT "Attempting to update variable with a list expression."
 
   case op of
-    DivEq  | mod n m == 0 -> return ()
-           | otherwise -> logError $ RuntimeError p $ CustomRT "Division has rest in update."
-    MultEq | n /= 0 && m /= 0 -> return ()
-           | otherwise -> logError $ RuntimeError p $ CustomRT "An operand in multiplication update is zero."
+    DivEq  | m == 0       -> logError $ RuntimeError p $ CustomRT "Dividing by zero: Expression is zero in division update."
+           | mod n m /= 0 -> logError $ RuntimeError p $ CustomRT "Division has rest in division update."
+           | otherwise    -> return ()
+    MultEq | m == 0       -> logError $ RuntimeError p $ CustomRT "Expression is zero in multiplication update."
+           | otherwise    -> return ()
     _ -> return ()
 
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
@@ -124,12 +127,11 @@ exec (Push id1 id2 p) = do
       | t == getType v1 -> do
         adjust clear id1 p
         adjust (push v1) id2 p
-      | otherwise ->
-        logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
+      | otherwise -> logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
     _ -> logError $ RuntimeError p $ CustomRT "Pushing onto non-list. " -- TODO: mere nøjagtig
   where push v (ListV ls t) = ListV (v:ls) t
-        clear (IntV _)    = IntV 0
-        clear (ListV _ t) = ListV [] t
+        clear (IntV _)      = IntV 0
+        clear (ListV _ t)   = ListV [] t
 
 exec (Pop id1 id2 p) = do
   v1 <- rd id1 p
@@ -171,8 +173,9 @@ eval :: Exp -> VarState Value
 eval (Lit v _)  = return v
 eval (Var id p) = rd id p
 
--- binary arithmetic and relational
 eval (Binary op l r p)
+
+  -- binary arithmetic and relational
   | op <= Geq  = do
     vl <- eval l
     vr <- eval r
@@ -186,9 +189,9 @@ eval (Binary op l r p)
     vr <- eval r
     case (vl, vr) of
       (IntV n, IntV m)
-        | m == 0    -> logError $ RuntimeError p $ CustomRT "Dividing by zero."
+        | m == 0    -> logError $ RuntimeError (getExpPos l) $ CustomRT "Dividing by zero."
         | otherwise -> return $ IntV (mapBinOp op n m)
-      _             -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+      _             -> logError $ RuntimeError (getExpPos l) $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
 
   -- binary logical
   | otherwise = eval l >>= \case
