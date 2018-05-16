@@ -15,8 +15,9 @@ class Editor extends Component {
     this.options = {
       lineNumbers: true,
       autofocus: true,
+      indentUnit: 2,
       tabSize: 2,
-      indentWithTabs: false,
+      smartIndent: true,
       theme: 'default-bsc',
       extraKeys: {
         'Cmd-Enter' : cm => {
@@ -34,6 +35,24 @@ class Editor extends Component {
             case 'invert':    this.invertProgram(); break;
             case 'translate': this.translateProgram(); break;
           }
+        },
+        'Tab': function (cm) {
+            if (cm.somethingSelected()) {
+                var sel = editor.getSelection('\n');
+                // Indent only if there are multiple lines selected, or if the selection spans a full line
+                if (sel.length > 0 && (sel.indexOf('\n') > -1 || sel.length === cm.getLine(cm.getCursor().line).length)) {
+                    cm.indentSelection('add');
+                    return;
+                }
+            }
+
+            if (cm.options.indentWithTabs)
+                cm.execCommand('insertTab');
+            else
+                cm.execCommand('insertSoftTab');
+        },
+        'Shift-Tab': function (cm) {
+            cm.indentSelection('subtract');
         },
       }
     };
