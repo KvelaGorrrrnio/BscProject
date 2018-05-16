@@ -39,6 +39,7 @@ languageDef =
                                       , "top"
                                       , "empty"
                                       , "size"
+                                      , "null"
                                       -- srl
                                       , "then"
                                       , "else"
@@ -133,6 +134,8 @@ operators = [
                                          >>= \p -> return (\e->  Unary     Top      e   p))           ]
             , [Prefix ((reservedOp "#"  <|> (reserved "size">>pos) )
                                          >>= \p -> return (\e->  Unary     Size     e   p))           ]
+            , [Prefix ((reserved "null">>pos)
+                                         >>= \p -> return (\e->  Unary     Null     e   p))           ]
             , [Prefix ((reservedOp "?"  <|> (reserved "empty">>pos) )
                                          >>= \p -> return (\e->  Unary     Empty    e   p))           ]
             , [Prefix ((reservedOp "-"  <|> (reserved "neg">>pos)  )
