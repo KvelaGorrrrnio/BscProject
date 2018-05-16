@@ -212,8 +212,8 @@ eval (Unary op exp p)
     _      -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
 
   | op == Null = eval exp >>= \case
-    ListV ls t -> IntV $ (boolToInt . allZero) ls
-    IntV n     -> IntV $ boolToInt (n==0)
+    ListV ls t -> return . IntV $ (boolToInt . allZero) ls
+    IntV n     -> return . IntV $ boolToInt (n==0)
   -- unary list
   | otherwise = eval exp >>= \case
     ListV ls t -> case op of
@@ -229,6 +229,8 @@ eval (Parens e p) = eval e
 
 allZero :: [Value] -> Bool
 allZero []     = True
-allZero (v:vs) = case v of
-  ListV ls _ -> allZero ls
-  IntV  n    -> n==0 && allZero vs
+allZero (v:vs) = (&&) (
+  case v of
+    ListV ls _ -> allZero ls
+    IntV  n    -> n==0
+  ) (allZero vs)
