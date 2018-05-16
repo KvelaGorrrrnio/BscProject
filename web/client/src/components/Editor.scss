@@ -6,11 +6,18 @@
   left: 0; width: 50%;
   top: 50px; bottom: 0;
   border-right: 1px solid $fg;
+  z-index: 100;
 }
 
-.CodeMirror {
+.editor-wrapper .CodeMirror {
   height: 100%;
+  transition: opacity 0.5s;
 }
+
+.editor-wrapper.disabled .CodeMirror {
+  opacity: 0.7;
+}
+
 
 .editor-wrapper .react-codemirror2 {
   height: 100%;
@@ -29,10 +36,21 @@
   background-color: $fg;
 }
 
+
 .editor-wrapper .error .CodeMirror-linenumber {
+  transition: all 0.0s;
   background-color: $fgError;
 }
-.editor-wrapper .error {
+.editor-wrapper .CodeMirror-code>div.error {
+  transition: all 0.0s;
   background-color: $bgError;
 }
 
+.editor-wrapper .step .CodeMirror-linenumber {
+  transition: all 0.0s;
+  background-color: $bg;
+}
+.editor-wrapper .CodeMirror-code>div.step {
+  transition: all 0.0s;
+  background-color: $fg;
+}

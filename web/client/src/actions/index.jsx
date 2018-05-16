@@ -27,3 +27,24 @@ export const changeResultTable = table => { return {
   type: 'change-result-table',
   payload: table
 }};
+
+export const changeResultLog = log => { return {
+  type: 'change-result-log',
+  payload: log
+}};
+
+export const startStepping = () => { return {
+  type: 'stepping-start'
+}};
+
+export const stopStepping = () => { return {
+  type: 'stepping-stop'
+}};
+
+export const nextStep = () => { return {
+  type: 'stepping-next'
+}};
+
+export const prevStep = () => { return {
+  type: 'stepping-prev'
+}};

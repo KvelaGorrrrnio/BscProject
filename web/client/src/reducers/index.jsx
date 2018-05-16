@@ -1,19 +1,24 @@
 const initState = {
   mode: 'run',
   language: 'srl',
-  code: 'int a\na += 1',
+  code: '// Program for computing the n\'th fibonacci pair\nint n\nint v int w\n\nn ^= 16\nw ^= 1\nfrom (v = 0) do\n  v += w\n  swap v w\n  n -= 1\nloop .\nuntil (n = 0)\n',
+  stepState: {
+    stepping: false,
+    index: 0
+  },
   result: {
     error: {},
     invert: '',
     translate: '',
-    log: [],
+    log: {
+      state: [],
+      table: [],
+    },
     table: []
   }
 }
 
 const rootReducer = (state = initState, action) => {
-  console.log("reducers")
-  console.log(state,action);
   switch (action.type) {
     case 'change-mode':
       return { ...state, mode: action.payload }
@@ -37,8 +42,34 @@ const rootReducer = (state = initState, action) => {
       return { ...state,
         result: { ...state.result, error: {}, table: action.payload }
       }
+    case 'change-result-log':
+      console.log("PL", action.payload);
+      return { ...state,
+        result: { ...state.result, 
+          error: {}, 
+          log: {
+            state: action.payload.state.table,
+            table: action.payload.table,
+          }
+        }
+      }
+    case 'stepping-start':
+      return { ...state,
+        stepState: { ...state.stepState, stepping: true, index: 0 }
+      }
+    case 'stepping-stop':
+      return { ...state,
+        stepState: { ...state.stepState, stepping: false, index: 0 }
+      }
+    case 'stepping-next':
+      return { ...state,
+        stepState: { ...state.stepState, index: state.stepState.index + 1 }
+      }
+    case 'stepping-prev':
+      return { ...state,
+        stepState: { ...state.stepState, index: state.stepState.index - 1 }
+      }
     default: return state
-
   }
 }
 

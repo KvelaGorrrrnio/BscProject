@@ -18,10 +18,11 @@ type ProgState = ReaderT AST VarState
 -- ==================
 
 runProgram :: AST -> TypeTab -> (Either Error VarTab, Log)
-runProgram ast ttab = do
-  let entry = getEntry ast
-      vtab  = buildVTab ttab
-  execVarState vtab . runReaderT (interp [] entry) $ ast
+runProgram ast ttab =
+  let entry   = getEntry ast
+      vtab    = buildVTab ttab
+      (vt,ms) = execVarState vtab . runReaderT (interp [] entry) $ ast
+    in (vt, Log vtab ms)
 
 -- ======
 -- Blocks
@@ -46,20 +47,17 @@ interp from l = do
       unless (from == l') $
         lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l'))
 
-  logMsg $ ">> " ++ l
-
   lift $ execStmts ss
 
   let msg = show j
 
   case j of
-    Exit _         -> logMsg msg
-    Goto l' _      -> logMsg msg >> interp l l'
+    Exit _         -> return ()
+    Goto l' _      -> interp l l'
     If c l1 l2 p -> do
       q <- lift $ eval c >>= \case
         IntV q -> return $ q/=0
         _      -> logError $ RuntimeError (getExpPos c) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-      logMsg $ msg ++ " -> " ++ if q then "true" else "false" -- we want lower case
 
       if q then interp l l1 else interp l l2
 

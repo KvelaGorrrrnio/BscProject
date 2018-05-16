@@ -1,5 +1,6 @@
-export function run(lng,content,callback) {
-  fetch(API_URL + '/run/'+lng, {
+export function run(lng,content,callback,log=false) {
+  const hasLog = log ? 'log/' : '';
+  fetch(API_URL + '/run/' + hasLog + lng, {
     method: 'POST',
     body:   JSON.stringify(content),
     headers: {
@@ -17,7 +18,7 @@ export function run(lng,content,callback) {
 }
 
 export function invert(lng,content,callback) {
-  fetch(API_URL + '/invert/'+lng, {
+  fetch(API_URL + '/invert/' + lng, {
     method: 'POST',
     body:   JSON.stringify(content),
     headers: {
@@ -35,7 +36,7 @@ export function invert(lng,content,callback) {
 }
 
 export function translate(lng,content,callback) {
-  fetch(API_URL + '/translate/'+lng, {
+  fetch(API_URL + '/translate/' + lng, {
     method: 'POST',
     body:   JSON.stringify(content),
     headers: {

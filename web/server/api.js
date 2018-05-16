@@ -94,8 +94,9 @@ function runMode(mode, req, res, log=false) {
   // Execute code
   const flags = 'cj' + (log ? 'l' : '');
   const cmd = './bin/' + lng + ' '+mode+' "' + cnt.code + '" -' + flags;
+  const maxBufferSize = 1024 * 3000 // 3 MB 
   console.log('running cmd: '+cmd);
-  exec(cmd, (err,stdout) => {
+  exec(cmd, { maxBuffer: maxBufferSize }, (err,stdout) => {
     if (err) {
       res.json({
         type: 'error',
@@ -103,6 +104,7 @@ function runMode(mode, req, res, log=false) {
       });
       return;
     }
+    if (log) console.log(JSON.parse(stdout));
     res.send(stdout);
   });
 }

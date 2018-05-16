@@ -6,13 +6,15 @@ class Radio extends Component {
     super(props);
     this.onChange = props.onChange;
     const items = props.items || [{ index: 0, title: 'default' }]
+    const disabled = props.disabled || false;
     this.state = {
       index: items[0].index,
-      items: items
+      items: items,
     };
   }
 
   onClick(event, item) {
+    if (this.props.disabled) return;
     if (item.index == this.state.index) {
       return;
     }
@@ -24,7 +26,7 @@ class Radio extends Component {
     return (
       <ul className='radio-wrapper'>
         { this.state.items.map(item => {
-          const className = item.index == this.state.index ? 'current' : '';
+          const className = (item.index == this.state.index ? 'current' : '') + (this.props.disabled ? ' disabled' : '');
           return (<li className={className} key={item.index} onClick={(e) => this.onClick(e,item)}>{item.title}</li>);
         }) }
       </ul>

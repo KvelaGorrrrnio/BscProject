@@ -1,11 +1,18 @@
 @import 'colors';
 
 ul.radio-wrapper li {
-  padding: 15px;
+  padding: 16px;
   display: inline-block;
   cursor: pointer;
+  transition: opacity 0.5s;
+}
+
+ul.radio-wrapper li.disabled  {
+  opacity: 0.5;
 }
 
 ul.radio-wrapper li.current {
   background-color: $fg;
+  opacity: 1.0;
+  transition: opacity 0.5s;
 }

@@ -32,8 +32,8 @@ main = do
       getAST c f >>= \case
         Left err  -> eout' err
         Right (ttab,ast) -> case runProgram ast ttab of
-          (_,log)        | l && j && null o -> putStrLn $ logToJSON log
-                         | l && j           -> writeFile o $ (++"\n") (logToJSON log)
+          (_,log)        | l && j && null o -> putStrLn $ stringify log
+                         | l && j           -> writeFile o $ (++"\n") (stringify log)
                          | l && null o      -> putStrLn $ logToString log
                          | l                -> writeFile o $ (++"\n") (logToString log)
           (Right vtab,_) | j && null o      -> putStrLn $ jsonTab "variable" vtab

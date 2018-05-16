@@ -15,3 +15,100 @@
 .react-codemirror2 {
   height: 100%;
 }
+
+
+.result-wrapper .variables {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  overflow-y: auto;
+}
+.result-wrapper .variables.fixed {
+  bottom: 50%;
+  border-bottom: 1px solid $fg;
+}
+
+.result-wrapper .log {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%; bottom: 0;
+  overflow-y: auto;
+}
+
+.result-wrapper .log ul li {
+  padding: 6px 20px;
+}
+
+.result-wrapper .log ul li {
+  transition: background-color 0.5s;
+}
+.result-wrapper .log ul li:nth-child(1) {
+  background-color: $fg;
+}
+.result-wrapper .log ul li:nth-child(2) {
+  background-color: rgba($fg, 0.8);
+}
+.result-wrapper .log ul li:nth-child(3) {
+  background-color: rgba($fg, 0.6);
+}
+.result-wrapper .log ul li:nth-child(4) {
+  background-color: rgba($fg, 0.4);
+}
+.result-wrapper .log ul li:nth-child(5) {
+  background-color: rgba($fg, 0.2);
+}
+.result-wrapper .log ul.success li:nth-child(1) {
+  background-color: $bgSuccess;
+}
+.result-wrapper .log ul.success li:nth-child(2) {
+  background-color: rgba($bgSuccess, 0.8);
+}
+.result-wrapper .log ul.success li:nth-child(3) {
+  background-color: rgba($bgSuccess, 0.6);
+}
+.result-wrapper .log ul.success li:nth-child(4) {
+  background-color: rgba($bgSuccess, 0.4);
+}
+.result-wrapper .log ul.success li:nth-child(5) {
+  background-color: rgba($bgSuccess, 0.2);
+}
+.result-wrapper .log ul.error li:nth-child(1) {
+  background-color: $bgError;
+}
+.result-wrapper .log ul.error li:nth-child(2) {
+  background-color: rgba($bgError, 0.8);
+}
+.result-wrapper .log ul.error li:nth-child(3) {
+  background-color: rgba($bgError, 0.6);
+}
+.result-wrapper .log ul.error li:nth-child(4) {
+  background-color: rgba($bgError, 0.4);
+}
+.result-wrapper .log ul.error li:nth-child(5) {
+  background-color: rgba($bgError, 0.2);
+}
+
+.result-wrapper .variables li {
+  padding: 6px 20px;
+  background-color: rgba($fg, 0.3);
+  display: block;
+  overflow: auto;
+  height: auto;
+}
+.result-wrapper .variables li:nth-child(2n) {
+  background-color: rgba($fg, 0.6);
+}
+
+.result-wrapper .variables .variable-id {
+  display: block;
+  float: left;
+  max-width: 200px;
+  overflow-wrap: break-word;
+}
+.result-wrapper .variables .variable-value {
+  display: block;
+  float: right;
+  overflow-wrap: break-word;
+  max-width: calc(100% - 200px);
+  text-align: right;
+}

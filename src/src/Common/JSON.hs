@@ -4,9 +4,7 @@ module Common.JSON
 , escStr
 , esc
 , jsonError
-, jsonLog
 , jsonTab
---, jsonTabL
 , jsonCode
 , getStmtPos
 ) where
@@ -33,12 +31,6 @@ jsonError msg (l,c) =
      "{ \"type\" : \"error\", "
   ++ "\"position\" : { \"line\" : " ++ show l ++ ", \"column\" : " ++ show c ++ " }, "
   ++ "\"message\" : \"" ++ escStr msg ++ "\" }"
-
--- Log
-jsonLog :: String -> String
-jsonLog l =
-     "{ \"type\" : \"log\", "
-  ++ "\"log\" : ["++l++"] }"
 
 jsonTab :: Show a => String -> M.HashMap String a -> String
 jsonTab t tab =

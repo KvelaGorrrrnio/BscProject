@@ -20,8 +20,9 @@ import Debug.Trace
 -- Monad transformer : The variable state
 -- ======================================
 
-type VarState = StateT VarTab (ExceptT Error (Writer Log))
-execVarState :: VarTab -> VarState () -> (Either Error VarTab, Log)
+
+type VarState = StateT VarTab (ExceptT Error (Writer [Message]))
+execVarState :: VarTab -> VarState () -> (Either Error VarTab, [Message])
 execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 
 rd :: Id -> Pos -> VarState Value
@@ -50,9 +51,6 @@ logError :: Error -> VarState a
 logError err = do
   tell [MsgError err]
   throwError err
-
-logMsg :: MonadWriter Log w => String -> w ()
-logMsg st = tell [MsgCustom st]
 
 adjust :: (Value -> Value) -> Id -> Pos -> VarState ()
 adjust op (Id id []) p = modify $ M.adjust op id

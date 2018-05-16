@@ -14,9 +14,8 @@ import Control.Monad.Reader
 -- ==================
 
 runProgram :: AST -> TypeTab -> (Either Error VarTab, Log)
-runProgram ast ttab = execVarState vtab . interp $ ast
+runProgram ast ttab = let (vt,ms) = (execVarState vtab . interp) ast in (vt, Log vtab ms)
   where vtab = buildVTab ttab
-
 
 interp :: Block -> VarState ()
 interp (Atom s) = logStmt s
@@ -26,9 +25,7 @@ interp (If t b1 b2 a p) = do
     IntV q -> return $ q/=0
     _      -> logError $ RuntimeError (getExpPos t) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
-  logMsg $ show (If t b1 b2 a p) ++ " -> " ++ if q then "[b1]" else "[b2]"
   interp $ if q then b1 else b2
-  logMsg $ "if: " ++ (if q then "[b1]" else "[b2]") ++ " done"
 
   r <- eval a >>= \case
     IntV r -> return $ r/=0
@@ -38,8 +35,6 @@ interp (If t b1 b2 a p) = do
     $ logError $ RuntimeError p $ CustomRT "Assert and such"
 
 interp (Until d a b1 b2 t p) = do -- log this
-  logMsg $ show (Until d a b1 b2 t p)
-
   q <- eval a >>= \case
     IntV q -> return $ q/=0
     _      -> logError $ RuntimeError (getExpPos a) $ CustomRT "Type does not match in assertion." -- TODO: mere nøjagtig
@@ -52,7 +47,6 @@ interp (Until d a b1 b2 t p) = do -- log this
     IntV r -> return $ r/=0
     _      -> logError $ RuntimeError (getExpPos t) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
 
-  logMsg $ "loop: " ++ show t ++ " -> " ++ if r then "true" else "false"
   unless r $ interp b2 >> interp (Until False a b1 b2 t p)
 
 interp (Seq b1 b2) = interp b1 >> interp b2
