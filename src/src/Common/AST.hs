@@ -145,11 +145,13 @@ data UnOp
   | Size
   | Empty
   | Top
+  | Null
   deriving (Eq,Ord)
 instance Show UnOp where
   show Neg   = "- "
   show Sign  = "~ "
   show Not   = "not "
+  show Null  = "null "
   show Size  = "# "
   show Empty = "? "
   show Top   = "^ "
