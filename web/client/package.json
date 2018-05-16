@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "codemirror": "^5.37.0",
-    "npm": "^6.0.0",
+    "npm": "^6.0.1",
     "react": "^16.0.0",
     "react-codemirror2": "^5.0.1",
     "react-dom": "^16.0.0",
