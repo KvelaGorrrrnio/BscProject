@@ -11,11 +11,9 @@ import Data.Bits (xor)
 import Control.Monad.State
 import Control.Monad.Writer
 import Control.Monad.Except
-import Control.Monad.Loops
 import qualified Data.HashMap.Strict as M
 import qualified Data.IntMap.Strict as I
 
--- debugging
 import Debug.Trace
 
 -- ======================================
@@ -28,25 +26,22 @@ execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 
 rd :: Id -> Pos -> VarState Value
 rd (Id id exps) p = gets (mLookup id) >>= \case
-  Just v  -> foldM (getIdx p) v exps
+  Just v  -> foldM (\acc e -> getIdx (getExpPos e) acc e) v exps
   Nothing -> logError $ RuntimeError p $ CustomRT ("Variable '" ++ id ++ "' is not declared.")
 
 getIdx :: Pos -> Value -> Exp -> VarState Value
-getIdx p (IntV _) _ = logError $ RuntimeError p $ CustomRT "Too many indices."
+getIdx p (IntV _) _ = logError $ RuntimeError p $ CustomRT "Indexing on non-list."
 getIdx p (ListV lst _) idx = eval idx >>= \case
-  IntV i | i < 0     -> logError $ RuntimeError p $ CustomRT "Index must be non-negative."
+  IntV i | i < 0     -> logError $ RuntimeError (getExpPos idx) $ CustomRT "Index must be non-negative."
     | otherwise -> case index lst i of
       Just v  -> return v
-      Nothing -> logError $ RuntimeError p $ CustomRT "Index out of bounds."
+      Nothing -> logError $ RuntimeError (getExpPos idx) $ CustomRT "Index out of bounds."
   _ -> logError $ RuntimeError p $ CustomRT "Index must be an integer."
   where index :: [Value] -> Integer -> Maybe Value
         index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
 
 logStmt :: Stmt -> VarState ()
-logStmt s = case s of
-  If{}    -> exec s
-  Until{} -> exec s
-  _ -> do
+logStmt s = do
     exec s
     msg <- gets (MsgStmt s)
     tell [msg]
@@ -74,24 +69,21 @@ adjust' op (e:es) p vo = do
   case vo of
     ListV lst t -> eval e >>= \case
       IntV i -> return $ ListV (replace lst i vi) t
-      _     -> logError $ RuntimeError p $ CustomRT "Index must be an integer."
-    _ -> logError $ RuntimeError p $ CustomRT "Too many indices."
+      _     -> logError $ RuntimeError (getExpPos e) $ CustomRT "Index must be an integer."
+    _ -> logError $ RuntimeError (getExpPos e) $ CustomRT "Indexing on non-list."
   where replace :: [Value] -> Integer -> Value -> [Value]
-        replace lst i v = take (fromIntegral i) lst ++ [v] ++ drop (fromIntegral (i + 1)) lst
+        replace lst i v | i' <- fromIntegral i = take i' lst ++ [v] ++ drop (i' + 1) lst
 
 -- ==========
 -- Statements
 -- ==========
-
-execStmts :: [Stmt] -> VarState ()
-execStmts = mapM_ logStmt
-
 exec :: Stmt -> VarState ()
 
 -- variable updates
 exec (Update (Id id exps) op e p) = do
   abuse <- contains e (Id id exps) []
   when abuse $ logError $ RuntimeError p $ CustomRT "Self-abuse in update."
+
   v1 <- rd (Id id exps) p
   n <- case v1 of
     IntV n -> return n
@@ -103,10 +95,11 @@ exec (Update (Id id exps) op e p) = do
     _      -> logError $ RuntimeError p $ CustomRT "Attempting to update variable with a list expression."
 
   case op of
-    DivEq  | mod n m == 0 -> return ()
-           | otherwise -> logError $ RuntimeError p $ CustomRT "Division has rest in update."
-    MultEq | n /= 0 && m /= 0 -> return ()
-           | otherwise -> logError $ RuntimeError p $ CustomRT "An operand in multiplication update is zero."
+    DivEq  | m == 0       -> logError $ RuntimeError p $ CustomRT "Dividing by zero: Expression is zero in division update."
+           | mod n m /= 0 -> logError $ RuntimeError p $ CustomRT "Division has rest in division update."
+           | otherwise    -> return ()
+    MultEq | m == 0       -> logError $ RuntimeError p $ CustomRT "Expression is zero in multiplication update."
+           | otherwise    -> return ()
     _ -> return ()
 
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
@@ -125,42 +118,6 @@ exec (Update (Id id exps) op e p) = do
         contains (Unary _ e _) id is = contains e id is
         contains (Parens e _) id is = contains e id is
 
--- control flow : unique for SRL
-exec (If t s1 s2 a p) = do
-  q  <- eval t >>= \case
-    IntV q -> return $ intToBool q
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-  logMsg $ show (If t s1 s2 a p) ++ " -> " ++ if q then "true" else "false"
-  execStmts $ if q then s1 else s2
-  logMsg $ (if q then "[s1]" else "[s2]") ++ " done"
-
-  r <- eval a >>= \case
-    IntV r -> return $ intToBool r
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-  when (q /= r)
-    $ logError $ RuntimeError p $ CustomRT "Assert and such"
-
-exec (Until d a s t p) = do -- log this
-  logMsg $ show (Until d a s t p)
-
-  q <- eval a >>= \case
-    IntV q -> return $ intToBool q
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-  unless (q == d) $ logError (RuntimeError p $ CustomRT "Assert")
-
-  execStmts s
-
-  r <- eval t >>= \case
-    IntV r -> return $ intToBool r
-    _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
-
-  unless r $ exec (Until False a s t p)
-
-  logMsg $ show t ++ " -> " ++ "true"
-
 -- list modification
 exec (Push id1 id2 p) = do
   v1 <- rd id1 p
@@ -170,12 +127,11 @@ exec (Push id1 id2 p) = do
       | t == getType v1 -> do
         adjust clear id1 p
         adjust (push v1) id2 p
-      | otherwise ->
-        logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
-    _ -> logError $ RuntimeError p $ CustomRT $ "Pushing onto non-list. " ++ show v2 ++ " " ++ (show . getType) v2 -- TODO: mere nøjagtig
-    where push v (ListV ls t) = ListV (v:ls) t
-          clear (IntV _)    = IntV 0
-          clear (ListV _ t) = ListV [] t
+      | otherwise -> logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
+    _ -> logError $ RuntimeError p $ CustomRT "Pushing onto non-list. " -- TODO: mere nøjagtig
+  where push v (ListV ls t) = ListV (v:ls) t
+        clear (IntV _)      = IntV 0
+        clear (ListV _ t)   = ListV [] t
 
 exec (Pop id1 id2 p) = do
   v1 <- rd id1 p
@@ -190,8 +146,8 @@ exec (Pop id1 id2 p) = do
         adjust (const v) id1 p
         adjust (const $ ListV ls (ListT t)) id2 p
       | otherwise ->
-        logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
-    _  -> logError $ RuntimeError p $ CustomRT "Popping from non-list"
+        logError $ RuntimeError p $ CustomRT "Types do not match." -- TODO: mere nøjagtig
+    _  -> logError $ RuntimeError p $ CustomRT "Popping from non-list."
 
 -- swapping variables
 exec (Swap id1 id2 p) = do
@@ -217,9 +173,9 @@ eval :: Exp -> VarState Value
 eval (Lit v _)  = return v
 eval (Var id p) = rd id p
 
+eval (Binary op l r p)
 
   -- binary arithmetic and relational
-eval (Binary op l r p)
   | op <= Geq  = do
     vl <- eval l
     vr <- eval r
@@ -233,9 +189,10 @@ eval (Binary op l r p)
     vr <- eval r
     case (vl, vr) of
       (IntV n, IntV m)
-        | m == 0    -> logError $ RuntimeError p $ CustomRT "Dividing by zero."
+        | m == 0    -> logError $ RuntimeError (getExpPos l) $ CustomRT "Dividing by zero."
         | otherwise -> return $ IntV (mapBinOp op n m)
-      _             -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+      _             -> logError $ RuntimeError (getExpPos l) $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+
   -- binary logical
   | otherwise = eval l >>= \case
     IntV 0 | op==And        -> return $ IntV 0

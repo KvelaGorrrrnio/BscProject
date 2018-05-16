@@ -30,9 +30,7 @@ runProgram ast ttab = do
 interp :: Label -> Label -> ProgState ()
 interp from l = do
   blks <- ask
-  Just (f,ss,t) <- asks (lookup l) -- >>= \case
---                Nothing -> fail $ "Label '" ++ l ++ "' is not defined."
---                Just b  -> return b
+  Just (f,ss,j) <- asks (lookup l)
 
   case f of
     Entry _      -> return ()
@@ -40,8 +38,8 @@ interp from l = do
       lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l' ))
     Fi a l1 l2 p -> do
       q <- lift $ eval a >>= \case
-        IntV q -> return $ intToBool q
-        _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+        IntV q -> return $ q/=0
+        _      -> logError $ RuntimeError (getExpPos a) $ CustomRT "Type does not match in assertion." -- TODO: mere nøjagtig
 
       let l' = if q then l1 else l2
 
@@ -52,15 +50,19 @@ interp from l = do
 
   lift $ execStmts ss
 
-  let msg = show t
+  let msg = show j
 
-  case t of
+  case j of
     Exit _         -> logMsg msg
     Goto l' _      -> logMsg msg >> interp l l'
-    IfTo c l1 l2 p -> do
+    If c l1 l2 p -> do
       q <- lift $ eval c >>= \case
-        IntV q -> return $ intToBool q
-        _      -> logError $ RuntimeError p $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+        IntV q -> return $ q/=0
+        _      -> logError $ RuntimeError (getExpPos c) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
       logMsg $ msg ++ " -> " ++ if q then "true" else "false" -- we want lower case
 
       if q then interp l l1 else interp l l2
+
+execStmts :: [Stmt] -> VarState ()
+execStmts = mapM_ logStmt
+

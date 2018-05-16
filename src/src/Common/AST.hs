@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module Common.AST where
 
 import Data.Bits (xor)
@@ -22,6 +21,7 @@ isClear (ListV ls _)  = null ls
 data Id = Id String [Exp] deriving Eq
 instance Show Id where
   show (Id id exps) = id ++ concatMap (\e-> "[" ++ show e ++ "]") exps
+
 type Pos = (Int,Int)
 
 type VarTab = M.HashMap String Value
@@ -30,7 +30,7 @@ showTab mtab =
       m   = maximum . map (\(n,_) -> length n) $ tab
     in intercalate "\n" $ map (\(n,v) -> n ++ pad (m-length n+1) ++ " : " ++ show v) tab
   where pad n = replicate (n-1) ' '
-insert id val = M.insert id val -- map (\(id',v) -> if id'==id then (id,val) else (id',v))
+insert id val = M.insert id val
 mLookup id    = M.lookup id
 
 showTypeDecs :: TypeTab -> String
@@ -45,9 +45,6 @@ data Stmt = Update Id UpdOp Exp Pos
           | Pop  Id Id Pos
           | Swap Id Id Pos
           | Skip Pos
-          -- unique for SRL
-          | If Exp [Stmt] [Stmt] Exp Pos
-          | Until Bool Exp [Stmt] Exp Pos
           deriving Eq
 instance Show Stmt where
   show (Update id op e _) = show id ++ show op ++ show e
@@ -55,17 +52,12 @@ instance Show Stmt where
   show (Pop id1 id2 _)    = "pop "  ++ show id1 ++ " " ++ show id2
   show (Swap id1 id2 _)   = "swap " ++ show id1 ++ " " ++ show id2
   show (Skip _)           = "skip"
-  -- unique for SRL
-  show (If t s1 s2 a _)   = "if " ++ showPar t ++ " then [s1] else [s2]"
-  show (Until _ a s t _)    = "from " ++ showPar a ++ " do [s] until " ++ showPar t
 getStmtPos :: Stmt -> Pos
 getStmtPos (Update _ _ _ p) = p
 getStmtPos (Push _ _ p)     = p
 getStmtPos (Pop _ _ p)      = p
 getStmtPos (Swap _ _ p)     = p
 getStmtPos (Skip p)         = p
-getStmtPos (If _ _ _ _ p)   = p
-getStmtPos (Until _ _ _ _ p)  = p
 
 data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq deriving Eq
 instance Show UpdOp where
@@ -89,7 +81,13 @@ instance Show Exp where
   show (Unary  op exp _)  = show op ++ show exp
   show (Parens exp _)     = case exp of
     Parens exp' _ -> show exp
-    _           -> "("++show exp++")"
+    _             -> "("++show exp++")"
+getExpPos :: Exp -> Pos
+getExpPos (Lit _ p)        = p
+getExpPos (Var _ p)        = p
+getExpPos (Binary _ _ _ p) = p
+getExpPos (Unary _ _ p)    = p
+getExpPos (Parens _ p)     = p
 showPar :: Exp -> String
 showPar e = case e of
   Parens _ _ -> show e
@@ -136,7 +134,6 @@ instance Show BinOp where
   show And     = " && "
 
 
-
 data UnOp
   = Neg
   | Sign
@@ -157,18 +154,6 @@ instance Show UnOp where
   show Empty = "? "
   show Top   = "^ "
 
--- ====
--- Type Inference
--- ====
--- data Type
---  = IntT
---  | ListT Type
---  | UnknownT
---  deriving Eq
---instance Show Type where
---  show IntT      = "int"
---  show (ListT t) = "["++show t++"]"
---  show UnknownT  = "?"
 
 -- ================
 -- Type declaration
@@ -188,7 +173,7 @@ getType (IntV _)    = IntT
 getType (ListV _ t) = t
 
 getDefaultValue :: Type -> Value
-getDefaultValue IntT      = IntV 0
+getDefaultValue IntT  = IntV 0
 getDefaultValue listt = ListV [] listt
 
 -- =======
@@ -217,9 +202,9 @@ mapBinOp Geq     = \n -> boolToInt . (n>=)
 
 mapUnOp Neg  = negate
 mapUnOp Sign = signum
-mapUnOp Not  = boolToInt . not . intToBool
+mapUnOp Not  = boolToInt . (==0)
 
--- normalise to bool
+-- normalise
 norm :: Integer -> Integer
 norm 0 = 0
 norm _ = 1
@@ -227,6 +212,3 @@ norm _ = 1
 -- converting bool to val
 boolToInt :: Bool -> Integer
 boolToInt b = if b then 1 else 0
--- converting val to bool
-intToBool :: Integer -> Bool
-intToBool = (/=0)

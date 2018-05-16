@@ -3,66 +3,58 @@ int b
 list  int l
 list  list  int l'
 
-lab0: entry
+l0: entry
   skip
-goto lab1
+goto l1
 
-lab1: from lab0
+l1: from l0
   a += 5
-goto lab4
+goto l12
 
-lab4: from lab1
+l12: from l1
   skip
-goto lab5
+goto l13
 
-lab5: from lab4
+l13: from l12
   push a l
-goto lab6
+goto l10
 
-lab6: from lab5
+l10: from l13
   skip
-goto lab7
+goto l11
 
-lab7: from lab6
+l11: from l10
   push l l'
-goto lab8
+goto l8
 
-lab8: from lab7
+l8: from l11
   skip
-goto lab9
+goto l9
 
-lab9: from lab8
+l9: from l8
   b += ^ (^ l')
-goto lab10
+goto l6
 
-lab10: from lab9
+l6: from l9
   skip
-goto lab11
+goto l7
 
-lab11: from lab10
+l7: from l6
   pop l l'
-goto lab12
+goto l4
 
-lab12: from lab11
+l4: from l7
   skip
-goto lab13
+goto l5
 
-lab13: from lab12
+l5: from l4
   pop a l
-goto lab14
+goto l2
 
-lab14: from lab13
+l2: from l5
   skip
-goto lab15
+goto l3
 
-lab15: from lab14
-  skip
-goto lab2
-
-lab2: from lab15
-  skip
-goto lab3
-
-lab3: from lab2
+l3: from l2
   skip
 exit

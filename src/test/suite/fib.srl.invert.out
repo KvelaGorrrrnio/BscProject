@@ -6,6 +6,8 @@ from (n = 0) do
   n += 1
   swap v w
   v -= w
+loop
+  skip
 until (v = 0)
 w ^= 1
 n ^= 16

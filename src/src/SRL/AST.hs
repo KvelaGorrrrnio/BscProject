@@ -3,39 +3,44 @@ module SRL.AST
     module Common.AST
   ) where
 
-import Data.Bits (xor)
-import Data.List (intercalate)
-
 import Common.AST
-import SRL.Error
 
 -- ===
 -- AST
 -- ===
 
-type AST   = [Stmt]
+type AST = Block
 showAST :: TypeTab -> AST -> String
-showAST ttab ast = showTypeDecs ttab ++ showAST' 0 ast
+showAST ttab ast = showTypeDecs ttab ++ showBlock 0 ast
 
 doIndent lvl = replicate (2 * lvl) ' '
 
-showAST' :: Int -> AST -> String
-showAST' lvl ast = if null ast then showStmt lvl (Skip (0,0)) else intercalate "\n" . map (showStmt lvl) $ ast
+showBlock :: Int -> Block -> String
+showBlock lvl b = case b of
+  Atom s              -> indent ++ show s
+  If t b1 b2 a _      -> indent ++ "if " ++ showPar t ++ " then\n"
+                      ++ showBlock (lvl+1) b1 ++ "\n"
+                      ++ indent ++ "else\n"
+                      ++ showBlock (lvl+1) b2 ++ "\n"
+                      ++ indent ++ "fi " ++ showPar a
 
-showStmt :: Int -> Stmt -> String
-showStmt lvl s = case s of
-  If t s1 s2 a _ -> indent ++ "if " ++ showPar t ++ " then\n"
-                 ++ showAST' (lvl+1) s1 ++ "\n"
-                 ++ indent ++ "else\n"
-                 ++ showAST' (lvl+1) s2 ++ "\n"
-                 ++ indent ++ "fi " ++ showPar a
+  Until _ t b1 b2 a _ -> indent ++ "from "  ++ showPar t ++ " do\n"
+                      ++ showBlock (lvl + 1) b1 ++ "\n"
+                      ++ indent ++ "loop\n"
+                      ++ showBlock (lvl + 1) b2 ++ "\n"
+                      ++ indent ++ "until " ++ showPar a
 
-  Until _ t s a _ -> indent ++ "from "  ++ showPar t ++ " do\n"
-                  ++ showAST' (lvl + 1) s ++ "\n"
-                  ++ indent ++ "until " ++ showPar a
-
-  s               -> indent ++ show s
+  Seq b1 b2           -> showBlock lvl b1 ++ "\n"
+                      ++ showBlock lvl b2
 
   where indent = doIndent lvl
 
-type Block = [Stmt]
+data Block = Atom Stmt
+           | If Exp Block Block Exp Pos
+           | Until Bool Exp Block Block Exp Pos
+           | Seq Block Block
+instance Show Block where
+  show (Atom s)                = show s
+  show (If t _ _ a (l,_))      = "line " ++ show l ++ "\nif " ++ show t ++ " then [b1] else [b2] fi " ++ show a
+  show (Until _ a _ _ t (l,_)) = "line " ++ show l ++ "\nfrom " ++ show a ++ " do [b1] loop [b2] until " ++ show t
+  show (Seq b1 b2)             = ""

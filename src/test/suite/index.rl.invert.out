@@ -4,8 +4,6 @@ int n
 int v
 
 end: entry
-  n -= 8 * n - 3
-  lst'[2][0] -= 5 * ^ lst'[2]
   push lst lst'
   swap lst'[0][3] lst'[2][0]
 goto next

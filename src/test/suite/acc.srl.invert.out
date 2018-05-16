@@ -4,5 +4,7 @@ int n
 from (n = 0) do
   n += 1
   a -= n
+loop
+  skip
 until (a = 0)
 n ^= 10

@@ -1,2 +1,4 @@
-A runtime error occured at (line 25, column 3):
-Self-abuse in update.
+lst  : [8,6,4,8,0]
+lst' : [[8,6,4,2,0],[2,6,4,2,0],[8,6,4,2,0],[8,6,4,2,0]]
+n    : 0
+v    : 0

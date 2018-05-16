@@ -28,9 +28,9 @@ block = do
   l <- identifier'
   colon
   f <- from
-  s <- statements
-  t <- to
-  return (l, (f,s,t))
+  s <- many statement
+  j <- jump
+  return (l, (f,s,j))
 
 from :: Parser From
 from = pos >>= \p-> (\s->s p)
@@ -38,23 +38,26 @@ from = pos >>= \p-> (\s->s p)
    <|> (reserved "fi"    >> Fi <$> expression <*> identifier' <*> identifier')
    <|> (reserved "entry" >> return Entry))
 
-to :: Parser To
-to  = pos >>= \p -> (\s->s p)
-  <$> ((reserved "goto"  >> Goto <$> identifier')
-  <|> (reserved "if"    >> IfTo <$> expression <*> identifier' <*> identifier')
-  <|> (reserved "exit"  >> return Exit))
+jump :: Parser Jump
+jump = gotoJmp <|> ifJmp <|> exitJmp
 
-statements :: Parser [Stmt]
-statements = many statement
+gotoJmp :: Parser Jump
+gotoJmp = pos >>= \p -> (\s->s p) <$> do
+  reserved "goto"
+  Goto <$> identifier'
 
-statement :: Parser Stmt
-statement = pos >>= \p -> (\s->s p)
-        <$> (try updateStmt
-        <|> swapStmt
-        <|> skipStmt
-        <|> pushStmt
-        <|> popStmt)
+ifJmp :: Parser Jump
+ifJmp = pos >>= \p -> (\s->s p) <$> do
+  reserved "if"
+  t  <- expression
+  l1 <- identifier'
+  l2 <- identifier'
+  return $ If t l1 l2
 
+exitJmp :: Parser Jump
+exitJmp = pos >>= \p -> (\s->s p) <$> do
+  reserved "exit"
+  return Exit
 
 parseSrc :: String -> Either Error (TypeTab, AST)
 parseSrc s = case parse rlParser "" s of

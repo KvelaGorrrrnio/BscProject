@@ -22,4 +22,5 @@ if size lst' = 5 end outloop
 end: from next
   swap lst'[0][3] lst'[2][0]
   pop lst lst'
+  lst[1 + 2] += lst[3]
 exit

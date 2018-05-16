@@ -4,6 +4,8 @@ int v
 from (n = 0) do
   n += 1
   v /= n
+loop
+  skip
 until (v = 1)
 v ^= 1
 n ^= 5
