@@ -15,6 +15,8 @@ class Editor extends Component {
     this.options = {
       lineNumbers: true,
       autofocus: true,
+      tabSize: 2,
+      indentWithTabs: false,
       theme: 'default-bsc',
       extraKeys: {
         'Cmd-Enter' : cm => {
