@@ -37,8 +37,10 @@ ifBlock = pos >>= \p -> (\s->s p) <$> do
   t <- expression
   reserved "then"
   b1 <- block
+  -- optional v
   reserved "else"
   b2 <- block
+  -- optional ^
   reserved "fi"
   a <- expression
   return $ If t b1 b2 a
@@ -54,6 +56,8 @@ untilBlock = pos >>= \p -> (\s->s p) <$> do
   reserved "until"
   t <- expression
   return $ Until True a b1 b2 t
+
+-- let until and let only have one body
 
 parseSrc :: String -> Either Error (TypeTab, AST)
 parseSrc s = case parse srlParser "" s of
