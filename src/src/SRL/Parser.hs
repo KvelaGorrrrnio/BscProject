@@ -21,9 +21,7 @@ srlParser = do
   return (decs,blk)
 
 block :: Parser Block
-block = do
-  (b:seq) <- many1 block'
-  return $ foldl Seq b seq
+block = foldl1 Seq <$> many1 block'
 
 block' :: Parser Block
 block' = stmtBlock <|> ifBlock <|> untilBlock
