@@ -127,17 +127,20 @@ translate ttab ast =
 trlProg :: RL.AST -> TrlState (TypeTab,SRL.AST)
 trlProg ast = do
   x  <- vec
+
   sl <- setupLoop (length ast)
-  bs <- trlBlocks ast
+
   let n  = fromIntegral . length $ ast
       b1 = genIf (genNull (genVar x [])) genSkip genSkip (genLit 1)
       b2 = genUpdate (genId x [0,1,0]) XorEq (genLit 1)
-      b3 = genUntil (genVar x [0,1,0]) bs genSkip (genVar x [n,n+1,0])
+
+  bs <- trlBlocks ast
+  let b3 = genUntil (genVar x [0,1,0]) bs genSkip (genVar x [n,n+1,0])
       b4 = genUpdate (genId x [n,n+1,0]) XorEq (genLit 1)
       b5 = b1
-      b  = genSeq [sl,b1,b2,b3,b4,b5]
+
   ttab <- initTypeDec
-  return (ttab, b)
+  return (ttab, genSeq [sl,b1,b2,b3,b4,b5])
 
 trlBlocks :: RL.AST -> TrlState SRL.Block
 trlBlocks = foldrM trlBlock (ef . genLit $ 0)
@@ -151,33 +154,46 @@ trlBlock (l,(f,ss,j)) sb = do
 -- comefroms
 trlFrom :: From -> Int -> SRL.Block -> TrlState SRL.Block
 trlFrom (Entry _) s b2 = do -- TODO: s skal være 1?
-  x <- vec
+  x  <- vec
+
+  let t = genVar x [0,1,0]
   b1 <- pMac 0 s
-  return $ genIf (genVar x [0,1,0]) b1 b2 (genLit 1)
+  let a = genLit 1
+
+  return $ genIf t b1 b2 a
 
 trlFrom (From l _) i b2 = do
   x  <- vec
-  j  <- mapLabel l
-  b1 <- pMac j i
-  return $ genIf (genVar x [j,i,0]) b1 b2 (genVar x [i,i,1])
 
-trlFrom (Fi e lj lk _) i b = do
+  j  <- mapLabel l
+
+  let t = genVar x [j,i,0]
+  b1 <- pMac j i
+  let a = genVar x [i,i,1]
+
+  return $ genIf t b1 b2 a
+
+trlFrom (Fi e lj lk _) i b2 = do
   x <- vec
 
   j <- mapLabel lj
   k <- mapLabel lk
 
-  b1 <- pMac j i
-  b2 <- pMac k i
+  -- outer test
+  let t2 = genOr (genVar x [j,i,0]) (genVar x [k,i,0])
 
-  let t1  = genVar x [j,i,0]
-      a1  = e
-      i1  = genIf t1 b1 b2 a1
+  -- inner if-block
+  b1 <- do
+    let t1 = genVar x [j,i,0]
+    b1 <- pMac j i
+    b2 <- pMac k i
+    let a1 = e
+    return $ genIf t1 b1 b2 a1
 
-      t2  = genOr (genVar x [j,i,0]) (genVar x [k,i,0])
-      a2 = genVar x [i,i,1]
+  -- outer assertion
+  let a2 = genVar x [i,i,1]
 
-  return $ genIf t2 i1 b a2
+  return $ genIf t2 b1 b2 a2
 
 
 -- steps
@@ -185,49 +201,54 @@ trlSteps :: [Stmt] -> Int -> SRL.Block -> TrlState SRL.Block
 trlSteps ss i b2 = do
   x <- vec
 
-  b1' <- pMac i i
-
   let t  = genVar x [i,i,1]
-      b1 = genSeq (map Step ss ++ [b1'])
-      a  = genVar x [i,i,2]
+  b1 <- do
+    bm <- pMac i i
+    return $ genSeq $ map Step ss ++ [bm]
+  let a  = genVar x [i,i,2]
+
   return $ genIf t b1 b2 a
 
 -- jumps
 trlJump :: Jump -> Int -> SRL.Block -> TrlState SRL.Block
-trlJump (RL.If e lj lk _) i b = do
+trlJump (RL.If e lj lk _) i b2 = do
   x <- vec
 
   j <- mapLabel lj
   k <- mapLabel lk
 
-  b1 <- rMac i j
-  b2 <- rMac i k
+  -- outer test
+  let t2 = genVar x [i,i,2]
 
-  let t1  = e
-      a1  = genVar x [i,j,0]
-      i1  = genIf t1 b1 b2 a1
+  -- inner if-block
+  b1 <- do
+    let t1 = e
+    b1 <- rMac i j
+    b2 <- rMac i k
+    let a1 = genVar x [i,j,0]
+    return $ genIf t1 b1 b2 a1
 
-      t2 = genVar x [i,i,2]
-      a2 = genOr (genVar x [i,j,0]) (genVar x [i,k,0])
+  -- outer assertion
+  let a2 = genOr (genVar x [i,j,0]) (genVar x [i,k,0])
 
-  return $ genIf t2 i1 b a2
+  return $ genIf t2 b1 b2 a2
 
 trlJump (Goto lj _) i b2 = do
   x <- vec
 
   j <- mapLabel lj
 
-  b1 <- rMac i j
-
   let t = genVar x [i,i,2]
-      a = genVar x [i,j,0]
+  b1 <- rMac i j
+  let a = genVar x [i,j,0]
+
   return $ genIf t b1 b2 a
 
 trlJump (Exit _) n b2 = do -- TODO: n skal være netop n (længden af AST'et)
   x <- vec
 
-  b1 <- rMac n (n+1)
-
   let t = genVar x [n,n,2]
-      a = genVar x [n,n+1,0]
+  b1 <- rMac n (n+1)
+  let a = genVar x [n,n+1,0]
+
   return $ genIf t b1 b2 a
