@@ -27,7 +27,7 @@ block' :: Parser Block
 block' = stmtBlock <|> ifBlock <|> untilBlock
 
 stmtBlock :: Parser Block
-stmtBlock = Atom <$> statement
+stmtBlock = Step <$> statement
 
 ifBlock :: Parser Block
 ifBlock = pos >>= \p -> (\s->s p) <$> do

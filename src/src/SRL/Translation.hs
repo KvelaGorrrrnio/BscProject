@@ -43,7 +43,7 @@ trlProg ast = do
   push l3 (fe,[],je)
 
 trlBlk :: SRL.AST -> Labels -> TrlMonad ()
-trlBlk (Atom s) (l0,l1,l2,l3) = do
+trlBlk (Step s) (l0,l1,l2,l3) = do
   let fs = From l0 p
       js = Goto l2 p
 

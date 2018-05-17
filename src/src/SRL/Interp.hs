@@ -18,7 +18,7 @@ runProgram ast ttab = let (vt,ms) = (execVarState vtab . interp) ast in (vt, Log
   where vtab = buildVTab ttab
 
 interp :: Block -> VarState ()
-interp (Atom s) = logStmt s
+interp (Step s) = logStmt s
 
 interp (If t b1 b2 a p) = do
   q  <- eval t >>= \case
