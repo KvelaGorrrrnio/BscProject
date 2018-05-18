@@ -18,6 +18,8 @@ html, body {
 }
 
 input {
+  box-sizing: border-box;
+  height: 35px;
   background-color: $bg;
   text-align: center;
   color: white;

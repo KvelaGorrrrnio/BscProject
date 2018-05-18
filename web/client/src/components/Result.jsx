@@ -43,7 +43,7 @@ class Result extends Component {
   }
 
   render() {
-    const wrap = cnt => (<div className='result-wrapper'>{cnt}</div>);
+    const wrap = cnt => (<div className='result-wrapper notranslate'>{cnt}</div>);
     switch(this.props.mode) {
       case 'run':
         return wrap(

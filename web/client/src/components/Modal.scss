@@ -1,5 +1,5 @@
-@import 'colors';
 @charset 'UTF-8';
+@import 'colors';
 
 .modal-wrapper {
   position: fixed;
@@ -20,7 +20,7 @@
   --background-color: rgba($bg, 0.95);
   backdrop-filter: blur(10px);
   z-index: 0;
-  transition: opacity 0.8s 0.2s;
+  transition: opacity 0.5s 0.2s;
 }
 
 .modal-wrapper.hidden .modal-shade {
@@ -35,7 +35,7 @@
   max-heght:  360px;
   padding: 25px 20px 20px 20px;
   background-color: $fg;
-  transition: top 0.5s ease-out;
+  transition: top 0.2s ease-out;
 }
 
 .modal-wrapper.hidden .modal-content {
@@ -98,7 +98,13 @@
 }
 
 .modal-wrapper ul li {
+  cursor: pointer;
   padding: 6px 20px;
+}
+.modal-wrapper ul li:hover,
+.modal-wrapper ul li.selected {
+  background-color: $bg !important;
+  color: $fg;
 }
 .modal-wrapper ul li:nth-child(2n) {
   background-color: rgba($fg,0.5);
@@ -107,9 +113,34 @@
   background-color: rgba($bg,0.5);
 }
 
+.modal-wrapper .sharelink input {
+ width: 235px;
+ float: left;
+ padding-right: 0px;
+}
+.modal-wrapper .sharelink span {
+  box-sizing: border-box;
+  background-color: $bg;
+  width: 45px; height: 35px;
+  padding: 7px 16px 3px 16px;
+  float: left;
+  cursor: pointer;
+}
+.modal-wrapper .sharelink img {
+  height: 20px;
+  transition: filter 1.0s;
+}
+.modal-wrapper .sharelink img.disabled {
+  opacity: 0.5;
+}
+.modal-wrapper .sharelink .success img {
+  filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(80deg) saturate(600%) contrast(0.8);
+  transition: filter 0.2s;
+}
+
 /** Line with text **/
 .fancy {
-  padding: 6px 0;
+  padding: 6px 0 1px 0;
   line-height: 0.5;
   font-size: 17px;
   text-align: center;

@@ -165,9 +165,7 @@ class Header extends Component {
   }
 
   openLocal() {
-    if (localStorage.codeCache) {
-      this.props.changeCode(localStorage.codeCache);
-    }
+    this.props.showOpenModal();
   }
 
   getActions(mode) {
@@ -197,6 +195,15 @@ class Header extends Component {
     }
   }
 
+  getModeName(mode) {
+    for (const i in modeItems) {
+      const m = modeItems[i];
+      console.log(m);
+      if(m.index==mode) return m.title;
+    }
+    console.log("NADSNÆDS")
+    return mode;
+  }
 
   render() {
     return (
@@ -214,7 +221,10 @@ class Header extends Component {
             { this.getActions(this.props.mode) }
           </span>
           <span className='modes'>
-            <Radio items={modeItems} onChange={this.changeMode.bind(this)} disabled={this.props.stepState.stepping} />
+            <div className='selected-mode'>
+              <span>{this.getModeName(this.props.mode)}</span>
+              <Radio items={modeItems} onChange={this.changeMode.bind(this)} disabled={this.props.stepState.stepping} />
+            </div>
           </span>
         </span>
       </div>
@@ -242,7 +252,8 @@ const mapDispatchToProps = dispatch => { return {
   stopStepping:      ()          => dispatch(actions.stopStepping()),
   nextStep:          ()          => dispatch(actions.nextStep()),
   prevStep:          ()          => dispatch(actions.prevStep()),
-  showSaveModal:   ()          => dispatch(actions.showSaveModal()),
+  showSaveModal:     ()          => dispatch(actions.showSaveModal()),
+  showOpenModal:     ()          => dispatch(actions.showOpenModal()),
 }};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

@@ -4,6 +4,7 @@ import { changeCode, hideSaveModal } from '../actions/index';
 import Button from './Button';
 import { download } from '../download';
 import './Modal.scss';
+import copyIcon from '../images/icons/copy.svg';
 
 class SaveModal extends Component {
 
@@ -65,14 +66,26 @@ class SaveModal extends Component {
     this.props.hideSaveModal();
   }
 
-  downloadScript() {
-    const filename = this.state.filename.trim() == '' ? 'somescript.' + this.props.language : this.state.filename;
+  exportScript() {
+    const filename = (this.state.filename.trim() == '' ? 'somescript' : this.state.filename) + '.' + this.props.language;
     download('data:text/plain,'+encodeURIComponent(this.props.code), filename, "text/plain");
   }
 
   getSharelink() {
     const url = [location.protocol, '//', location.host, location.pathname].join('');
     this.setState({ sharelink: url + '?code=' + btoa(this.props.code) })
+  }
+  
+  selectSharelink() {
+    const sharelink = this.refs.sharelink;
+    sharelink.setSelectionRange(0,sharelink.value.length);
+  }
+
+  copySharelink() {
+    this.selectSharelink();
+    document.execCommand('copy');
+    this.refs.sharelinkcopy.classList.add('success');
+    setTimeout(() => { this.refs.sharelinkcopy.classList.remove('success'); }, 700);
   }
 
   render () {
@@ -88,13 +101,16 @@ class SaveModal extends Component {
             <Button className='half' onClick={this.saveFile.bind(this)}>{saveText}</Button>
             <Button className='half' onClick={this.hide.bind(this)}>Cancel</Button>
             <p className='fancy'><span> or </span></p>
-            <Button onClick={this.downloadScript.bind(this)}>Export to computer</Button>
+            <Button onClick={this.exportScript.bind(this)}>Export to computer</Button>
             <Button onClick={this.getSharelink.bind(this)}>Share with a link</Button>
-            <input type='text' readOnly value={this.state.sharelink} />
+            <div className="sharelink">
+              <input type='text' ref='sharelink' readOnly onClick={this.selectSharelink.bind(this)} value={this.state.sharelink} />
+              <span ref="sharelinkcopy" onClick={this.copySharelink.bind(this)}><img src={copyIcon} className={this.state.sharelink=='' ? 'disabled' : ''} /></span>
+            </div>
           </div><div className='_2column'>
-            <ul>
+            <ul className='notranslate'>
               { this.getFiles().map((file,idx) => { return (
-                <li key={idx} onClick={() => {this.setState({ filename: this.trimExt(file.title) }) }}>
+                <li key={idx} className={filename == file.title ? 'selected' : ''} onClick={() => {this.setState({ filename: this.trimExt(file.title) }) }}>
                   {file.title}
                 </li>
               ); }) }

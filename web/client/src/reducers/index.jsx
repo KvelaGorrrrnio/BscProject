@@ -85,6 +85,18 @@ const rootReducer = (state = initState, action) => {
           save: false,
         }
       }
+    case 'show-open-modal':
+      return { ...state,
+        modal: { ...state.modal,
+          open: true,
+        }
+      }
+    case 'hide-open-modal':
+      return { ...state,
+        modal: { ...state.modal,
+          open: false,
+        }
+      }
     default: return state
   }
 }

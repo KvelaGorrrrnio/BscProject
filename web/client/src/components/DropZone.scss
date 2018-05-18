@@ -1,0 +1,14 @@
+@charset 'UTF-8';
+@import 'colors';
+
+.dropzone {
+  background-color: rgba($bg,0.2);
+  padding: 10px 10px;
+  user-select: none;
+  cursor: pointer;
+}
+.dropzone>div {
+  border: dashed 1px $fg;
+  padding: 41px 10px;
+  text-align: center;
+}

@@ -9,7 +9,7 @@ li, ol form, label, sub,
 sup, table, caption, tbody,
 tfoot, thead, tr, th, td 
 {
-border: 0;
+border: none;
 font-family: inherit;
 font-size: 100%;
 margin: 0;
@@ -19,6 +19,12 @@ vertical-align: baseline;
 text-decoration: none;
 list-style: none;
 color: inherit;
+}
+
+input, textarea {
+  appearance: none;
+  outline: none;
+  border: none;
 }
 
 /** HTML BODY fullscreen size **/

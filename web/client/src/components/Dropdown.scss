@@ -21,11 +21,12 @@
 .dropdown li {
   position: relative;
   padding: 6px 20px;
-  background-color: rgba($fg,0.5);
+  background-color: $fg;
+  border: 1px solid $fg;
 }
 
 .dropdown li:hover {
-  background-color: rgba($fg,1.0);
+  background-color: $bg;
 }
 
 .dropdown>ul {

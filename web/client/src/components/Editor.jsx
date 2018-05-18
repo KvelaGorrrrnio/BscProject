@@ -137,7 +137,7 @@ class Editor extends Component {
         if (line > 0) this.editor.scrollIntoView(line,60);
       }
     }
-    const className = (err.type ? 'editor-wrapper has-error' : 'editor-wrapper') + (options.readOnly ? ' disabled' : '');
+    const className = (err.type ? 'editor-wrapper has-error' : 'editor-wrapper') + ' notranslate' + (options.readOnly ? ' disabled' : '');
     const Error = err.type ? (<div className='error-wrapper'>{err.message}</div>) : null;
     return (
       <div className={className}>

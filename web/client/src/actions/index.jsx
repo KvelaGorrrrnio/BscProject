@@ -56,3 +56,11 @@ export const showSaveModal = () => { return {
 export const hideSaveModal = () => { return {
   type: 'hide-save-modal'
 }};
+
+export const showOpenModal = () => { return {
+  type: 'show-open-modal'
+}};
+
+export const hideOpenModal = () => { return {
+  type: 'hide-open-modal'
+}};
