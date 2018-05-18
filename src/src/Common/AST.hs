@@ -65,6 +65,8 @@ getStmtPos (Push _ _ p)     = p
 getStmtPos (Pop _ _ p)      = p
 getStmtPos (Swap _ _ p)     = p
 getStmtPos (Skip p)         = p
+getStmtPos (Init _ _ p)     = p
+getStmtPos (Free _ _ p)     = p
 
 data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq deriving Eq
 instance Show UpdOp where

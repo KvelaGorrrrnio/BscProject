@@ -22,11 +22,7 @@ initTypeDec :: TrlReader TypeTab
 initTypeDec = do
   x <- vec
   return $ M.fromList
-    [ (x,  ListT (ListT (ListT IntT)))
-    , ("S1", ListT (ListT IntT))
-    , ("S2", ListT IntT)
-    , ("s",  IntT)
-    ]
+    [ (x,  ListT (ListT (ListT IntT))) ]
 
 -- TODO: Make sure Entry gets 0 Exit n
 genLabelMap :: TypeTab -> RL.AST -> LabelMap

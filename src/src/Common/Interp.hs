@@ -204,7 +204,7 @@ exec (Free id exps p) = do
 
   where
 
-    equalLengths v (e:exps) = case v of
+    equalLengths v (e:exps) = case v of -- TODO: Monadic with errors
       ListV ls _ -> case e of
         IntV n -> length ls == fromIntegral n && all (`equalLengths` exps) ls
     equalLengths v [] = True
