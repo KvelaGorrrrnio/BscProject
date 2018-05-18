@@ -7,7 +7,7 @@
     "start": "node babel-server.js",
     "devstart": "nodemon babel-server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd ../client && npm run build && mkdir -p ../server/client && cp build/* ../server/client"
+    "build": "cd ../client && npm run build && mkdir -p ../server/client && cp build/* ../server/client && cd ../server && ../server/getbin.sh"
   },
   "author": "",
   "license": "ISC",

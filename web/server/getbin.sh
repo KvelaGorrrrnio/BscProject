@@ -1,1 +1,1 @@
-cp ../../src/.stack-work/install/x86_64-osx/lts-11.6/8.2.2/bin/* bin/
+mkdir -p bin && cd ../../src && stack build && cd ../web/server && cp ../../src/$(stack path --dist-dir)/build/RL/rl ./bin/rl && cp ../../src/$(stack path --dist-dir)/build/SRL/srl ./bin/srl && chmod +x ./bin/rl ./bin/srl
