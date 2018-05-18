@@ -12,8 +12,8 @@ goto test
 
 test: fi (? q || (^ q != 1)) count end
   skip
-if (? q) init count
+if (? q) start count
 
-init: from test
+start: from test
   skip
 exit

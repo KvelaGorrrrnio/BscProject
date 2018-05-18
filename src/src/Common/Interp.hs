@@ -79,8 +79,8 @@ exec :: Stmt -> VarState ()
 
 -- variable updates
 exec (Update (Id id exps) op e p) = do
-  abuse <- contains e (Id id exps) []
-  when abuse $ logError $ RuntimeError p $ CustomRT "Self-abuse in update."
+  cont <- contains e (Id id exps) []
+  when cont $ logError $ RuntimeError p $ CustomRT "Update contains same variable on both sides."
 
   v1 <- rd (Id id exps) p
   n <- case v1 of

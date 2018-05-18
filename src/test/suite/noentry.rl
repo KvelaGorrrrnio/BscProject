@@ -1,8 +1,8 @@
 int a
 
-init : from ntry
+start : from ntry
   a += 10
 goto ntry
 
-ntry: from init
+ntry: from start
 exit

@@ -6,10 +6,10 @@
 list int q
 int n
 
-init: entry
+start: entry
 goto test
 
-test: fi (?q) init count
+test: fi (?q) start count
 if (?q || (^q != 1)) count end
 
 count: from test
