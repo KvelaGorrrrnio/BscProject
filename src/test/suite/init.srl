@@ -1,0 +1,6 @@
+list list list int S
+
+init S [1,2,10]
+
+free S [1,2,10]
+

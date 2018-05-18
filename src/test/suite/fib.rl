@@ -7,13 +7,13 @@ int v
 int w
 
 // Initialisation
-init: entry
+start: entry
   n ^= 16
   w ^= 1
 goto loop
 
 // The loop body
-loop: fi (v = 0) init loop
+loop: fi (v = 0) start loop
   v += w
   swap v w
   n -= 1
