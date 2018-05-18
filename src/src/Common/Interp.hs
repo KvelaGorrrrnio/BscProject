@@ -11,6 +11,8 @@ import Data.Bits (xor)
 import Control.Monad.State
 import Control.Monad.Writer
 import Control.Monad.Except
+import Control.Monad.Loops (allM)
+
 import qualified Data.HashMap.Strict as M
 import qualified Data.IntMap.Strict as I
 
@@ -176,13 +178,15 @@ exec (Init id exps p) = do
 
   where
 
+    foldrM f e = foldr ((=<<) . f) (return e)
+
     repl e acc = eval e >>= \case
       IntV n
-        | n >= 0    -> case acc of
-          ListV ls t -> return $ ListV (replicate (fromIntegral n) acc) (ListT t)
-          IntV _     -> return $ ListV (replicate (fromIntegral n) acc) (ListT IntT)
+        | n >= 0 -> case acc of
+          ListV ls t  -> return $ ListV (replicate (fromIntegral n) acc) (ListT t)
+          IntV _      -> return $ ListV (replicate (fromIntegral n) acc) (ListT IntT)
         | otherwise -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the initialisation must be non-negative."
-      ListV _ _     -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the initialisation must be integers."
+      ListV _ _  -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the initialisation must be integers."
 
 -- freeing a list
 exec (Free id exps p) = do
@@ -196,18 +200,24 @@ exec (Free id exps p) = do
     _ -> return ()
 
   unless (allZero v) $ logError $ RuntimeError p $ CustomRT "The list being freed must consist of only zeroes."
-  values <- mapM eval exps
-  unless (v `equalLengths` values)
+
+  eql <- equalLengths v exps
+  unless eql
     $ logError $ RuntimeError p $ CustomRT "The lengths in the free don't match the actual lengths of the list."
 
   adjust (const . getDefaultValue . getType $ v) (Id id []) p
 
   where
 
-    equalLengths v (e:exps) = case v of -- TODO: Monadic with errors
-      ListV ls _ -> case e of
-        IntV n -> length ls == fromIntegral n && all (`equalLengths` exps) ls
-    equalLengths v [] = True
+    equalLengths v (e:exps) = eval e >>= \case
+      IntV n
+        | n >= 0 -> case v of
+          ListV ls t  -> (&&) (length ls == fromIntegral n) <$> allM (`equalLengths` exps) ls
+          IntV _      -> logError $ RuntimeError p $ CustomRT "The variable being freed is not a list."
+        | otherwise -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the free must be non-negative."
+      ListV _ _ -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the free must be integers."
+    equalLengths ListV{} [] = return False
+    equalLengths IntV{}  [] = return True
 
 -- skip
 exec _ = return ()
@@ -215,8 +225,6 @@ exec _ = return ()
 getDim t = case t of
   ListT t -> 1 + getDim t
   IntT    -> 0
-
-foldrM f e = foldr ((=<<) . f) (return e)
 
 
 -- ===========
