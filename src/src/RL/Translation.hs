@@ -13,15 +13,15 @@ import Control.Monad.Writer
 import Debug.Trace
 
 type LabelMap = (String, M.HashMap Label Int)
-type TrlState = StateT (Int,Int,Int) (Reader LabelMap)
+type TrlReader = Reader LabelMap
 
-mapLabel :: Label -> TrlState Int
+mapLabel :: Label -> TrlReader Int
 mapLabel l = asks ((M.! l) . snd)
 
-vec :: TrlState String
+vec :: TrlReader String
 vec = asks fst
 
-initTypeDec :: TrlState TypeTab
+initTypeDec :: TrlReader TypeTab
 initTypeDec = do
   x <- vec
   return $ M.fromList
@@ -32,7 +32,7 @@ initTypeDec = do
     ]
 
 -- setting up the states
-setupLoop :: Int -> TrlState SRL.Block
+setupLoop :: Int -> TrlReader SRL.Block
 setupLoop n = do
   x <- vec
 
@@ -68,8 +68,8 @@ setupLoop n = do
 -- TODO: Make sure Entry gets 0 Exit n
 genLabelMap :: TypeTab -> RL.AST -> LabelMap
 genLabelMap ttab ast =
-  let lm = (M.fromList . foldl (\acc (l,b) -> (l,length acc + 1):acc) []) ast
-    in trace (show lm) (genVec ttab,lm)
+  let lm = M.fromList . foldl (\acc (l,b) -> (l,length acc + 1):acc) [] $ ast
+    in (genVec ttab,lm)
 
 genVec :: TypeTab -> String
 genVec ttab = "S"
@@ -93,20 +93,16 @@ genSeq s            = foldl1 Seq s
 genSkip             = Step $ Skip p
 
 -- Macros
-pMac :: Int -> Int -> TrlState SRL.Block
-pMac oj j' = do
+pMac :: Int -> (Int,Int,Int) -> TrlReader SRL.Block
+pMac j' (j,i,k) = do
   x <- vec
-  (j,i,k) <- get
   let k' = (k + 1) `mod` 3
-  put (j',i,k')
   return $ genSwap (genId x [j,i,k]) (genId x [j',i,k'])
 
-rMac :: Int -> Int -> TrlState SRL.Block
-rMac oi i' = do
+rMac :: Int -> (Int,Int,Int) -> TrlReader SRL.Block
+rMac i' (j,i,k) = do
   x <- vec
-  (j,i,k) <- get
   let k' = (k + 1) `mod` 3
-  put (j,i',k')
   return $ genSwap (genId x [j,i,k]) (genId x [j,i',k'])
 
 -- Sanity check
@@ -121,10 +117,10 @@ p = (0,0)
 
 translate :: TypeTab -> RL.AST -> String
 translate ttab ast =
-  let (ttab',ast') = runReader (evalStateT (trlProg ast) (0,0,0)) (genLabelMap ttab ast)
+  let (ttab',ast') = runReader (trlProg ast) (genLabelMap ttab ast)
     in SRL.showAST (ttab `M.union` ttab') ast'
 
-trlProg :: RL.AST -> TrlState (TypeTab,SRL.AST)
+trlProg :: RL.AST -> TrlReader (TypeTab,SRL.AST)
 trlProg ast = do
   x  <- vec
 
@@ -142,23 +138,23 @@ trlProg ast = do
   ttab <- initTypeDec
   return (ttab, genSeq [sl,b1,b2,b3,b4,b5])
 
-trlBlocks :: RL.AST -> TrlState SRL.Block
+trlBlocks :: RL.AST -> TrlReader SRL.Block
 trlBlocks = foldrM trlBlock (ef . genLit $ 0)
   where foldrM f e = foldr ((=<<) . f) (return e)
 
-trlBlock :: (Label,RL.Block) -> SRL.Block -> TrlState SRL.Block
+trlBlock :: (Label,RL.Block) -> SRL.Block -> TrlReader SRL.Block
 trlBlock (l,(f,ss,j)) sb = do
   i <- mapLabel l
-  trlFrom f i =<< trlSteps ss i =<< trlJump j i sb
+  trlJump j i sb >>= trlSteps ss i >>= trlFrom f i
 
 -- comefroms
-trlFrom :: From -> Int -> SRL.Block -> TrlState SRL.Block
-trlFrom (Entry _) s b2 = do -- TODO: s skal være 1?
+trlFrom :: From -> Int -> SRL.Block -> TrlReader SRL.Block
+trlFrom (Entry _) 1 b2 = do -- TODO: i skal være 1?
   x  <- vec
 
   let t = genVar x [0,1,0]
-  b1 <- pMac 0 s
-  let a = genLit 1
+  b1 <- pMac 1 (0,1,0)
+  let a = genVar x [1,1,1]
 
   return $ genIf t b1 b2 a
 
@@ -168,10 +164,11 @@ trlFrom (From l _) i b2 = do
   j  <- mapLabel l
 
   let t = genVar x [j,i,0]
-  b1 <- pMac j i
+  b1 <- pMac i (j,i,0)
   let a = genVar x [i,i,1]
 
   return $ genIf t b1 b2 a
+trlFrom (Entry _) n _ = fail "Entry not the starting state."
 
 trlFrom (Fi e lj lk _) i b2 = do
   x <- vec
@@ -185,8 +182,8 @@ trlFrom (Fi e lj lk _) i b2 = do
   -- inner if-block
   b1 <- do
     let t1 = genVar x [j,i,0]
-    b1 <- pMac j i
-    b2 <- pMac k i
+    b1 <- pMac i (j,i,0)
+    b2 <- pMac i (k,i,0)
     let a1 = e
     return $ genIf t1 b1 b2 a1
 
@@ -197,20 +194,44 @@ trlFrom (Fi e lj lk _) i b2 = do
 
 
 -- steps
-trlSteps :: [Stmt] -> Int -> SRL.Block -> TrlState SRL.Block
+trlSteps :: [Stmt] -> Int -> SRL.Block -> TrlReader SRL.Block
 trlSteps ss i b2 = do
   x <- vec
 
   let t  = genVar x [i,i,1]
   b1 <- do
-    bm <- pMac i i
+    bm <- pMac i (i,i,1)
     return $ genSeq $ map Step ss ++ [bm]
   let a  = genVar x [i,i,2]
 
   return $ genIf t b1 b2 a
 
+
 -- jumps
-trlJump :: Jump -> Int -> SRL.Block -> TrlState SRL.Block
+trlJump :: Jump -> Int -> SRL.Block -> TrlReader SRL.Block
+trlJump (Exit _) n b2 = do -- TODO: n skal være netop n (længden af AST'et)
+  n' <- asks length
+  unless (n == n') $ fail "Exit not the ending state."
+
+  x <- vec
+
+  let t = genVar x [n,n,2]
+  b1 <- rMac (n+1) (n,n,2)
+  let a = genVar x [n,n+1,0]
+
+  return $ genIf t b1 b2 a
+
+trlJump (Goto lj _) i b2 = do
+  x <- vec
+
+  j <- mapLabel lj
+
+  let t = genVar x [i,i,2]
+  b1 <- rMac j (i,i,2)
+  let a = genVar x [i,j,0]
+
+  return $ genIf t b1 b2 a
+
 trlJump (RL.If e lj lk _) i b2 = do
   x <- vec
 
@@ -223,8 +244,8 @@ trlJump (RL.If e lj lk _) i b2 = do
   -- inner if-block
   b1 <- do
     let t1 = e
-    b1 <- rMac i j
-    b2 <- rMac i k
+    b1 <- rMac j (i,i,2)
+    b2 <- rMac k (i,i,2)
     let a1 = genVar x [i,j,0]
     return $ genIf t1 b1 b2 a1
 
@@ -233,22 +254,3 @@ trlJump (RL.If e lj lk _) i b2 = do
 
   return $ genIf t2 b1 b2 a2
 
-trlJump (Goto lj _) i b2 = do
-  x <- vec
-
-  j <- mapLabel lj
-
-  let t = genVar x [i,i,2]
-  b1 <- rMac i j
-  let a = genVar x [i,j,0]
-
-  return $ genIf t b1 b2 a
-
-trlJump (Exit _) n b2 = do -- TODO: n skal være netop n (længden af AST'et)
-  x <- vec
-
-  let t = genVar x [n,n,2]
-  b1 <- rMac n (n+1)
-  let a = genVar x [n,n+1,0]
-
-  return $ genIf t b1 b2 a

@@ -2,7 +2,6 @@
   Fibonacci program
   Written in RL
 */
-
 int n
 int v
 int w
@@ -25,4 +24,3 @@ end: from loop
 exit
 
 // End of program
-
