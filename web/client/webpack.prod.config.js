@@ -75,7 +75,8 @@ module.exports = {
     new ExtractTextPlugin('style.css'),
     new webpack.optimize.UglifyJsPlugin(),
     new webpack.DefinePlugin({
-      'API_URL' : JSON.stringify('http://localhost:3001/api')
+      'API_URL':  JSON.stringify('http://localhost:3001/api'),
+      'process.env.NODE_ENV': JSON.stringify('production'),
     }),
   ],
 };

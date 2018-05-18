@@ -1,11 +1,29 @@
-zipfile=robin.zip
+all: src web
+src:
+	@make -C src build
+web:
+	@make -C web build
 
-zip: clean
-	@echo "Compressing project into ${zipfile}..."
-	@zip -r ${zipfile} src/Makefile src/bin src/RL src/SRL src/Common # > /dev/null
+clean: clean-src clean-web
+clean-src:
+	@make -C src clean
+clean-web:
+	@make -C web clean
 
-clean:
-	@$(MAKE) --no-print-directory -C src clean
-	@rm -rf ${zipfile}
+zip: zip-src zip-web
+	zip bsc.zip src.zip web.zip
+zip-src: clean-src
+	@zip -r src.zip src
+zip-web: clean-web
+	@zip -r web.zip web
 
-.PHONY: clean zip
+install:
+	@make -C src install
+
+serve:
+	@make -C web serve
+
+release:
+	@zip -r src.zip release
+
+.PHONY: all src web install serve release clean clean-src clean-web zip zip-src zip-web
