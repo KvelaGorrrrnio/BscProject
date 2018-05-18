@@ -106,7 +106,6 @@ trlBlocks = foldrM trlBlock (ef . genLit $ 0)
 trlBlock :: (Label,RL.Block) -> SRL.Block -> TrlReader SRL.Block
 trlBlock (l,(f,ss,j)) sb = do
   i <- mapLabel l
-  -- trlJump j i sb >>= trlSteps ss i >>= trlFrom f i
   trlFrom f i =<< trlSteps ss i =<< trlJump j i sb
 
 -- comefroms
