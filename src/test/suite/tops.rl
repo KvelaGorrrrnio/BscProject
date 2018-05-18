@@ -4,7 +4,7 @@ int n
 list int q
 list list int p
 
-init: entry
+start: entry
   n ^= 3
   push n q
   n ^= 9

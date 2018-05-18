@@ -8,8 +8,8 @@ goto loop
 loop: fi (n) loop end
   n += 1
   v -= n
-if (v = 0) init loop
+if (v = 0) start loop
 
-init: from loop
+start: from loop
   n ^= 10
 exit

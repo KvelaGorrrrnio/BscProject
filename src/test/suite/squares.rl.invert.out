@@ -10,8 +10,8 @@ loop: fi (n = 0) end loop
   n += 1
   pop w q
   w -= n * n
-if (n = 10) init loop
+if (n = 10) start loop
 
-init: from loop
+start: from loop
   n ^= 10
 exit

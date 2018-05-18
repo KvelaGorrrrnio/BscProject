@@ -2,7 +2,7 @@ int n
 list  list  int p
 list  int q
 
-init: entry
+start: entry
   n -= ^ (^ p)
   pop q p
   pop n q

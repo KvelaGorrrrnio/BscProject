@@ -10,9 +10,9 @@ loop: fi (n = 0) end loop
   n += 1
   swap v w
   v -= w
-if (v = 0) init loop
+if (v = 0) start loop
 
-init: from loop
+start: from loop
   w ^= 1
   n ^= 16
 exit

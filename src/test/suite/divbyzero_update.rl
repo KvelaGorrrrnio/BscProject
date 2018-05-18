@@ -1,5 +1,5 @@
 int a
 
-init: entry
+start: entry
   a /= 4 - (2 * 2)
 exit

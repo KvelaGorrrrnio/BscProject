@@ -30,6 +30,8 @@ languageDef =
                                       , "swap"
                                       , "push"
                                       , "pop"
+                                      , "init"
+                                      , "free"
                                       -- expressions
                                       , "neg"
                                       , "sig"
@@ -69,17 +71,22 @@ parens        = Token.parens        lexer
 brackets      = Token.brackets      lexer
 integer       = Token.integer       lexer
 colon         = Token.colon         lexer
+comma         = Token.comma         lexer
 whiteSpace    = Token.whiteSpace    lexer
 
 -- identifier
 identifier :: Parser Id
 identifier = do
   id <- identifier'
-  is <- many index
+  is <- indices
   return $ Id id is
 
-index :: Parser Exp
-index = brackets expression
+indices :: Parser [Exp]
+indices = try (many $ brackets expression) <|> brackets (sepBy expression comma)
+
+indices1 :: Parser [Exp]
+indices1 = try (many1 $ brackets expression) <|> brackets (sepBy1 expression comma)
+
 
 -- type declarations
 typedecs :: Parser TypeTab
@@ -102,7 +109,9 @@ statement = pos >>= \p -> (\s->s p)
         <|> swapStmt
         <|> skipStmt
         <|> pushStmt
-        <|> popStmt)
+        <|> popStmt
+        <|> initStmt
+        <|> freeStmt)
 
 updateStmt :: Parser (Pos -> Stmt)
 updateStmt = Update <$> identifier <*> update <*> expression
@@ -124,6 +133,19 @@ pushStmt = reserved "push" >> Push <$> identifier <*> identifier
 
 popStmt :: Parser (Pos -> Stmt)
 popStmt = reserved "pop" >> Pop <$> identifier <*> identifier
+
+initStmt :: Parser (Pos -> Stmt)
+initStmt = do
+  reserved "init"
+  id  <- identifier'
+  Init id <$> indices1
+
+freeStmt :: Parser (Pos -> Stmt)
+freeStmt = do
+  reserved "free"
+  id  <- identifier'
+  Free id <$> indices1
+
 
 -- expressions
 expression :: Parser Exp

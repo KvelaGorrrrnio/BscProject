@@ -1,10 +1,10 @@
-init: entry
+start: entry
 goto dup
 
-dup: from init
+dup: from start
 goto end
 
-dup: from init
+dup: from start
 goto end
 
 end: from dup

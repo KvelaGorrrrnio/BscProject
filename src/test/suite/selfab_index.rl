@@ -2,10 +2,10 @@
 list list int lst'
 int n int v
 
-init: entry
+start: entry
 goto outloop
 
-outloop: fi empty lst' init next
+outloop: fi empty lst' start next
 goto loop
 
 loop: fi v=0 outloop loop

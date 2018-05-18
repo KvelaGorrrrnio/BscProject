@@ -1,6 +1,6 @@
 int a
 
-init: entry
+start: entry
   a += 9
   a /= 4
 exit

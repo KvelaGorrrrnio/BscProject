@@ -2,7 +2,7 @@ int n
 list int q
 list list int p
 
-init : entry
+start : entry
   n += 1
   push n q
   push q p

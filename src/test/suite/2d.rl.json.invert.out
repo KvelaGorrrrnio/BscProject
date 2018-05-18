@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "int n\nlist  list  int p\nlist  int q\n\ninit: entry\n  n -= ^ (^ p)\n  pop q p\n  pop n q\n  n -= 1\n  pop q p\n  pop n q\n  n -= 1\nexit" }
+{ "type" : "code", "code" : "int n\nlist  list  int p\nlist  int q\n\nstart: entry\n  n -= ^ (^ p)\n  pop q p\n  pop n q\n  n -= 1\n  pop q p\n  pop n q\n  n -= 1\nexit" }

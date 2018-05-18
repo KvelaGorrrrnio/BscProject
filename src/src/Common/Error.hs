@@ -30,8 +30,7 @@ data TypeError
   | PopFromNonList  Id   Type
 
 data StaticError
-  = SelfAbuse Id
-  | DuplicateLabel String Pos
+  = DuplicateLabel String Pos
   | DuplicateEntry
   | DuplicateExit
   | NotDefinedLabel String
@@ -55,7 +54,6 @@ instance Show RuntimeError where
   show (CustomRT s) = s
 
 instance Show StaticError where
-  show (SelfAbuse id)             = show id ++ " is abusing itself."
   show (DuplicateLabel lbl (l,_)) = " Can't redefine " ++ lbl ++ ". First defined at line " ++ show l ++ "."
   show (NotDefinedLabel lbl)      = "Label " ++ lbl ++ " is not defined."
   show DuplicateEntry             = "Only one entry-point is allowed."

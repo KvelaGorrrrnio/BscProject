@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "int n\nint v\n\nend: entry\n  skip\ngoto loop\n\nloop: fi (n) loop end\n  n += 1\n  v -= n\nif (v = 0) init loop\n\ninit: from loop\n  n ^= 10\nexit" }
+{ "type" : "code", "code" : "int n\nint v\n\nend: entry\n  skip\ngoto loop\n\nloop: fi (n) loop end\n  n += 1\n  v -= n\nif (v = 0) start loop\n\nstart: from loop\n  n ^= 10\nexit" }

@@ -5,7 +5,7 @@ int v
 
 end: entry
   push lst lst'
-  swap lst'[0][3] lst'[2][0]
+  swap lst'[0,3] lst'[2,0]
 goto next
 
 next: fi (# lst' = 5) end outloop
@@ -21,8 +21,8 @@ if (v = 0) outloop loop
 
 outloop: from loop
   skip
-if (? lst') init next
+if (? lst') start next
 
-init: from outloop
+start: from outloop
   skip
 exit
