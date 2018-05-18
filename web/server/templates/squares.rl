@@ -4,12 +4,12 @@ int n int w
 list int q
 
 // Initialisation
-init: entry
+start: entry
   n ^= 10
 goto loop
 
 // Loop
-loop: fi (n = 10) init loop
+loop: fi (n = 10) start loop
   w += n * n
   push w q
   n -= 1

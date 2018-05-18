@@ -1,7 +1,7 @@
 int n int i
 list int q
 
-init: entry
+start: entry
   n += 1
   push n q
   push n q
@@ -15,7 +15,7 @@ init: entry
   push n q
 goto loop
 
-loop: fi (i = 0) init loop
+loop: fi (i = 0) start loop
   n += (2 * q[#q - i - 1]) ** i
   i += 1
 if (i = #q) end loop
