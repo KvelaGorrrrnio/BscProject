@@ -198,10 +198,8 @@ class Header extends Component {
   getModeName(mode) {
     for (const i in modeItems) {
       const m = modeItems[i];
-      console.log(m);
       if(m.index==mode) return m.title;
     }
-    console.log("NADSNÆDS")
     return mode;
   }
 

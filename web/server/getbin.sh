@@ -1,1 +1,0 @@
-mkdir -p bin && cd ../../src && stack build && cd ../web/server && cp ../../src/$(stack path --dist-dir)/build/rl/rl ./bin/rl && cp ../../src/$(stack path --dist-dir)/build/srl/srl ./bin/srl && chmod +x ./bin/rl ./bin/srl
