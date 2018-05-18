@@ -15,7 +15,8 @@ class Radio extends Component {
 
   onClick(event, item) {
     if (this.props.disabled) return;
-    if (item.index == this.state.index) {
+    const index = this.props.selected !== undefined ? this.props.selected : this.state.index;
+    if (item.index == index) {
       return;
     }
     this.setState({ index: item.index });
@@ -23,10 +24,11 @@ class Radio extends Component {
   }
 
   render() {
+    const index = this.props.selected !== undefined ? this.props.selected : this.state.index;
     return (
       <ul className='radio-wrapper'>
         { this.state.items.map(item => {
-          const className = (item.index == this.state.index ? 'current' : '') + (this.props.disabled ? ' disabled' : '');
+          const className = (item.index == index ? 'current' : '') + (this.props.disabled ? ' disabled' : '');
           return (<li className={className} key={item.index} onClick={(e) => this.onClick(e,item)}>{item.title}</li>);
         }) }
       </ul>

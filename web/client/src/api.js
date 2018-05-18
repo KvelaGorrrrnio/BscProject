@@ -52,3 +52,35 @@ export function translate(lng,content,callback) {
         callback({ type: 'error', message: error });
       });
 }
+
+export function templates(callback) {
+  fetch(API_URL + '/template/list', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        callback(null,result);
+      }, (error) => {
+        callback({ type: 'error', message: error });
+      });
+}
+
+export function template(file,callback) {
+  fetch(API_URL + '/template/' + encodeURIComponent(file), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => res.json())
+    .then(
+      (result) => {
+        callback(null,result);
+      }, (error) => {
+        callback({ type: 'error', message: error });
+      });
+}

@@ -48,3 +48,11 @@ export const nextStep = () => { return {
 export const prevStep = () => { return {
   type: 'stepping-prev'
 }};
+
+export const showSaveModal = () => { return {
+  type: 'show-save-modal'
+}};
+
+export const hideSaveModal = () => { return {
+  type: 'hide-save-modal'
+}};

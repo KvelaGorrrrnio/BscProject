@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Radio from './Radio';
 import Button from './Button';
-import { changeMode, changeLanguage, changeResultCode, changeResultError, changeResultTable, changeResultLog, startStepping, stopStepping, nextStep, prevStep } from '../actions/index';
-import './Header.scss';
+import Dropdown from './Dropdown';
+import * as actions from '../actions/index';
 import * as api from '../api';
+import './Header.scss';
 
 import playIcon from '../images/icons/play.svg';
 import stepIcon from '../images/icons/step.svg';
@@ -47,6 +48,13 @@ const modeItems = [
 
 class Header extends Component {
 
+  constructor() {
+    super()
+    this.state = { templates: {
+      srl: [], rl: [],
+    } };
+  }
+
   changeMode(event,item) {
     this.props.changeMode(item.index);
   }
@@ -85,8 +93,44 @@ class Header extends Component {
     }, log);
   }
 
+  selectTemplate(lng,template) {
+    const changeLanguage = this.props.changeLanguage;
+    api.template(template,(err,cnt) => {
+      if (err) return;
+      changeLanguage(lng);
+      this.props.changeCode(cnt.code);
+    });
+  }
+
+  componentDidMount() {
+    api.templates((err,templates) => {
+      if (err) return;
+      this.setState({
+        templates: {
+          srl: {
+            type: 'category',
+            title: 'SRL',
+            children: templates.srl.map(template => { return {
+              type: 'item',
+              title: template,
+              onClick: () => { this.selectTemplate.bind(this)('srl',template) }
+            }})
+          },
+          rl: {
+            type: 'category',
+            title: 'RL',
+            children: templates.rl.map(template => { return {
+              type: 'item',
+              title: template,
+              onClick: () => { this.selectTemplate.bind(this)('rl',template) }
+            }})
+          },
+        }
+      });
+    });
+  }
+
   stopStepping() {
-    console.log(this.props);
     this.props.changeResultLog({ state: { table: [] }, table: [] });
     this.props.stopStepping();
   }
@@ -116,6 +160,16 @@ class Header extends Component {
     while (i < n) { this.nextStep(); i++ }
   }
 
+  saveLocal() {
+    this.props.showSaveModal();
+  }
+
+  openLocal() {
+    if (localStorage.codeCache) {
+      this.props.changeCode(localStorage.codeCache);
+    }
+  }
+
   getActions(mode) {
     switch (mode) {
       case 'run':
@@ -143,15 +197,16 @@ class Header extends Component {
     }
   }
 
+
   render() {
     return (
       <div className='header-wrapper'>
         <span className='controls'>
-          <Radio items={items} onChange={this.changeLanguage.bind(this)} disabled={this.props.stepState.stepping} />
+          <Radio items={items} selected={this.props.language} onChange={this.changeLanguage.bind(this)} disabled={this.props.stepState.stepping} />
           <span className='actions'>
-            <Button disabled={this.props.stepState.stepping}><img src={tempIcon}/></Button>
-            <Button disabled={this.props.stepState.stepping}><img src={openIcon}/></Button>
-            <Button disabled={this.props.stepState.stepping}><img src={saveIcon}/></Button>
+            <Dropdown disabled={this.props.stepState.stepping} items={[this.state.templates.srl,this.state.templates.rl]}><img src={tempIcon}/></Dropdown>
+            <Button disabled={this.props.stepState.stepping} onClick={this.openLocal.bind(this)}><img src={openIcon}/></Button>
+            <Button disabled={this.props.stepState.stepping} onClick={this.saveLocal.bind(this)}><img src={saveIcon}/></Button>
           </span>
         </span>
         <span className='mode-controls'>
@@ -176,16 +231,18 @@ const mapStateToProps = state => { return {
 }};
 
 const mapDispatchToProps = dispatch => { return {
-  changeMode:        mode        => dispatch(changeMode(mode)),
-  changeLanguage:    language    => dispatch(changeLanguage(language)),
-  changeResultError: error       => dispatch(changeResultError(error)),
-  changeResultCode:  (mode,code) => dispatch(changeResultCode(mode,code)),
-  changeResultTable: table       => dispatch(changeResultTable(table)),
-  changeResultLog:   log         => dispatch(changeResultLog(log)),
-  startStepping:     ()          => dispatch(startStepping()),
-  stopStepping:      ()          => dispatch(stopStepping()),
-  nextStep:          ()          => dispatch(nextStep()),
-  prevStep:          ()          => dispatch(prevStep()),
+  changeMode:        mode        => dispatch(actions.changeMode(mode)),
+  changeCode:        code        => dispatch(actions.changeCode(code)),
+  changeLanguage:    language    => dispatch(actions.changeLanguage(language)),
+  changeResultError: error       => dispatch(actions.changeResultError(error)),
+  changeResultCode:  (mode,code) => dispatch(actions.changeResultCode(mode,code)),
+  changeResultTable: table       => dispatch(actions.changeResultTable(table)),
+  changeResultLog:   log         => dispatch(actions.changeResultLog(log)),
+  startStepping:     ()          => dispatch(actions.startStepping()),
+  stopStepping:      ()          => dispatch(actions.stopStepping()),
+  nextStep:          ()          => dispatch(actions.nextStep()),
+  prevStep:          ()          => dispatch(actions.prevStep()),
+  showSaveModal:   ()          => dispatch(actions.showSaveModal()),
 }};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

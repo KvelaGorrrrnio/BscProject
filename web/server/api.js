@@ -40,7 +40,7 @@ api.get('/template/:file',   (req,res) => {
     }
     res.json({
       type: 'template',
-        file: req.params.file,
+      file: req.params.file,
       code: stdout
     });
   });

@@ -13,9 +13,10 @@ class Button extends Component {
   }
 
   render() {
-    const disabled = this.props.disabled ? ' disabled' : '';
+    const disabled = this.props.disabled ? 'disabled' : '';
+    const className = ['button',this.props.className, disabled].join(' ');
     return (
-      <div className={'button' + disabled} onClick={this.handleClick.bind(this)}>{this.props.children}</div>
+      <div className={className} onClick={this.handleClick.bind(this)}>{this.props.children}</div>
     );
   }
 }

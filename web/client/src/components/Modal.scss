@@ -1,0 +1,138 @@
+@import 'colors';
+@charset 'UTF-8';
+
+.modal-wrapper {
+  position: fixed;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  z-index: 100000;
+  overflow: hidden;
+}
+.modal-wrapper.hidden {
+  bottom: 100%;
+}
+
+
+.modal-wrapper .modal-shade {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  --background-color: rgba($bg, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 0;
+  transition: opacity 0.8s 0.2s;
+}
+
+.modal-wrapper.hidden .modal-shade {
+  opacity: 0;
+}
+
+.modal-wrapper .modal-content {
+  position: absolute;
+  top: 0;
+  left: calc(50% - 320px);
+  width: 600px;
+  max-heght:  360px;
+  padding: 25px 20px 20px 20px;
+  background-color: $fg;
+  transition: top 0.5s ease-out;
+}
+
+.modal-wrapper.hidden .modal-content {
+  top: -400px;
+}
+
+.modal-wrapper .button {
+  width: 100%;
+  background-color: rgba($bg,0.5);
+  transition: background-color 0.5s;
+  box-sizing: border-box;
+  font-size: 17px;
+  margin: 20px 0 0 0;
+}
+.modal-wrapper .button:hover {
+  background-color: rgba($bg,1);
+}
+.modal-wrapper .button.half {
+  width: 50%;
+}
+
+.modal-wrapper input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 20px;
+  margin: 0;
+}
+
+.modal-wrapper .modal-content h2 {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 12px;
+}
+
+.modal-wrapper ._2column {
+  font-size: 0;
+  display: block;
+  box-sizing: border-box;
+  width: 50%;
+  height: 100%;
+  float: left;
+}
+
+.modal-wrapper ._2column * {
+  font-size: 17px;
+}
+.modal-wrapper ._2column:nth-child(2n) {
+  padding-right: 20px;
+}
+.modal-wrapper ._2column:nth-child(2n+1) {
+  padding-left: 20px;
+}
+
+.modal-wrapper ul {
+  display: block;
+  background-color: rgba($bg,0.2);
+  height: 300px;
+  overflow: auto;
+}
+
+.modal-wrapper ul li {
+  padding: 6px 20px;
+}
+.modal-wrapper ul li:nth-child(2n) {
+  background-color: rgba($fg,0.5);
+}
+.modal-wrapper ul li:nth-child(2n+1) {
+  background-color: rgba($bg,0.5);
+}
+
+/** Line with text **/
+.fancy {
+  padding: 6px 0;
+  line-height: 0.5;
+  font-size: 17px;
+  text-align: center;
+  margin: 20px 0 0 0;
+}
+.fancy span {
+  display: inline-block;
+  position: relative;  
+}
+.fancy span:before,
+.fancy span:after {
+  content: "";
+  position: absolute;
+  height: 1px;
+  border-bottom: 1px solid white;
+  top: 3px;
+  width: 110px;
+}
+.fancy span:before {
+  right: 100%;
+  margin-right: 15px;
+}
+.fancy span:after {
+  left: 100%;
+  margin-left: 15px;
+}

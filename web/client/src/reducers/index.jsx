@@ -4,7 +4,7 @@ const initState = {
   code: '// Program for computing the n\'th fibonacci pair\nint n\nint v int w\n\nn ^= 16\nw ^= 1\nfrom (v = 0) do\n  v += w\n  swap v w\n  n -= 1\nloop .\nuntil (n = 0)\n',
   stepState: {
     stepping: false,
-    index: 0
+    index: 0,
   },
   result: {
     error: {},
@@ -14,8 +14,12 @@ const initState = {
       state: [],
       table: [],
     },
-    table: []
-  }
+    table: [],
+  },
+  modal: {
+    save: false,
+    open: false,
+  },
 }
 
 const rootReducer = (state = initState, action) => {
@@ -68,6 +72,18 @@ const rootReducer = (state = initState, action) => {
     case 'stepping-prev':
       return { ...state,
         stepState: { ...state.stepState, index: state.stepState.index - 1 }
+      }
+    case 'show-save-modal':
+      return { ...state,
+        modal: { ...state.modal,
+          save: true,
+        }
+      }
+    case 'hide-save-modal':
+      return { ...state,
+        modal: { ...state.modal,
+          save: false,
+        }
       }
     default: return state
   }

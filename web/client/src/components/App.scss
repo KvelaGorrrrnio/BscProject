@@ -13,7 +13,15 @@ html, body {
   background-color: $bg;
   color: white;
   font-size: 17px;
-  /*font-family: 'helvetica neue', helvetica;*/
+  font-family: "Courier New", Courier, monospace;
+  font-weight: lighter;
+}
+
+input {
+  background-color: $bg;
+  text-align: center;
+  color: white;
+  font-size: 17px;
   font-family: "Courier New", Courier, monospace;
   font-weight: lighter;
 }
