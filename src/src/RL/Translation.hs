@@ -4,13 +4,10 @@ module RL.Translation
 
 import RL.AST as RL
 import SRL.AST as SRL
+
 import qualified Data.HashMap.Strict as M
+
 import Control.Monad.Reader
-import Control.Monad.State
-
-import Control.Monad.Writer
-
-import Debug.Trace
 
 type LabelMap = (String, M.HashMap Label Int)
 type TrlReader = Reader LabelMap
@@ -31,40 +28,6 @@ initTypeDec = do
     , ("s",  IntT)
     ]
 
--- setting up the states
-setupLoop :: Int -> TrlReader SRL.Block
-setupLoop n = do
-  x <- vec
-
-  let b  = genSkip
-
-      -- inner loop
-      a1 = genEmpty $ genVar "S2" []
-      b1 = genPush  (genId "s" []) (genId "S2" [])
-      t1 = genEqual (genSize (genVar "S2" [])) (genLit 3)
-
-      s1 = genPush (genId "S2" []) (genId "S1" [])
-
-      l1 = genSeq [genUntil a1 b1 b t1, s1]
-
-      -- next outer loop
-      n' = genLit (fromIntegral (n + 2))
-
-      a2 = genEmpty $ genVar "S1" []
-      b2 = l1
-      t2 = genEqual (genSize (genVar "S1" [])) n'
-
-      s2 = genPush (genId "S1" []) (genId x [])
-
-      l2 = genSeq [genUntil a2 b2 b t2, s2]
-
-      -- outermost loop
-      a3 = genEmpty $ genVar x []
-      b3 = l2
-      t3 = genEqual (genSize (genVar x [])) n'
-
-  return $ genUntil a3 b3 b t3
-
 -- TODO: Make sure Entry gets 0 Exit n
 genLabelMap :: TypeTab -> RL.AST -> LabelMap
 genLabelMap ttab ast =
@@ -75,6 +38,8 @@ genVec :: TypeTab -> String
 genVec ttab = "S"
 
 -- Code generation
+genInit id n        = Step $ Init id [genLit n, genLit n, genLit 3] p
+genFree id n        = Step $ Free id [genLit n, genLit n, genLit 3] p
 genId id            = Id id . map (\idx -> Lit (IntV . fromIntegral $ idx) p)
 genVar id idxs      = Var (genId id idxs) p
 genEmpty id         = Unary Empty id p
@@ -124,9 +89,8 @@ trlProg :: RL.AST -> TrlReader (TypeTab,SRL.AST)
 trlProg ast = do
   x  <- vec
 
-  sl <- setupLoop (length ast)
-
   let n  = fromIntegral . length $ ast
+      b0 = genInit x (n + 2)
       b1 = genIf (genNull (genVar x [])) genSkip genSkip (genLit 1)
       b2 = genUpdate (genId x [0,1,0]) XorEq (genLit 1)
 
@@ -134,9 +98,10 @@ trlProg ast = do
   let b3 = genUntil (genVar x [0,1,0]) bs genSkip (genVar x [n,n+1,0])
       b4 = genUpdate (genId x [n,n+1,0]) XorEq (genLit 1)
       b5 = b1
+      b6 = genFree x (n + 2)
 
   ttab <- initTypeDec
-  return (ttab, genSeq [sl,b1,b2,b3,b4,b5])
+  return (ttab, genSeq [b0,b1,b2,b3,b4,b5,b6])
 
 trlBlocks :: RL.AST -> TrlReader SRL.Block
 trlBlocks = foldrM trlBlock (ef . genLit $ 0)
@@ -145,7 +110,8 @@ trlBlocks = foldrM trlBlock (ef . genLit $ 0)
 trlBlock :: (Label,RL.Block) -> SRL.Block -> TrlReader SRL.Block
 trlBlock (l,(f,ss,j)) sb = do
   i <- mapLabel l
-  trlJump j i sb >>= trlSteps ss i >>= trlFrom f i
+  -- trlJump j i sb >>= trlSteps ss i >>= trlFrom f i
+  trlFrom f i =<< trlSteps ss i =<< trlJump j i sb
 
 -- comefroms
 trlFrom :: From -> Int -> SRL.Block -> TrlReader SRL.Block
@@ -209,7 +175,7 @@ trlSteps ss i b2 = do
 
 -- jumps
 trlJump :: Jump -> Int -> SRL.Block -> TrlReader SRL.Block
-trlJump (Exit _) n b2 = do -- TODO: n skal være netop n (længden af AST'et)
+trlJump (Exit _) n b2 = do
   n' <- asks length
   unless (n == n') $ fail "Exit not the ending state."
 

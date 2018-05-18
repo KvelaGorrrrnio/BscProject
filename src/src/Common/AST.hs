@@ -20,7 +20,10 @@ isClear (ListV ls _)  = null ls
 -- ids
 data Id = Id String [Exp] deriving Eq
 instance Show Id where
-  show (Id id exps) = id ++ concatMap (\e-> "[" ++ show e ++ "]") exps
+  show (Id id exps) =
+    id ++ showIdx exps
+
+showIdx exps = if null exps then "" else "[" ++ (intercalate "," . map show) exps ++ "]"
 
 type Pos = (Int,Int)
 
@@ -45,11 +48,15 @@ data Stmt = Update Id UpdOp Exp Pos
           | Pop  Id Id Pos
           | Swap Id Id Pos
           | Skip Pos
+          | Init String [Exp] Pos
+          | Free String [Exp] Pos
           deriving Eq
 instance Show Stmt where
   show (Update id op e _) = show id ++ show op ++ show e
   show (Push id1 id2 _)   = "push " ++ show id1 ++ " " ++ show id2
   show (Pop id1 id2 _)    = "pop "  ++ show id1 ++ " " ++ show id2
+  show (Init id dim _)      = "init " ++ id ++ " " ++ showIdx dim
+  show (Free id dim _)      = "free " ++ id ++ " " ++ showIdx dim
   show (Swap id1 id2 _)   = "swap " ++ show id1 ++ " " ++ show id2
   show (Skip _)           = "skip"
 getStmtPos :: Stmt -> Pos

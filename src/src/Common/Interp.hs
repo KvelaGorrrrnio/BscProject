@@ -157,8 +157,66 @@ exec (Swap id1 id2 p) = do
 
   adjust (const v2) id1 p >> adjust (const v1) id2 p
 
+-- initialising a list
+exec (Init id exps p) = do
+  v <- rd (Id id []) p
+
+  case v of
+    IntV _ -> logError $ RuntimeError p $ CustomRT "Trying to initalise non-list."
+    ListV ls t
+      | getDim t /= length exps ->
+        logError $ RuntimeError p $ CustomRT "Dimensions of the initialisation do not match dimensions of the list being initialised."
+    _ -> return ()
+
+  unless (isClear v) $ logError $ RuntimeError p $ CustomRT "Trying to initalise non-empty list."
+
+  nv <- foldrM repl (IntV 0) exps
+
+  adjust (const nv) (Id id []) p
+
+  where
+
+    repl e acc = eval e >>= \case
+      IntV n
+        | n >= 0    -> case acc of
+          ListV ls t -> return $ ListV (replicate (fromIntegral n) acc) (ListT t)
+          IntV _     -> return $ ListV (replicate (fromIntegral n) acc) (ListT IntT)
+        | otherwise -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the initialisation must be non-negative."
+      ListV _ _     -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the initialisation must be integers."
+
+-- freeing a list
+exec (Free id exps p) = do
+  v <- rd (Id id []) p
+
+  case v of
+    IntV _ -> logError $ RuntimeError p $ CustomRT "Trying to free non-list."
+    ListV ls t
+      | getDim t /= length exps ->
+        logError $ RuntimeError p $ CustomRT "Dimensions of the free do not match dimensions of the list being freed."
+    _ -> return ()
+
+  unless (allZero v) $ logError $ RuntimeError p $ CustomRT "The list being freed must consist of only zeroes."
+  values <- mapM eval exps
+  unless (v `equalLengths` values)
+    $ logError $ RuntimeError p $ CustomRT "The lengths in the free don't match the actual lengths of the list."
+
+  adjust (const . getDefaultValue . getType $ v) (Id id []) p
+
+  where
+
+    equalLengths v (e:exps) = case v of
+      ListV ls _ -> case e of
+        IntV n -> length ls == fromIntegral n && all (`equalLengths` exps) ls
+    equalLengths v [] = True
+
 -- skip
 exec _ = return ()
+
+getDim t = case t of
+  ListT t -> 1 + getDim t
+  IntT    -> 0
+
+foldrM f e = foldr ((=<<) . f) (return e)
 
 
 -- ===========
@@ -211,9 +269,7 @@ eval (Unary op exp p)
     IntV n -> return $ IntV (mapUnOp op n)
     _      -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
 
-  | op == Null = eval exp >>= \case
-    ListV ls t -> return . IntV $ (boolToInt . allZero) ls
-    IntV n     -> return . IntV $ boolToInt (n==0)
+  | op == Null = IntV . boolToInt . allZero <$> eval exp
   -- unary list
   | otherwise = eval exp >>= \case
     ListV ls t -> case op of
@@ -227,10 +283,15 @@ eval (Unary op exp p)
 -- parantheses
 eval (Parens e p) = eval e
 
-allZero :: [Value] -> Bool
-allZero []     = True
-allZero (v:vs) = (&&) (
-  case v of
-    ListV ls _ -> allZero ls
-    IntV  n    -> n==0
-  ) (allZero vs)
+allZero :: Value -> Bool
+allZero v = case v of
+  ListV ls _ -> foldl (\acc e -> acc && allZero e) True ls
+  IntV  n    -> n == 0
+
+-- allZero :: [Value] -> Bool
+-- allZero []     = True
+-- allZero (v:vs) = (&&) (
+--   case v of
+--     ListV ls _ -> allZero ls
+--     IntV  n    -> n==0
+--   ) (allZero vs)
