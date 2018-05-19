@@ -8,6 +8,8 @@ module Lib
 , runSuite
 , runSuites
 , scriptColor
+, trueColor
+, errColor
 ) where
 
 import System.FilePath.Glob (compile, globDir)
