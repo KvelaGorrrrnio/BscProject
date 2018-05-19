@@ -9,4 +9,7 @@ clean:
 	@stack clean --full
 	@rm -rf .stack-work bin
 
-.PHONY: build clean
+test:
+	@stack test
+
+.PHONY: build clean test

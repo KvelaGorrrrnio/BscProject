@@ -26,4 +26,7 @@ serve:
 release:
 	@zip -r src.zip release
 
-.PHONY: all src web install serve release clean clean-src clean-web zip zip-src zip-web
+test:
+	@make -C src test
+
+.PHONY: all src web install serve release clean clean-src clean-web zip zip-src zip-web test
