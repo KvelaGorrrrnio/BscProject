@@ -19,6 +19,7 @@ const initState = {
   modal: {
     save: false,
     open: false,
+    help: false,
   },
 }
 
@@ -95,6 +96,18 @@ const rootReducer = (state = initState, action) => {
       return { ...state,
         modal: { ...state.modal,
           open: false,
+        }
+      }
+    case 'show-help-modal':
+      return { ...state,
+        modal: { ...state.modal,
+          help: true,
+        }
+      }
+    case 'hide-help-modal':
+      return { ...state,
+        modal: { ...state.modal,
+          help: false,
         }
       }
     default: return state

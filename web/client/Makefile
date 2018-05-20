@@ -10,4 +10,7 @@ clean:
 	@echo "Cleaning web client..."
 	@rm -rf bin build node_modules
 
-.PHONY: build install clean
+server:
+	@npm start
+
+.PHONY: build install clean server

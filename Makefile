@@ -20,8 +20,11 @@ zip-web: clean-web
 install:
 	@make -C src install
 
-serve:
-	@make -C web serve
+server:
+	@make -C web server
+
+cserver:
+	@make -C web cserver
 
 release:
 	@zip -r src.zip release
@@ -29,4 +32,4 @@ release:
 test:
 	@make -C src test
 
-.PHONY: all src web install serve release clean clean-src clean-web zip zip-src zip-web test
+.PHONY: all src web install server release clean clean-src clean-web zip zip-src zip-web test cserver
