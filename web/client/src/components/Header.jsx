@@ -7,6 +7,7 @@ import * as actions from '../actions/index';
 import * as api from '../api';
 import './Header.scss';
 
+import helpIcon from '../images/icons/help.svg';
 import playIcon from '../images/icons/play.svg';
 import stepIcon from '../images/icons/step.svg';
 import stepAllIcon from '../images/icons/stepall.svg';
@@ -168,6 +169,10 @@ class Header extends Component {
     this.props.showOpenModal();
   }
 
+  openHelp() {
+    this.props.showHelpModal();
+  }
+
   getActions(mode) {
     switch (mode) {
       case 'run':
@@ -209,6 +214,7 @@ class Header extends Component {
         <span className='controls'>
           <Radio items={items} selected={this.props.language} onChange={this.changeLanguage.bind(this)} disabled={this.props.stepState.stepping} />
           <span className='actions'>
+            <Button disabled={this.props.stepState.stepping} onClick={this.openHelp.bind(this)}><img src={helpIcon}/></Button>
             <Dropdown disabled={this.props.stepState.stepping} items={[this.state.templates.srl,this.state.templates.rl]}><img src={tempIcon}/></Dropdown>
             <Button disabled={this.props.stepState.stepping} onClick={this.openLocal.bind(this)}><img src={openIcon}/></Button>
             <Button disabled={this.props.stepState.stepping} onClick={this.saveLocal.bind(this)}><img src={saveIcon}/></Button>
@@ -252,6 +258,7 @@ const mapDispatchToProps = dispatch => { return {
   prevStep:          ()          => dispatch(actions.prevStep()),
   showSaveModal:     ()          => dispatch(actions.showSaveModal()),
   showOpenModal:     ()          => dispatch(actions.showOpenModal()),
+  showHelpModal:     ()          => dispatch(actions.showHelpModal()),
 }};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

@@ -64,3 +64,11 @@ export const showOpenModal = () => { return {
 export const hideOpenModal = () => { return {
   type: 'hide-open-modal'
 }};
+
+export const showHelpModal = () => { return {
+  type: 'show-help-modal'
+}};
+
+export const hideHelpModal = () => { return {
+  type: 'hide-help-modal'
+}};

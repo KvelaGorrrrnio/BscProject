@@ -6,6 +6,7 @@ import Editor from './Editor';
 import Result from './Result';
 import SaveModal from './SaveModal';
 import OpenModal from './OpenModal';
+import HelpModal from './HelpModal';
 import './App.scss';
 
 function isASCII(str) {
@@ -33,6 +34,7 @@ class App extends Component {
         <Result/>
         <SaveModal/>
         <OpenModal/>
+        <HelpModal/>
       </div>
     );
   }

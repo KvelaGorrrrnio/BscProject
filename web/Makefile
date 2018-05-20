@@ -10,7 +10,9 @@ clean-client:
 clean-server:
 	@make -C server clean
 
-serve:
-	@make -C server serve
+server:
+	@make -C server server
+cserver:
+	@make -C client server
 
-.PHONY: build build-client build-server clean clean-client clean-server serve
+.PHONY: build build-client build-server clean clean-client clean-server server cserver

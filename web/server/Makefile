@@ -5,7 +5,7 @@ build: install
 install:
 	@npm install
 
-serve:
+server:
 	@npm start
 
 clean:
