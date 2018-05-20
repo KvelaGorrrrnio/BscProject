@@ -6,8 +6,8 @@ import saveIcon from '../images/icons/save.svg';
 export default (<div>
   <h2>Help for RL and SRL Web Interface</h2>
   <h3>Languages</h3>
-  This web application is an interface to two interpreters for two reversible languages, <b>SRL</b> and <b>RL</b>.
-  Common for both languages are that they are primarily explicitly strongly typed with dynamic checks.
+  This web application is an interactive interface for two reversible programming languages, <b>SRL</b> and <b>RL</b>.
+  Common for both languages is that they are primarily explicitly strongly typed with dynamic checks.
   For more information on syntax and the languages, refer to their individual help pages.
 
   <h3>Windows</h3>
@@ -28,7 +28,7 @@ export default (<div>
           <td><b>Result Window</b></td>
           <td>Right Bottom</td>
           <td>
-            The <b>Result Window</b> contains the result(s) of the mode actions on your <b>RL</b>/<b>SRL</b> script.<br/>
+            The <b>Result Window</b> contains the result of the mode actions on your <b>RL</b>/<b>SRL</b> script.<br/>
             See the different modes for which actions are available and what the corresponding results are.
           </td>
         </tr>
@@ -36,15 +36,15 @@ export default (<div>
           <td><b>Toolbar</b></td>
           <td>Right Bottom</td>
           <td>
-            The <b>Toolbar</b> contains actions altering state of the webinterface.
-            See the following section on which actions are available.
+            The <b>Toolbar</b> contains actions altering the state of the interface.
+            See the following section to learn about the actions available.
           </td>
         </tr>
       </tbody>
   </table>
 
   <b>Toolbar actions</b><br/>
-  The actions of <b>Toolbar</b> is divided into 4 groups.
+  The actions of <b>Toolbar</b> are divided into 4 groups.
     <table>
       <tbody>
         <tr>
@@ -59,10 +59,10 @@ export default (<div>
           <td>Left Center</td>
           <td>
             This action group has 4 actions:
-              <img className='inline' src={helpIcon}/> <b>Help</b>, which shows this help dialog;
-              <img className='inline' src={tempIcon}/> <b>Template</b>, which reveals a dropdown with template programs for both <b>RL</b> and <b>SRL</b>;
-              <img className='inline' src={openIcon}/> <b>Open</b>, which reveals a dialog for opening from the browser or importing the code from a file.
-              <img className='inline' src={saveIcon}/> <b>Save</b>, which reveals a dialog for saving to the browser, sharing the script with the code embeded into a link or exporting/ downloading the code as a file.
+              <img className='inline' src={helpIcon}/> <b>Help</b>, which shows this help dialogue;
+              <img className='inline' src={tempIcon}/> <b>Template</b>, which reveals a dropdown menu with template programs for both <b>RL</b> and <b>SRL</b>;
+              <img className='inline' src={openIcon}/> <b>Open</b>, which reveals a dialogue for opening files from the browser or importing the code from a file on the local computer.
+              <img className='inline' src={saveIcon}/> <b>Save</b>, which reveals a dialogue for saving files to the browser, sharing the script with the code embeded into a link or exporting/downloading the code as a file to the local computer.
           </td>
         </tr>
         <tr>
@@ -77,7 +77,7 @@ export default (<div>
           <td>Mode Selection</td>
           <td>Right Center</td>
           <td>
-            This action group handles selection of interpreation modes. There are 4 modes: <br/>
+            This action group handles selection of interpretation modes. There are 4 modes: <br/>
               &nbsp;&nbsp;<b>Run</b>, which executes the code;<br/>
               &nbsp;&nbsp;<b>Step</b>, which executes the code step-by-step;<br/>
               &nbsp;&nbsp;<b>Invert</b>, which computes the inverse program;<br/>
