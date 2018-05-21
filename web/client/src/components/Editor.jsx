@@ -128,13 +128,17 @@ class Editor extends Component {
       }
       if ('position' in err) {
         const line = parseInt(err.position.line)-1;
-        this.editor.doc.addLineClass(line, 'wrap', 'error');
-        this.editor.scrollIntoView(line,60);
+        if (line > 0) {
+          this.editor.doc.addLineClass(line, 'wrap', 'error');
+          this.editor.scrollIntoView(line,60);
+        }
       } else if (this.props.stepState.stepping) {
         const line = this.getStepLine()-1;
-        const done = this.props.result.log.table.length > 0 && this.props.stepState.index >= this.props.result.log.table.length;
-        this.editor.doc.addLineClass(line, 'wrap', this.stepFailed() && done  ? 'error' : 'step');
-        if (line > 0) this.editor.scrollIntoView(line,60);
+        if (line > 0) {
+          const done = this.props.result.log.table.length > 0 && this.props.stepState.index >= this.props.result.log.table.length;
+          this.editor.doc.addLineClass(line, 'wrap', this.stepFailed() && done  ? 'error' : 'step');
+          if (line > 0) this.editor.scrollIntoView(line,60);
+        }
       }
     }
     const className = (err.type ? 'editor-wrapper has-error' : 'editor-wrapper') + ' notranslate' + (options.readOnly ? ' disabled' : '');
