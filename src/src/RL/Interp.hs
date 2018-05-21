@@ -34,9 +34,10 @@ interp from l = do
   Just (f,ss,j) <- asks (lookup l)
 
   case f of
-    Entry _      -> return ()
-    From l' p    -> unless (from == l') $
-      lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l' ))
+    Entry p      -> unless (null from)
+      $ lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from entry\nExpecting label: " ++ from ))
+    From l' p    -> unless (from == l')
+      $ lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l' ))
     Fi a l1 l2 p -> do
       q <- lift $ eval a >>= \case
         IntV q -> return $ q/=0

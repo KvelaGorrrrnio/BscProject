@@ -1,6 +1,6 @@
 ## VIGTIGT
 - Tjek, at Entry er start og at Exit er slut (kræves af translate, så det skal nok kræves i interp også)
-- Får stadig fejl nogle gange når en blok ikke er defineret
+- Evaluer Entry som assertion
 
 ## Finpudsninger
 - Kommentarer skal tjekkes igennem
