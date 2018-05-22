@@ -34,24 +34,24 @@ genVec :: TypeTab -> String
 genVec ttab = maximum (M.keys ttab) ++ "_"
 
 -- Code generation
-genInit id n        = Step $ Init id [genLit n, genLit n, genLit 3] p
-genFree id n        = Step $ Free id [genLit n, genLit n, genLit 3] p
-genId id            = Id id . map (\idx -> Lit (IntV . fromIntegral $ idx) p)
-genVar id idxs      = Var (genId id idxs) p
-genEmpty id         = Unary Empty id p
-genNull id          = Unary Null id p
-genSize id          = Unary Size id p
-genLit n            = Lit (IntV n) p
-genEqual e1 e2      = Binary Equal e1 e2 p
-genOr e1 e2         = Binary Or e1 e2 p
-genIf t b1 b2 a     = SRL.If t b1 b2 a p
-genSwap id1 id2     = Step $ Swap id1 id2 p
-genUpdate id op e   = Step $ Update id op e p
-genUntil a b1 b2 t  = Until True a b1 b2 t p
-genPush id1 id2     = Step $ Push id1 id2 p
-genSeq []           = genSkip
-genSeq s            = foldl1 Seq s
-genSkip             = Step $ Skip p
+genInit id n      = Step $ Init id [genLit n, genLit n, genLit 3] p
+genFree id n      = Step $ Free id [genLit n, genLit n, genLit 3] p
+genId id          = Id id . map (\idx -> Lit (IntV . fromIntegral $ idx) p)
+genVar id idxs    = Var (genId id idxs) p
+genEmpty id       = Unary Empty id p
+genNull id        = Unary Null id p
+genSize id        = Unary Size id p
+genLit n          = Lit (IntV n) p
+genEqual e1 e2    = Binary Equal e1 e2 p
+genOr e1 e2       = Binary Or e1 e2 p
+genIf             = SRL.If
+genSwap id1 id2   = Step $ Swap id1 id2 p
+genUpdate id op e = Step $ Update id op e p
+genUntil          = Until True
+genPush id1 id2   = Step $ Push id1 id2 p
+genSeq []         = genSkip
+genSeq s          = foldl1 Seq s
+genSkip           = Step $ Skip p
 
 -- Macros
 pMac :: Int -> (Int,Int,Int) -> TrlReader SRL.Block
@@ -214,4 +214,3 @@ trlJump (RL.If e lj lk _) i b2 = do
   let a2 = genOr (genVar x [i,j,0]) (genVar x [i,k,0])
 
   return $ genIf t2 b1 b2 a2
-

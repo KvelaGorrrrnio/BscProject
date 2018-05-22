@@ -30,7 +30,7 @@ stmtBlock :: Parser Block
 stmtBlock = Step <$> statement
 
 ifBlock :: Parser Block
-ifBlock = pos >>= \p -> (\s->s p) <$> do
+ifBlock = do
   reserved "if"
   t <- expression
   reserved "then"
@@ -44,7 +44,7 @@ ifBlock = pos >>= \p -> (\s->s p) <$> do
   return $ If t b1 b2 a
 
 untilBlock :: Parser Block
-untilBlock = pos >>= \p -> (\s->s p) <$> do
+untilBlock = do
   reserved "from"
   a <- expression
   reserved "do"

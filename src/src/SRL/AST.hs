@@ -17,30 +17,25 @@ doIndent lvl = replicate (2 * lvl) ' '
 
 showBlock :: Int -> Block -> String
 showBlock lvl b = case b of
-  Step s              -> indent ++ show s
-  If t b1 b2 a _      -> indent ++ "if " ++ showPar t ++ " then\n"
-                      ++ showBlock (lvl+1) b1 ++ "\n"
-                      ++ indent ++ "else\n"
-                      ++ showBlock (case b2 of If{} -> lvl ; _ -> lvl + 1)  b2 ++ "\n"
-                      ++ indent ++ "fi " ++ showPar a
+  Step s            -> indent ++ show s
+  If t b1 b2 a      -> indent ++ "if " ++ showPar t ++ " then\n"
+                    ++ showBlock (lvl+1) b1 ++ "\n"
+                    ++ indent ++ "else\n"
+                    ++ showBlock (case b2 of If{} -> lvl ; _ -> lvl + 1)  b2 ++ "\n"
+                    ++ indent ++ "fi " ++ showPar a
 
-  Until _ t b1 b2 a _ -> indent ++ "from "  ++ showPar t ++ " do\n"
-                      ++ showBlock (lvl + 1) b1 ++ "\n"
-                      ++ indent ++ "loop\n"
-                      ++ showBlock (lvl + 1) b2 ++ "\n"
-                      ++ indent ++ "until " ++ showPar a
+  Until _ t b1 b2 a -> indent ++ "from "  ++ showPar t ++ " do\n"
+                    ++ showBlock (lvl + 1) b1 ++ "\n"
+                    ++ indent ++ "loop\n"
+                    ++ showBlock (lvl + 1) b2 ++ "\n"
+                    ++ indent ++ "until " ++ showPar a
 
-  Seq b1 b2           -> showBlock lvl b1 ++ "\n"
-                      ++ showBlock lvl b2
+  Seq b1 b2         -> showBlock lvl b1 ++ "\n"
+                    ++ showBlock lvl b2
 
   where indent = doIndent lvl
 
 data Block = Step Stmt
-           | If Exp Block Block Exp Pos
-           | Until Bool Exp Block Block Exp Pos
+           | If Exp Block Block Exp
+           | Until Bool Exp Block Block Exp
            | Seq Block Block
-instance Show Block where
-  show (Step s)                = show s
-  show (If t _ _ a (l,_))      = "if " ++ show t ++ " then [b1] else [b2] fi " ++ show a
-  show (Until _ a _ _ t (l,_)) = "from " ++ show a ++ " do [b1] loop [b2] until " ++ show t
-  show (Seq b1 b2)             = ""

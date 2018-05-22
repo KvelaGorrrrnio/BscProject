@@ -20,7 +20,7 @@ runProgram ast ttab = let (vt,ms) = (execVarState vtab . interp) ast in (vt, Log
 interp :: Block -> VarState ()
 interp (Step s) = logStmt s
 
-interp (If t b1 b2 a p) = do
+interp (If t b1 b2 a) = do
   q  <- eval t >>= \case
     IntV q -> return $ q/=0
     w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
@@ -32,14 +32,14 @@ interp (If t b1 b2 a p) = do
     w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
 
   when (q /= r)
-    $ logError $ RuntimeError p $ AssertionFailed a (IntV . boolToInt $ q) (IntV . boolToInt $ r)
+    $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a (IntV . boolToInt $ q) (IntV . boolToInt $ r)
 
-interp (Until d a b1 b2 t p) = do -- log this
+interp (Until d a b1 b2 t) = do -- log this
   q <- eval a >>= \case
     IntV q -> return $ q/=0
     w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
 
-  unless (q == d) $ logError $RuntimeError p $ AssertionFailed a (IntV . boolToInt $ q) (IntV . boolToInt $ d)
+  unless (q == d) $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a (IntV . boolToInt $ q) (IntV . boolToInt $ d)
 
   interp b1
 
@@ -47,6 +47,6 @@ interp (Until d a b1 b2 t p) = do -- log this
     IntV r -> return $ r/=0
     w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
 
-  unless r $ interp b2 >> interp (Until False a b1 b2 t p)
+  unless r $ interp b2 >> interp (Until False a b1 b2 t)
 
 interp (Seq b1 b2) = interp b1 >> interp b2

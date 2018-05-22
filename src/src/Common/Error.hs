@@ -100,7 +100,7 @@ instance Show RuntimeError where
   show (NonIntegerDimension t) = "Expected dimension size to be of type " ++ show IntT ++ ", received " ++ show t
   show (FreeOnNonList id) = "Tried freeing non-list identifier: " ++ id
   show (FreeNonEmptyList id) = "Tried freeing non-empty list identifier: " ++ id
-  show (AssertionFailed exp e r) = "Assertion " ++ show exp ++ " expected " ++ show e ++ ", but received " ++ show r
+  show (AssertionFailed exp e r) = "Assertion " ++ show exp ++ " expected " ++ show e ++ ", but evaluated to " ++ show r
   show (FromFail f e) = "From-clause not consistent.\n Coming from " ++ f ++ ", but expected " ++ e ++ "."
 
 instance Show StaticError where
