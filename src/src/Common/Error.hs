@@ -41,6 +41,7 @@ data RuntimeError
   | InitOnNonList String
   | InitNonEmptyList String
   | ConflictingDimensions
+  | ConflictingLengths
   | NegativeDimension Integer
   | NonIntegerDimension Type
   | FreeOnNonList String
@@ -94,6 +95,7 @@ instance Show RuntimeError where
   show (InitOnNonList id) = "Tried initializing non-list identifier " ++ id
   show (InitNonEmptyList id) = "Tried initliazing non-empty list identifier " ++ id
   show (ConflictingDimensions) = "The number of dimensions specified does not match depth of list type."
+  show (ConflictingLengths) = "The lengths specified do not match lengths of the of list."
   show (NegativeDimension n) = "Encountered negative dimension: " ++ show n
   show (NonIntegerDimension t) = "Expected dimension size to be of type " ++ show IntT ++ ", received " ++ show t
   show (FreeOnNonList id) = "Tried freeing non-list identifier: " ++ id

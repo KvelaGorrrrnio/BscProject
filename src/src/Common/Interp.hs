@@ -203,7 +203,7 @@ exec (Free id exps p) = do
 
   eql <- equalLengths v exps
   unless eql
-    $ logError $ RuntimeError p $ ConflictingDimensions
+    $ logError $ RuntimeError p $ ConflictingLengths
 
   adjust (const . getDefaultValue . getType $ v) (Id id []) p
 
