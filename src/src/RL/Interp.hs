@@ -35,18 +35,18 @@ interp from l = do
 
   case f of
     Entry p      -> unless (null from)
-      $ lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from entry\nExpecting label: " ++ from ))
+      $ lift $ logError $ RuntimeError p $ FromFail (show $ Entry p) from -- (CustomRT $ "From-clause not consistent.\nComing from entry\nExpecting label: " ++ from ))
     From l' p    -> unless (from == l')
-      $ lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l' ))
+      $ lift $ logError $ RuntimeError p $ FromFail from l' -- CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l' ))
     Fi a l1 l2 p -> do
       q <- lift $ eval a >>= \case
         IntV q -> return $ q/=0
-        _      -> logError $ RuntimeError (getExpPos a) $ CustomRT "Type does not match in assertion." -- TODO: mere nøjagtig
+        w      -> logError $ RuntimeError (getExpPos a) $ ConflictingType IntT (getType w)
 
       let l' = if q then l1 else l2
 
       unless (from == l') $
-        lift (logError $ RuntimeError p (CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l'))
+        lift $logError $ RuntimeError p $ FromFail from l'
 
   lift $ execStmts ss
 
@@ -58,7 +58,7 @@ interp from l = do
     If c l1 l2 p -> do
       q <- lift $ eval c >>= \case
         IntV q -> return $ q/=0
-        _      -> logError $ RuntimeError (getExpPos c) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+        w      -> logError $ RuntimeError (getExpPos c) $ ConflictingType IntT (getType w)
 
       if q then interp l l1 else interp l l2
 

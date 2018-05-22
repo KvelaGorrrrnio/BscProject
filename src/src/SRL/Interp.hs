@@ -23,29 +23,29 @@ interp (Step s) = logStmt s
 interp (If t b1 b2 a p) = do
   q  <- eval t >>= \case
     IntV q -> return $ q/=0
-    _      -> logError $ RuntimeError (getExpPos t) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+    w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
 
   interp $ if q then b1 else b2
 
   r <- eval a >>= \case
     IntV r -> return $ r/=0
-    _      -> logError $ RuntimeError (getExpPos a) $ CustomRT "Type does not match in assertion." -- TODO: mere nøjagtig
+    w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
 
   when (q /= r)
-    $ logError $ RuntimeError p $ CustomRT "Assert and such"
+    $ logError $ RuntimeError p $ AssertionFailed a (IntV . boolToInt $ q) (IntV . boolToInt $ r)
 
 interp (Until d a b1 b2 t p) = do -- log this
   q <- eval a >>= \case
     IntV q -> return $ q/=0
-    _      -> logError $ RuntimeError (getExpPos a) $ CustomRT "Type does not match in assertion." -- TODO: mere nøjagtig
+    w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
 
-  unless (q == d) $ logError (RuntimeError p $ CustomRT "Assert")
+  unless (q == d) $ logError $RuntimeError p $ AssertionFailed a (IntV . boolToInt $ q) (IntV . boolToInt $ d)
 
   interp b1
 
   r <- eval t >>= \case
     IntV r -> return $ r/=0
-    _      -> logError $ RuntimeError (getExpPos t) $ CustomRT "Type does not match in conditional." -- TODO: mere nøjagtig
+    w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
 
   unless r $ interp b2 >> interp (Until False a b1 b2 t p)
 
