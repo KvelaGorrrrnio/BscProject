@@ -30,16 +30,16 @@ execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 rd :: Id -> Pos -> VarState Value
 rd (Id id exps) p = gets (mLookup id) >>= \case
   Just v  -> foldM (\acc e -> getIdx (getExpPos e) acc e) v exps
-  Nothing -> logError $ RuntimeError p $ CustomRT ("Variable '" ++ id ++ "' is not declared.")
+  Nothing -> logError $ RuntimeError p $ NonDefinedId id
 
 getIdx :: Pos -> Value -> Exp -> VarState Value
-getIdx p (IntV _) _ = logError $ RuntimeError p $ CustomRT "Indexing on non-list."
+getIdx p (IntV n) _ = logError $ RuntimeError p $ IndexOnNonListExp (IntV n)
 getIdx p (ListV lst _) idx = eval idx >>= \case
-  IntV i | i < 0     -> logError $ RuntimeError (getExpPos idx) $ CustomRT "Index must be non-negative."
+  IntV i | i < 0     -> logError $ RuntimeError (getExpPos idx) $ NegativeIndex i
     | otherwise -> case index lst i of
       Just v  -> return v
-      Nothing -> logError $ RuntimeError (getExpPos idx) $ CustomRT "Index out of bounds."
-  _ -> logError $ RuntimeError p $ CustomRT "Index must be an integer."
+      Nothing -> logError $ RuntimeError (getExpPos idx) $ IndexOutOfBounds i
+  w -> logError $ RuntimeError p $ NonIntegerIndex w
   where index :: [Value] -> Integer -> Maybe Value
         index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
 
@@ -69,8 +69,8 @@ adjust' op (e:es) p vo = do
   case vo of
     ListV lst t -> eval e >>= \case
       IntV i -> return $ ListV (replace lst i vi) t
-      _     -> logError $ RuntimeError (getExpPos e) $ CustomRT "Index must be an integer."
-    _ -> logError $ RuntimeError (getExpPos e) $ CustomRT "Indexing on non-list."
+      w     -> logError $ RuntimeError (getExpPos e) $ NonIntegerIndex w
+    _ -> logError $ RuntimeError (getExpPos e) $ IndexOnNonListExp vo
   where replace :: [Value] -> Integer -> Value -> [Value]
         replace lst i v | i' <- fromIntegral i = take i' lst ++ [v] ++ drop (i' + 1) lst
 
@@ -82,23 +82,23 @@ exec :: Stmt -> VarState ()
 -- variable updates
 exec (Update (Id id exps) op e p) = do
   cont <- contains e (Id id exps) []
-  when cont $ logError $ RuntimeError p $ CustomRT "Update contains same variable on both sides."
+  when cont $ logError $ RuntimeError p $ SelfAbuse (Id id exps)
 
   v1 <- rd (Id id exps) p
   n <- case v1 of
     IntV n -> return n
-    _      -> logError $ RuntimeError p $ CustomRT "Attempting to update list variable."
+    w      -> logError $ RuntimeError p $ UpdateOnNonIntager (Id id exps) (getType w)
 
   v2 <- eval e
   m <- case v2 of
     IntV m -> return m
-    _      -> logError $ RuntimeError p $ CustomRT "Attempting to update variable with a list expression."
+    w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
 
   case op of
-    DivEq  | m == 0       -> logError $ RuntimeError p $ CustomRT "Dividing by zero: Expression is zero in division update."
-           | mod n m /= 0 -> logError $ RuntimeError p $ CustomRT "Division has rest in division update."
+    DivEq  | m == 0       -> logError $ RuntimeError p $ DivByZero
+           | mod n m /= 0 -> logError $ RuntimeError p $ DivHasRest
            | otherwise    -> return ()
-    MultEq | m == 0       -> logError $ RuntimeError p $ CustomRT "Expression is zero in multiplication update."
+    MultEq | m == 0       -> logError $ RuntimeError p $ MultByZero
            | otherwise    -> return ()
     _ -> return ()
 
@@ -127,8 +127,8 @@ exec (Push id1 id2 p) = do
       | t == getType v1 -> do
         adjust clear id1 p
         adjust (push v1) id2 p
-      | otherwise -> logError $ RuntimeError p $ CustomRT "Types do not match" -- TODO: mere nøjagtig
-    _ -> logError $ RuntimeError p $ CustomRT "Pushing onto non-list. " -- TODO: mere nøjagtig
+      | otherwise -> logError $ RuntimeError p $ ConflictingType t (getType v1)
+    _ -> logError $ RuntimeError p $ PushToNonList id2
   where push v (ListV ls t) = ListV (v:ls) t
         clear (IntV _)      = IntV 0
         clear (ListV _ t)   = ListV [] t
@@ -136,18 +136,18 @@ exec (Push id1 id2 p) = do
 exec (Pop id1 id2 p) = do
   v1 <- rd id1 p
   unless (isClear v1) $
-    logError $ RuntimeError p $ CustomRT ("Popping into non-clear variable '" ++ show id1 ++ "'.")
+    logError $ RuntimeError p $ PopToNonEmpty id1
 
   v2 <- rd id2 p
   case v2 of
-    ListV [] _ -> logError $ RuntimeError p $ CustomRT $ "Popping from empty list '" ++ show id2 ++ "'."
+    ListV [] _ -> logError $ RuntimeError p $ PopFromEmpty id2
     ListV (v:ls) (ListT t)
       | t == getType v1 -> do
         adjust (const v) id1 p
         adjust (const $ ListV ls (ListT t)) id2 p
       | otherwise ->
-        logError $ RuntimeError p $ CustomRT "Types do not match." -- TODO: mere nøjagtig
-    _  -> logError $ RuntimeError p $ CustomRT "Popping from non-list."
+        logError $ RuntimeError p $ ConflictingType t (getType v1)
+    _  -> logError $ RuntimeError p $ PopFromNonList id2
 
 -- swapping variables
 exec (Swap id1 id2 p) = do
@@ -155,7 +155,7 @@ exec (Swap id1 id2 p) = do
   v2 <- rd id2 p
 
   unless (getType v1 == getType v2)
-    $ logError $ RuntimeError p $ CustomRT "Variables being swapped must be of the same type."
+    $ logError $ RuntimeError p $ ConflictingType (getType v1) (getType v2)
 
   adjust (const v2) id1 p >> adjust (const v1) id2 p
 
@@ -164,13 +164,13 @@ exec (Init id exps p) = do
   v <- rd (Id id []) p
 
   case v of
-    IntV _ -> logError $ RuntimeError p $ CustomRT "Trying to initalise non-list."
+    IntV _ -> logError $ RuntimeError p $ InitOnNonList id
     ListV ls t
       | getDim t /= length exps ->
-        logError $ RuntimeError p $ CustomRT "Dimensions of the initialisation do not match dimensions of the list being initialised."
+        logError $ RuntimeError p $ ConflictingDimensions
     _ -> return ()
 
-  unless (isClear v) $ logError $ RuntimeError p $ CustomRT "Trying to initalise non-empty list."
+  unless (isClear v) $ logError $ RuntimeError p $ InitNonEmptyList id
 
   nv <- foldrM repl (IntV 0) exps
 
@@ -185,25 +185,25 @@ exec (Init id exps p) = do
         | n >= 0 -> case acc of
           ListV ls t  -> return $ ListV (replicate (fromIntegral n) acc) (ListT t)
           IntV _      -> return $ ListV (replicate (fromIntegral n) acc) (ListT IntT)
-        | otherwise -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the initialisation must be non-negative."
-      ListV _ _  -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the initialisation must be integers."
+        | otherwise -> logError $ RuntimeError (getExpPos e) $ NegativeDimension n
+      ListV _ t  -> logError $ RuntimeError (getExpPos e) $ NonIntegerDimension t -- TODO: Maybe List t
 
 -- freeing a list
 exec (Free id exps p) = do
   v <- rd (Id id []) p
 
   case v of
-    IntV _ -> logError $ RuntimeError p $ CustomRT "Trying to free non-list."
+    IntV _ -> logError $ RuntimeError p $ FreeOnNonList id
     ListV ls t
       | getDim t /= length exps ->
-        logError $ RuntimeError p $ CustomRT "Dimensions of the free do not match dimensions of the list being freed."
+        logError $ RuntimeError p $ ConflictingDimensions
     _ -> return ()
 
-  unless (allZero v) $ logError $ RuntimeError p $ CustomRT "The list being freed must consist of only zeroes."
+  unless (allZero v) $ logError $ RuntimeError p $ FreeNonEmptyList id
 
   eql <- equalLengths v exps
   unless eql
-    $ logError $ RuntimeError p $ CustomRT "The lengths in the free don't match the actual lengths of the list."
+    $ logError $ RuntimeError p $ ConflictingDimensions
 
   adjust (const . getDefaultValue . getType $ v) (Id id []) p
 
@@ -213,9 +213,9 @@ exec (Free id exps p) = do
       IntV n
         | n >= 0 -> case v of
           ListV ls t  -> (&&) (length ls == fromIntegral n) <$> allM (`equalLengths` exps) ls
-          IntV _      -> logError $ RuntimeError p $ CustomRT "The variable being freed is not a list."
-        | otherwise -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the free must be non-negative."
-      ListV _ _ -> logError $ RuntimeError (getExpPos e) $ CustomRT "Lengths of the free must be integers."
+          IntV _      -> logError $ RuntimeError p $ FreeOnNonList id
+        | otherwise -> logError $ RuntimeError (getExpPos e) $ NegativeDimension n
+      ListV _ t -> logError $ RuntimeError (getExpPos e) $ NonIntegerDimension t -- Maybe ListT t
     equalLengths ListV{} [] = return False
     equalLengths IntV{}  [] = return True
 
@@ -245,7 +245,7 @@ eval (Binary op l r p)
     vr <- eval r
     case (vl, vr) of
       (IntV n, IntV m) -> return $ IntV (mapBinOp op n m)
-      _                -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+      (v,w)            -> logError $ RuntimeError p $ ConflictingTypes [IntT,IntT] [getType v, getType w]
 
   -- binary div and mod
   | op <= Mod = do
@@ -253,9 +253,9 @@ eval (Binary op l r p)
     vr <- eval r
     case (vl, vr) of
       (IntV n, IntV m)
-        | m == 0    -> logError $ RuntimeError (getExpPos l) $ CustomRT "Dividing by zero."
+        | m == 0    -> logError $ RuntimeError (getExpPos l) $ DivByZero
         | otherwise -> return $ IntV (mapBinOp op n m)
-      _             -> logError $ RuntimeError (getExpPos l) $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+      (v,w)         -> logError $ RuntimeError (getExpPos l) $ ConflictingTypes [IntT,IntT] [getType v, getType w]
 
   -- binary logical
   | otherwise = eval l >>= \case
@@ -263,30 +263,30 @@ eval (Binary op l r p)
     IntV v | v/=0 && op==Or -> return $ IntV 1
     IntV _ -> eval r >>= \case
         IntV n -> return $ IntV (norm n)
-        _      -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
-    _ -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+        w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
+    w -> logError $ RuntimeError p $ NonIntegerExp (getType w)
 
   -- unary arithmetic
 eval (Unary op exp p)
   | op <= Sign = eval exp >>= \case
     IntV n -> return $ IntV (mapUnOp op n)
-    _      -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+    w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
 
   -- unary logical
   | op < Size = eval exp >>= \case
     IntV n -> return $ IntV (mapUnOp op n)
-    _      -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+    w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
 
   | op == Null = IntV . boolToInt . allZero <$> eval exp
   -- unary list
   | otherwise = eval exp >>= \case
     ListV ls t -> case op of
       Top   -> case ls of
-        []    -> logError $ RuntimeError p $ CustomRT "Accessing top of empty list."
+        []    -> logError $ RuntimeError p $ EmptyTop
         v:_   -> return v
       Empty -> return $ IntV (boolToInt . null $ ls)
       Size  -> return $ IntV (fromIntegral . length $ ls)
-    _  -> logError $ RuntimeError p $ CustomRT "Type error in expression." -- TODO: mere nøjagtig
+    w  -> logError $ RuntimeError p $ NonListExp (getType w)
 
 -- parantheses
 eval (Parens e p) = eval e
