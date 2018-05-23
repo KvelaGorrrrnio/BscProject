@@ -7,28 +7,28 @@
 syn keyword rlGoTo         goto exit
 syn keyword rlComeFrom     entry from
 syn keyword rlConditional  if fi
-syn keyword rlFunctionlike skip swap
-syn keyword rlOperator     neg sig not and or top empty size
+syn keyword rlFunctionlike skip swap free init
+syn keyword rlOperator     neg sig not and or top empty size null
+syn keyword rlType         int list
 
 syn match rlVariable   "[a-zA-Z][a-zA-Z0-9_']*"
 syn match rlOperator   "[!+\-\^\*/><%=&\|\#\?\~]"
-syn match rlBoolean    "\(\w\|\.\)\@<!\(true\|false\)\(\w\|\.\)\@!"
 syn match rlInteger    "\d\+"
-syn match rlComment    "\/\/.*$"
 syn match rlBlockStart "[a-zA-Z][a-zA-Z0-9_']*:"
 
+syn match rlComment    "\/\/.*$"
 syn region rlComment start="\/\*"    end="\*\/"
 
-hi def link rlGoTo	   Structure
+hi def link rlBlockStart   Label
 hi def link rlComeFrom	   Structure
-hi def link rlConditional  Conditional
+hi def link rlGoTo	       Structure
 
+hi def link rlConditional  Conditional
 hi def link rlVariable	   Underlined
 hi def link rlComment      Comment
 hi def link rlOperator     Operator
 hi def link rlFunctionlike Function
-hi def link rlBoolean      Boolean
 hi def link rlInteger      Number
-hi def link rlBlockStart   Label
+hi def link rlType	       Type
 
 let b:current_syntax = "rl"

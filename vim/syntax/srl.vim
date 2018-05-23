@@ -3,24 +3,24 @@
 " Maintainer: Lars Vadgaard
 " Latest Revision: 19 March 2018
 
-" syn keyword rlStatement
-syn keyword rlConditional  if then else fi from do until
-syn keyword rlFunctionlike skip swap
-syn keyword rlOperator     neg sig not and or top empty size
+syn keyword srlConditional  if then else fi from do loop until
+syn keyword srlFunctionlike skip swap free init
+syn keyword srlOperator     neg sig not and or top empty size
+syn keyword srlType         int list
 
-syn match rlVariable   "[a-zA-Z][a-zA-Z0-9_']*"
-syn match rlOperator   "[!+\-\^\*/><%=&\|\#\?\~]"
-syn match rlInteger    "\d\+"
-syn match rlComment    "\/\/.*$"
+syn match srlVariable   "[a-zA-Z][a-zA-Z0-9_']*"
+syn match srlOperator   "[!+\-\^\*/><%=&\|\#\?\~]"
+syn match srlInteger    "\d\+"
 
-syn region rlComment start="\/\*"    end="\*\/"
+syn match srlComment    "\/\/.*$"
+syn region srlComment start="\/\*"    end="\*\/"
 
-hi def link rlConditional  Conditional
-
-hi def link rlVariable	   Underlined
-hi def link rlComment      Comment
-hi def link rlOperator     Operator
-hi def link rlFunctionlike Function
-hi def link rlInteger      Number
+hi def link srlConditional  Conditional
+hi def link srlVariable	    Underlined
+hi def link srlComment      Comment
+hi def link srlOperator     Operator
+hi def link srlFunctionlike Function
+hi def link srlInteger      Number
+hi def link srlType	        Type
 
 let b:current_syntax = "srl"
