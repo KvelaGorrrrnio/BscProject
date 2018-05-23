@@ -31,7 +31,7 @@ genLabelMap ttab ast =
     in (genVec ttab,lm)
 
 genVec :: TypeTab -> String
-genVec ttab = maximum (M.keys ttab) ++ "_"
+genVec ttab = if M.null ttab then "x" else maximum (M.keys ttab) ++ "_"
 
 -- Code generation
 genInit id n      = Step $ Init id [genLit n, genLit n, genLit 3] p
