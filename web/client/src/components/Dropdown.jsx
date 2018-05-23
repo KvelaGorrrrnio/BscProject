@@ -12,14 +12,14 @@ class Dropdown extends Component {
       </li>);
     } else {
       return (
-        <li key={idx} onClick={item.onClick}>{ item.title }</li>
+        <li key={idx} onClick={item.onClick ? item.onClick : () => {}}>{ item.title }</li>
       );
     }
   }
 
   render() {
     const disabled = this.props.disabled ? ' disabled' : '';
-    const items = this.props.items ? this.props.items : [{ type: 'item', title: '<center>No items.</center>' }];
+    const items = this.props.items ? this.props.items : [{ type: 'item', title: 'No items.' }];
     return (
       <div className={'dropdown' + disabled}>
         {this.props.children}
