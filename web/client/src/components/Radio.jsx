@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import './Radio.scss';
 
 class Radio extends Component {
+
   constructor(props) {
     super(props);
     this.onChange = props.onChange;
     const items = props.items || [{ index: 0, title: 'default' }]
-    const disabled = props.disabled || false;
     this.state = {
       index: items[0].index,
       items: items,
@@ -20,7 +20,9 @@ class Radio extends Component {
       return;
     }
     this.setState({ index: item.index });
-    this.onChange(event, item);
+    if (this.onChange) {
+      this.onChange(event, item);
+    }
   }
 
   render() {
@@ -34,6 +36,7 @@ class Radio extends Component {
       </ul>
     );
   }
+
 }
 
 export default Radio;

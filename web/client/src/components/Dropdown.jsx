@@ -3,10 +3,6 @@ import './Dropdown.scss'
 
 class Dropdown extends Component {
 
-  constructor(props) {
-    super(props);
-  }
-
   renderItem(item,idx) {
     if (item.type == 'category') {
       return (<li key={idx}>{ item.title }
@@ -23,11 +19,12 @@ class Dropdown extends Component {
 
   render() {
     const disabled = this.props.disabled ? ' disabled' : '';
+    const items = this.props.items ? this.props.items : [{ type: 'item', title: '<center>No items.</center>' }];
     return (
       <div className={'dropdown' + disabled}>
         {this.props.children}
         <ul>
-          { this.props.items.map(this.renderItem.bind(this)) }
+          { items.map(this.renderItem.bind(this)) }
         </ul>
       </div>
     );

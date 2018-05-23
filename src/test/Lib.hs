@@ -21,6 +21,7 @@ import Data.List (stripPrefix,concat)
 import Control.Monad (mapM,join, filterM)
 import Control.Monad.Except
 import Data.Char (isSpace)
+import Text.Regex
 
 data Target
   = All
@@ -123,7 +124,7 @@ runSuite' file (OutFile o m) = do
     (ec1,so1,se1) <- lift $ readProcessWithExitCode "stack" ["exec", lng, "--", bdir ++ "/" ++ file] ""
     (ec2,so2,se2) <- lift $ readProcessWithExitCode "stack" ["exec", swapInterpreter lng, "--", bdir ++ "/" ++ o] ""
     case (ec1,ec2) of
-      (ExitSuccess, ExitSuccess) -> if trim so1 == trim so2 then return ()
+      (ExitSuccess, ExitSuccess) -> let so1' = removeLineNumbers so1; so2' = removeLineNumbers so2 in if trim so1' == trim so2' then return ()
         else throwError $ "Execution of '" ++ file ++ "' and '" ++ o ++ "' have different output:\n" ++ expColor (trim so1) ++ "\n" ++ maxDash out exp ++ "\n" ++ errColor (trim so2) ++ "\n"
       _                          -> throwError $ "Either '" ++ file ++ "' and/or '" ++ o ++ "' wasn't executed."
   where hasF f s = if f then s else ""
@@ -131,6 +132,9 @@ runSuite' file (OutFile o m) = do
         swapInterpreter "rl" = "srl"
         swapInterpreter "srl" = "rl"
         swapInterpreter s = s
+
+removeLineNumbers :: String -> String
+removeLineNumbers s = subRegex (mkRegex "(line [0-9]+, column [0-9]+)") s ""
 
 dash :: String -> String
 dash s = replicate ((min 80 . maximum . map length . lines) s) '-'
