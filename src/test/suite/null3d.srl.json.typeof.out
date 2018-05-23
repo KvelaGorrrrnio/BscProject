@@ -1,0 +1,1 @@
+{ "type" : "type", "table" : [{ "id" : "N1", "value" : "list  int" }, { "id" : "N2", "value" : "list  list  int" }, { "id" : "N3", "value" : "list  list  list  int" }, { "id" : "n", "value" : "int" }] }

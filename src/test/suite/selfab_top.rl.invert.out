@@ -1,0 +1,6 @@
+list  list  list  int N
+
+enter: entry
+  N[2,0,0] -= ^ (^ N[2])
+  free N [4,4,4]
+exit

@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int a\n\nstart: entry\n  a *= 4\n  a -= 9\nexit" }

@@ -1,0 +1,1 @@
+{ "type" : "error", "position" : { "line" : 4, "column" : 8 }, "message" : "A runtime error occurred at (line 4, column 8):\nDivision by zero." }

@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int a\nlist  int l\n\nfrom (a = # l) do\n  a -= 1\n  l[a] /= 2\nloop\n  skip\nuntil (a = 0)\nfrom (# l = 10) do\n  pop a l\n  a -= # l\nloop\n  skip\nuntil (? l)" }

@@ -1,0 +1,4 @@
+N1 : list  int
+N2 : list  list  int
+N3 : list  list  list  int
+n  : int

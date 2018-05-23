@@ -1,0 +1,23 @@
+list  int N1
+list  list  int N2
+list  list  list  int N3
+int n
+
+n -= null N3
+swap N3[1,2,3] n
+n -= null N3
+from (# N3 = 4) do
+  pop N2 N3
+  from (# N2 = 4) do
+    pop N1 N2
+    from (# N1 = 4) do
+      pop n N1
+    loop
+      skip
+    until (? N1)
+  loop
+    skip
+  until (? N2)
+loop
+  skip
+until (? N3)

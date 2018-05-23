@@ -1,0 +1,25 @@
+int a
+
+l0: entry
+  skip
+goto l1
+
+l1: from l0
+  a += 9
+goto l4
+
+l4: from l1
+  skip
+goto l5
+
+l5: from l4
+  a /= 4
+goto l2
+
+l2: from l5
+  skip
+goto l3
+
+l3: from l2
+  skip
+exit

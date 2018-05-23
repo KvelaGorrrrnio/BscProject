@@ -1,0 +1,20 @@
+list  int i
+int n
+list  list  int o
+
+n -= o[5]
+pop n i
+n -= o[3,4]
+pop n i
+n -= o[2,1]
+from (# o = 5) do
+  pop i o
+  from (# i = 6) do
+    pop n i
+    n -= # i + # o
+  loop
+    skip
+  until (? i)
+loop
+  skip
+until (? o)

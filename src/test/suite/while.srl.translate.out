@@ -1,0 +1,34 @@
+int v
+int w
+
+l0: entry
+  skip
+goto l1
+
+l1: fi (v = 0 && w = 0) l0 l7
+  skip
+goto l4
+
+l4: from l1
+  v += 1
+goto l5
+
+l5: from l4
+  skip
+goto l2
+
+l6: from l2
+  w += 1
+goto l7
+
+l7: from l6
+  skip
+goto l1
+
+l2: from l5
+  skip
+if (w = 0) l3 l6
+
+l3: from l2
+  skip
+exit

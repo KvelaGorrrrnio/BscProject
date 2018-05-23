@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int v\nint w\n\nfrom (w = 0) do\n  v -= 1\nloop\n  w -= 1\nuntil (v = 0 && w = 0)" }

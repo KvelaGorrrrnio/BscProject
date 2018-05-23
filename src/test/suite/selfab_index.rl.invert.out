@@ -1,0 +1,29 @@
+list  int lst
+list  list  int lst'
+int n
+int v
+
+end: entry
+  lst[1 + 2] -= lst[3]
+  push lst lst'
+  swap lst'[0,3] lst'[2,0]
+goto next
+
+next: fi (# lst' = 5) end outloop
+  pop lst lst'
+  v += 10
+goto loop
+
+loop: fi (v < 10) loop next
+  pop n lst
+  v -= 2
+  n -= v
+if (v = 0) outloop loop
+
+outloop: from loop
+  skip
+if (? lst') start next
+
+start: from outloop
+  skip
+exit

@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int a\n\na *= 4 - (2 * 2)" }

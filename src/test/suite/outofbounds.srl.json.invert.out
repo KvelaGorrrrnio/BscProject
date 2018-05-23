@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "list  int i\nint n\nlist  list  int o\n\nn -= o[5]\npop n i\nn -= o[3,4]\npop n i\nn -= o[2,1]\nfrom (# o = 5) do\n  pop i o\n  from (# i = 6) do\n    pop n i\n    n -= # i + # o\n  loop\n    skip\n  until (? i)\nloop\n  skip\nuntil (? o)" }

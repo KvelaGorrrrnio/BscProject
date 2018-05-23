@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int a\n\nl0: entry\n  skip\ngoto l1\n\nl1: from l0\n  a += 4 >= 5\ngoto l2\n\nl2: from l1\n  skip\ngoto l3\n\nl3: from l2\n  skip\nexit" }
