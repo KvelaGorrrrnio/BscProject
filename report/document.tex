@@ -1,0 +1,37 @@
+\documentclass[12pt,a4paper]{article}
+
+% Fetch preamble
+\usepackage{mystyle}
+
+% Title
+\title{
+    \vspace{5cm}
+    \Huge{COURSE \\ }
+    \Large{Assignment number}
+    \linebreak \\
+    University of Copenhagen - Department of Computer Science \\
+}
+
+% Author
+\author{
+    \Large{Lars Vadgaard - hnd531}
+}
+
+%----------------------------------------------------
+% Forside
+%----------------------------------------------------
+\begin{document}
+% Frontpage
+\AddToShipoutPicture*{\put(0,0){\includegraphics*[viewport=0 0 700 600]{\string~/grive/uni/tex/front/ku-farve.pdf}}}
+\AddToShipoutPicture*{\put(0,602){\includegraphics*[viewport=0 600 700 1600]{\string~/grive/uni/tex/front/ku-farve.pdf}}}
+\AddToShipoutPicture*{\put(0,0){\includegraphics*{\string~/grive/uni/tex/front/ku-en.pdf}}}
+
+\clearpage\maketitle
+\thispagestyle{empty}
+
+\newpage
+\setcounter{page}{1}
+
+\input{tex/s1}
+
+\end{document}
