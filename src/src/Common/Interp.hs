@@ -30,13 +30,13 @@ rd (Id id exps) p = gets (mLookup id) >>= \case
   Nothing -> logError $ RuntimeError p $ NonDefinedId id
 
 getIdx :: Pos -> Value -> Exp -> VarState Value
-getIdx p (IntV n) _ = logError $ RuntimeError p $ IndexOnNonListExp (IntV n)
+getIdx p (IntV n) _ = logError $ RuntimeError p IndexOnNonListExp
 getIdx p (ListV lst _) idx = eval idx >>= \case
-  IntV i | i < 0     -> logError $ RuntimeError (getExpPos idx) $ NegativeIndex i
+  IntV i | i < 0     -> logError $ RuntimeError (getExpPos idx) NegativeIndex
     | otherwise -> case index lst i of
       Just v  -> return v
-      Nothing -> logError $ RuntimeError (getExpPos idx) $ IndexOutOfBounds i
-  w -> logError $ RuntimeError p $ NonIntegerIndex w
+      Nothing -> logError $ RuntimeError (getExpPos idx) IndexOutOfBounds
+  w -> logError $ RuntimeError p NonIntegerIndex
   where index :: [Value] -> Integer -> Maybe Value
         index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
 
@@ -66,8 +66,8 @@ adjust' op (e:es) p vo = do
   case vo of
     ListV lst t -> eval e >>= \case
       IntV i -> return $ ListV (replace lst i vi) t
-      w     -> logError $ RuntimeError (getExpPos e) $ NonIntegerIndex w
-    _ -> logError $ RuntimeError (getExpPos e) $ IndexOnNonListExp vo
+      w     -> logError $ RuntimeError (getExpPos e) NonIntegerIndex
+    _ -> logError $ RuntimeError (getExpPos e) IndexOnNonListExp
   where replace :: [Value] -> Integer -> Value -> [Value]
         replace lst i v | i' <- fromIntegral i = take i' lst ++ [v] ++ drop (i' + 1) lst
 
@@ -182,7 +182,7 @@ exec (Init id exps p) = do
         | n >= 0 -> case acc of
           ListV ls t  -> return $ ListV (replicate (fromIntegral n) acc) (ListT t)
           IntV _      -> return $ ListV (replicate (fromIntegral n) acc) (ListT IntT)
-        | otherwise -> logError $ RuntimeError (getExpPos e) $ NegativeDimension n
+        | otherwise -> logError $ RuntimeError (getExpPos e) NegativeDimension
       ListV _ t  -> logError $ RuntimeError (getExpPos e) $ NonIntegerDimension t -- TODO: Maybe List t
 
 -- freeing a list
@@ -211,7 +211,7 @@ exec (Free id exps p) = do
         | n >= 0 -> case v of
           ListV ls t  -> (&&) (length ls == fromIntegral n) <$> allM (`equalLengths` exps) ls
           IntV _      -> logError $ RuntimeError p $ FreeOnNonList id
-        | otherwise -> logError $ RuntimeError (getExpPos e) $ NegativeDimension n
+        | otherwise -> logError $ RuntimeError (getExpPos e) NegativeDimension
       ListV _ t -> logError $ RuntimeError (getExpPos e) $ NonIntegerDimension t -- Maybe ListT t
     equalLengths ListV{} [] = return False
     equalLengths IntV{}  [] = return True
