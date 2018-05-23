@@ -5,7 +5,11 @@
 
 ## Build
 
-## Autocompletion BASH
+## Autocompletion BASH (and ZSH)
+
+    # for ZSH, these lines should be added
+    # autoload bashcompinit
+    # bashcompinit
 
     function _rl() {
       local allmodes="run translate invert typeof"
