@@ -20,11 +20,11 @@ data Error
 data RuntimeError
   = NonDefinedId String
   | IndexOnNonList String
-  | IndexOnNonListExp Value
-  | NonIntegerIndex Value
+  | IndexOnNonListExp
+  | NonIntegerIndex
   | SelfAbuse Id
-  | NegativeIndex Integer
-  | IndexOutOfBounds Integer
+  | NegativeIndex
+  | IndexOutOfBounds
   | PushToNonList Id
   | PopToNonEmpty Id
   | PopFromEmpty Id
@@ -42,7 +42,7 @@ data RuntimeError
   | InitNonEmptyList String
   | ConflictingDimensions
   | ConflictingLengths
-  | NegativeDimension Integer
+  | NegativeDimension
   | NonIntegerDimension Type
   | FreeOnNonList String
   | FreeNonEmptyList String
@@ -72,35 +72,35 @@ instance JSON Error where
   stringify (Custom e)             = jsonError e (0,0)
 
 instance Show RuntimeError where
-  show (NonDefinedId id) = "'" ++ id ++ "' is not defined."
+  show (NonDefinedId id) = "Variable '" ++ id ++ "' is not defined."
   show (IndexOnNonList id) = "Tried indexing on non-list identifier: " ++ id
-  show (IndexOnNonListExp v) = "Tried indexing on non-list value:" ++ show v
-  show (NonIntegerIndex v) = "Tried indexing with non-list value: " ++ show v
-  show (SelfAbuse idx) = "Update on '" ++ show idx ++ "' contains the identifier itself."
-  show (NegativeIndex n) = "Tried indexing with negative index: " ++ show n
-  show (IndexOutOfBounds n) = "Indexing " ++ show n ++ " is out of bounds."
+  show IndexOnNonListExp = "Tried indexing on non-list value"
+  show NonIntegerIndex = "Tried indexing with non-integer value"
+  show (SelfAbuse idx) = "Update on variable '" ++ show idx ++ "' contains the identifier itself."
+  show NegativeIndex = "Index is negative"
+  show IndexOutOfBounds = "Index out of bounds"
   show (PushToNonList idx) = "Tried pushing to non-list identifier: " ++ show idx
   show (PopToNonEmpty idx) = "Tried popping to non-clear identifier: " ++ show idx
   show (PopFromEmpty idx) = "Tried popping from empty identifier: " ++ show idx
   show (PopFromNonList idx) = "Tried popping from non-list identifier: " ++ show idx
   show (ConflictingType t1 t2) = "Expected " ++ show t1 ++ " as type, but got " ++ show t2
   show (ConflictingTypes tl1 tl2) = "Expected " ++ intercalate " -> " (map show tl1) ++ " as type, but got " ++ intercalate " -> " (map show tl2)
-  show (EmptyTop) = "Tried reading top of empty list."
+  show EmptyTop = "Tried reading top of empty list."
   show (NonListExp t) = "Expected list from expression, but received " ++ show t
   show (NonIntegerExp t) = "Expected " ++ show IntT ++ " from expression, but received " ++ show t
-  show (DivByZero) = "Division by zero."
-  show (DivHasRest) = "Division has rest."
-  show (MultByZero) = "Multiplication update by zero."
-  show (UpdateOnNonIntager idx t) = "Tried updating non-" ++ show IntT ++ " identifier " ++ show idx ++ " of type " ++ show t
-  show (InitOnNonList id) = "Tried initializing non-list identifier " ++ id
-  show (InitNonEmptyList id) = "Tried initliazing non-empty list identifier " ++ id
-  show (ConflictingDimensions) = "The number of dimensions specified does not match depth of list type."
-  show (ConflictingLengths) = "The lengths specified do not match lengths of the of list."
-  show (NegativeDimension n) = "Encountered negative dimension: " ++ show n
+  show DivByZero = "Division by zero."
+  show DivHasRest = "Division has rest."
+  show MultByZero = "Multiplication update by zero."
+  show (UpdateOnNonIntager idx t) = "Tried updating non-" ++ show IntT ++ " identifier '" ++ show idx ++ "' of type " ++ show t
+  show (InitOnNonList id) = "Tried initializing non-list identifier '" ++ id ++ "'"
+  show (InitNonEmptyList id) = "Tried initliazing non-empty list identifier '" ++ id ++ "'"
+  show ConflictingDimensions = "The number of dimensions specified does not match depth of list type."
+  show ConflictingLengths = "The lengths specified do not match lengths of the of list."
+  show NegativeDimension = "Encountered negative dimension"
   show (NonIntegerDimension t) = "Expected dimension size to be of type " ++ show IntT ++ ", received " ++ show t
-  show (FreeOnNonList id) = "Tried freeing non-list identifier: " ++ id
-  show (FreeNonEmptyList id) = "Tried freeing non-empty list identifier: " ++ id
-  show (AssertionFailed exp e r) = "Assertion " ++ show exp ++ " expected " ++ show e ++ ", but evaluated to " ++ show r
+  show (FreeOnNonList id) = "Tried freeing non-list identifier '" ++ id ++ "'"
+  show (FreeNonEmptyList id) = "Tried freeing non-empty list identifier '" ++ id ++ "'"
+  show (AssertionFailed exp e r) = "Assertion '" ++ show exp ++ "' expected " ++ show e ++ ", but evaluated to " ++ show r
   show (FromFail f e) = "From-clause not consistent.\n Coming from " ++ f ++ ", but expected " ++ e ++ "."
 
 instance Show StaticError where
