@@ -17,13 +17,6 @@ type Label = String
 type AST = [(Label, Block)]
 showAST :: TypeTab -> AST -> String
 showAST ttab ast = showTypeDecs ttab ++ (intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ showBlock b)) ast
-getEntry ast =
-  let entries = (map fst . filter
-          (\case
-              (_, (Entry _,_,_)) -> True
-              _                  -> False
-          )) ast
-    in head entries
 
 type Block = (From, [Stmt], Jump)
 showBlock (f,s,j) = show f ++ "\n  "

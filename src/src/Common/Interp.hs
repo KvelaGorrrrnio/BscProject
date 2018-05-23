@@ -14,9 +14,6 @@ import Control.Monad.Except
 import Control.Monad.Loops (allM)
 
 import qualified Data.HashMap.Strict as M
-import qualified Data.IntMap.Strict as I
-
-import Debug.Trace
 
 -- ======================================
 -- Monad transformer : The variable state
@@ -95,10 +92,10 @@ exec (Update (Id id exps) op e p) = do
     w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
 
   case op of
-    DivEq  | m == 0       -> logError $ RuntimeError p $ DivByZero
-           | mod n m /= 0 -> logError $ RuntimeError p $ DivHasRest
+    DivEq  | m == 0       -> logError $ RuntimeError p DivByZero
+           | mod n m /= 0 -> logError $ RuntimeError p DivHasRest
            | otherwise    -> return ()
-    MultEq | m == 0       -> logError $ RuntimeError p $ MultByZero
+    MultEq | m == 0       -> logError $ RuntimeError p MultByZero
            | otherwise    -> return ()
     _ -> return ()
 
@@ -167,7 +164,7 @@ exec (Init id exps p) = do
     IntV _ -> logError $ RuntimeError p $ InitOnNonList id
     ListV ls t
       | getDim t /= length exps ->
-        logError $ RuntimeError p $ ConflictingDimensions
+        logError $ RuntimeError p ConflictingDimensions
     _ -> return ()
 
   unless (isClear v) $ logError $ RuntimeError p $ InitNonEmptyList id
@@ -196,14 +193,14 @@ exec (Free id exps p) = do
     IntV _ -> logError $ RuntimeError p $ FreeOnNonList id
     ListV ls t
       | getDim t /= length exps ->
-        logError $ RuntimeError p $ ConflictingDimensions
+        logError $ RuntimeError p ConflictingDimensions
     _ -> return ()
 
   unless (allZero v) $ logError $ RuntimeError p $ FreeNonEmptyList id
 
   eql <- equalLengths v exps
   unless eql
-    $ logError $ RuntimeError p $ ConflictingDimensions
+    $ logError $ RuntimeError p ConflictingLengths
 
   adjust (const . getDefaultValue . getType $ v) (Id id []) p
 
@@ -253,7 +250,7 @@ eval (Binary op l r p)
     vr <- eval r
     case (vl, vr) of
       (IntV n, IntV m)
-        | m == 0    -> logError $ RuntimeError (getExpPos l) $ DivByZero
+        | m == 0    -> logError $ RuntimeError (getExpPos l) DivByZero
         | otherwise -> return $ IntV (mapBinOp op n m)
       (v,w)         -> logError $ RuntimeError (getExpPos l) $ ConflictingTypes [IntT,IntT] [getType v, getType w]
 
@@ -282,7 +279,7 @@ eval (Unary op exp p)
   | otherwise = eval exp >>= \case
     ListV ls t -> case op of
       Top   -> case ls of
-        []    -> logError $ RuntimeError p $ EmptyTop
+        []    -> logError $ RuntimeError p EmptyTop
         v:_   -> return v
       Empty -> return $ IntV (boolToInt . null $ ls)
       Size  -> return $ IntV (fromIntegral . length $ ls)
@@ -295,11 +292,3 @@ allZero :: Value -> Bool
 allZero v = case v of
   ListV ls _ -> foldl (\acc e -> acc && allZero e) True ls
   IntV  n    -> n == 0
-
--- allZero :: [Value] -> Bool
--- allZero []     = True
--- allZero (v:vs) = (&&) (
---   case v of
---     ListV ls _ -> allZero ls
---     IntV  n    -> n==0
---   ) (allZero vs)

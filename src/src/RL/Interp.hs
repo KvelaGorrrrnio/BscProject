@@ -19,7 +19,7 @@ type ProgState = ReaderT AST VarState
 
 runProgram :: AST -> TypeTab -> (Either Error VarTab, Log)
 runProgram ast ttab =
-  let entry   = getEntry ast
+  let entry   = (fst . head) ast
       vtab    = buildVTab ttab
       (vt,ms) = execVarState vtab . runReaderT (interp [] entry) $ ast
     in (vt, Log vtab ms)

@@ -73,7 +73,6 @@ dupLab = do
       let Just b = lookup l ast
       throwError $ StaticError (getBlockPos b) (DuplicateLabel l)
 
-
 defLab :: BlockReader ()
 defLab = do
   ast <- ask

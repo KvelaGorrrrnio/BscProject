@@ -53,7 +53,7 @@ trlBlk (Step s) (l0,l1,l2,l3) = do
   push l1 (fs,[s],js)
   push l2 (fe,[ ],je)
 
-trlBlk (SRL.If t b1 b2 a _) (l0,l1,l6,l7) = do
+trlBlk (SRL.If t b1 b2 a) (l0,l1,l6,l7) = do
   l2 <- genLabel ()
   l3 <- genLabel ()
   l4 <- genLabel ()
@@ -70,7 +70,7 @@ trlBlk (SRL.If t b1 b2 a _) (l0,l1,l6,l7) = do
   trlBlk b2 (l1,l4,l5,l6)
   push l6 (fe,[],te)
 
-trlBlk (Until d a b1 b2 t p) (l0,l1,l4,l7) = do
+trlBlk (Until d a b1 b2 t) (l0,l1,l4,l7) = do
   l2 <- genLabel ()
   l3 <- genLabel ()
   l5 <- genLabel ()
