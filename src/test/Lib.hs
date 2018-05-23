@@ -124,7 +124,10 @@ runSuite' file (OutFile o m) = do
     (ec1,so1,se1) <- lift $ readProcessWithExitCode "stack" ["exec", lng, "--", bdir ++ "/" ++ file] ""
     (ec2,so2,se2) <- lift $ readProcessWithExitCode "stack" ["exec", swapInterpreter lng, "--", bdir ++ "/" ++ o] ""
     case (ec1,ec2) of
-      (ExitSuccess, ExitSuccess) -> let so1' = removeLineNumbers so1; so2' = removeLineNumbers so2 in if trim so1' == trim so2' then return ()
+      (ExitSuccess, ExitSuccess) ->
+        let so1' = removeAllSpace . trim . removeLineNumbers $ so1
+            so2' = removeAllSpace . removeStateVariable lng . trim . removeLineNumbers $ so2
+          in if so1' == so2' then return ()
         else throwError $ "Execution of '" ++ file ++ "' and '" ++ o ++ "' have different output:\n" ++ expColor (trim so1) ++ "\n" ++ maxDash out exp ++ "\n" ++ errColor (trim so2) ++ "\n"
       _                          -> throwError $ "Either '" ++ file ++ "' and/or '" ++ o ++ "' wasn't executed."
   where hasF f s = if f then s else ""
@@ -136,8 +139,17 @@ runSuite' file (OutFile o m) = do
 removeLineNumbers :: String -> String
 removeLineNumbers s = subRegex (mkRegex "(line [0-9]+, column [0-9]+)") s ""
 
+removeStateVariable :: String -> String -> String
+removeStateVariable "rl" s = unlines . init . lines $ s
+removeStateVariable _ s    = s
+
+removeAllSpace :: String -> String
+removeAllSpace = filter (not . isSpace)
+
 dash :: String -> String
-dash s = replicate ((min 80 . maximum . map length . lines) s) '-'
+dash s =
+  let l = (map length . lines) s
+      mx = if null l then 0 else maximum l in replicate (min 80 mx) '-'
 maxDash s t = let ds = dash s; dt = dash t in if length ds > length dt then ds else dt
 
 runSuites :: [Suite] -> IO [(String,[(Bool,String)])]
