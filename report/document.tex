@@ -1,37 +1,51 @@
-\documentclass[12pt,a4paper]{article}
+\documentclass[12pt,twoside,openright,pdftex]{DIKU-report}
 
-% Fetch preamble
-\usepackage{mystyle}
+% KU-forside
+\usepackage[babel, en, titelside]{ku-forside}
+\selectdanish
 
-% Title
-\title{
-    \vspace{5cm}
-    \Huge{COURSE \\ }
-    \Large{Assignment number}
-    \linebreak \\
-    University of Copenhagen - Department of Computer Science \\
-}
+%% Frontmatter
+% Title page
+% Abstract
+% Table of contents
+% Preface
 
-% Author
-\author{
-    \Large{Lars Vadgaard - hnd531}
-}
+% Titelsideinformation
+\titel{Reversible Programming Languages} %
+\undertitel{--- and Program Transformations} %
+\opgave{Bachelor's Thesis} % Findes kun under 'titelside'
+\forfatter{Lars Vadgaard \& Anders Jørgensen}
+\dato{Juni 2018}%
+\vejleder{Robin Kaarsgaard} %  Findes kun under 'titelside'
 
-%----------------------------------------------------
-% Forside
-%----------------------------------------------------
 \begin{document}
-% Frontpage
-\AddToShipoutPicture*{\put(0,0){\includegraphics*[viewport=0 0 700 600]{\string~/grive/uni/tex/front/ku-farve.pdf}}}
-\AddToShipoutPicture*{\put(0,602){\includegraphics*[viewport=0 600 700 1600]{\string~/grive/uni/tex/front/ku-farve.pdf}}}
-\AddToShipoutPicture*{\put(0,0){\includegraphics*{\string~/grive/uni/tex/front/ku-en.pdf}}}
+\maketitle % laver forsiden
 
-\clearpage\maketitle
-\thispagestyle{empty}
+\frontmatter
 
-\newpage
-\setcounter{page}{1}
+\begin{abstract}
+Each report must include an abstract that summarizes the results.Recommended length is at most 150 words.  The abstract should notcontain any references or displayed equations.
+\end{abstract}
 
-\input{tex/s1}
+\tableofcontents
+
+\mainmatter
+
+%% Mainmatter
+% Inner chapters
+% Appendices
+
+\input{tex/introduction}
+
+%% Backmatter
+% Bibliography
+
+%% \begin{acknowledgements}
+%% Den danske tekst i dette dokument er fremstillet ved hjælp af Google
+%% Translate.
+%% \end{acknowledgements}
+
+\bibliographystyle{DIKU}
+\bibliography{article-sample}
 
 \end{document}
