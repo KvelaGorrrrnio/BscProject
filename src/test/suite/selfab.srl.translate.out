@@ -1,4 +1,4 @@
-list  int a
+list int a
 int n
 
 l0: entry

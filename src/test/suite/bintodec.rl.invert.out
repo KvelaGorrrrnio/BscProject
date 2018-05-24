@@ -1,6 +1,6 @@
 int i
 int n
-list  int q
+list int q
 
 end: entry
   i += # q

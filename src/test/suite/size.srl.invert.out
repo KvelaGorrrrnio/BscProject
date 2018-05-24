@@ -1,5 +1,5 @@
 int a
-list  int l
+list int l
 
 from (a = # l) do
   a -= 1

@@ -1,4 +1,4 @@
-list  list  list  int S
+list list list int S
 int n
 
 init S [1,2,3]

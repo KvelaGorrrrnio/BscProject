@@ -1,0 +1,1 @@
+{ "type" : "error", "position" : { "line" : 3, "column" : 9 }, "message" : "The entry must be at the beginning of the program." }

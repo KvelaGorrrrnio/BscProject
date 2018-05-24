@@ -1,4 +1,4 @@
-list  int N
+list int N
 int n
 
 N[1] -= null n

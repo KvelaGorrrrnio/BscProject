@@ -1,5 +1,5 @@
 int n
-list  int q
+list int q
 int w
 
 end: entry

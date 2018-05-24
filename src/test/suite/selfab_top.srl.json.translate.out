@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "list  list  list  int N\n\nl0: entry\n  skip\ngoto l1\n\nl1: from l0\n  init N [4,4,4]\ngoto l4\n\nl4: from l1\n  skip\ngoto l5\n\nl5: from l4\n  N[2,3,3] += ^ (^ N[2])\ngoto l2\n\nl2: from l5\n  skip\ngoto l3\n\nl3: from l2\n  skip\nexit" }
+{ "type" : "code", "code" : "list list list int N\n\nl0: entry\n  skip\ngoto l1\n\nl1: from l0\n  init N [4,4,4]\ngoto l4\n\nl4: from l1\n  skip\ngoto l5\n\nl5: from l4\n  N[2,3,3] += ^ (^ N[2])\ngoto l2\n\nl2: from l5\n  skip\ngoto l3\n\nl3: from l2\n  skip\nexit" }

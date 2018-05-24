@@ -31,6 +31,7 @@ data RuntimeError
   | PopFromNonList Id
   | ConflictingType Type Type
   | ConflictingTypes [Type] [Type]
+  | SwapNotSameType Type Type
   | EmptyTop
   | NonListExp Type
   | NonIntegerExp Type
@@ -84,7 +85,8 @@ instance Show RuntimeError where
   show (PopFromEmpty idx) = "Tried popping from empty identifier: " ++ show idx
   show (PopFromNonList idx) = "Tried popping from non-list identifier: " ++ show idx
   show (ConflictingType t1 t2) = "Expected " ++ show t1 ++ " as type, but got " ++ show t2
-  show (ConflictingTypes tl1 tl2) = "Expected " ++ intercalate " -> " (map show tl1) ++ " as type, but got " ++ intercalate " -> " (map show tl2)
+  show (ConflictingTypes tl1 tl2) = "Expected " ++ show tl1 ++ " as types, but got " ++ show tl2
+  show (SwapNotSameType t1 t2) = "Trying to swap two variables of different types: " ++ show t1 ++ " and " ++ show t2
   show EmptyTop = "Tried reading top of empty list."
   show (NonListExp t) = "Expected list from expression, but received " ++ show t
   show (NonIntegerExp t) = "Expected " ++ show IntT ++ " from expression, but received " ++ show t

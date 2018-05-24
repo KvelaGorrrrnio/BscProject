@@ -1,6 +1,6 @@
 int n
-list  list  int p
-list  int q
+list list int p
+list int q
 
 start: entry
   n -= ^ (^ p)

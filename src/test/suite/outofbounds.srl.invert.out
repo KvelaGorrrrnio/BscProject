@@ -1,6 +1,6 @@
-list  int i
+list int i
 int n
-list  list  int o
+list list int o
 
 n -= o[5]
 pop n i
