@@ -14,22 +14,22 @@ export default (<div>
       <tr>
         <td><img src={stepIcon}/></td>
         <td>Next Step</td>
-        <td>Available in <b>Step</b> mode. Executes next statement in program.</td>
+        <td>Available in <b>Step</b> mode. Moves to the next statement in program.</td>
       </tr>
       <tr>
         <td><img src={stepPrevIcon}/></td>
         <td>Prev Step</td>
-        <td>Available in <b>Step</b> mode. Reverse executes last statement in program.</td>
+        <td>Available in <b>Step</b> mode. Moves to the previous statement in program.</td>
       </tr>
       <tr>
         <td><img src={stepAllIcon}/></td>
         <td>Step To End</td>
-        <td>Available in <b>Step</b> mode. Executes all remaining statements in program.</td>
+        <td>Available in <b>Step</b> mode. Moves to the end of the program.</td>
       </tr>
       <tr>
         <td><img src={resetIcon}/></td>
         <td>Reset Execution</td>
-        <td>Available in <b>Step</b> mode. Reset execution state to before first statement.</td>
+        <td>Available in <b>Step</b> mode. Moves to the beginning of the program.</td>
       </tr>
       <tr>
         <td><img src={stopIcon}/></td>
@@ -38,12 +38,12 @@ export default (<div>
       </tr>
     </tbody>
   </table>
-  When in <b>Step</b> mode, language-selection, code-editing and storage-actions are disabled. Use <img className='inline' src={stopIcon} /> <b>End Step</b> to leave <b>Step</b> mode to re-enable these features.
+  When in <b>Step</b> mode, language selection, code-editing and storage-actions are disabled. Use <img className='inline' src={stopIcon} /> <b>End Step</b> to leave <b>Step</b> mode to re-enable these features.
 
   <h3>Result Window</h3>
   In the <b>Result Window</b> two windows are shown. The upper half is the current state of the executing program.
-  The lower half shows a statement log, containing all executed statements. The top of the log is the most recent executed statement.<br/>
+  The lower half shows a statement log containing all executed statements. The top of the log is the most recent executed statement.<br/>
   If the last statement of the program is executed, either the last statement and an error is shown with red highlighting on failure or the last statement with green highlighting on success.<br/>
-  Only runtime errors will be shown via the log. Parse and static errors will be shown in the <b>Error Window</b> (only visible when errors are present) below the <b>Code Window</b>.
+  Only runtime errors will be shown via the log. Parse errors and static errors will be shown in the <b>Error Window</b> (only visible when errors are present) below the <b>Code Window</b>.
 
 </div>);
