@@ -11,7 +11,9 @@ import * as CodeMirror from 'codemirror';
     const idRE = /[a-zA-Z][a-zA-Z0-9_']*/;
     const cmtRE = /\/\/.*/;
     const numRE = /[0-9]+/;
-    const symRE = new RegExp(idRE.source + '|' + '[+=\\-*/%^?!~#<>|&]+');
+    const lblRE = /[0-9]+/;
+    const alpRE = /[a-zA-Z]/;
+    const opRE  = /[%?!~#=]|[+\-*/^<>]=?|&&|\|\|/;
 
     const keywords = function() {
       var kws = {};
@@ -46,7 +48,7 @@ import * as CodeMirror from 'codemirror';
       setGroup('builtin')(
         'top', 'size', 'null', 'not', 'and', 'or', 'empty'
       );
-     
+
       return kws;
 
     }();
@@ -64,7 +66,7 @@ import * as CodeMirror from 'codemirror';
         stream.skipToEnd();
         return 'comment';
       }
-      
+
       // Brackets
       if (c == '(' || c == ')') {
         stream.next();
@@ -75,10 +77,19 @@ import * as CodeMirror from 'codemirror';
         stream.eatWhile(numRE);
         return 'number';
       }
+      // Operators
+      if (opRE.test(c)) {
+        stream.match(opRE);
+        return 'builtin';
+      }
 
       // Variables and stuff
-      if (symRE.test(c)) {
-        stream.match(symRE);
+      if (idRE.test(c)) {
+        stream.match(idRE);
+        if (stream.peek() == ':') {
+          stream.next();
+          return 'variable-2';
+        }
         return 'variable';
       }
 
