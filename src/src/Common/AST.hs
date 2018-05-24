@@ -176,7 +176,7 @@ data Type = IntT
           deriving (Eq)
 instance Show Type where
   show IntT = "int"
-  show (ListT tp) = "list  " ++ show tp
+  show (ListT tp) = "list " ++ show tp
 buildVTab :: TypeTab -> VarTab
 buildVTab = M.map getDefaultValue
 getType :: Value -> Type
