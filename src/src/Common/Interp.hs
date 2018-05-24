@@ -113,8 +113,9 @@ exec (Update (Id id exps) op e p) = do
           | otherwise = return False
         contains (Binary _ e1 e2 _) id is = (||) <$> contains e1 id is <*> contains e2 id is
         contains (Unary Top e p) (Id id exps) is = do
-          id' <- getIdentifier (Unary Top e p)
-          contains (Var id' p) (Id id exps) []
+          (Id id' exps') <- getIdentifier (Unary Top e p)
+          let id'' = if null id' then Id id exps' else Id id' exps'
+          contains (Var id'' p) (Id id exps) []
         contains (Unary Size _ _) _ _ = return False
         contains (Unary _ e _) id is = contains e id is
         contains (Parens e _) id is = contains e id is
@@ -123,10 +124,12 @@ exec (Update (Id id exps) op e p) = do
         getIdentifier (Var id p) = return id
         getIdentifier (Unary Top exp p) = do
           (Id id' exps') <- getIdentifier exp
-          (ListV l _)    <- rd (Id id' exps') p
-          return (Id id' (exps' ++ [Lit (IntV . fromIntegral $ length l - 1) p]))
+          if null id' then return (Id id' exps')
+          else do
+            (ListV l _)    <- rd (Id id' exps') p
+            return (Id id' (exps' ++ [Lit (IntV . fromIntegral $ length l - 1) p]))
         getIdentifier (Parens e p) = getIdentifier e
-        getIdentifier e = return (Id (show e) [])
+        getIdentifier _ = return (Id "" [])
 
 
 
