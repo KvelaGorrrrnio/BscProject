@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "list  int a\nint n\n\na[1] -= 3 * a[1] + 2\na[0] -= a[1] - 92\na[2] -= 5 * ^ a\npop n a\npop n a\npop n a" }
+{ "type" : "code", "code" : "list  int a\nint n\n\na[0] -= a[1] - 92\na[2] -= 5 * ^ a\na[1] -= 3 * a[1] + 2\npop n a\npop n a\npop n a" }

@@ -30,7 +30,7 @@ l8: from l11
 goto l9
 
 l9: from l8
-  a[2] += 5 * ^ a
+  a[1] += 3 * a[1] + 2
 goto l6
 
 l6: from l9
@@ -38,7 +38,7 @@ l6: from l9
 goto l7
 
 l7: from l6
-  a[0] += a[1] - 92
+  a[2] += 5 * ^ a
 goto l4
 
 l4: from l7
@@ -46,7 +46,7 @@ l4: from l7
 goto l5
 
 l5: from l4
-  a[1] += 3 * a[1] + 2
+  a[0] += a[1] - 92
 goto l2
 
 l2: from l5
