@@ -1,4 +1,4 @@
-list  list  list  int N
+list list list int N
 
 enter: entry
   N[2,3,3] -= ^ (^ N[2])

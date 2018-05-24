@@ -1,8 +1,8 @@
-list  int lst
-list  list  int lst'
+list int lst
+list list int lst'
 int n
 int v
-list  list  list  int v_
+list list list int v_
 
 init v_ [7,7,3]
 if (null v_) then

@@ -1,4 +1,4 @@
-list  list  list  int x
+list list list int x
 
 init x [3,3,3]
 if (null x) then

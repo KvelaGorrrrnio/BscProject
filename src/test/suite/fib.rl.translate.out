@@ -1,7 +1,7 @@
 int n
 int v
 int w
-list  list  list  int w_
+list list list int w_
 
 init w_ [5,5,3]
 if (null w_) then

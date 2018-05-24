@@ -1,9 +1,9 @@
-list  list  list  int S
-list  list  int S1
-list  int S2
+list list list int S
+list list int S1
+list int S2
 int n
-list  list  int p
-list  int q
+list list int p
+list int q
 int s
 
 l0: entry

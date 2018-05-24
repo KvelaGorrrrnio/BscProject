@@ -1,6 +1,6 @@
-list  int N1
-list  list  int N2
-list  list  list  int N3
+list int N1
+list list int N2
+list list list int N3
 int n
 
 n -= null N3

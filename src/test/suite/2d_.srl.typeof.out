@@ -1,7 +1,7 @@
-S  : list  list  list  int
-S1 : list  list  int
-S2 : list  int
+S  : list list list int
+S1 : list list int
+S2 : list int
 n  : int
-p  : list  list  int
-q  : list  int
+p  : list list int
+q  : list int
 s  : int

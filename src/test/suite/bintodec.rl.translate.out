@@ -1,7 +1,7 @@
 int i
 int n
-list  int q
-list  list  list  int q_
+list int q
+list list list int q_
 
 init q_ [5,5,3]
 if (null q_) then

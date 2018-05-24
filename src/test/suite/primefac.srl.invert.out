@@ -1,5 +1,5 @@
 int n
-list  int p
+list int p
 int v
 
 n += 1

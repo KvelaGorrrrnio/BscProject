@@ -1,3 +1,3 @@
-i : list  int
+i : list int
 n : int
-o : list  list  int
+o : list list int

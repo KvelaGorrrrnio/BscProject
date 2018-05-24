@@ -1,6 +1,6 @@
 int n
 int v
-list  list  list  int v_
+list list list int v_
 
 init v_ [5,5,3]
 if (null v_) then

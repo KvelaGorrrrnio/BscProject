@@ -1,4 +1,4 @@
-list  list  list  int N
+list list list int N
 
 N[2,3,3] -= ^ (^ N[2])
 free N [4,4,4]

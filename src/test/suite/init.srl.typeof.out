@@ -1,2 +1,2 @@
-S : list  list  list  int
+S : list list list int
 n : int

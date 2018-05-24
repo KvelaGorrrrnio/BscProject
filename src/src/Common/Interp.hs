@@ -167,7 +167,7 @@ exec (Swap id1 id2 p) = do
   v2 <- rd id2 p
 
   unless (getType v1 == getType v2)
-    $ logError $ RuntimeError p $ ConflictingType (getType v1) (getType v2)
+    $ logError $ RuntimeError p $ SwapNotSameType (getType v1) (getType v2)
 
   adjust (const v2) id1 p >> adjust (const v1) id2 p
 

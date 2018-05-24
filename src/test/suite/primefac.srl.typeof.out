@@ -1,3 +1,3 @@
 n : int
-p : list  int
+p : list int
 v : int

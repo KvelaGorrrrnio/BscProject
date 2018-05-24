@@ -1,4 +1,4 @@
-list  int a
+list int a
 int n
 
 a[0] -= a[1] - 92

@@ -1,5 +1,5 @@
 int a
-list  int l
+list int l
 
 l0: entry
   skip
