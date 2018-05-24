@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { changeMode, changeCode, changeLanguage, changeResultCode, changeResultError, changeResultTable, changeResultLog, changeStepping } from '../actions/index';
 import * as api from '../api';
 import { Controlled as CodeMirror } from 'react-codemirror2';
+import '../mode/srl/srl';
 import 'codemirror/lib/codemirror.css';
 import './default-bsc.scss';
 import './Editor.scss';
@@ -19,6 +20,7 @@ class Editor extends Component {
       tabSize: 2,
       smartIndent: true,
       theme: 'default-bsc',
+      mode: 'srl',
       extraKeys: {
         'Cmd-Enter' : cm => {
           switch (this.props.mode) {
@@ -91,7 +93,7 @@ class Editor extends Component {
       else         this.props.changeResultTable(result.table);
     }, log);
   }
-  
+
   getStepLine() {
     // return empty if index is out of bound
     if (this.props.stepState.index > this.props.result.log.table.length) {
@@ -121,6 +123,7 @@ class Editor extends Component {
     const options = this.options;
     options.readOnly = this.props.stepState.stepping;
     if (this.editor) {
+      console.log(this.editor.modes);
       // Reset
       for (var i=0; i<this.editor.doc.size; i++) {
         this.editor.doc.removeLineClass(i, 'wrap', 'error');
