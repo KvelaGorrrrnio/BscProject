@@ -2,17 +2,11 @@ int n int i
 list int q
 
 start: entry
-  n += 1
-  push n q
-  push n q
-  n += 1
-  push n q
-  n += 1
-  push n q
-  push n q
-  push n q
-  n += 1
-  push n q
+  init q [10]
+
+  q[2] += 1
+  q[5] += 1
+  q[9] += 1
 goto loop
 
 loop: fi (i = 0) start loop

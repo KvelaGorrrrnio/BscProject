@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "list  int l\nint n\n\npush n l\nfrom (# l = 10) do\n  pop n l\n  n -= # l + 1\nloop\n  skip\nuntil (? l)" }

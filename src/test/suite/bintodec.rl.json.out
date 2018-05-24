@@ -1,1 +1,1 @@
-{ "type" : "variable", "table" : [{ "id" : "i", "value" : "0" }, { "id" : "n", "value" : "77" }, { "id" : "q", "value" : "[1,0,0,1,1,0,1]" }] }
+{ "type" : "variable", "table" : [{ "id" : "i", "value" : "0" }, { "id" : "n", "value" : "145" }, { "id" : "q", "value" : "[0,0,1,0,0,1,0,0,0,1]" }] }

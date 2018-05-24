@@ -126,7 +126,7 @@ exec (Push id1 id2 p) = do
         adjust (push v1) id2 p
       | otherwise -> logError $ RuntimeError p $ ConflictingType t (getType v1)
     _ -> logError $ RuntimeError p $ PushToNonList id2
-  where push v (ListV ls t) = ListV (v:ls) t
+  where push v (ListV ls t) = ListV (ls++[v]) t
         clear (IntV _)      = IntV 0
         clear (ListV _ t)   = ListV [] t
 
@@ -138,10 +138,10 @@ exec (Pop id1 id2 p) = do
   v2 <- rd id2 p
   case v2 of
     ListV [] _ -> logError $ RuntimeError p $ PopFromEmpty id2
-    ListV (v:ls) (ListT t)
+    ListV ls (ListT t)
       | t == getType v1 -> do
-        adjust (const v) id1 p
-        adjust (const $ ListV ls (ListT t)) id2 p
+        adjust (const $ last ls) id1 p
+        adjust (const $ ListV (init ls) (ListT t)) id2 p
       | otherwise ->
         logError $ RuntimeError p $ ConflictingType t (getType v1)
     _  -> logError $ RuntimeError p $ PopFromNonList id2
@@ -280,7 +280,7 @@ eval (Unary op exp p)
     ListV ls t -> case op of
       Top   -> case ls of
         []    -> logError $ RuntimeError p EmptyTop
-        v:_   -> return v
+        ls    -> return $ last ls
       Empty -> return $ IntV (boolToInt . null $ ls)
       Size  -> return $ IntV (fromIntegral . length $ ls)
     w  -> logError $ RuntimeError p $ NonListExp (getType w)

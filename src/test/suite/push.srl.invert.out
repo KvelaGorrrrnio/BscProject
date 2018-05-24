@@ -1,0 +1,10 @@
+list  int l
+int n
+
+push n l
+from (# l = 10) do
+  pop n l
+  n -= # l + 1
+loop
+  skip
+until (? l)
