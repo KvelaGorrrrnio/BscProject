@@ -11,7 +11,7 @@ sige, de tomme sider i outputtet er der med vilje.
 
 \section*{Brug af stilfilen}
 
-hej Stilfilen \verb|ku-forside.sty| kan bruges til at producere en forside
+Stilfilen \verb|ku-forside.sty| kan bruges til at producere en forside
 til alle opgaver (f.eks.~bachelorprojekter, kandidatspecialer og
 phd-afhandlinger) skrevet på Københavns Universitet.  Stifilen
 accepterer følgende optioner:
@@ -40,3 +40,25 @@ hvilket giver et lille logo i sorthvid for juridisk fakultet og loader
 stilfil udenfor naturvidenskabelig fakultet eller i sorthvid, hent
 arkivet \verb|ku-forside.zip| fra internettet; det indeholder de
 nødvendige billedfiler.
+
+
+\section*{Problem definition}
+\label{sec:problem_definition}
+The project concerns the implementation of interpreters for each of the two reversible programming languages RL and SRL as described in the article "Fundamentals of reversible flowchart languages"[1]. RL, which is an abbreviation of Reversible Language, is a low-level, assembler-style language with jumps that is, thus, non-structured. SRL, which is an abbreviation of Structured Reversible Language, is, as the name implies, a structured version of RL (with conditionals and loops). \\
+\indent Furthermore, we will implement program transformations on them, specifically program inversion and translation between RL and SRL. %, and structured reversible program theorem.
+To test our implementation and evaluate the practicality of the two languages, we write a collection of test programs of varying complexity.
+
+\section*{Boundaries of problem definition}
+\label{sec:boundaries_of_problem_definition}
+
+The focus of the project is on writing the two interpreters in Haskell. Each of the interpreters has to run reasonably fast, although the main focus will be on correctly implementing the full feature set of both languages. \\
+\indent We may choose to alter the syntax or semantics of the languages in question in cooperation with our supervisor --- given that the alteration is well argued for. \\
+\indent The test programs should demonstrate all of the implemented features of both languages. Some of the test programs should reflect real world problems, in the sense that they should have some level of purpose and complexity. \\
+\indent We will also implement a command-line interface for the interpreters along with a web-based interface for running and testing the languages.
+
+\section*{Motivation}
+\label{sec:motivation}
+Many sequential programming languages today are forward deterministic; a given instruction in a program uniquely defines the next state. Most of these languages, however, may discard information along the execution path. Thus, one given instruction in a program may not uniquely define the previous state. These languages are therefore not backward deterministic; they are irreversible. \\
+\indent There are, however, reversible programming languages that do not allow this loss of information. A given instruction still uniquely defines the next state, but it also uniquely defines the previous. Two such languages, proposed in the article "Fundamentals of reversible flowchart languages"[1], are RL and SRL. \\
+\indent \textit{Landauer's Principle}[2] states that erased information must be dissipated as heat. That is, the lower limit of power consumption in a microprocessor depends, in some way, on erasure of information. Thus, reversible computing, which does not allow loss of information, can ideally circumvent this lower bound and improve upon the power efficiency of modern computers. \\
+\indent In this project we will implement interpreters for RL and SRL along with some useful program transformations, see Section \ref{sec:problem_definition}.

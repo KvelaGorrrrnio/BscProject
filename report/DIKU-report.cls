@@ -270,7 +270,7 @@
   \let\@evenhead\@oddhead\let\@evenfoot\@oddfoot%
   \def\sectionmark##1{}%
   \def\subsectionmark##1{}%
-}  
+}
 
 \if@runningheads%
   \ps@DIKUheadings
@@ -434,7 +434,7 @@
       \protected@xdef\toc@author{\@author}}%
     \else
       \def\\{\noexpand\protect\noexpand\newline}%
-      \protected@xdef\toc@author{\@tocauthor}% 
+      \protected@xdef\toc@author{\@tocauthor}%
     \fi
     \addtocontents{toc}{\noexpand\protect\noexpand\authcount{\the\c@auco}}%
     \addcontentsline{toc}{author}{\toc@author}%
@@ -577,7 +577,7 @@
     \interlinepenalty\@M%
     \Large \bfseries #1\par\nobreak%
     \vskip 1.5em%
-  }\noindent\ignorespaces%  
+  }\noindent\ignorespaces%
 }
 
 \def\@schapter#1{\if@twocolumn
@@ -672,7 +672,7 @@
 
 \def\AND{%%                             % \begin{tabular}
 \end{tabular}\vskip 12pt plus 6pt minus 4pt\begin{tabular}[t]{c}%
-\small\rm%% \end{tabular} 
+\small\rm%% \end{tabular}
 }
 
 \newenvironment{verse}
@@ -993,11 +993,11 @@
      {\@ssect{#3}{#4}{#5}{#6}}{\@dblarg{\@sect{#1}{#2}{#3}{#4}{#5}{#6}}}}
 
 \def\@sect#1#2#3#4#5#6[#7]#8{\ifnum #2>\c@secnumdepth
-     \def\@svsec{}\else 
+     \def\@svsec{}\else
      \refstepcounter{#1}\edef\@svsec{\csname the#1\endcsname\ifnum
      #2=1.\fi\hskip 0.5em }\fi %original had a space after .
      \@tempskipa #5\relax
-      \ifdim \@tempskipa>\z@ 
+      \ifdim \@tempskipa>\z@
         \begingroup #6\relax
           \@hangfrom{\hskip #3\relax\@svsec}{\interlinepenalty \@M #8\par}%
         \endgroup
@@ -1207,16 +1207,16 @@
 
 \providecommand\l@chapter[2]{%
 %  \addpenalty{-\@highpenalty}%
-  \vskip 1.0em plus 1pt 
+  \vskip 1.0em plus 1pt
   \setlength\@tempdima{1.5em}%
   \begingroup
     \parindent \z@%
     \rightskip \@tocrmarg%
     \advance\rightskip by 0pt plus 2cm
-    \parfillskip -\rightskip 
+    \parfillskip -\rightskip
     \pretolerance=10000
-    \leavevmode 
-    \advance\leftskip\@tempdima 
+    \leavevmode
+    \advance\leftskip\@tempdima
     \hskip -\leftskip
     {\large\bfseries\boldmath#1}
     \ifx0#2%
@@ -1244,7 +1244,7 @@
     \leaders\hbox{$\m@th \mkern \@dotsep mu.\mkern
     \@dotsep mu$}\hfill
     \nobreak\hbox to\@pnumwidth{\hss #2}\par
-    \penalty\@highpenalty 
+    \penalty\@highpenalty
   \endgroup%
 }
 
