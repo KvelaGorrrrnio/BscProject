@@ -1,2 +1,2 @@
 A runtime error occurred at (line 19, column 8):
-Indexing 5 is out of bounds.
+Index out of bounds

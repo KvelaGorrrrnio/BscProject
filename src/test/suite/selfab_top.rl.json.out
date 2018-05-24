@@ -1,1 +1,1 @@
-{ "type" : "error", "position" : { "line" : 5, "column" : 3 }, "message" : "A runtime error occurred at (line 5, column 3):\nUpdate on 'N[2,0,0]' contains the identifier itself." }
+{ "type" : "error", "position" : { "line" : 5, "column" : 3 }, "message" : "A runtime error occurred at (line 5, column 3):\nUpdate on variable 'N[2,0,0]' contains the identifier itself." }
