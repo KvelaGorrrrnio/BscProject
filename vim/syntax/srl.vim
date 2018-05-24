@@ -1,5 +1,5 @@
 " Vim syntax file
-" Language: Reversible Language
+" Language: Structured Reversible Language
 " Maintainer: Lars Vadgaard
 " Latest Revision: 19 March 2018
 
