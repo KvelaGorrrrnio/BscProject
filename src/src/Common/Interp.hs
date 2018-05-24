@@ -21,7 +21,6 @@ import qualified Data.HashMap.Strict as M
 -- Monad transformer : The variable state
 -- ======================================
 
-
 type VarState = StateT VarTab (ExceptT Error (Writer [Message]))
 execVarState :: VarTab -> VarState () -> (Either Error VarTab, [Message])
 execVarState vtab = runWriter . runExceptT . flip execStateT vtab
@@ -130,9 +129,6 @@ exec (Update (Id id exps) op e p) = do
             return (Id id' (exps' ++ [Lit (IntV . fromIntegral $ length l - 1) p]))
         getIdentifier (Parens e p) = getIdentifier e
         getIdentifier _ = return (Id "" [])
-
-
-
 
 -- list modification
 exec (Push id1 id2 p) = do
