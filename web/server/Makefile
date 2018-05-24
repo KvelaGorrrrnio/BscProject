@@ -1,5 +1,6 @@
 build: install
 	@echo "Building web server..."
+	@make -C ../client clean
 	@npm run build
 
 install:

@@ -7,7 +7,7 @@ const cmoptions = {
   indentUnit: 2,
   tabSize: 2,
   smartIndent: true,
-  theme: 'default-bsc'
+  theme: 'editor-theme'
 }
 
 export default (<div>

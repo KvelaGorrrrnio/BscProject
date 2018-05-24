@@ -48,7 +48,6 @@ const rootReducer = (state = initState, action) => {
         result: { ...state.result, error: {}, table: action.payload }
       }
     case 'change-result-log':
-      console.log("PL", action.payload);
       return { ...state,
         result: { ...state.result, 
           error: {}, 

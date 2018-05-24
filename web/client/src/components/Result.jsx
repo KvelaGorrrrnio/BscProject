@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
-import './default-bsc.scss';
-import './Result.scss';
+import '../styles/EditorTheme.scss';
+import '../styles/Result.scss';
 
 class Result extends Component {
 
@@ -12,8 +12,10 @@ class Result extends Component {
     // CodeMirror options
     this.options = {
       lineNumbers: true,
+      lineWrapping: true,
       readOnly:    true,
-      theme:       'default-bsc'
+      theme:       'editor-theme',
+      mode: '[s]rl'
     };
   }
 

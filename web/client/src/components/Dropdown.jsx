@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './Dropdown.scss'
+import '../styles/Dropdown.scss'
 
 class Dropdown extends Component {
 

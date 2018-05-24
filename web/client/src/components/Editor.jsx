@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { changeMode, changeCode, changeLanguage, changeResultCode, changeResultError, changeResultTable, changeResultLog, changeStepping } from '../actions/index';
+import * as actions from '../actions/index';
 import * as api from '../api';
 import { Controlled as CodeMirror } from 'react-codemirror2';
-import '../mode/srl/srl';
 import 'codemirror/lib/codemirror.css';
-import './default-bsc.scss';
-import './Editor.scss';
+import '../styles/EditorTheme.scss';
+import '../styles/Editor.scss';
+import '../syntax.js';
 
 class Editor extends Component {
 
@@ -15,27 +15,48 @@ class Editor extends Component {
     // CodeMirror options
     this.options = {
       lineNumbers: true,
+      lineWrapping: true,
       autofocus: true,
       indentUnit: 2,
       tabSize: 2,
       smartIndent: true,
-      theme: 'default-bsc',
-      mode: 'srl',
+      theme: 'editor-theme',
+      mode: '[s]rl',
       extraKeys: {
-        'Cmd-Enter' : cm => {
+        'Cmd-Enter': cm => {
           switch (this.props.mode) {
             case 'run': this.runProgram(); break;
-            case 'step':      this.runProgram(true); break;
+            case 'step':      this.stepEnter(); break;
             case 'invert': this.invertProgram(); break;
             case 'translate': this.translateProgram(); break;
           }
         },
-        'Ctrl-Enter' : cm => {
+        'Shift-Cmd-Enter': cm => {
+          switch (this.props.mode) {
+            case 'step':      this.stepShiftEnter(); break;
+          }
+        },
+        'Shift-Ctrl-Enter': cm => {
+          switch (this.props.mode) {
+            case 'step':      this.stepShiftEnter(); break;
+          }
+        },
+        'Ctrl-Enter': cm => {
           switch (this.props.mode) {
             case 'run':       this.runProgram(); break;
-            case 'step':      this.runProgram(true); break;
+            case 'step':      this.stepEnter(); break;
             case 'invert':    this.invertProgram(); break;
             case 'translate': this.translateProgram(); break;
+          }
+        },
+        'Cmd-Backspace': cm => {
+          if (this.props.stepState.stepping) {
+            this.stopStepping();
+          }
+        },
+        'Ctrl-Backspace': cm => {
+          if (this.props.stepState.stepping) {
+            this.stopStepping();
           }
         },
         'Tab': function (cm) {
@@ -66,6 +87,26 @@ class Editor extends Component {
     this.editor = editor;
   }
 
+  stopStepping() {
+    this.props.changeResultLog({ state: { table: [] }, table: [] });
+    this.props.stopStepping();
+  }
+
+  stepEnter() {
+    if (!this.props.stepState.stepping) {
+      this.runProgram(true);
+    } else if (this.props.stepState.index < this.props.result.log.table.length) {
+      this.props.nextStep();
+    }
+  }
+
+  stepShiftEnter() {
+    if (this.props.stepState.stepping && this.props.stepState.index <= 0) {
+      return;
+    }
+    this.props.prevStep();
+  }
+
   invertProgram() {
     api.invert(this.props.language,{
       code: this.props.code
@@ -85,12 +126,14 @@ class Editor extends Component {
   }
 
   runProgram(log=false) {
-    api.run(this.props.language, {
+    api.run(this.props.language,{
       code: this.props.code
     }, (err,result) => {
       if (err)     this.props.changeResultError(err);
-      else if(log) this.props.changeResultLog(result.log);
-      else         this.props.changeResultTable(result.table);
+      else if(log) {
+        this.props.changeResultLog(result);
+        this.props.startStepping();
+      } else         this.props.changeResultTable(result.table);
     }, log);
   }
 
@@ -123,7 +166,6 @@ class Editor extends Component {
     const options = this.options;
     options.readOnly = this.props.stepState.stepping;
     if (this.editor) {
-      console.log(this.editor.modes);
       // Reset
       for (var i=0; i<this.editor.doc.size; i++) {
         this.editor.doc.removeLineClass(i, 'wrap', 'error');
@@ -164,14 +206,18 @@ class Editor extends Component {
 }
 
 const mapDispatchToProps = dispatch => { return {
-  changeCode: code => dispatch(changeCode(code)),
-  changeMode:        mode        => dispatch(changeMode(mode)),
-  changeLanguage:    language    => dispatch(changeLanguage(language)),
-  changeResultError: error       => dispatch(changeResultError(error)),
-  changeResultCode:  (mode,code) => dispatch(changeResultCode(mode,code)),
-  changeResultTable: table       => dispatch(changeResultTable(table)),
-  changeResultLog:   log         => dispatch(changeResultLog(log)),
-  changeStepping:     yesno       => dispatch(changeStepping(yesno))
+  changeCode:        code        => dispatch(actions.changeCode(code)),
+  changeMode:        mode        => dispatch(actions.changeMode(mode)),
+  changeLanguage:    language    => dispatch(actions.changeLanguage(language)),
+  changeResultError: error       => dispatch(actions.changeResultError(error)),
+  changeResultCode:  (mode,code) => dispatch(actions.changeResultCode(mode,code)),
+  changeResultTable: table       => dispatch(actions.changeResultTable(table)),
+  changeResultLog:   log         => dispatch(actions.changeResultLog(log)),
+  startStepping:     ()          => dispatch(actions.startStepping()),
+  stopStepping:      ()          => dispatch(actions.stopStepping()),
+  stopStepping:      ()          => dispatch(actions.stopStepping()),
+  nextStep:          ()          => dispatch(actions.nextStep()),
+  prevStep:          ()          => dispatch(actions.prevStep())
 }};
 
 const mapStateToProps = state => { return {

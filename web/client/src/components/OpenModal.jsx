@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { changeCode, hideOpenModal } from '../actions/index';
 import Button from './Button';
 import DropZone from './DropZone';
-import './Modal.scss';
+import '../styles/Modal.scss';
 
 class OpenModal extends Component {
 

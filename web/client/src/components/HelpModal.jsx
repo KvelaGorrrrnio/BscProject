@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { hideHelpModal } from '../actions/index'
 import Button from './Button';
-import './HelpModal.scss';
+import '../styles/HelpModal.scss';
 
 import overviewContent from '../help/overview';
 import rlContent from '../help/rl';

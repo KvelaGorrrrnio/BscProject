@@ -5,7 +5,7 @@ import Button from './Button';
 import Dropdown from './Dropdown';
 import * as actions from '../actions/index';
 import * as api from '../api';
-import './Header.scss';
+import '../styles/Header.scss';
 
 import helpIcon from '../images/icons/help.svg';
 import playIcon from '../images/icons/play.svg';

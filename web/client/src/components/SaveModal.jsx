@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { changeCode, hideSaveModal } from '../actions/index';
 import Button from './Button';
 import { download } from '../download';
-import './Modal.scss';
+import '../styles/Modal.scss';
 import copyIcon from '../images/icons/copy.svg';
 
 class SaveModal extends Component {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './DropZone.scss';
+import '../styles/DropZone.scss';
 
 class DropZone extends Component {
 

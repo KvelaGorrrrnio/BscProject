@@ -7,7 +7,7 @@ import Result from './Result';
 import SaveModal from './SaveModal';
 import OpenModal from './OpenModal';
 import HelpModal from './HelpModal';
-import './App.scss';
+import '../styles/App.scss';
 
 function isASCII(str) {
     return /^[\x00-\x7F]*$/.test(str);

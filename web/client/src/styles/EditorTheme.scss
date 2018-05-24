@@ -1,0 +1,35 @@
+/*
+
+    Name:       Bsc
+    Author:     Anders Jørgensen
+
+*/
+@import 'colors';
+
+.cm-s-editor-theme.CodeMirror { background: $bg; color: white; }
+.cm-s-editor-theme div.CodeMirror-selected { background: #3a3432; }
+.cm-s-editor-theme .CodeMirror-line::selection, .cm-s-editor-theme .CodeMirror-line > span::selection, .cm-s-editor-theme .CodeMirror-line > span > span::selection { background: rgba(58, 52, 50, .99); }
+.cm-s-editor-theme .CodeMirror-line::-moz-selection, .cm-s-editor-theme .CodeMirror-line > span::-moz-selection, .cm-s-editor-theme .CodeMirror-line > span > span::-moz-selection { background: rgba(58, 52, 50, .99); }
+.cm-s-editor-theme .CodeMirror-gutters { background: $fg; border-right: 0px; }
+.cm-s-editor-theme .CodeMirror-guttermarker { color: white; }
+.cm-s-editor-theme .CodeMirror-guttermarker-subtle { color: $bg; }
+.cm-s-editor-theme .CodeMirror-linenumber { color: white; }
+
+.cm-s-editor-theme .CodeMirror-cursor { border-left: 1px solid #807d7c; }
+
+.cm-s-editor-theme span.cm-comment { color: $fg; }
+.cm-s-editor-theme span.cm-atom { color: $cmNumber; }
+.cm-s-editor-theme span.cm-number { color: $cmNumber; }
+
+.cm-s-editor-theme span.cm-keyword { color: $cmStatement; }
+.cm-s-editor-theme span.cm-flow { color: $cmFlow; }
+.cm-s-editor-theme span.cm-builtin { color: $cmOperator; }
+
+.cm-s-editor-theme span.cm-variable { color: white; }
+.cm-s-editor-theme span.cm-variable-2 { color: #white; }
+.cm-s-editor-theme span.cm-def { color: $cmType; }
+.cm-s-editor-theme span.cm-bracket { color: $cmOperator; }
+
+.cm-s-editor-theme .CodeMirror-activeline-background { background: #2F2F2F; }
+.cm-s-editor-theme .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }
+
