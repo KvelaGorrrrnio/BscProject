@@ -105,7 +105,7 @@ class SaveModal extends Component {
             <Button onClick={this.getSharelink.bind(this)}>Share with a link</Button>
             <div className="sharelink">
               <input type='text' ref='sharelink' readOnly onClick={this.selectSharelink.bind(this)} value={this.state.sharelink} />
-              <span ref="sharelinkcopy" onClick={this.copySharelink.bind(this)}><img src={copyIcon} className={this.state.sharelink=='' ? 'disabled' : ''} /></span>
+              <span ref="sharelinkcopy" onClick={this.copySharelink.bind(this)}><img src={copyIcon} className={'icon' + (this.state.sharelink=='' ? ' disabled' : '')} /></span>
             </div>
           </div><div className='_2column'>
             <ul className='notranslate'>

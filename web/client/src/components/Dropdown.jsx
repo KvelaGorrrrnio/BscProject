@@ -11,9 +11,15 @@ class Dropdown extends Component {
         </ul>
       </li>);
     } else {
-      return (
-        <li key={idx} onClick={item.onClick ? item.onClick : () => {}}>{ item.title }</li>
-      );
+      if (this.props.selected && (this.props.selected == idx || this.props.selected == item.title)) {
+        return (
+          <li key={idx} className='current'>{ item.title }</li>
+        );
+      } else {
+        return (
+          <li key={idx} onClick={item.onClick ? item.onClick : () => {}}>{ item.title }</li>
+        );
+      }
     }
   }
 

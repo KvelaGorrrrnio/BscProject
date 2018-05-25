@@ -1,56 +1,74 @@
 @charset 'utf-8';
 @import 'colors';
 
-.editor-wrapper {
-  position: fixed;
-  left: 0; width: 50%;
-  top: 50px; bottom: 0;
-  border-right: 1px solid $fg;
-  z-index: 100;
-}
+@for $i from 1 through length($themes) {
+  $theme: nth($themes, $i);
+  $name: map-get($theme, 'name');
+  $forground-color: map-get($theme, 'forground-color');
+  $background-color: map-get($theme, 'background-color');
+  $error-gutter-color: map-get($theme, 'error-gutter-color');
+  $error-forground-color: map-get($theme, 'error-forground-color');
+  $error-background-color: map-get($theme, 'error-background-color');
+  $icon-color: map-get($theme, 'icon-color');
+  $icon-value: map-get($theme, 'icon-value');
 
-.editor-wrapper .CodeMirror {
-  height: 100%;
-  transition: opacity 0.5s;
-}
+  .theme-#{$name} {
+    
+    .editor-wrapper {
+      position: fixed;
+      left: 0; width: 50%;
+      top: 50px; bottom: 0;
+      border-right: 1px solid $forground-color;
+      z-index: 100;
+    }
 
-.editor-wrapper.disabled .CodeMirror {
-  opacity: 0.7;
-}
+    .editor-wrapper .CodeMirror {
+      height: 100%;
+      transition: opacity 0.5s;
+    }
 
-
-.editor-wrapper .react-codemirror2 {
-  height: 100%;
-}
-
-.editor-wrapper.has-error .react-codemirror2 {
-  height: calc(100% - 120px);
-}
-
-.error-wrapper {
-  position: absolute;
-  padding: 10px 20px 10px 40px;
-  height: 100px;
-  left: 0; right: 0;
-  bottom: 0;
-  background-color: $fg;
-}
+    .editor-wrapper.disabled .CodeMirror {
+      opacity: 0.7;
+    }
 
 
-.editor-wrapper .error .CodeMirror-linenumber {
-  transition: all 0.0s;
-  background-color: $fgError;
-}
-.editor-wrapper .CodeMirror-code>div.error {
-  transition: all 0.0s;
-  background-color: $bgError;
-}
+    .editor-wrapper .react-codemirror2 {
+      height: 100%;
+    }
 
-.editor-wrapper .step .CodeMirror-linenumber {
-  transition: all 0.0s;
-  background-color: $bg;
-}
-.editor-wrapper .CodeMirror-code>div.step {
-  transition: all 0.0s;
-  background-color: $fg;
+    .editor-wrapper.has-error .react-codemirror2 {
+      height: calc(100% - 120px);
+    }
+
+    .error-wrapper {
+      position: absolute;
+      padding: 10px 20px 10px 40px;
+      height: 100px;
+      left: 0; right: 0;
+      bottom: 0;
+
+      background-color: $forground-color;
+    }
+
+
+    .editor-wrapper .error .CodeMirror-linenumber {
+      transition: all 0.0s;
+      background-color: $error-gutter-color;
+    }
+    .editor-wrapper .CodeMirror-code>div.error {
+      transition: all 0.0s;
+      background-color: $error-background-color;
+    }
+
+    .editor-wrapper .step .CodeMirror-linenumber {
+      transition: all 0.0s;
+      background-color: $background-color;
+    }
+    .editor-wrapper .CodeMirror-code>div.step {
+      transition: all 0.0s;
+      background-color: $forground-color;
+    }
+
+  }
+
 }

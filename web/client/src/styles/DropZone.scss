@@ -1,14 +1,31 @@
 @charset 'UTF-8';
 @import 'colors';
 
-.dropzone {
-  background-color: rgba($bg,0.2);
-  padding: 10px 10px;
-  user-select: none;
-  cursor: pointer;
-}
-.dropzone>div {
-  border: dashed 1px $fg;
-  padding: 41px 10px;
-  text-align: center;
+@for $i from 1 through length($themes) {
+  $theme: nth($themes, $i);
+  $name: map-get($theme, 'name');
+  $color: map-get($theme, 'color');
+  $forground-color: map-get($theme, 'forground-color');
+  $background-color: map-get($theme, 'background-color');
+  $error-forground-color: map-get($theme, 'error-forground-color');
+  $error-background-color: map-get($theme, 'error-background-color');
+  $icon-color: map-get($theme, 'icon-color');
+  $icon-value: map-get($theme, 'icon-value');
+
+  .theme-#{$name} {
+        
+    .dropzone {
+      background-color: rgba($background-color, 0.2);
+      padding: 10px 10px;
+      user-select: none;
+      cursor: pointer;
+    }
+    .dropzone>div {
+      border: dashed 1px $forground-color;
+      padding: 41px 10px;
+      text-align: center;
+    }
+
+  }
+
 }

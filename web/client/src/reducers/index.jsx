@@ -1,4 +1,5 @@
 const initState = {
+  theme: 'default',
   mode: 'run',
   language: 'srl',
   code: '// Program for computing the n\'th fibonacci pair\nint n\nint v int w\n\nn ^= 16\nw ^= 1\nfrom (v = 0) do\n  v += w\n  swap v w\n  n -= 1\nloop .\nuntil (n = 0)\n',
@@ -108,6 +109,10 @@ const rootReducer = (state = initState, action) => {
         modal: { ...state.modal,
           help: false,
         }
+      }
+    case 'change-theme':
+      return { ...state,
+        theme: action.payload,
       }
     default: return state
   }

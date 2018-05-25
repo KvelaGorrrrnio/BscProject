@@ -89,7 +89,7 @@ import * as CodeMirror from 'codemirror';
       // Operators
       if (opRE.test(c)) {
         stream.match(opRE);
-        return 'builtin';
+        return 'operator';
       }
 
       // Variables and stuff
@@ -97,7 +97,7 @@ import * as CodeMirror from 'codemirror';
         stream.match(idRE);
         if (stream.peek() == ':') {
           stream.next();
-          return 'variable-2';
+          return 'label';
         }
         return 'variable';
       }
@@ -115,7 +115,7 @@ import * as CodeMirror from 'codemirror';
         };
       }
 
-      setGroup('def')('list', 'int');
+      setGroup('type')('list', 'int');
 
       setGroup('keyword')(
         'swap', 'push', 'pop', 'skip', '\.',
@@ -128,15 +128,15 @@ import * as CodeMirror from 'codemirror';
         'goto', 'entry', 'exit'
       );
 
-      setGroup('builtin')(
+      setGroup('operator')(
         '+', '-', '*', '/', '^', '%',
         '<', '>', '=', '!', '!=', '<=', '>=',
         '+=', '-=', '*=', '/=', '^=',
         '?', '#', '~'
       );
 
-      // Exp builtins
-      setGroup('builtin')(
+      // Exp operators
+      setGroup('operator')(
         'top', 'size', 'null', 'not', 'and', 'or', 'empty'
       );
 

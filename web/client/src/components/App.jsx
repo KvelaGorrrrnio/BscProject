@@ -28,7 +28,7 @@ class App extends Component {
 
   render() {
     return (
-      <div className='app-wrapper'>
+      <div className={'app-wrapper theme-'+this.props.theme}>
         <Header/>
         <Editor/>
         <Result/>
@@ -40,8 +40,12 @@ class App extends Component {
   }
 }
 
+const mapStateToProps = state => { return {
+  theme: state.theme
+}};
+
 const mapDispatchToProps = dispatch => { return {
   changeCode: code => dispatch(changeCode(code))
 }};
 
-export default connect(null,mapDispatchToProps)(App);
+export default connect(mapStateToProps,mapDispatchToProps)(App);

@@ -1,83 +1,102 @@
 @charset 'UTF-8';
 @import 'colors';
 
-.header-wrapper {
-  position: fixed;
-  left: 0; right: 0;
-  top: 0; height: 50px;
-  border-bottom: 1px solid $fg;
-  z-index: 1000;
-  user-select: none;
-}
+@for $i from 1 through length($themes) {
+  $theme: nth($themes, $i);
+  $name: map-get($theme, 'name');
+  $forground-color: map-get($theme, 'forground-color');
+  $background-color: map-get($theme, 'background-color');
+  $error-forground-color: map-get($theme, 'error-forground-color');
+  $error-background-color: map-get($theme, 'error-background-color');
+  $icon-color: map-get($theme, 'icon-color');
+  $icon-value: map-get($theme, 'icon-value');
 
-.header-wrapper .controls {
-  position: absolute;
-  left: 0; right: 50%;
-  top: 0; bottom: 0;
-}
+  .theme-#{$name} {
 
-.header-wrapper .controls .radio-wrapper {
-  float: left;
-}
-.header-wrapper .controls .actions {
-  padding-right: 20px;
-  float: right;
-}
-
-.header-wrapper .mode-controls {
-  position: absolute;
-  left: 50%; right: 0;
-  top: 0; bottom: 0;
-}
-
-.header-wrapper .mode-controls .actions {
-  padding-left: 20px;
-  float: left;
-}
-
-.header-wrapper .mode-controls .modes { 
-  float: right;
-}
-
-.header-wrapper .mode-controls .modes .selected-mode {
-  position: relative;
-  height: 51px;
-}
-.header-wrapper .selected-mode span {
-  display: none;
-  float: right;
-  padding: 16px;
-  background-color: $fg;
-  
-  @media screen and (max-width: 1199px) {
-    display: inline-block;
-  }
-}
-@media screen and (max-width: 1199px) {
-  .header-wrapper .selected-mode .radio-wrapper {
-    display: none;
-    position: absolute;
-    background-color: $bg;
-    border-left: 1px solid $fg;
-    border-bottom: 1px solid $fg;
-    top: 100%;
-    right: 0;
-
-    li {
-      display: block;
+    .header-wrapper {
+      position: fixed;
+      left: 0; right: 0;
+      top: 0; height: 50px;
+      border-bottom: 1px solid $forground-color;
+      background-color: $background-color;
+      z-index: 1000;
+      user-select: none;
     }
-    li.current {
+
+    .header-wrapper .controls {
+      position: absolute;
+      left: 0; right: 50%;
+      top: 0; bottom: 0;
+    }
+
+    .header-wrapper .controls .radio-wrapper {
+      float: left;
+    }
+    .header-wrapper .controls .actions {
+      padding-right: 20px;
+      float: right;
+    }
+
+    .header-wrapper .mode-controls {
+      position: absolute;
+      left: 50%; right: 0;
+      top: 0; bottom: 0;
+    }
+
+    .header-wrapper .mode-controls .actions {
+      padding-left: 20px;
+      float: left;
+    }
+
+    .header-wrapper .mode-controls .modes { 
+      float: right;
+    }
+
+    .header-wrapper .mode-controls .modes .selected-mode {
+      position: relative;
+      height: 51px;
+    }
+
+    .header-wrapper .selected-mode span {
       display: none;
+      float: right;
+      padding: 16px;
+      background-color: $forground-color;
+      
+      @media screen and (max-width: 1199px) {
+        display: inline-block;
+      }
     }
-  }
-}
 
-.header-wrapper .mode-controls .modes .selected-mode:hover .radio-wrapper{
-  @media screen and (max-width: 1199px) {
-    display: block;
-  }
-}
+    @media screen and (max-width: 1199px) {
+      .header-wrapper .selected-mode .radio-wrapper {
+        display: none;
+        position: absolute;
+        background-color: $background-color;
+        border-left: 1px solid $forground-color;
+        border-bottom: 1px solid $forground-color;
+        top: 100%;
+        right: 0;
 
-.header-wrapper .button img {
-  height: 20px;
+        li {
+          display: block;
+        }
+        li.current {
+          display: none;
+        }
+      }
+    }
+
+    .header-wrapper .mode-controls .modes .selected-mode:hover .radio-wrapper{
+      @media screen and (max-width: 1199px) {
+        display: block;
+      }
+    }
+
+    .header-wrapper .button img {
+      height: 20px;
+    }
+
+  }
+
 }

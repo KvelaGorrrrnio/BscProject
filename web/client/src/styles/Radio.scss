@@ -1,23 +1,37 @@
 @import 'colors';
 
-ul.radio-wrapper li {
-  padding: 16px;
-  display: inline-block;
-  cursor: pointer;
-  transition: opacity 0.5s;
-  transition: background-color 0.2s;
-}
+@for $i from 1 through length($themes) {
+  $theme: nth($themes, $i);
+  $name: map-get($theme, 'name');
+  $forground-color: map-get($theme, 'forground-color');
+  $background-color: map-get($theme, 'background-color');
+  $error-forground-color: map-get($theme, 'error-forground-color');
+  $error-background-color: map-get($theme, 'error-background-color');
+  $icon-color: map-get($theme, 'icon-color');
+  $icon-value: map-get($theme, 'icon-value');
 
-ul.radio-wrapper li.disabled  {
-  opacity: 0.5;
-}
+  .theme-#{$name} {
+    
+    ul.radio-wrapper li {
+      padding: 16px;
+      display: inline-block;
+      cursor: pointer;
+      transition: opacity 0.5s;
+      transition: background-color 0.2s;
+    }
 
-ul.radio-wrapper li.current {
-  background-color: $fg;
-  opacity: 1.0;
-  transition: opacity 0.5s;
-}
-ul.radio-wrapper li:hover {
-  background-color: rgba($fg,0.5);
-  transition: background-color 0.2s;
+    ul.radio-wrapper li.disabled  {
+      opacity: 0.5;
+    }
+
+    ul.radio-wrapper li.current {
+      background-color: $forground-color;
+      opacity: 1.0;
+      transition: opacity 0.5s;
+    }
+    ul.radio-wrapper li:hover {
+      background-color: rgba($forground-color, 0.5);
+      transition: background-color 0.2s;
+    }
+  }
 }

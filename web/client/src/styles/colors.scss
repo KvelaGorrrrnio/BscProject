@@ -10,3 +10,17 @@ $cmNumber:    #CC6666;
 $cmFlow:      #81A2BE;
 $cmStatement: #F0C674; // #5AB4C6;
 $cmType:      #DE935F;
+
+@import './themes/default';
+@import './themes/white';
+
+$themes: (
+  default-theme(),
+  white-theme()
+);
+
+@mixin colorize($c: yellow, $v: 0.5) {
+  $h:  hue($c);
+  $s:  saturation($c);
+  filter: grayscale(100%) brightness($v) sepia(100%) hue-rotate($h - 60deg) saturate($s * 9);
+}

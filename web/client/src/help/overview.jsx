@@ -59,10 +59,10 @@ export default (<div>
           <td>Left Center</td>
           <td>
             This action group has 4 actions:
-              <img className='inline' src={helpIcon}/> <b>Help</b>, which shows this help dialogue;
-              <img className='inline' src={tempIcon}/> <b>Template</b>, which reveals a dropdown menu with template programs for both <b>RL</b> and <b>SRL</b>;
-              <img className='inline' src={openIcon}/> <b>Open</b>, which reveals a dialogue for opening files from the browser or importing the code from a file on the local computer.
-              <img className='inline' src={saveIcon}/> <b>Save</b>, which reveals a dialogue for saving files to the browser, sharing the script with the code embeded into a link or exporting/downloading the code as a file to the local computer.
+              <img className='icon inline' src={helpIcon}/> <b>Help</b>, which shows this help dialogue;
+              <img className='icon inline' src={tempIcon}/> <b>Template</b>, which reveals a dropdown menu with template programs for both <b>RL</b> and <b>SRL</b>;
+              <img className='icon inline' src={openIcon}/> <b>Open</b>, which reveals a dialogue for opening files from the browser or importing the code from a file on the local computer.
+              <img className='icon inline' src={saveIcon}/> <b>Save</b>, which reveals a dialogue for saving files to the browser, sharing the script with the code embeded into a link or exporting/downloading the code as a file to the local computer.
           </td>
         </tr>
         <tr>

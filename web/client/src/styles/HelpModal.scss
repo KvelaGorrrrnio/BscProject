@@ -1,70 +1,87 @@
 @charset 'UTF-8';
 @import  'colors';
 
-.modal-wrapper.help-modal .sections {
-  position: absolute;
-  left: 0px;
-  top: 0px; bottom: 0px;
-  width: 140px;
-}
+@for $i from 1 through length($themes) {
+  $theme: nth($themes, $i);
+  $name: map-get($theme, 'name');
+  $color: map-get($theme, 'color');
+  $forground-color: map-get($theme, 'forground-color');
+  $background-color: map-get($theme, 'background-color');
+  $error-forground-color: map-get($theme, 'error-forground-color');
+  $error-background-color: map-get($theme, 'error-background-color');
+  $icon-color: map-get($theme, 'icon-color');
+  $icon-value: map-get($theme, 'icon-value');
 
-.modal-wrapper.help-modal .sections h3 {
-  text-align: center;
-  padding: 12px 6px;
-}
+  .theme-#{$name} {
+    
+    .modal-wrapper.help-modal .sections {
+      position: absolute;
+      left: 0px;
+      top: 0px; bottom: 0px;
+      width: 140px;
+    }
 
-.modal-wrapper.help-modal .sections ul {
-  height: auto;
-}
+    .modal-wrapper.help-modal .sections h3 {
+      text-align: center;
+      padding: 12px 6px;
+    }
 
-.modal-wrapper.help-modal .sections .button {
-  margin: 0;
-}
+    .modal-wrapper.help-modal .sections ul {
+      height: auto;
+    }
 
-.modal-wrapper.help-modal .modal-content {
-  min-height: 283px;
-  padding-left: 160px;
-  padding-bottom: 40px;
-  padding-right: 40px;
-  height: auto;
-}
+    .modal-wrapper.help-modal .sections .button {
+      margin: 0;
+    }
 
-.modal-wrapper.help-modal .modal-content .article {
-  overflow: hidden;
-  overflow-y: auto;
-  max-height: 80vh;
-}
+    .modal-wrapper.help-modal .modal-content {
+      min-height: 283px;
+      padding-left: 160px;
+      padding-bottom: 40px;
+      padding-right: 40px;
+      height: auto;
+    }
 
-.modal-wrapper.help-modal .modal-content .article h3 {
-  font-size : 22px;
-  border-bottom: 1px solid white;
-  margin-bottom: 12px;
-  margin-top: 20px;
-}
+    .modal-wrapper.help-modal .modal-content .article {
+      overflow: hidden;
+      overflow-y: auto;
+      max-height: 80vh;
+    }
 
-.modal-wrapper.help-modal .modal-content .close {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-}
+    .modal-wrapper.help-modal .modal-content .article h3 {
+      font-size : 22px;
+      border-bottom: 1px solid white;
+      margin-bottom: 12px;
+      margin-top: 20px;
+    }
 
-.modal-wrapper.help-modal .modal-content img.inline {
-  height: 11px;
-}
+    .modal-wrapper.help-modal .modal-content .close {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
 
-.modal-wrapper.help-modal table {
-  table-layout: fixed;
-  border-collapse: collapse;
-  border-spacing: 0;
-  margin: 20px 0;
-}
-.modal-wrapper.help-modal table td {
-  background-color: $bg;
-  border: 1px solid $fg;
-  padding: 10px 12px 10px 12px;
-  vertical-align: middle;
-}
+    .modal-wrapper.help-modal .modal-content img.inline {
+      height: 11px;
+    }
 
-.modal-wrapper.help-modal .react-codemirror2 {
-  margin: 20px 0;
+    .modal-wrapper.help-modal table {
+      table-layout: fixed;
+      border-collapse: collapse;
+      border-spacing: 0;
+      margin: 20px 0;
+    }
+    .modal-wrapper.help-modal table td {
+      background-color: $background-color;
+      border: 1px solid $forground-color;
+      padding: 10px 12px 10px 12px;
+      vertical-align: middle;
+    }
+
+    .modal-wrapper.help-modal .react-codemirror2 {
+      margin: 20px 0;
+    }
+
+  }
+
 }

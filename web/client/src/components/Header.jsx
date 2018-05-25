@@ -16,36 +16,38 @@ import stopIcon from '../images/icons/stop.svg';
 import resetIcon from '../images/icons/reset.svg';
 import saveIcon from '../images/icons/save.svg';
 import openIcon from '../images/icons/open.svg';
-import tempIcon from '../images/icons/template.svg';
+import templatesIcon from '../images/icons/template.svg';
+import themesIcon from '../images/icons/themes.svg';
 
 const items = [
-{
-  index: 'srl',
-  title: 'SRL'
-},
-{
-  index: 'rl',
-  title: 'RL'
-}
+  {
+    index: 'srl',
+    title: 'SRL'
+  },
+  {
+    index: 'rl',
+    title: 'RL'
+  }
 ];
 const modeItems = [
-{
-  index: 'run',
-  title: 'Run'
-},
-{
-  index: 'step',
-  title: 'Step'
-},
-{
-  index: 'invert',
-  title: 'Invert'
-},
-{
-  index: 'translate',
-  title: 'Translate'
-}
+  {
+    index: 'run',
+    title: 'Run'
+  },
+  {
+    index: 'step',
+    title: 'Step'
+  },
+  {
+    index: 'invert',
+    title: 'Invert'
+  },
+  {
+    index: 'translate',
+    title: 'Translate'
+  }
 ];
+
 
 class Header extends Component {
 
@@ -176,26 +178,26 @@ class Header extends Component {
   getActions(mode) {
     switch (mode) {
       case 'run':
-        return (<Button onClick={this.runProgram.bind(this)} disabled={this.props.stepState.stepping}><img src={playIcon}/></Button>);
+        return (<Button onClick={this.runProgram.bind(this)} disabled={this.props.stepState.stepping}><img className='icon' src={playIcon}/></Button>);
       case 'step':
         if (this.props.stepState.stepping) {
           const lastStep  = this.props.stepState.index >= this.props.result.log.table.length;
           const firstStep = this.props.stepState.index == 0;
           return (
             <div>
-              <Button disabled={firstStep} onClick={this.prevStep.bind(this)}><img src={stepPrevIcon} /></Button>
-              <Button disabled={lastStep}  onClick={this.nextStep.bind(this)}><img src={stepIcon} /></Button>
-              <Button disabled={firstStep} onClick={this.props.startStepping}><img src={resetIcon} style={{ height: '18px', padding: '1px' }}/></Button>
-              <Button onClick={this.stopStepping.bind(this)}><img src={stopIcon} style={{ height: '18px', padding: '1px' }}/></Button>
-              <Button disabled={lastStep} onClick={this.stepAll.bind(this)}><img src={stepAllIcon} style={{ height: '18px', padding: '1px' }}/></Button>
+              <Button disabled={firstStep} onClick={this.prevStep.bind(this)}><img className='icon' src={stepPrevIcon} /></Button>
+              <Button disabled={lastStep}  onClick={this.nextStep.bind(this)}><img className='icon' src={stepIcon} /></Button>
+              <Button disabled={firstStep} onClick={this.props.startStepping}><img className='icon' src={resetIcon} style={{ height: '18px', padding: '1px' }}/></Button>
+              <Button onClick={this.stopStepping.bind(this)}><img className='icon' src={stopIcon} style={{ height: '18px', padding: '1px' }}/></Button>
+              <Button disabled={lastStep} onClick={this.stepAll.bind(this)}><img className='icon' src={stepAllIcon} style={{ height: '18px', padding: '1px' }}/></Button>
             </div>);
         } else return (
-          <Button onClick={(e) => { this.runProgram.bind(this)(e,true) }}><img src={playIcon}/></Button>
+          <Button onClick={(e) => { this.runProgram.bind(this)(e,true) }}><img className='icon' src={playIcon}/></Button>
         );
       case 'invert':
-        return (<Button onClick={this.invertProgram.bind(this)} disabled={this.props.stepState.stepping}><img src={playIcon}/></Button>);
+        return (<Button onClick={this.invertProgram.bind(this)} disabled={this.props.stepState.stepping}><img className='icon' src={playIcon}/></Button>);
       case 'translate':
-        return (<Button onClick={this.translateProgram.bind(this)} disabled={this.props.stepState.stepping}><img src={playIcon}/></Button>);
+        return (<Button onClick={this.translateProgram.bind(this)} disabled={this.props.stepState.stepping}><img className='icon' src={playIcon}/></Button>);
       default: return;
     }
   }
@@ -208,16 +210,30 @@ class Header extends Component {
     return mode;
   }
 
+  getThemes() {
+    return [
+      {
+        title: 'default',
+        onClick: () => this.props.changeTheme('default')
+      },
+      {
+        title: 'white',
+        onClick: () => this.props.changeTheme('white')
+      }
+    ];
+  }
+
   render() {
     return (
       <div className='header-wrapper'>
         <span className='controls'>
           <Radio items={items} selected={this.props.language} onChange={this.changeLanguage.bind(this)} disabled={this.props.stepState.stepping} />
           <span className='actions'>
-            <Button disabled={this.props.stepState.stepping} onClick={this.openHelp.bind(this)}><img src={helpIcon}/></Button>
-            <Dropdown disabled={this.props.stepState.stepping} items={[this.state.templates.srl,this.state.templates.rl]}><img src={tempIcon}/></Dropdown>
-            <Button disabled={this.props.stepState.stepping} onClick={this.openLocal.bind(this)}><img src={openIcon}/></Button>
-            <Button disabled={this.props.stepState.stepping} onClick={this.saveLocal.bind(this)}><img src={saveIcon}/></Button>
+            <Dropdown disabled={this.props.stepState.stepping} selected={this.props.theme} items={this.getThemes()}><img className='icon' src={themesIcon}/></Dropdown>
+            <Button disabled={this.props.stepState.stepping} onClick={this.openHelp.bind(this)}><img className='icon' src={helpIcon}/></Button>
+            <Dropdown disabled={this.props.stepState.stepping} items={[this.state.templates.srl,this.state.templates.rl]}><img className='icon' src={templatesIcon}/></Dropdown>
+            <Button disabled={this.props.stepState.stepping} onClick={this.openLocal.bind(this)}><img className='icon' src={openIcon}/></Button>
+            <Button disabled={this.props.stepState.stepping} onClick={this.saveLocal.bind(this)}><img className='icon' src={saveIcon}/></Button>
           </span>
         </span>
         <span className='mode-controls'>
@@ -238,6 +254,7 @@ class Header extends Component {
 
 const mapStateToProps = state => { return {
   mode:     state.mode,
+  theme:    state.theme,
   language: state.language,
   code:     state.code,
   stepState: state.stepState,
@@ -259,6 +276,7 @@ const mapDispatchToProps = dispatch => { return {
   showSaveModal:     ()          => dispatch(actions.showSaveModal()),
   showOpenModal:     ()          => dispatch(actions.showOpenModal()),
   showHelpModal:     ()          => dispatch(actions.showHelpModal()),
+  changeTheme:       theme       => dispatch(actions.changeTheme(theme)),
 }};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

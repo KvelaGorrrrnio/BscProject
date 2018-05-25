@@ -6,30 +6,56 @@
 */
 @import 'colors';
 
-.cm-s-editor-theme.CodeMirror { background: $bg; color: white; }
-.cm-s-editor-theme div.CodeMirror-selected { background: #3a3432; }
-.cm-s-editor-theme .CodeMirror-line::selection, .cm-s-editor-theme .CodeMirror-line > span::selection, .cm-s-editor-theme .CodeMirror-line > span > span::selection { background: rgba(58, 52, 50, .99); }
-.cm-s-editor-theme .CodeMirror-line::-moz-selection, .cm-s-editor-theme .CodeMirror-line > span::-moz-selection, .cm-s-editor-theme .CodeMirror-line > span > span::-moz-selection { background: rgba(58, 52, 50, .99); }
-.cm-s-editor-theme .CodeMirror-gutters { background: $fg; border-right: 0px; }
-.cm-s-editor-theme .CodeMirror-guttermarker { color: white; }
-.cm-s-editor-theme .CodeMirror-guttermarker-subtle { color: $bg; }
-.cm-s-editor-theme .CodeMirror-linenumber { color: white; }
+@for $i from 1 through length($themes) {
+  $theme: nth($themes, $i);
+  $name: map-get($theme, 'name');
+  $color: map-get($theme, 'color');
+  $forground-color: map-get($theme, 'forground-color');
+  $background-color: map-get($theme, 'background-color');
+  $error-gutter-color: map-get($theme, 'error-gutter-color');
+  $error-forground-color: map-get($theme, 'error-forground-color');
+  $error-background-color: map-get($theme, 'error-background-color');
+  $icon-color: map-get($theme, 'icon-color');
+  $icon-value: map-get($theme, 'icon-value');
+  $codemirror-comment: map-get($theme, 'codemirror-comment');
+  $codemirror-atom: map-get($theme, 'codemirror-atom');
+  $codemirror-keyword: map-get($theme, 'codemirror-keyword');
+  $codemirror-flow: map-get($theme, 'codemirror-flow');
+  $codemirror-variable: map-get($theme, 'codemirror-variable');
+  $codemirror-label: map-get($theme, 'codemirror-label');
+  $codemirror-type: map-get($theme, 'codemirror-type');
+  $codemirror-operator: map-get($theme, 'codemirror-operator');
+  $codemirror-bracket: map-get($theme, 'codemirror-bracket');
 
-.cm-s-editor-theme .CodeMirror-cursor { border-left: 1px solid #807d7c; }
+  .theme-#{$name} {
 
-.cm-s-editor-theme span.cm-comment { color: $fg; }
-.cm-s-editor-theme span.cm-atom { color: $cmNumber; }
-.cm-s-editor-theme span.cm-number { color: $cmNumber; }
+    .cm-s-editor-theme.CodeMirror { background: $background-color; color: white; }
+    .cm-s-editor-theme div.CodeMirror-selected { background: #3a3432; }
+    .cm-s-editor-theme .CodeMirror-line::selection, .cm-s-editor-theme .CodeMirror-line > span::selection, .cm-s-editor-theme .CodeMirror-line > span > span::selection { background: rgba(58, 52, 50, .99); }
+    .cm-s-editor-theme .CodeMirror-line::-moz-selection, .cm-s-editor-theme .CodeMirror-line > span::-moz-selection, .cm-s-editor-theme .CodeMirror-line > span > span::-moz-selection { background: rgba(58, 52, 50, .99); }
+    .cm-s-editor-theme .CodeMirror-gutters { background: $forground-color; border-right: 0px; }
+    .cm-s-editor-theme .CodeMirror-guttermarker { color: white; }
+    .cm-s-editor-theme .CodeMirror-guttermarker-subtle { color: $background-color; }
+    .cm-s-editor-theme .CodeMirror-linenumber { color: white; }
 
-.cm-s-editor-theme span.cm-keyword { color: $cmStatement; }
-.cm-s-editor-theme span.cm-flow { color: $cmFlow; }
-.cm-s-editor-theme span.cm-builtin { color: $cmOperator; }
+    .cm-s-editor-theme .CodeMirror-cursor { border-left: 1px solid #807d7c; }
 
-.cm-s-editor-theme span.cm-variable { color: white; }
-.cm-s-editor-theme span.cm-variable-2 { color: $cmType; }
-.cm-s-editor-theme span.cm-def { color: $cmType; }
-.cm-s-editor-theme span.cm-bracket { color: $cmOperator; }
+    .cm-s-editor-theme span.cm-comment { color: $codemirror-comment; }
+    .cm-s-editor-theme span.cm-atom { color: $codemirror-atom; }
+    .cm-s-editor-theme span.cm-number { color: $codemirror-atom; }
 
-.cm-s-editor-theme .CodeMirror-activeline-background { background: #2F2F2F; }
-.cm-s-editor-theme .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }
+    .cm-s-editor-theme span.cm-keyword { color: $codemirror-keyword; }
+    .cm-s-editor-theme span.cm-flow { color: $codemirror-flow; }
+    .cm-s-editor-theme span.cm-operator { color: $codemirror-operator; }
 
+    .cm-s-editor-theme span.cm-variable { color: $codemirror-variable; }
+    .cm-s-editor-theme span.cm-label { color: $codemirror-label; }
+    .cm-s-editor-theme span.cm-type { color: $codemirror-type; }
+    .cm-s-editor-theme span.cm-bracket { color: $codemirror-operator; }
+
+    .cm-s-editor-theme .CodeMirror-activeline-background { background: #2F2F2F; }
+    .cm-s-editor-theme .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }
+
+  }
+
+}

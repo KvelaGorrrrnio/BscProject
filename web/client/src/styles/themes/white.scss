@@ -1,0 +1,31 @@
+@function white-theme() {
+  $fg:  #999999;
+  $bg:  #eeeeee;
+  $efg: #990000;
+  $ebg: #995555;
+  $sbg: #559955;
+  $ifg: #000000;
+  $iv:        0;
+  @return (
+      'name': 'white',
+      'color': black,
+      'forground-color': $fg,
+      'background-color': $bg,
+      'error-gutter-color': $efg,
+      'error-forground-color': white,
+      'error-background-color': $ebg,
+      'success-background-color': $sbg,
+      'icon-color': $ifg,
+      'icon-value': $iv,
+      'codemirror-atom': red,
+      'codemirror-comment': $fg,
+      'codemirror-keyword': magenta,
+      'codemirror-flow': green,
+      'codemirror-variable': black,
+      'codemirror-label': blue,
+      'codemirror-type': darkred,
+      'codemirror-operator': blue,
+      'codemirror-bracket': blue,
+    );
+}
+

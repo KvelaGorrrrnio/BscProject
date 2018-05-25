@@ -1,0 +1,30 @@
+@function default-theme() {
+  $fg:  #6E7D96;
+  $bg:  #232C31;
+  $efg: #966E6E;
+  $ebg: #603F3F;
+  $sbg: #5EA15E;
+  $ifg: #FFFFFF;
+  $iv:        1;
+  @return (
+      'name': 'default',
+      'color': white,
+      'forground-color': $fg,
+      'background-color': $bg,
+      'error-gutter-color': $efg,
+      'error-forground-color': white,
+      'error-background-color': $ebg,
+      'success-background-color': $sbg,
+      'icon-color': $ifg,
+      'icon-value': $iv,
+      'codemirror-atom': #CC6666,
+      'codemirror-comment': $fg,
+      'codemirror-keyword': #F0C674,
+      'codemirror-flow':    #81A2BE,
+      'codemirror-variable': white,
+      'codemirror-label':   #DE935F,
+      'codemirror-type':    #DE935F,
+      'codemirror-operator': #8ABEB7,
+      'codemirror-bracket': #8ABEB7,
+    );
+}
