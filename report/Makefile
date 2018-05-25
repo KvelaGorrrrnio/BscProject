@@ -1,7 +1,7 @@
 main    := document
 outfile := thesis
 outdir  := out
-compile := pdflatex --output-directory=$(outdir) -file-line-error \
+compile := pdflatex --output-directory=$(outdir) -shell-escape -file-line-error \
            -jobname $(outfile) $(main)
 bibtex  := bibtex $(outfile)
 

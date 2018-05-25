@@ -139,7 +139,7 @@ function handleError(err) {
   if (err.indexOf('maxBuffer') !== -1) {
     return 'Size of response exceeded ' + (maxBuffer/(1024)) + ' KB.';
   }
-  return 'Timeout in execution occured. Infinity loops are a plausible cause.';
+  return 'Timeout in execution occured. Infinite loops are a plausible cause.';
 }
 
 export default api;
