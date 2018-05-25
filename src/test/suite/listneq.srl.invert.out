@@ -1,0 +1,15 @@
+list int a
+list int b
+int n
+int t
+
+t -= a != b
+a[3] += 1
+t -= a != b
+a[3] -= 1
+push n b
+t -= a != b
+pop t b
+t -= a != b
+free b [5]
+free a [5]
