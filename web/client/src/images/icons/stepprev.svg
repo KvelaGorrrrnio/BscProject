@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="14px" height="21px" viewBox="0 0 14 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="14px" height="20px" viewBox="0 0 14 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
     <title>stepprev</title>
     <desc>Created with Sketch.</desc>
@@ -8,8 +8,8 @@
         <g id="Run" transform="translate(-778.000000, -15.000000)" fill="#FFFFFF">
             <g id="Run-actions" transform="translate(750.000000, 15.000000)">
                 <g id="stepprev" transform="translate(28.000000, 0.000000)">
-                    <polygon id="Triangle-Copy-2" transform="translate(6.666667, 9.259259) scale(-1, 1) translate(-6.666667, -9.259259) " points="13.3333333 9.25925926 0 18.5185185 0 0"></polygon>
-                    <polygon id="1" stroke="#181E28" points="6.31111111 11.5555556 4.34074074 13.3777778 3.3037037 12.1481481 6.47407407 9.51111111 8.08888889 9.51111111 8.08888889 20 6.31111111 20"></polygon>
+                    <path d="M8.58807373,15.2231993 L8.58807373,9.00376892 L6.29341125,9.00376892 L3.26714588,11.5281106 L0,9.25925926 L13.3333333,0 L13.3333333,18.5185185 L8.58807373,15.2231993 Z M5.8094635,13.2936089 L5.4430776,13.0391743 L5.8094635,12.6997375 L5.8094635,13.2936089 Z" id="Combined-Shape"></path>
+                    <polygon id="1" points="6.31111111 11.5555556 4.34074074 13.3777778 3.3037037 12.1481481 6.47407407 9.51111111 8.08888889 9.51111111 8.08888889 20 6.31111111 20"></polygon>
                 </g>
             </g>
         </g>
