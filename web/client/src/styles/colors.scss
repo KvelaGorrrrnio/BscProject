@@ -1,12 +1,12 @@
-$bg:        #181E28;
+$bg:        #232c31; //#181E28;
 $fg:        #6E7D96;
 $fgError:   #966E6E;
 $bgError:   #603F3F;
 $bgSuccess: #5EA15E;
 
 /** CodeMirror Mode **/
-$cmOperator:  #89A7D7;
-$cmNumber:    #CC6627;
-$cmFlow:      #5C84C4;
-$cmStatement: #5AB4C6;
-$cmType:      #C5A574;
+$cmOperator:  #8abeb7; // #89A7D7; // .s:fg_aqua
+$cmNumber:    #cc6666; // #CC6627; // .s:fg_red
+$cmFlow:      #81a2be; // #5C84C4; // .s:fg_aqua
+$cmStatement: #f0c674; // #5AB4C6; // .s:fg_blue
+$cmType:      #de935f; // #C5A574; // .s:fg_orange
