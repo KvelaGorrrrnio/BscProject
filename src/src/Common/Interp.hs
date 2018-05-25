@@ -129,7 +129,6 @@ exec (Update (Id id exps) op e p) = do
             case v of
               ListV l _ -> return $ Id id' (exps' ++ [Lit (IntV . fromIntegral $ length l - 1) p])
               IntV _    -> return $ Id id' exps'
-
         getIdentifier (Parens e p) = getIdentifier e
         getIdentifier _ = return (Id "" [])
 
