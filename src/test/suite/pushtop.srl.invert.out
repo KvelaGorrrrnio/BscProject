@@ -1,0 +1,12 @@
+list int a
+int b
+list list list int c
+
+c[2,4,1] -= ^ (^ a[2])
+free c [10,5,2]
+pop b a
+b -= 3
+pop b a
+b -= 2
+pop b a
+b -= 1
