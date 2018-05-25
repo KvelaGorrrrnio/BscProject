@@ -7,17 +7,16 @@ bibtex  := bibtex $(outfile)
 
 default: run
 
+run: compile
+	cd $(outdir) && $(bibtex)
+	$(compile)
+
 compile:
 	mkdir -p $(outdir)
 	cp *.{bst,cls,bib} ./out
 	$(compile)
 	#cd $(outdir) && $(bibtex)
 	$(compile)
-
-run: compile
-	cd $(outdir) && $(bibtex)
-	$(compile)
-
 
 clean:
 	rm -rf $(outdir)
