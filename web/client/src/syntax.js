@@ -14,50 +14,59 @@ import * as CodeMirror from 'codemirror';
     const lblRE = /[0-9]+/;
     const alpRE = /[a-zA-Z]/;
     const opRE  = /[%?!~#=]|[+\-*/^<>]=?|&&|\|\|/;
-
-    const keywords = function() {
-      var kws = {};
-      function setGroup(t) {
-        return function () {
-          for (var i = 0; i < arguments.length; i++)
-            kws[arguments[i]] = t;
-        };
-      }
-
-      setGroup('def')('list', 'int');
-
-      setGroup('keyword')(
-        'swap', 'push', 'pop', 'skip', '\.',
-        'init', 'free'
-      );
-
-      setGroup('flow')(
-        'if', 'then', 'else', 'fi',
-        'from', 'do', 'loop', 'until',
-        'goto', 'entry', 'exit'
-      );
-
-      setGroup('builtin')(
-        '+', '-', '*', '/', '^', '%',
-        '<', '>', '=', '!', '!=', '<=', '>=',
-        '+=', '-=', '*=', '/=', '^=',
-        '?', '#', '~'
-      );
-
-      // Exp builtins
-      setGroup('builtin')(
-        'top', 'size', 'null', 'not', 'and', 'or', 'empty'
-      );
-
-      return kws;
-
-    }();
+    const notcmtperRE = /[^\*\/]/
+    const cmtperRE = /\/\*|\*\//
 
     function token(stream, state) {
 
       const c = stream.peek();
+
+      // block comment start
+      if (c == '/') {
+        if (stream.match(/\/\*/)) {
+          state.blockComment++;
+          return 'comment';
+        } else if (state.blockComment > 0) {
+          stream.next();
+          return 'comment';
+        }
+      }
+
+      // block comment end
+      if (c == '*' && state.blockComment > 0) {
+        if (stream.match(/\*\//)) {
+          state.blockComment--;
+        } else {
+          stream.next();
+        }
+        return 'comment';
+      }
+
+      // In block comment
+      if (state.blockComment > 0) {
+          // Try to jump to next start or end
+        while (stream.skipTo('*')) {
+          // Check if begin
+          stream.backUp(1);
+          if (stream.peek() == '/') {
+            break;
+          }
+          // Check if end
+          stream.next();
+          stream.next();
+          if (stream.peek() == '/') {
+            stream.backUp(1);
+            break;
+          }
+        }
+        if (stream.peek() != '*' && stream.peek() != '/') {
+          stream.skipToEnd();
+        }
+        return 'comment';
+      }
+
       // Eat whitespace
-      if (stream.eatWhile(wsRE)) {
+      if (stream.eatSpace()) {
         return null;
       }
 
@@ -97,11 +106,54 @@ import * as CodeMirror from 'codemirror';
       stream.next();
     }
 
+    const keywords = function() {
+      var kws = {};
+      function setGroup(t) {
+        return function () {
+          for (var i = 0; i < arguments.length; i++)
+            kws[arguments[i]] = t;
+        };
+      }
+
+      setGroup('def')('list', 'int');
+
+      setGroup('keyword')(
+        'swap', 'push', 'pop', 'skip', '\.',
+        'init', 'free'
+      );
+
+      setGroup('flow')(
+        'if', 'then', 'else', 'fi',
+        'from', 'do', 'loop', 'until',
+        'goto', 'entry', 'exit'
+      );
+
+      setGroup('builtin')(
+        '+', '-', '*', '/', '^', '%',
+        '<', '>', '=', '!', '!=', '<=', '>=',
+        '+=', '-=', '*=', '/=', '^=',
+        '?', '#', '~'
+      );
+
+      // Exp builtins
+      setGroup('builtin')(
+        'top', 'size', 'null', 'not', 'and', 'or', 'empty'
+      );
+
+      return kws;
+
+    }();
+
     return {
+      startState: function() {
+        return {
+          blockComment: 0
+        };
+      },
       token: function(stream, state){
         const t = token(stream,state);
         const w = stream.current();
-        return w in keywords ? keywords[w] : t;
+        return w in keywords && t != 'comment' ? keywords[w] : t;
       },
     };
   });
