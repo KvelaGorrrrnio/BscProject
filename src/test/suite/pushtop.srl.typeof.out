@@ -1,0 +1,3 @@
+a : list int
+b : int
+c : list list list int

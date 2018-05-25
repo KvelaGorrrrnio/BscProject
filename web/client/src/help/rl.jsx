@@ -14,26 +14,26 @@ export default (<div>
   <h2>Reversible Language</h2>
 
   <h3>Variables and types</h3>
-  <b>RL</b> is a explicitly strongly typed language, to which every program starts by defining the variables that it uses.
+  <b>RL</b> is an explicitly strongly typed language in which every program starts by declaring the variables that it uses.
   Variables can only be declared at the start of the program, before any statements.
   There are two types in <b>RL</b>: <i>int</i> describing integers; <i>list t</i> describing lists, where t either is a nested <i>list</i> type or an <i>int</i> type.
   Thus we see that <b>RL</b> supports multidimensional integer lists.
   An example of variable declarations:
   <CodeMirror value={'list list int a\nlist int b\nlist int c\nint d\nint e'} options={cmoptions} />
 
-  A variable is known by its <i>id</i>. Lists suppots indexing on already defined indices (pushed via push or allocated via init).
+  A variable is known by its <i>id</i>. Lists support indexing on already defined indices (pushed via push or allocated via init).
   <i>id</i> describes by default an identifier along with its indices. If <i>id</i> is described as root id, no indices are allowed.
-  Indices starts at 0.
+  Indices start at 0.
   Following sample program shows the syntax of indexing.
   <CodeMirror value={'// N = [[1, 2, 3], [4, 5, 6], [7, 8, 9]\n\nN[1][0] += 2\n// N = [[1, 2, 3], [6, 5, 6], [7, 8, 9]\n\nswap N[1][1] N[0][1]\n// N = [[1, 6, 3], [2, 5, 6], [7, 8, 9]'} options={cmoptions} />
 
   <h3>Structures</h3>
-  An <b>RL</b> program is structured into blocks. Each block consist of 3 parts:
+  An <b>RL</b> program is structured into blocks. Each block consists of 3 parts:
   <table>
     <tbody>
       <tr>
-        <td>From</td>
-        <td>A from part can be one of 3 things: <b>entry</b>, which defines the entry point of the program. Only one entry point is allowed, and is recommended to be placed in the first block of the program; <b>from</b>, which describes the previous block; <b>fi</b>, which uses a conditional to determine which of two blocks execution came from.</td>
+        <td>Come-From assertion</td>
+        <td>A come-from assertion can be one of 3 things: <b>entry</b>, which defines the entry point of the program. Only one entry point is allowed and must be placed in the first block of the program; <b>from</b>, which describes the previous block; <b>fi</b>, which uses a conditional to determine which of two blocks execution came from.</td>
       </tr>
       <tr>
         <td>Statements</td>
@@ -90,7 +90,7 @@ export default (<div>
       <tr>
         <td>init <i>id</i> [<i>s<sub>0</sub></i>, <i>s<sub>1</sub></i>, ...]</td>
         <td>
-          init takes an root id (no indices) of a variable with a <i>list</i> type, and a list of sizes, where the listsize should match the number of dimensions that <i>id</i> has.<br/>
+          init takes a root id (no indices) of a variable with a <i>list</i> type, and a list of sizes, where the list size should match the number of dimensions that <i>id</i> has.<br/>
           If this is the case, then these dimensions are pushed onto <i>id</i>.
           E.g. a variable with type <i>list list list int</i> should have size list with 3 integers.
           <i>id</i> must be empty when using init, otherwise a runtime error is thrown.
@@ -99,7 +99,7 @@ export default (<div>
       <tr>
         <td>free <i>id</i> [<i>s<sub>0</sub></i>, <i>s<sub>1</sub></i>, ...]</td>
         <td>
-          free takes an root id (no indices) of a variable with a <i>list</i> type, and a list of sizes, where the listsize should match the number of dimensions that <i>id</i> has.<br/>
+          free takes a root id (no indices) of a variable with a <i>list</i> type, and a list of sizes, where the listsize should match the number of dimensions that <i>id</i> has.<br/>
           <i>id</i> must have same dimensions as specified in the size list, and all entries must be empty (0 or empty list).
           If this is the case, then <i>id</i> becomes an empty list.
           E.g. a variable with type <i>list list list int</i> should have size list with 3 integers.

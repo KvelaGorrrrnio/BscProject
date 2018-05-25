@@ -107,7 +107,7 @@ exec (Update (Id id exps) op e p) = do
         contains Lit{} _ _ = return False
         contains (Var (Id id2 exps2) _) (Id id1 exps1) is
           | id1 == id2 = let exps2' = exps2 ++ is in
-            (&&) (length exps1 == length exps2') <$>
+            (&&) (length exps2 == length exps2') <$>
             ( (==) <$> mapM eval exps1 <*> mapM eval exps2' )
           | otherwise = return False
         contains (Binary _ e1 e2 _) id is = (||) <$> contains e1 id is <*> contains e2 id is
@@ -125,8 +125,10 @@ exec (Update (Id id exps) op e p) = do
           (Id id' exps') <- getIdentifier exp
           if null id' then return (Id id' exps')
           else do
-            (ListV l _)    <- rd (Id id' exps') p
-            return (Id id' (exps' ++ [Lit (IntV . fromIntegral $ length l - 1) p]))
+            v <- rd (Id id' exps') p
+            case v of
+              ListV l _ -> return $ Id id' (exps' ++ [Lit (IntV . fromIntegral $ length l - 1) p])
+              IntV _    -> return $ Id id' exps'
         getIdentifier (Parens e p) = getIdentifier e
         getIdentifier _ = return (Id "" [])
 
@@ -257,6 +259,9 @@ eval (Binary op l r p)
     vr <- eval r
     case (vl, vr) of
       (IntV n, IntV m) -> return $ IntV (mapBinOp op n m)
+      (ListV ls1 _, ListV ls2 _)
+        | op == Equal  -> return $ IntV (boolToInt $ ls1==ls2)
+        | op == Neq    -> return $ IntV (boolToInt $ ls1/=ls2)
       (v,w)            -> logError $ RuntimeError p $ ConflictingTypes [IntT,IntT] [getType v, getType w]
 
   -- binary div and mod

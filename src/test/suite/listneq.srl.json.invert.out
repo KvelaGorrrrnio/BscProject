@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "list int a\nlist int b\nint n\nint t\n\nt -= a != b\na[3] += 1\nt -= a != b\na[3] -= 1\npush n b\nt -= a != b\npop t b\nt -= a != b\nfree b [5]\nfree a [5]" }
