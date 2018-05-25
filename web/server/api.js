@@ -3,7 +3,7 @@ import { exec } from 'child_process';
 import * as c from './colors';
 
 // Constants
-const maxBuffer = 1024 * 3000; // 3 MB 
+const maxBuffer = 1024 * 3000; // 3 MB
 const timeout   = 1000; // 1 s
 
 // Setup
