@@ -5,15 +5,19 @@ compile := pdflatex --output-directory=$(outdir) -file-line-error \
            -jobname $(outfile) $(main)
 bibtex  := bibtex $(outfile)
 
-default:compile
+default: run
 
 compile:
 	mkdir -p $(outdir)
 	cp *.{bst,cls,bib} ./out
 	$(compile)
-	cd $(outdir) && $(bibtex)
-	$(compile)
+	#cd $(outdir) && $(bibtex)
 	$(compile)
 
-clean: 
+run: compile
+	cd $(outdir) && $(bibtex)
+	$(compile)
+
+
+clean:
 	rm -rf $(outdir)
