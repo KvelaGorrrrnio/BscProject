@@ -155,57 +155,82 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
 
 \subsection*{Grammar and Structure}
 
+The grammar of the two languages along with the common structures are given in~\cite{REV} and can be seen in Figure~\ref{fig:rl_srl_grammar_and_structure}. As we see, while the two languages share all their expressions and step operations, RL, described in Figure~\ref{fig:rlspec}, consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program. Note that a well-formed RL program must contain exactly one entry and one exit.
+
+SRL is more linear; as we see in Figure~\ref{fig:srlspec}, a program consists of exactly one (SRL-)block, where a block may either be an atomic step operation, a control structure --- that is, an \texttt{if}- or a \texttt{do-until} structure --- or recursively a sequence of two blocks. Sequences of blocks are executed in order, and thus, an SRL program looks a lot like a program written in common programming languages such as Python or C, to name a few. Note that a block in RL is different from a block in SRL.\\
+
+\noindent As mentioned, the two languages share expressions and step operations along with the basic value types. A brief overview:
+
+\begin{itemize}
+  \item Values and types
+  \begin{itemize}
+    \item A variable can either be mapped to an integer or to a list of integers.
+    \item We only have integer literals; to obtain a certain list of integers, one has to bind each of the wanted values to a variable and push it to a list.
+    \item Boolean values are represented by integers. If a variable maps to a non-zero integer value it will evaluate to true, and false otherwise.
+  \end{itemize}
+  \item Step operations
+  \begin{itemize}
+    \item To modify a variable, we have the variable update. The variable update only supports reversible operators, namely addition and subtraction. Indexing is supported. One rule is that the identifier being updated must not occur in the right-hand expression since such an update is irreversible.
+    \item You can push the value of a variable onto a list with the \texttt{push} step operation. The variable being pushed must be zero-cleared afterwards.
+    \item You can pop the top value from a list into a variable with the \texttt{pop} step operation. The variable must be zero-cleared beforehand.
+    \item The \texttt{skip} step operation does nothing.
+  \end{itemize}
+  \item Expressions
+  \begin{itemize}
+    \item We can have any arbitrary binary operator between two expressions, recursively.
+    \item An expression terminates with an integer literal or a variable lookup.
+    \item The \texttt{top} expression is unary and returns the top of the operand.
+    \item The \texttt{empty} predicate is unary and returns the top of the operand.
+  \end{itemize}
+\end{itemize}
+
 % figur der viser grammatikken her tak
-\begin{figure}[ht]
+\begin{figure}[]
 
-  \begin{minipage}{\textwidth}
+  \begin{subfigure}{\textwidth}
     \center
     $$\begin{matrix*}[l]
-      \mathtt{p} & ::= & \mathtt{b} & \quad & \mathtt{b} & ::= & \mathtt{a}             & | & \texttt{ if }e\texttt{ then }b\texttt{ else }b\texttt{ fi }e\\
-                 &     &           &        &            &  |  & \mathtt{b}\ \mathtt{b} & | & \texttt{ from }e\texttt{ do }b\texttt{ loop }b\texttt{ until }e\\
+      {p} & ::= & {b} & \quad & {b} & ::= & a             & | & \texttt{ if }e\texttt{ then }b\texttt{ else }b\texttt{ fi }e\\
+                 &     &           &        &            &  |  & b\ b & | & \texttt{ from }e\texttt{ do }b\texttt{ loop }b\texttt{ until }e\\
     \end{matrix*}$$
-    (a) Structured reversible language \textit{SRL}.
-  \end{minipage}
+    \caption{Structured reversible language \textit{SRL}.}
+    \label{fig:srlspec}
+  \end{subfigure}
 
-  \begin{minipage}{\textwidth}
+  \begin{subfigure}{\textwidth}
     \center
     $$\begin{matrix*}[l]
-      \mathtt{q} & ::= & \mathtt{d}^+                                      & & \mathtt{k} & ::= & \texttt{from }\mathtt{l} & & \mathtt{j} & ::= & \texttt{goto }\mathtt{l}\\
-      \mathtt{d} & ::= & \mathtt{l}:\ \mathtt{k}\ \mathtt{a}^*\ \mathtt{j} &       &            &  |  & \texttt{fi }e\texttt{ from }\mathtt{l}\texttt{ else }\mathtt{l} &
-        & & | & \texttt{if }e\texttt{ goto }\mathtt{l}\text{ else }\mathtt{l}\\
+      {q} & ::= & {d}^+                                      & & {k} & ::= & \texttt{from }l & & {j} & ::= & \texttt{goto }l\\
+      {d} & ::= & {l}:\ {k}\ {a}^*\ {j} &       &            &  |  & \texttt{fi }e\texttt{ from }l\texttt{ else }l &
+        & & | & \texttt{if }e\texttt{ goto }l\texttt{ else }l\\
     \end{matrix*}$$
-    (b) Unstructured reversible language \textit{RL}.
-  \end{minipage}
+    \caption{Unstructured reversible language \textit{RL}.}
+    \label{fig:rlspec}
+  \end{subfigure}
 
-  \begin{minipage}{\textwidth}
+  \begin{subfigure}{\textwidth}
     \center
     $$\begin{matrix*}[l]
-      \mathtt{a} & ::= & \mathtt{x}\oplus= e & \quad\quad\quad &  e & ::= & \mathtt{c} \ | \ \mathtt{x} \ | \ \mathtt{x}[ e] \ | \  e\otimes e \ | \ \texttt{top }\mathtt{x} \ | \ \texttt{empty }\mathtt{x}\\
-                 &  |  & \mathtt{x}[ e]\oplus= e &     & \mathtt{c} & ::= & 0\ | \ 1\ |\ \cdots\ |\ 4294967295\\
-                 &  |  & \texttt{push }\mathtt{x}\ \mathtt{x}      &     & \otimes    & ::= & \oplus \ | \ * \ | \ / \ | \ \cdots\\
-                 &  |  & \texttt{pop  }\mathtt{x}\ \mathtt{x}      &     & \oplus     & ::= & +  \ | \  -  \ | \  \hat{}\\
+      {a} & ::= & {x}\oplus= e & \quad\quad\quad &  e & ::= & {c} \ | \ {x} \ | \ {x}[ e] \ | \  e\otimes e \ | \ \texttt{top }{x} \ | \ \texttt{empty }{x}\\
+                 &  |  & {x}[ e]\oplus= e &     & {c} & ::= & 0\ | \ 1\ |\ \cdots\ |\ 4294967295\\
+                 &  |  & \texttt{push }{x}\ {x}      &     & \otimes    & ::= & \oplus \ | \ * \ | \ / \ | \ \cdots\\
+                 &  |  & \texttt{pop  }{x}\ {x}      &     & \oplus     & ::= & +  \ | \  -  \ | \  \textasciicircum\\
                  &  |  & \texttt{skip}\\
     \end{matrix*}$$
-    (c) Reversible step operations and expressions.
-  \end{minipage}
+    \caption{Reversible step operations and expressions.}
+  \end{subfigure}
 
-  \begin{minipage}{\textwidth}
+  \begin{subfigure}{\textwidth}
     \center
     $$\begin{matrix*}[l]
-      \mathtt{SRL}:     & \mathtt{p}\in\mathtt{SRL}  & & \mathtt{b}\in\mathtt{Blk}\\
-      \mathtt{RL}:      & \mathtt{q}\in\mathtt{RL}   & & \mathtt{d}\in\mathtt{RLBlk} & & \mathtt{j}\in\mathtt{Jump}  & & \mathtt{k}\in\mathtt{From} & & \mathtt{l}\in\mathtt{Label}\\
-      \mathtt{SRL, RL}: & \mathtt{a}\in\mathtt{Step} & &  e\in\mathtt{Exp}   & & \mathtt{c}\in\mathtt{Const} & & \mathtt{x}\in\mathtt{Var}  & & \oplus,\otimes\in\mathtt{Op}\\
+      \mathtt{SRL}:     & {p}\in\mathtt{SRL}  & & {b}\in\mathtt{Blk}\\
+      \mathtt{RL}:      & {q}\in\mathtt{RL}   & & {d}\in\mathtt{RLBlk} & & {j}\in\mathtt{Jump}  & & {k}\in\mathtt{From} & & {l}\in\mathtt{Label}\\
+      \mathtt{SRL, RL}: & {a}\in\mathtt{Step} & &  e\in\mathtt{Exp}   & & {c}\in\mathtt{Const} & & {x}\in\mathtt{Var}  & & \oplus,\otimes\in\mathtt{Op}\\
     \end{matrix*}$$
-    (d) Syntax domains of \textit{SRL} and \textit{RL}.
-  \end{minipage}
+    \caption{Syntax domains of \textit{SRL} and \textit{RL}.}
+  \end{subfigure}
 
   \caption{Syntax of the two reversible flowchart languages.}
   \label{fig:rl_srl_grammar_and_structure}
 
 \end{figure}
-
-The grammar of the two languages along with the common structures are given in~\cite{REV} and can be seen in Figure~\ref{fig:rl_srl_grammar_and_structure}. As we see, while the two languages share expressions and step operations, RL consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program.
-
-SRL is more linear; a program consists of exactly one (SRL-)block, where a block may either be an atomic step operation, a control structure --- that is, either an \texttt{if}- or a \texttt{do-until} structure --- or recursively a sequence of two blocks. Note that a block in RL is different from a block in SRL.\
-
-%\subsection*{Inversion and translation}
