@@ -94,6 +94,53 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
 The grammar of the two languages along with the common structures are given in~\cite{REV}:\\
 
 % figur der viser grammatikken her tak
+\begin{figure}[h]
+
+  \begin{minipage}{\textwidth}
+    \center
+    $$\begin{matrix*}[l]
+      \mathtt{p} & ::= & \mathtt{b} & \quad & \mathtt{b} & ::= & \mathtt{a}             & | & \text{ if }\mathtt{e}\text{ then }\mathtt{b}\text{ else }\mathtt{b}\text{ fi }\mathtt{e}\\
+                 &     &           &        &            &  |  & \mathtt{b}\ \mathtt{b} & | & \text{ from }\mathtt{e}\text{ do }\mathtt{b}\text{ loop }\mathtt{b}\text{ until }\mathtt{e}\\
+    \end{matrix*}$$
+    (a) Structured reversible language \textit{SRL}.
+  \end{minipage}
+
+  \begin{minipage}{\textwidth}
+    \center
+    $$\begin{matrix*}[l]
+      \mathtt{q} & ::= & \mathtt{d}^+                                      & & \mathtt{k} & ::= & \text{from }\mathtt{l} & & \mathtt{j} & ::= & \text{goto }\mathtt{l}\\
+      \mathtt{d} & ::= & \mathtt{l}:\ \mathtt{k}\ \mathtt{a}^*\ \mathtt{j} &       &            &  |  & \text{fi }\mathtt{e}\text{ from }\mathtt{l}\text{ else }\mathtt{l} &   
+        & & | & \text{if }\mathtt{e}\text{ goto }\mathtt{l}\text{ else }\mathtt{l}\\
+    \end{matrix*}$$
+    (b) Unstructured reversible language \textit{RL}.
+  \end{minipage}
+
+  \begin{minipage}{\textwidth}
+    \center
+    $$\begin{matrix*}[l]
+      \mathtt{a} & ::= & \mathtt{x}\oplus=\mathtt{e} & \quad\quad\quad & \mathtt{e} & ::= & \mathtt{c}|\mathtt{x}|\mathtt{x}[\mathtt{e}]|\mathtt{e}\otimes\mathtt{e}|\text{top }\mathtt{x}|\text{empty }\mathtt{x}\\
+                 &  |  & \mathtt{x}[\mathtt{e}]\oplus=\mathtt{e} &     & \mathtt{c} & ::= & 0|1|\cdots|4294967295\\
+                 &  |  & \text{push }\mathtt{x}\ \mathtt{x}      &     & \otimes    & ::= & \oplus|*|/|\cdots\\
+                 &  |  & \text{pop  }\mathtt{x}\ \mathtt{x}      &     & \oplus     & ::= & + | - | \textasciicircum\\
+                 &  |  & \text{skip}\\
+    \end{matrix*}$$
+    (c) Reversible step operations and expressions.
+  \end{minipage}
+
+  \begin{minipage}{\textwidth}
+    \center
+    $$\begin{matrix*}[l]
+      \mathtt{SRL}:     & \mathtt{p}\in\mathtt{SRL}  & & \mathtt{b}\in\mathtt{Blk}\\
+      \mathtt{RL}:      & \mathtt{q}\in\mathtt{RL}   & & \mathtt{d}\in\mathtt{RLBlk} & & \mathtt{j}\in\mathtt{Jump}  & & \mathtt{k}\in\mathtt{From} & & \mathtt{l}\in\mathtt{Label}\\
+      \mathtt{SRL, RL}: & \mathtt{a}\in\mathtt{Step} & & \mathtt{e}\in\mathtt{Exp}   & & \mathtt{c}\in\mathtt{Const} & & \mathtt{x}\in\mathtt{Var}  & & \oplus,\otimes\in\mathtt{Op}\\
+    \end{matrix*}$$
+    (d) Syntax domains of \textit{SRL} and \textit{RL}.
+  \end{minipage}
+
+  \caption{Syntax of the two reversible flowchart languages.}
+  \label{fig:rl_srl_grammar_and_structure}
+
+\end{figure}
 
 \noindent As we see, while the two languages share expressions and step operations, RL consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program.
 
