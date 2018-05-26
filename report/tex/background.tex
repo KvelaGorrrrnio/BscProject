@@ -162,30 +162,30 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
 
 SRL is more linear; as we see in Figure~\ref{fig:srlspec}, a program consists of exactly one (SRL-)block, where a block may either be an atomic step operation, a control structure --- that is, an \texttt{if}- or a \texttt{do-until} structure --- or recursively a sequence of two blocks. Sequences of blocks are executed in order, and thus, an SRL program looks a lot like a program written in common programming languages such as Python or C, to name a few. Note that a block in RL is different from a block in SRL.\\
 
-\noindent As mentioned, the two languages share expressions and step operations along with the basic value types. A brief overview:
+\noindent As mentioned, the two languages share expressions and step operations along with the basic value types. A brief overview:\\
 
-\begin{itemize}
-  \item Values and types
+\begin{description}
+  \item[Values and types]~\
   \begin{itemize}
     \item A variable can either be mapped to an integer or to a list of integers.
     \item We only have integer literals; to obtain a certain list of integers, one has to bind each of the wanted values to a variable and push it to a list.
     \item Boolean values are represented by integers. If a variable maps to a non-zero integer value it will evaluate to true, and false otherwise.
   \end{itemize}
-  \item Step operations
+  \item [Step operations]~\
   \begin{itemize}
     \item To modify a variable, we have the variable update. The variable update only supports reversible operators, namely addition and subtraction. Indexing is supported. One rule is that the identifier being updated must not occur in the right-hand expression since such an update is irreversible.
     \item You can push the value of a variable onto a list with the \texttt{push} step operation. The variable being pushed must be zero-cleared afterwards.
     \item You can pop the top value from a list into a variable with the \texttt{pop} step operation. The variable must be zero-cleared beforehand.
     \item The \texttt{skip} step operation does nothing.
   \end{itemize}
-  \item Expressions
+  \item [Expressions]~\
   \begin{itemize}
     \item We can have any arbitrary binary operator between two expressions, recursively.
     \item An expression terminates with an integer literal or a variable lookup.
     \item The \texttt{top} expression is unary and returns the top of the operand.
-    \item The \texttt{empty} predicate is unary and returns the top of the operand.
+    \item The \texttt{empty} predicate is unary and returns true if the operand is empty and false otherwise.
   \end{itemize}
-\end{itemize}
+\end{description}
 
 % figur der viser grammatikken her tak
 \begin{figure}[]
