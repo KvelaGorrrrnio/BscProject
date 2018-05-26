@@ -764,7 +764,7 @@
 \newcommand\@pnumwidth{2em}
 \newcommand\@tocrmarg {3.5em}
 \newcommand\@dotsep{2}
-\setcounter{tocdepth}{0}
+\setcounter{tocdepth}{2}
 
 \def\@dottedtocline#1#2#3#4#5{%
   \ifnum #1>\c@tocdepth \else
@@ -1258,7 +1258,7 @@
  \textit{#1}\par
  \penalty\@highpenalty \endgroup}
 
-\setcounter{tocdepth}{0}
+\setcounter{tocdepth}{2}
 \newdimen\tocchpnum
 \newdimen\tocsecnum
 \newdimen\tocsectotal
