@@ -13,7 +13,7 @@ run: compile
 
 compile:
 	mkdir -p $(outdir)
-	cp *.{bst,cls,bib} ./out
+	cp *.{bst,cls,bib} $(outdir)
 	$(compile)
 	#cd $(outdir) && $(bibtex)
 	$(compile)
