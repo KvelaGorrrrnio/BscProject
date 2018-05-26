@@ -16,14 +16,15 @@
     - Grammar and structure
     - (Inversion and translation)
 
-- Practice
+- Implementation
 
-  - Implementation of interpreters
+  - The interpreters
+    - Changes
     - Common
     - RL
     - SRL
 
-  - Implementation of program transformations
+  - The program transformations
 
     - Inversion
       - Common
@@ -35,7 +36,7 @@
       - RL
       - SRL
 
-  - Implementation of web based user interface
+  - The web based user interface
 
     - Server
       - API
@@ -44,9 +45,9 @@
       - Interface and functionality
       - Implementation
 
-  - Usage
-    - Command-line-interface
-    - Web based user interface
+- Usage
+  - Command-line interface
+  - Web based user interface
 
 - Appendix
 

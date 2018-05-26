@@ -12,9 +12,9 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
   \item[(b)] the \textit{test} passes the control flow to one of two outgoing edges depending on a predicate $e$, and
   \item[(c)] the \textit{assertion} joins two edges and passes the control flow depending on a predicate $e$.
 \end{description}~\\
-\noindent The atomic operations can be seen in Figure~\ref{fig:atop}. Having these as elementary building blocks of our reversible flowcharts, it is trivial to invert a program; simply invert each edge and, of course, any step operation in the flowchart.
+\noindent The atomic operations can be seen in Figure~\ref{fig:atop}. Having these as elementary building blocks of our reversible flowcharts, it is trivial to invert a program; simply invert each edge and, naturally, any step operation in the flowchart. This, in turn, means that the inversion of a test becomes an assertion and vice versa. The inversion of each atomic operation can be seen in Figure~\ref{fig:atopinv}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
   \begin{subfigure}[t]{0.3\textwidth}
     \centering
@@ -33,7 +33,7 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
         \path[draw=none] (down) node {} (a);
       \end{tikzpicture}
     }
-    \caption{}
+    \caption{Step}
   \end{subfigure}
   \begin{subfigure}[t]{0.3\textwidth}
     \centering
@@ -53,7 +53,7 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
         \path[->] (down) edge node {} (dr);
       \end{tikzpicture}
     }
-    \caption{}
+    \caption{Test}
   \end{subfigure}
   \begin{subfigure}[t]{0.3\textwidth}
     \centering
@@ -73,9 +73,73 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
         \path[->] (a) edge node {} (end);
       \end{tikzpicture}
     }
-    \caption{}
+    \caption{Assertion}
   \end{subfigure}
-  \caption{The three atomic operations of reversible flow charts}\label{fig:atop}
+  \caption{The three atomic operations of reversible flowcharts}\label{fig:atop}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \scalebox{0.8}{%
+      \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+        \node (a) [stmt] {$a^{-1}$};
+        \node [output] (up)    [above of=a, node distance=1.3cm]{};
+        \node [input]  (end)   [right of=a, node distance=1.5cm]{};
+        \node [output] (start) [left  of=a, node distance=1.5cm]{};
+        \node [output] (down)  [below of=a, node distance=1.3cm]{};
+
+        \path[->] (a) edge node {} (start);
+        \path[->] (end) edge node {} (a) ;
+
+        \path[draw=none] (up) node {} (a);
+        \path[draw=none] (down) node {} (a);
+      \end{tikzpicture}
+    }
+    \caption{Step}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \scalebox{0.8}{%
+      \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+        \node [assert] (a)    {$e$};
+        \node [input]  (up)   [below of=a, node distance=1.2cm]{};
+        \node [input]  (dr)   [right of=up, node distance=1.2cm]{};
+        \node [input]  (down) [above of=a, node distance=1.2cm]{};
+        \node [input]  (ur)   [right of=down, node distance=1.2cm]{};
+        \node [output] (end)  [left of=a, node distance=1.5cm]{};
+
+        \path[-] (dr) edge node {} (up);
+        \path[->] (up) edge node {$f$} (a);
+        \path[-] (ur) edge node {} (down);
+        \path[->] (down) edge node {$t$} (a);
+        \path[->] (a) edge node {} (end);
+      \end{tikzpicture}
+    }
+    \caption{Assertion}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \scalebox{0.8}{%
+      \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+        \node (a) [test] {$e$};
+        \node [input]  (start) [right of=a, node distance=1.5cm]{};
+        \node [output]  (up)   [above of=a, node distance=1.2cm]{};
+        \node [output]  (ur)   [left of=up, node distance=1.2cm]{};
+        \node [output] (down)  [below of=a, node distance=1.2cm]{};
+        \node [output] (dr)    [left of=down, node distance=1.2cm]{};
+
+        \path[->] (start) edge node {} (a);
+        \path[-] (a) edge node {$t$} (up);
+        \path[->] (up) edge node {} (ur);
+        \path[-] (a) edge node {$f$} (down);
+        \path[->] (down) edge node {} (dr);
+      \end{tikzpicture}
+    }
+    \caption{Test}
+  \end{subfigure}
+  \caption{Inversion of the three atomic operations of reversible flowcharts}\label{fig:atopinv}
 \end{figure}
 
 % figurer af de forskellige byggeklodser her tak
@@ -94,7 +158,7 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
 The grammar of the two languages along with the common structures are given in~\cite{REV}:\\
 
 % figur der viser grammatikken her tak
-\begin{figure}[h]
+\begin{figure}[ht]
 
   \begin{minipage}{\textwidth}
     \center
@@ -142,7 +206,7 @@ The grammar of the two languages along with the common structures are given in~\
 
 \end{figure}
 
-\noindent As we see, while the two languages share expressions and step operations, RL consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program.
+The grammar of the two languages along with the common structures are given in~\cite{REV} and can be seen in Figure~\ref{fig:rl_srl_grammar_and_structure}. As we see, while the two languages share expressions and step operations, RL consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program.
 
 SRL is more linear; a program consists of exactly one (SRL-)block, where a block may either be an atomic step operation, a control structure --- that is, either an \texttt{if}- or a \texttt{do-until} structure --- or recursively a sequence of two blocks. Note that a block in RL is different from a block in SRL.\
 
