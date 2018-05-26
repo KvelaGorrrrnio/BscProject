@@ -4,17 +4,34 @@
 \section*{Installation}
 \addcontentsline{toc}{section}{Installation}%
 
-\lstsetconsole
 Both the interpreters for RL and SRL and the web interface can be found at the same github repository: \href{https://github.com/KvelaGorrrrnio/BscProject}{KvelaGorrrrnio/BscProject}.\\
-To get the code, clone the repository with\\ \lstinline[language=bash]{$ git clone https://github.com/KvelaGorrrrnio/BscProject.git}\\
+To get the code, clone the repository with:
+\shcmd{$ git clone https://github.com/KvelaGorrrrnio/BscProject.git}
 
 \subsection*{Command-Line Interface}
 \addcontentsline{toc}{subsection}{Command-Line Interface}%
+The Interpreters and the Command-Line Interface are located under the \path{/src} directory, but can be build from the project root directory.
+The underlying dependency manager and build system for the Command-Line Interface is Stack, which can be installed by one of following:\\
+\shcmd{$ brew install haskell-stack cabal-install ghc # MacOS}\\
+\shcmd{$ curl -sSL https://get.haskellstack.org/ | sh # Unix}\\
+\shcmd{$ wget -qO- https://get.haskellstack.org/ | sh # Unix alternative}\\
 
-When entering the cloned repository, before
+\noindent
+When standing at the project root, there are two ways of installing the Command-Line Interface.\\
+First option is to \shcmd{$ make src}, which builds the \texttt{rl} and \texttt{srl} executables into \path{/src/bin}. Copy the executables your local bin, for system wide usage.\\
+Second option is to \shcmd{$ make install}, which installs the \texttt{rl} and \texttt{srl} executables directly to the stack local bin, for system wide usage. This requires that the stack local bin is in your \texttt{\$PATH}.
 
-\subsection*{Web Based User Interface}
-\addcontentsline{toc}{subsection}{Web Based User Interface}%
+\subsection*{Web Interface}
+\addcontentsline{toc}{subsection}{Web Interface}%
+
+The web client interface is found under \path{/web/client} and the web server is found under \path{/web/server}.
+Both the server and the client application are NodeJS projects. NodeJS can be installed with one of the following:\\
+\shcmd{$ brew install node               # Mac OS}\\
+\shcmd{$ sudo apt-get install nodejs npm # Ubuntu}\\
+\shcmd{$ sudo pacman -S nodejs npm       # Arch}\\
+
+\noindent
+By running \shcmd{$ make web server}, when standing at the project root, the Command-Line Interface is built and copied to the web server, the web client is build and copied to the server and the server is started. For only building the server (without starting it), use \shcmd{$ make web}. If already built use \shcmd{$ make server} for starting the web server.
 
 \section*{Usage}
 \addcontentsline{toc}{section}{Usage}%
@@ -22,6 +39,8 @@ When entering the cloned repository, before
 \subsection*{Command-Line Interface}
 \addcontentsline{toc}{subsection}{Command-Line Interface}%
 
-\subsection*{Web Based User Interface}
-\addcontentsline{toc}{subsection}{Web Based User Interface}%
 
+\subsection*{Web Interface}
+\addcontentsline{toc}{subsection}{Web Interface}%
+
+\section*{Testing}
