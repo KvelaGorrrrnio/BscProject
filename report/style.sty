@@ -37,6 +37,7 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 \definecolor{KU-red}{RGB}{144,26,30}
 
+\lstloadlanguages{sh}
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{greybg},
     commentstyle=\color{codegreen},
@@ -59,14 +60,14 @@
 \lstset{style=mystyle, lineskip=1pt}
 \lstset{
   basicstyle=\fontsize{10}{10}\ttfamily,
-  keywordstyle=\color{blue}\ttfamily,
+  keywordstyle=\color{purple}\ttfamily,
   stringstyle=\color{red}\ttfamily,
   commentstyle=\color{gray}\ttfamily,
   morecomment=[l][\color{magenta}]{\#}
 }
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[T1]{fontenc}
+\newcommand{\shcmd}{\lstinline[language=sh]}
 % TikZ
 \usepackage{tikz}
 \usepackage{textcomp}
