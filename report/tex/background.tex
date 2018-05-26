@@ -1,7 +1,11 @@
 \chapter*{Background}
 \addcontentsline{toc}{chapter}{Background}%
 
+In this chapter, we will briefly discuss the background of the implementation project. We will dive into the definitions, and some of the theory, presented in \cite{REV}. % lidt mere?
+
 % TODO: overordnet om flowcharts og reversible flowcharts
+\section*{Reversible Flowcharts}
+\addcontentsline{toc}{section}{Reversible Flowcharts}%
 Flowcharts are a natural way to model imperative programs. Similarly, \textit{reversible} imperative programs can be naturally modeled by reversible flowcharts. The two models are similar --- however, to actually guarantee reversibility in reversible flowcharts, we may define some additional attributes. That is, we want to add an assertion to each edge such that any transfer of control is acknowledged. More specifically, the definition as seen in~\cite{REV} says that \\
 
 \say{A \textit{reversible flowchart $F$} is a finite directed graph with three types of nodes, each of which represents an \textit{atomic operation}} \\
@@ -151,6 +155,7 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
 % går så videre til det mere specifikke med RL og SRL
 % og snakker om den formelle syntaks
 \section*{RL and SRL}
+\addcontentsline{toc}{section}{RL and SRL}%
 \noindent Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps, while SRL, as the name indicates, is a similar language but with control structures and no jumps. The two languages share a common subset of features --- namely their statements and expressions.
 
 \subsection*{Grammar and Structure}
