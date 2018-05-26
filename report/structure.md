@@ -36,10 +36,13 @@
       - SRL
 
   - Implementation of web based user interface
+
     - Server
       - API
+
     - Client
-      -
+      - Interface and functionality
+      - Implementation
 
   - Usage
     - Command-line-interface
