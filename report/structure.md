@@ -14,6 +14,13 @@
   - Implementation of interpreters
   - Implementation of program transformations
   - Implementation of web-based interface
+    - Server
+      - API
+    - Client
+      -
+  - Usage guide
+    - CLI
+    - Webinterace
 - Appendix
 
 # Backmatter
