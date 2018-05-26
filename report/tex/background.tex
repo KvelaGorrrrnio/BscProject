@@ -6,7 +6,7 @@ In this chapter, we will briefly discuss the background of the implementation pr
 % TODO: overordnet om flowcharts og reversible flowcharts
 \section*{Reversible Flowcharts}
 \addcontentsline{toc}{section}{Reversible Flowcharts}%
-Flowcharts are a natural way to model imperative programs. Similarly, \textit{reversible} imperative programs can be naturally modeled by reversible flowcharts. The two models are similar --- however, to actually guarantee reversibility in reversible flowcharts, we may define some additional attributes. That is, we want to add an assertion to each edge such that any transfer of control is acknowledged. More specifically, the definition as seen in~\cite{REV} says that \\
+Flowcharts are a natural way to model imperative programs. Similarly, \textit{reversible} imperative programs can be naturally modeled by reversible flowcharts. The two models are similar --- however, to actually guarantee reversibility in reversible flowcharts, we may define some additional attributes. More specifically, we may want any join point between two edges in a flowchart to be acknowledged through an assertion which can determine the origin of the control flow. The definition as seen in~\cite{REV} says that \\
 
 \say{A \textit{reversible flowchart $F$} is a finite directed graph with three types of nodes, each of which represents an \textit{atomic operation}} \\
 
@@ -16,9 +16,9 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
   \item[(b)] the \textit{test} passes the control flow to one of two outgoing edges depending on a predicate $e$, and
   \item[(c)] the \textit{assertion} joins two edges and passes the control flow depending on a predicate $e$.
 \end{description}~\\
-\noindent The atomic operations can be seen in Figure~\ref{fig:atop}. Having these as elementary building blocks of our reversible flowcharts, it is trivial to invert a program; simply invert each edge and, naturally, any step operation in the flowchart. This, in turn, means that the inversion of a test becomes an assertion and vice versa. The inversion of each atomic operation can be seen in Figure~\ref{fig:atopinv}.
+\noindent The atomic operations can be seen in Figure~\ref{fig:atop}. Having these as elementary building blocks of our reversible flowcharts, it is trivial to invert a program; simply invert each edge and, naturally, any step operation in the flowchart. This, in turn, means that the inversion of a test is an assertion and vice versa. The inversion of each atomic operation can be seen in Figure~\ref{fig:atopinv}.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \begin{subfigure}[t]{0.3\textwidth}
     \centering
@@ -82,7 +82,7 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
   \caption{The three atomic operations of reversible flowcharts}\label{fig:atop}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \begin{subfigure}[t]{0.3\textwidth}
     \centering
@@ -156,11 +156,9 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
 % og snakker om den formelle syntaks
 \section*{RL and SRL}
 \addcontentsline{toc}{section}{RL and SRL}%
-\noindent Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps, while SRL, as the name indicates, is a similar language but with control structures and no jumps. The two languages share a common subset of features --- namely their statements and expressions.
+\noindent Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps, while SRL, as the name indicates, is a similar language but with control structures and no jumps. The two languages share a common subset of features --- namely their statements and expressiions. The grammar of the two languages along with the common structures are given in~\cite{REV} and can be seen in Figure~\ref{fig:rl_srl_grammar_and_structure}.\\
 
-\subsection*{Grammar and Structure}
-
-The grammar of the two languages along with the common structures are given in~\cite{REV} and can be seen in Figure~\ref{fig:rl_srl_grammar_and_structure}. As we see, while the two languages share all their expressions and step operations, RL, described in Figure~\ref{fig:rlspec}, consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program. Note that a well-formed RL program must contain exactly one entry and one exit.
+\noindent As we see, RL, described in Figure~\ref{fig:rlspec}, consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program. Note that a well-formed RL program must contain exactly one entry and one exit.
 
 SRL is more linear; as we see in Figure~\ref{fig:srlspec}, a program consists of exactly one (SRL-)block, where a block may either be an atomic step operation, a control structure --- that is, an \texttt{if}- or a \texttt{do-until} structure --- or recursively a sequence of two blocks. Sequences of blocks are executed in order, and thus, an SRL program looks a lot like a program written in common programming languages such as Python or C, to name a few. Note that a block in RL is different from a block in SRL.\\
 
