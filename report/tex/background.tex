@@ -82,17 +82,21 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
 
 \noindent This is the general idea of reversible flowcharts, and two incarnations of this model are RL and SRL.\
 
+
+
 % går så videre til det mere specifikke med RL og SRL
 % og snakker om den formelle syntaks
 \section*{RL and SRL}
-\noindent Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps, while SRL, as the name indicates, is a similar language but with control structures. The two languages share a common subset of features --- namely their statements and expressions.
+\noindent Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps, while SRL, as the name indicates, is a similar language but with control structures and no jumps. The two languages share a common subset of features --- namely their statements and expressions.
+
+\subsection*{Grammar and Structure}
 
 The grammar of the two languages along with the common structures are given in~\cite{REV}:\\
 
 % figur der viser grammatikken her tak
 
-\noindent That is, while the two languages share expressions and step operations, RL consists of one or more (RL-)blocks, where each block is defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump any block in the program.
+\noindent As we see, while the two languages share expressions and step operations, RL consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program.
 
-SRL is more linear; a program consists of exactly one (SRL-)block, where a block may either be an atomic step operation, a control structure --- that is, either \texttt{if}- or \texttt{do-until} structure --- or recursively a sequence of two blocks.\\
+SRL is more linear; a program consists of exactly one (SRL-)block, where a block may either be an atomic step operation, a control structure --- that is, either an \texttt{if}- or a \texttt{do-until} structure --- or recursively a sequence of two blocks. Note that a block in RL is different from a block in SRL.\
 
-\noindent Note that a block in RL is different from a block in SRL.\
+%\subsection*{Inversion and translation}
