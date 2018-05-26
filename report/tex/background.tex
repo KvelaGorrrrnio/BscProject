@@ -155,11 +155,7 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
 
 \subsection*{Grammar and Structure}
 
-The grammar of the two languages along with the common structures are given in~\cite{REV}:\\
-
-% figur der viser grammatikken her tak
-
-\noindent As we see, while the two languages share expressions and step operations, RL consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program.
+The grammar of the two languages along with the common structures are given in~\cite{REV} and can be seen in Figure~\ref{fig:gram}. As we see, while the two languages share expressions and step operations, RL consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program.
 
 SRL is more linear; a program consists of exactly one (SRL-)block, where a block may either be an atomic step operation, a control structure --- that is, either an \texttt{if}- or a \texttt{do-until} structure --- or recursively a sequence of two blocks. Note that a block in RL is different from a block in SRL.\
 
