@@ -259,10 +259,12 @@ eval (Binary op l r p)
     vr <- eval r
     case (vl, vr) of
       (IntV n, IntV m) -> return $ IntV (mapBinOp op n m)
-      (ListV ls1 _, ListV ls2 _)
-        | op == Equal  -> return $ IntV (boolToInt $ ls1==ls2)
-        | op == Neq    -> return $ IntV (boolToInt $ ls1/=ls2)
-      (v,w)            -> logError $ RuntimeError p $ ConflictingTypes [IntT,IntT] [getType v, getType w]
+      (ListV ls1 t1, ListV ls2 t2)
+        | t1 == t2 -> case op of
+          Equal     -> return $ IntV (boolToInt $ ls1==ls2)
+          Neq       -> return $ IntV (boolToInt $ ls1/=ls2)
+        | otherwise -> logError $ RuntimeError p $ ConflictingTypes [t1,t1] [t1,t2]
+      (v,w) -> logError $ RuntimeError p $ ConflictingTypes [IntT,IntT] [getType v, getType w]
 
   -- binary div and mod
   | op <= Mod = do
