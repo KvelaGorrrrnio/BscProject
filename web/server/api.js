@@ -61,13 +61,16 @@ api.get('/template/:file',   (req,res) => {
   });
 });
 // 404
-api.get('/:nonsense',(req,res) => {
+api.get('/', _404);
+api.get('/:nonsense', _404);
+function _404(req,res) {
   console.log(c.error('  Unknown API-call.'));
+  const nonsense = req.params.nonsense ? req.params.nonsense : '';
   res.json({
     type: 'error',
-    message: '\'' + req.params.nonsense + '\' is unknown API-call.'
+    message: '\'' + nonsense + '\' is unknown API-call.'
   });
-})
+}
 
 // Helpers
 function verifyLng(lng) {
