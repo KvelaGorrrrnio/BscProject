@@ -1,7 +1,7 @@
 all: src web
 src:
 	@make -C src build
-web:
+web: src
 	@make -C web build
 
 clean: clean-src clean-web

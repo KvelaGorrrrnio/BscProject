@@ -1,7 +1,8 @@
 build: install
 	@echo "Building web server..."
-	@make -C ../client clean
-	@npm run build
+	@mkdir -p ./client && cp -r ../client/build/* ./client
+	@make -C ../../src && cp -r ../../src/bin .
+	@echo "Web server has been build."
 
 install:
 	@npm install
@@ -13,4 +14,4 @@ clean:
 	@echo "Cleaning web server..."
 	@rm -rf bin client node_modules
 
-.PHONY: build install serve clean
+.PHONY: build install server clean

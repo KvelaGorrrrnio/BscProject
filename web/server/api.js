@@ -10,9 +10,9 @@ const timeout   = 1000; // 1 s
 const api = Router();
 api.use(json());
 
-// Log calls
+// Log requests
 api.use((req,res,next) => {
-  console.log(c.call('\n' + new Date(Date.now()).toLocaleString() + ': Call to ' + req.originalUrl));
+  console.log(c.call('\n' + new Date(Date.now()).toLocaleString() + ': Requested ' + req.originalUrl));
   next();
 });
 
@@ -34,7 +34,7 @@ api.get('/template/list',   (req,res) => {
     const files = stdout.trim().split("\n").map(s => s.replace('templates/',''))
     const rl    = files.filter(s => s.match(".*\\.rl"))
     const srl   = files.filter(s => s.match(".*\\.srl"))
-    console.log(c.success(' Response ended with success.'));
+    console.log(c.success('  Response ended with success.'));
     res.json({
       type: 'templates',
       rl,
@@ -52,7 +52,7 @@ api.get('/template/:file',   (req,res) => {
       });
       return;
     }
-    console.log(c.success(' Response ended with success.'));
+    console.log(c.success('  Response ended with success.'));
     res.json({
       type: 'template',
       file: req.params.file,
@@ -129,7 +129,7 @@ function runMode(mode, req, res, log=false) {
       });
       return;
     }
-    console.log(c.success(' Response ended with success.'));
+    console.log(c.success('  Response ended with success.'));
     res.send(stdout);
   });
 }

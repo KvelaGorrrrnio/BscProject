@@ -1,4 +1,4 @@
-build: build-server
+build: build-client build-server
 build-client:
 	@make -C client build
 build-server:

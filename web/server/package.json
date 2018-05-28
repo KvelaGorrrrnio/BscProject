@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node babel-server.js",
     "devstart": "nodemon babel-server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./fetchInterpreters.sh && ./fetchClient.sh"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
