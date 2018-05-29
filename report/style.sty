@@ -14,7 +14,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Package for including figures. TeX and thus LaTeX was developped before the existence of directory file-structures, but the graphicspath let's you add directories, that the \includegraphics will search.
 %\usepackage{graphicx}
-%\graphicspath{{figures/}}
+\graphicspath{{fig/}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Package for typesetting programs. Listings does not support fsharp, but a little modification goes a long way
@@ -62,14 +62,14 @@
 \lstset{
   basicstyle=\fontsize{10}{10}\ttfamily,
   keywordstyle=\color{purple}\ttfamily,
-  ndkeywordstyle=\color{magenta}\ttfamily
+  ndkeywordstyle=\color{magenta}\ttfamily,
   commentstyle=\color{gray}\ttfamily,
   morecomment=[l][\color{magenta}]{\#}
 }
 
 \lstdefinelanguage{javascript}{
   keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, continue},
-  ndkeywords={class, export, boolean, throw, implements, import, from, default, this},
+  ndkeywords={const, class, extends, export, boolean, throw, implements, import, from, default, this},
   sensitive=false,
   comment=[l]{//},
   morecomment=[s]{/*}{*/},
