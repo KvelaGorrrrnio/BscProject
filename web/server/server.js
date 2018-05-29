@@ -4,8 +4,7 @@ import { exists } from 'fs';
 import * as c from './colors';
 
 // Create express server
-const app = express();
-
+export const app = express();
 const port = 3001;
 
 // Enable CORS
@@ -23,27 +22,26 @@ app.use('/api', api);
 app.get('/', (req,res) => {
   console.log(c.call('\n' + new Date(Date.now()).toLocaleString() + ': Requested ' + req.originalUrl));
   const p = join(__dirname, 'client', 'index.html');
+  _sendFile(p, res);
+});
+app.get('/:filename.:ext', (req,res) => {
+  const p = join(__dirname, 'client', req.params.filename + '.' + req.params.ext);
+  _sendFile(p, res, false);
+});
+app.get('*', (req,res) => res.status(404).sendFile(join(__dirname, 'static', '404.html')));
+
+function _sendFile(p, res, log=true) {
   exists(p, exs => {
     if (!exs) {
-      res.send('Couldn\'t serve index page.');
-      console.log(c.error('  Couldn\'t serve index page.'));
+      if (log) {
+        console.log(c.error('  404 encountered.'));
+      }
+      res.status(404).sendFile(join(__dirname, 'static', '404.html'));
       return;
     }
     res.sendFile(p);
-    console.log(c.success('  Response ended with success.'));
   });
-});
-app.get('/:f.:ext', (req,res) => {
-  const p = join(__dirname, 'client', req.params.f + '.' + req.params.ext);
-  exists(p, exs => {
-    if (!exs) {
-      res.send('Couldn\'t serve ' + req.originalUrl + '.');
-      return;
-    }
-    res.sendFile(p);
-  });
-});
-app.get('*', (req,res) => res.send('Couldn\'t find requested page (404).'));
+}
 
 // Start server
 app.listen(port, () => console.log('Server has started.\nWeb interface is running at ' + c.url('http://localhost:' + port.toString()) + '.'));

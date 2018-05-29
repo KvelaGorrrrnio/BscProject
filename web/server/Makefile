@@ -14,4 +14,7 @@ clean:
 	@echo "Cleaning web server..."
 	@rm -rf bin client node_modules
 
-.PHONY: build install server clean
+test:
+	@npm test
+
+.PHONY: build install server clean test

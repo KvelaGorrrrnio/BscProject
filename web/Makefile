@@ -15,4 +15,10 @@ server:
 cserver:
 	@make -C client server
 
-.PHONY: build build-client build-server clean clean-client clean-server server cserver
+test: test-client test-server
+test-client:
+	@make -C client test
+test-server:
+	@make -C server test
+
+.PHONY: build build-client build-server clean clean-client clean-server server cserver test test-client test-server

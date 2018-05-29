@@ -13,4 +13,7 @@ clean:
 server:
 	@npm start
 
-.PHONY: build install clean server
+test:
+	@npm test
+
+.PHONY: build install clean server test

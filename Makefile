@@ -29,7 +29,13 @@ cserver:
 release:
 	@zip -r src.zip release
 
-test:
+test: test-src test-web
+test-src:
 	@make -C src test
+test-web: test-web-client test-web-server
+test-web-client:
+	@make -C web test-client
+test-web-server:
+	@make -C web test-server
 
-.PHONY: all src web install server release clean clean-src clean-web zip zip-src zip-web test cserver
+.PHONY: all src web install server release clean clean-src clean-web zip zip-src zip-web cserver test test-src test-web test-web-client test-web-server
