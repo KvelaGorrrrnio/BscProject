@@ -3,17 +3,24 @@
 \usepackage [T1]{fontenc}
 \usepackage{subcaption}
 \usepackage[toc,page]{appendix}
+
+% figure positioning
 \usepackage{float}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Masterrace Concrete Mathematics Font
+%\usepackage[boldsans]{ccfonts}
+%\usepackage[euler-digits,euler-hat-accent]{eulervm}
+
 % Package for inserting clickable hyperlinks in pdf versions as produced by pdflatex
 \usepackage[colorlinks = true,
             linkcolor = black,
             urlcolor  = blue,
             citecolor = blue,
             anchorcolor = blue]{hyperref}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Package for including figures. TeX and thus LaTeX was developped before the existence of directory file-structures, but the graphicspath let's you add directories, that the \includegraphics will search.
-%\usepackage{graphicx}
+\usepackage{graphicx}
 \graphicspath{{fig/}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,7 +33,6 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{mathtools}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Listings styling
@@ -77,7 +83,6 @@
   morestring=[b]"
 }
 
-\usepackage[T1]{fontenc}
 \newcommand{\shcmd}{\lstinline[language=sh]}
 % TikZ
 \usepackage{tikz}
@@ -108,3 +113,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO command
 \newcommand{\todo}[1]{{\color{red}\textbf{TODO: #1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Text-sized inline images
+\DeclareRobustCommand{\inlineicon}[1]{%
+  \begingroup\normalfont
+  \includegraphics[height=\fontcharht\font`\B]{#1}%
+  \endgroup
+}

@@ -62,11 +62,76 @@ We have, as was the goal of the project, successfully implemented interpreters f
 \section*{The Web Interface}
 \addcontentsline{toc}{section}{The Web Interface}%
 
-The purpose of the web interface is to grant a simpler way to user for interacting with the interpreters.
+The purpose of the web interface is to grant a simpler way to users for interacting with the interpreters.
 This is split up in two parts:
 The server, which handles the routing of the web server and serves the client interface, along with api-calls for the actual interaction with the Command-Line Interpreters;
 The client part, which is the actual web interface that the user sees.
 The implementation of these are described in the following subsections.
+
+\subsection*{Client Interface}
+\addcontentsline{toc}{subsection}{Client Interface}%
+
+\subsubsection{Features}
+\addcontentsline{toc}{subsubsection}{Features}%
+
+Before explaining the implementation of the client interface, the features of the interface will be described.
+If we look at the User Interface seen in Figure \ref{fig:web_client_ui}, we have 3 rectangular areas: The toolbar at the top; the code editor, located below the toolbar on the left hand side; the result area, located below the toolbar on the right hand side.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{web_client_ui.png}
+  \caption{Screenshot of Web Client UI.}
+  \label{fig:web_client_ui}
+\end{figure}
+
+\noindent
+At the far left of the toolbar a radio button group with the options SRL and RL. The highlighted option indicates how the code in the code editor should be interpreted. If RL is chosen, the code is interpreted as if it were a RL program; likewise for SRL.\\
+On the left hand side of the middle, the toolbar has some icons:\\
+
+\begin{description}
+
+  \item[\inlineicon{themes.png} Themes]~\\
+    By hovering over the icon a dropdown menu, for choosing the colorscheme/ theme of the client interface, appears.\\
+    \includegraphics[width=\textwidth]{web_client_themes.png}\\
+
+  \item[\inlineicon{help.png} Help]~\\
+    By clicking on this icon a modal window opens with help for the web interface, the modes and the languages.\\
+    \includegraphics[width=\textwidth]{web_client_help.png}\\
+
+  \item[\inlineicon{template.png} Templates]~\\
+    By hovering over this icon a dropdown menu, where template programs for both RL and SRL can be loaded into the code editor, appears.\\
+    \includegraphics[width=\textwidth]{web_client_templates.png}\\
+
+  \item[\inlineicon{open.png} Open]~\\
+    By click on this icon a modal window opens. Here it is possible to import and open previously stored programs.\\
+    \includegraphics[width=\textwidth]{web_client_open.png}\\
+
+  \item[\inlineicon{save.png} Save]~\\
+    By clicking on this icon a modal window opens. Here it is possible to export, share and store the code currently loaded into the code editor.\\
+    \includegraphics[width=\textwidth]{web_client_save.png}\\
+
+\end{description}
+
+The right hand side of the toolbar is dedicated to modes and their associated actions. There are 4 modes which are chosen from the radio button group at the far right:\\
+
+\begin{description}
+
+  \item[Run]~\\
+    The Run mode utilises the run mode from the Command-Line Interface. The only action associated with the Run mode is \inlineicon{play} run, which executes the code written in the code editor, and displays the final program-state in the result area.
+
+  \item[Step]~\\
+
+
+  \item[Invert]~\\
+
+
+  \item[Translate]~\\
+
+
+\end{description}
+
+\todo{Project important packages}\\
+\todo{Project structure}\\
+\todo{Features}\\
 
 \subsection*{Server \& API}
 \addcontentsline{toc}{subsection}{Server \& API}%
@@ -103,7 +168,7 @@ The routing has two responsebilities: To handle API calls, which can be seen in 
 
 If the client interface is hosted at a different address than the api, the \path{/web/server/client} folder can be removed, causing the route for the index page and the static pages to respond with a 404 (page not found) status and content.\\
 
-\todo{API}\\
+\todo{API - features}\\
 
 \begin{figure}[H]
   \begin{tabular}{|l|l|p{6.7cm}|}\hline
@@ -120,23 +185,30 @@ If the client interface is hosted at a different address than the api, the \path
                                                 This API-call translates the code from the specified language to its counterpart.
                                                 The code submitted should be wrapped in a JSON object, with the attribute \texttt{code}.\\\hline
     \texttt{/template/list}  & \texttt{GET} & Returns a list of SRL and RL files, as a JSON-object. The object has the attributes \texttt{srl} and \texttt{rl}, where each corresponding value is a list of template-names for that language. \\\hline
-    \texttt{/template/:file} & \texttt{GET} & Here \texttt{:file} is the template requested. 
+    \texttt{/template/:file} & \texttt{GET} & Here \texttt{:file} is the template requested.
                                               A JSON-object, with the attribute \texttt{code}, which contains the code of the requested template file, is returned.\\\hline
   \end{tabular}
   \caption{API routes.}
   \label{fig:full_api}
 \end{figure}
 
-\todo{Security (encodeURIComponent)}
+\todo{Security}
+For accessing the Command-Line interface, listing and fetching template-files, the interface execFile(file, [arguments], callback) from the node module
 
+% To secure the application, and the hosting system, most input parameters are validated before the the shell commands are executed; the input code is one of the paramaters which is not validated.
+% To avoid command injections via code input, the execFile interface from nodes child\_process module, is used.
+% execFile does not by default open a new shell, but spawns the specified command/ file directly, which minimizes the overhead.
+% The
 
+\begin{lstlisting}[language=javascript]
+execFile(cmd,
+        [mode, code, flags],
+        {maxBuffer, timeout},
+        (err, stdout, stderr) => {
+  // ... callback content
+});
+\end{lstlisting}
 
-\subsection*{Client}
-\addcontentsline{toc}{subsection}{Client}%
-
-\todo{Project important packages}\\
-\todo{Project structure}\\
-\todo{Features}\\
 
 
 

@@ -1,5 +1,5 @@
-import { Router, urlencoded, json } from 'express';
-import { exec } from 'child_process';
+import { Router, json } from 'express';
+import { execFile } from 'child_process';
 import * as c from './colors';
 
 // Constants
@@ -22,9 +22,9 @@ api.post('/run/log/:lng',   (req,res) => { runMode('run',req,res,true) });
 api.post('/invert/:lng',    (req,res) => { runMode('invert',req,res) });
 api.post('/translate/:lng', (req,res) => { runMode('translate',req,res) });
 api.get('/template/list',   (req,res) => {
-  exec('find templates -maxdepth 1 -type f \\( -iname "*.srl" -o -iname "*.rl"  \\)', (err,stdout) => {
+  execFile('find', ['templates', '-maxdepth', '1', '-type', 'f', '\\( -iname "*.srl" -o -iname "*.rl"  \\)'], { shell: true },(err,stdout) => {
     if (err) {
-      console.log(c.error('  Execution failed with: ' + handleError(err.message)));
+      console.log(c.error('  Execution failed with: ' + err.message));
       res.json({
         type: 'error',
         message: 'Couldn\'t find templates: ' + err
@@ -43,9 +43,9 @@ api.get('/template/list',   (req,res) => {
   });
 });
 api.get('/template/:file',   (req,res) => {
-  exec('cat "templates/' + encodeURIComponent(req.params.file) + '"', (err,stdout) => {
+  execFile('cat', ['templates/' + req.params.file], { shell: true }, (err,stdout) => {
     if (err) {
-      console.log(c.error('  Execution failed with: ' + handleError(err.message)));
+      console.log(c.error('  Execution failed with: ' + err.message));
       res.json({
         type: 'error',
         message: 'Couldn\'t fetch template ' + req.params.file + ': ' + err
@@ -62,7 +62,7 @@ api.get('/template/:file',   (req,res) => {
 });
 // 404
 api.get('/', _404);
-api.get('/:nonsense', _404);
+api.all('/:nonsense', _404);
 function _404(req,res) {
   console.log(c.error('  Unknown API-call.'));
   const nonsense = req.params.nonsense ? req.params.nonsense : '';
@@ -121,11 +121,12 @@ function runMode(mode, req, res, log=false) {
     return;
   }
   // Execute code
-  const flags = 'cj' + (log ? 'l' : '');
-  const cmd = './bin/' + lng + ' '+mode+' "' + cnt.code + '" -' + flags;
-  exec(cmd, { maxBuffer, timeout }, (err,stdout) => {
+  const flags = '-cj' + (log ? 'l' : '');
+  const cmd = './bin/' + lng;
+  const code = cnt.code;
+  execFile(cmd, [mode, code, flags], { maxBuffer, timeout }, (err,stdout) => {
     if (err) {
-    console.log(c.error('  Execution failed with: ' + handleError(err.message)));
+    console.log(c.error('  Execution failed with: ' + err.message));
       res.json({
         type: 'error',
         message: 'Execution of code failed with error: ' +  handleError(err.message)

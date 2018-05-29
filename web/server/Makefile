@@ -2,7 +2,7 @@ build: install
 	@echo "Building web server..."
 	@mkdir -p ./client && cp -r ../client/build/* ./client
 	@make -C ../../src && cp -r ../../src/bin .
-	@echo "Web server has been build."
+	@echo "Web server has been built."
 
 install:
 	@npm install
