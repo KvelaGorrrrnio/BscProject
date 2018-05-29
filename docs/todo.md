@@ -5,6 +5,8 @@
     - Integer Physics
   √ Lav test til translation RL => SRL
   - Tests til web server og web client (Anders)
+    - UI testing (bliver nok ikke lavet helt)
+    - Test call to API
 
 ## Ellers
   - Rapporten skal sættes op. (LA)
@@ -28,3 +30,5 @@
   - Refaktorer Main og måske gøre den fælles? den er kringlet lige nu
   - Ret help igennem i tilfælde af, at der er fejl
   - (Open | Save)
+  - Ret fi (exp) l1 l2 (l1 not syntaxed)
+  - Ret pixel-column
