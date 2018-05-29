@@ -38,10 +38,10 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 \definecolor{KU-red}{RGB}{144,26,30}
 
-\lstloadlanguages{sh}
+\lstloadlanguages{sh,haskell}
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{greybg},
-    commentstyle=\color{codegreen},
+    commentstyle=\color{codegray},
     keywordstyle=\color{codeblue},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
@@ -62,9 +62,19 @@
 \lstset{
   basicstyle=\fontsize{10}{10}\ttfamily,
   keywordstyle=\color{purple}\ttfamily,
-  stringstyle=\color{red}\ttfamily,
+  ndkeywordstyle=\color{magenta}\ttfamily
   commentstyle=\color{gray}\ttfamily,
   morecomment=[l][\color{magenta}]{\#}
+}
+
+\lstdefinelanguage{javascript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, continue},
+  ndkeywords={class, export, boolean, throw, implements, import, from, default, this},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
 }
 
 \usepackage[T1]{fontenc}
