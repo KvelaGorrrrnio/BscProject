@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{LAN}
+ R.~Landauer, Irreversibility and heat generation in the computing process,
+  \emph{IBM Journal of Research and Development} \textbf{5}, 3  (1961),
+  183--191.
+
+\bibitem{REV}
+ T.~Yokoyama, H.~B. Axelsen, and R.~Gl{\"u}ck, Fundamentals of reversible
+  flowchart languages, \emph{Theoretical Computer Science}, 611  (2016),
+  87--115.
+
+\end{thebibliography}

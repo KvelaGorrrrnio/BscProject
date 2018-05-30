@@ -1,22 +1,19 @@
-main    := document
+main    := thesis
 outfile := thesis
 outdir  := out
+
 compile := pdflatex --output-directory=$(outdir) -shell-escape -file-line-error \
            -jobname $(outfile) $(main)
-bibtex  := bibtex $(outfile)
+bibtex  := bibtex $(outdir)/$(outfile)
 
-default: run
-
-run: compile
-	cd $(outdir) && $(bibtex)
-	$(compile)
+default: compile #run
 
 compile:
-	mkdir -p $(outdir)
-	cp *.{bst,cls,bib} $(outdir)
+	#mkdir -p $(outdir)
 	$(compile)
-	#cd $(outdir) && $(bibtex)
 	$(compile)
+	#$(bibtex)       - Commented out because it's slow and stuff
+	#$(compile)      - Commented out because it's slow and stuff
 
 clean:
 	rm -rf $(outdir)

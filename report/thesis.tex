@@ -1,8 +1,8 @@
-\documentclass[12pt,twoside,openright,pdftex]{DIKU-report}
+\documentclass[12pt,twoside,openright,pdftex]{style/DIKU-report}
 
 % KU-forside
-\usepackage[babel, en, titelside]{ku-forside}
-\usepackage{style}
+\usepackage[babel, en, titelside]{style/ku-forside}
+\usepackage{style/style}
 
 %% Frontmatter
 % Title page
@@ -36,11 +36,11 @@ Each report must include an abstract that summarizes the results.Recommended len
 % Inner chapters
 % Appendices
 
-\input{tex/introduction}
-\input{tex/background}
-\input{tex/implementation}
-\input{tex/documentation}
-\input{tex/appendices}
+\input{chapters/introduction}
+\input{chapters/background}
+\input{chapters/implementation}
+\input{chapters/documentation}
+\input{chapters/appendices}
 
 %% Backmatter
 % Bibliography
@@ -50,7 +50,7 @@ Each report must include an abstract that summarizes the results.Recommended len
 %% Translate.
 %% \end{acknowledgements}
 
-\bibliographystyle{DIKU}
-\bibliography{article-sample}
+\bibliographystyle{style/DIKU}
+\bibliography{references}
 
 \end{document}

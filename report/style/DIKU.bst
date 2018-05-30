@@ -34,16 +34,16 @@
 % American Mathematical Society bibliography style 13-Oct-1994 version 1.2beta
 % filename "amsplain.bst"
 
-% Status: Bibliography entries 
-% booklet, 
+% Status: Bibliography entries
+% booklet,
 % inbook,
 % misc,
 % have not been tested.
 % Cross-references have never been used.
 
-% BibtTeX is  a primitive stack engine created by Oren Patashnik. A style 
-% file like this translates the bibliography entries mentioned in an aux-file 
-% and described in a bib-file to a sequence of tokens (name, title, journal, 
+% BibtTeX is  a primitive stack engine created by Oren Patashnik. A style
+% file like this translates the bibliography entries mentioned in an aux-file
+% and described in a bib-file to a sequence of tokens (name, title, journal,
 % etc.) in the LaTeX-format to a bbl-file. This program considers the entries
 % one at a time, generates the tokens for each entry, and the mode tells
 % which separator is outputted _before_ each token. The default separator is
@@ -55,7 +55,7 @@
 % and field site which gives a Web address.
 %
 % webdocument
-% Required fields: (author or editor) or (organization and key), title, 
+% Required fields: (author or editor) or (organization and key), title,
 % site, year; Optional field: note
 %
 % website
@@ -326,7 +326,7 @@ FUNCTION {format.authors}
 FUNCTION {format.editors}
 { editor empty$
     { "" }
-    { editor format.names 
+    { editor format.names
       editor num.names$ #1 >
         { " (Editors)" * }
         { " (Editor)" * }
@@ -598,13 +598,13 @@ FUNCTION {format.incoll.inproc.crossref}
     { "in " format.crossref.editor * }
   if$
   " \cite{" * crossref * "}" *
-}  
+}
 
 FUNCTION {format.site}
-{ 
+{
 "\url{" site * "}" *
 }
-   	  
+
 FUNCTION {article}
 { output.bibitem
   format.authors "author" output.check
@@ -745,7 +745,7 @@ FUNCTION {incollection}
   crossref missing$
     { format.booktitle "booktitle" output.check
 %      format.editors output
-      format.series output      
+      format.series output
       format.edition output
       publisher "publisher" output.check
       address output
@@ -775,7 +775,7 @@ FUNCTION {inproceedings}
       format.series output
       publisher output
       address output
-      blank.mode 
+      blank.mode
       format.date "year" output.check
     }
     { format.incoll.inproc.crossref output.nonnull }
@@ -910,7 +910,7 @@ FUNCTION {techreport}
   period.mode
   site empty$
     'skip$
-    {    period.mode 
+    {    period.mode
      "Available at " output
     blank.mode
     format.site output
@@ -956,8 +956,8 @@ FUNCTION {webdocument}
       if$
     }
     { format.authors output }
-  if$  
-  comma.mode 
+  if$
+  comma.mode
   lower.title "title" output.check
   "Worldwide Web Document" output
   blank.mode
@@ -985,8 +985,8 @@ FUNCTION {webbook}
       if$
     }
     { format.authors output }
-  if$  
-  comma.mode 
+  if$
+  comma.mode
   format.title "title" output.check
   "Worldwide Web Document" output
   blank.mode
@@ -1016,7 +1016,7 @@ FUNCTION {website}
       if$
     }
     { format.authors output }
-  if$  
+  if$
   comma.mode
   lower.title "title" output.check
   "Website accessible at " output
