@@ -21,14 +21,13 @@
       √ Install
       - Usage
       - Testing
-  - README skal skrives. (Anders)
-    - Standard github readme for project
-    - Ret help til web-interface
 
 ## Finpudsninger
   - Kommentarer skal tjekkes igennem
-  - Refaktorer Main og måske gøre den fælles? den er kringlet lige nu
+  - Refaktorer Main og måske gøre den fælles? Den er kringlet lige nu
   - Ret help igennem i tilfælde af, at der er fejl
   - (Open | Save)
   - Ret fi (exp) l1 l2 (l1 not syntaxed)
-  - Ret pixel-column
+  - README skal skrives. (Anders)
+    - Standard github readme for project
+    - Ret help til web-interface
