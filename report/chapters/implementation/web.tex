@@ -12,9 +12,11 @@ The implementation of these are described in the following subsections.
 \subsection*{Client Interface}
 \addcontentsline{toc}{subsection}{Client Interface}%
 
-\subsubsection{Features}
-\addcontentsline{toc}{subsubsection}{Features}%
+%%%%%%%%%%%%%%%%%%%
+%%% Features
+%%%%%%%%%%%%%%%%%%%
 
+\noindent
 Before explaining the implementation of the client interface, the features of the interface will be described.
 If we look at the User Interface seen in Figure \ref{fig:web_client_ui}, we have 3 rectangular areas: The toolbar at the top; the code editor, located below the toolbar on the left hand side; the result area, located below the toolbar on the right hand side.
 
@@ -79,7 +81,7 @@ On the left hand side of the middle, the toolbar has some icons:\\
 \end{description}
 
 \noindent
-The right hand side of the toolbar is dedicated to modes and their associated actions. There are 4 modes which are chosen from the radio button group at the far right:\\
+The right hand side of the toolbar is dedicated to modes and their associated actions. There are 4 modes which are selected from the radio button group at the far right:\\
 
 \begin{description}
 
@@ -118,10 +120,12 @@ All the above modes have the ability to fail. Figure \ref{fig:web_client_error} 
   \label{fig:web_client_error}
 \end{figure}
 
-\subsubsection{Implementation}
-\addcontentsline{toc}{subsubsection}{}%
+%%%%%%%%%%%%%%%%%%%
+%%% Implementation
+%%%%%%%%%%%%%%%%%%%
 
 \noindent
+Now that the features has been introduced, we can look at the implementation hereof.
 The web client interface is a nodeJS project written in ECMAScript 6, using the library ReactJS, for creating modularised components.
 We chose to use ReactJS, instead of vanilla javascript and html, since it allows component rendering based on state.
 This way focus was primarily on state and logic, instead of design and propagating state to the application.
@@ -131,18 +135,24 @@ This way the possibilities where a specific state alteration can fail is limited
 
 \noindent
 The web client interface uses babel and webpack to compile and bundle scripts and resources.
-Webpack uses babel to convert JSX to React components and transpile ECMAScript 6 to ECMAScript 5, to allow for import statements.
-Webpack itself is used to precompile SASS to CSS, append prefixes to the CSS for better cross-browser support and bundling scripts, styles and assets for minimal HTTP requests.\\
+Webpack uses babel to convert JSX to React components and transpile ECMAScript 6 to ECMAScript 5, to allow for \texttt{import} statements.
+Webpack itself is used to precompile SASS, which is used for styling, to CSS, appending prefixes to the CSS for better cross-browser support and bundling scripts, styles and assets for minimal HTTP requests.\\
 
 \noindent
 The root of the web client is \path{/web/client}. Configuration files for node package dependencies and the webpack build flow are found here.
-Under the subdirectory \path{src/} all source files and resources are located.
-SASS files are found under \path{src/styles} and the ReactJS components are found under \path{src/components}.
+Under the subdirectory \path{src/} are all source files and resources located.
+ReactJS components are found under \path{src/components} and the corresponding styling/ SASS files are found under \path{src/styles} along with the theme color schemes in the subdirectory \path{src/styles/themes}.\\
 
-\todo{CodeMirror}
-
-\todo{Project important packages}\\
-\todo{Project structure}\\
+\todo{App component}
+\todo{Header component}
+  \todo{Radio, Button, Dropdown component}
+\todo{Editor component}
+  \todo{CodeMirror}
+\todo{Result component}
+\todo{Modals}
+  \todo{HelpModal}
+  \todo{OpenModal}
+  \todo{SaveModal}
 
 
 
