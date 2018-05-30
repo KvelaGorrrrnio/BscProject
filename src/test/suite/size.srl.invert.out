@@ -1,15 +1,15 @@
 int a
 list int l
 
-from (a = # l) do
+from (a = size l) do
   a -= 1
   l[a] /= 2
 loop
   skip
 until (a = 0)
-from (# l = 10) do
+from (size l = 10) do
   pop a l
-  a -= # l
+  a -= size l
 loop
   skip
-until (? l)
+until (empty l)

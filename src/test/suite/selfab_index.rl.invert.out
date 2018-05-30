@@ -9,7 +9,7 @@ end: entry
   swap lst'[0,3] lst'[2,0]
 goto next
 
-next: fi (# lst' = 5) end outloop
+next: fi (size lst' = 5) end outloop
   pop lst lst'
   v += 10
 goto loop
@@ -22,7 +22,7 @@ if (v = 0) outloop loop
 
 outloop: from loop
   skip
-if (? lst') start next
+if (empty lst') start next
 
 start: from outloop
   skip

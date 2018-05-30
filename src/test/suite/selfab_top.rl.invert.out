@@ -1,6 +1,6 @@
 list list list int N
 
 enter: entry
-  N[2,3,3] -= ^ (^ N[2])
+  N[2,3,3] -= top (top N[2])
   free N [4,4,4]
 exit

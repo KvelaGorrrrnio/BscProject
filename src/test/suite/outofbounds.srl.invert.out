@@ -7,14 +7,14 @@ pop n i
 n -= o[3,4]
 pop n i
 n -= o[2,1]
-from (# o = 5) do
+from (size o = 5) do
   pop i o
-  from (# i = 6) do
+  from (size i = 6) do
     pop n i
-    n -= # i + # o
+    n -= size i + size o
   loop
     skip
-  until (? i)
+  until (empty i)
 loop
   skip
-until (? o)
+until (empty o)

@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "int i\nint n\nlist int q\n\nend: entry\n  i += # q\ngoto loop\n\nloop: fi (i = # q) end loop\n  i -= 1\n  n -= (2 * q[# q - i - 1]) ** i\nif (i = 0) start loop\n\nstart: from loop\n  q[9] -= 1\n  q[5] -= 1\n  q[2] -= 1\n  free q [10]\nexit" }
+{ "type" : "code", "code" : "int i\nint n\nlist int q\n\nend: entry\n  i += size q\ngoto loop\n\nloop: fi (i = size q) end loop\n  i -= 1\n  n -= (2 * q[size q - i - 1]) ** i\nif (i = 0) start loop\n\nstart: from loop\n  q[9] -= 1\n  q[5] -= 1\n  q[2] -= 1\n  free q [10]\nexit" }

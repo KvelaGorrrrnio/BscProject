@@ -5,12 +5,12 @@ l0: entry
   skip
 goto l1
 
-l1: fi (? l) l0 l9
+l1: fi (empty l) l0 l9
   skip
 goto l6
 
 l6: from l1
-  n += # l + 1
+  n += size l + 1
 goto l10
 
 l10: from l6
@@ -35,7 +35,7 @@ goto l1
 
 l4: from l7
   skip
-if (# l = 10) l5 l8
+if (size l = 10) l5 l8
 
 l5: from l4
   pop n l

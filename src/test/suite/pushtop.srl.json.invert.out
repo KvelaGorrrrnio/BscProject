@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "list int a\nint b\nlist list list int c\n\nc[2,4,1] -= ^ (^ a[2])\nfree c [10,5,2]\npop b a\nb -= 3\npop b a\nb -= 2\npop b a\nb -= 1" }
+{ "type" : "code", "code" : "list int a\nint b\nlist list list int c\n\nc[2,4,1] -= top (top a[2])\nfree c [10,5,2]\npop b a\nb -= 3\npop b a\nb -= 2\npop b a\nb -= 1" }

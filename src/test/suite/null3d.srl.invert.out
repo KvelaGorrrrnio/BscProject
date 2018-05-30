@@ -6,18 +6,18 @@ int n
 n -= null N3
 swap N3[1,2,3] n
 n -= null N3
-from (# N3 = 4) do
+from (size N3 = 4) do
   pop N2 N3
-  from (# N2 = 4) do
+  from (size N2 = 4) do
     pop N1 N2
-    from (# N1 = 4) do
+    from (size N1 = 4) do
       pop n N1
     loop
       skip
-    until (? N1)
+    until (empty N1)
   loop
     skip
-  until (? N2)
+  until (empty N2)
 loop
   skip
-until (? N3)
+until (empty N3)

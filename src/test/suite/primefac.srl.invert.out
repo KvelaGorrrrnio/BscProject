@@ -3,10 +3,10 @@ list int p
 int v
 
 n += 1
-v += ^ p
+v += top p
 from (n = 1) do
-  if (not (? p) && ^ p = v) then
-    v ^= ^ p
+  if (not (empty p) && top p = v) then
+    v ^= top p
     pop v p
     n *= v
   else
@@ -14,6 +14,6 @@ from (n = 1) do
   fi (n % v = 0)
 loop
   skip
-until ((? p) && v = 2)
+until ((empty p) && v = 2)
 v -= 2
 n -= 315

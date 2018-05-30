@@ -5,7 +5,7 @@ l0: entry
   skip
 goto l1
 
-l1: fi (? N) l0 l15
+l1: fi (empty N) l0 l15
   skip
 goto l12
 
@@ -27,7 +27,7 @@ goto l1
 
 l10: from l13
   skip
-if (# N = 10) l11 l14
+if (size N = 10) l11 l14
 
 l11: from l10
   n += null N

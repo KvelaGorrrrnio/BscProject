@@ -6,18 +6,18 @@ list list int p
 list int q
 int s
 
-from (# S = 1) do
+from (size S = 1) do
   pop S1 S
-  from (# S1 = 1) do
+  from (size S1 = 1) do
     pop S2 S1
-    from (# S2 = 3) do
+    from (size S2 = 3) do
       pop s S2
     loop
       skip
-    until (? S2)
+    until (empty S2)
   loop
     skip
-  until (? S1)
+  until (empty S1)
 loop
   skip
-until (? S)
+until (empty S)
