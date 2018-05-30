@@ -61,8 +61,8 @@ SRL is more linear; as we see in Figure~\ref{fig:srlspec}, a program consists of
   \begin{subfigure}{\textwidth}
     \center
     $$\begin{matrix*}[l]
-      {a} & ::= & {x}\oplus= e & \quad\quad\quad &  e & ::= & {c} \ | \ {x} \ | \ {x}[ e] \ | \  e\otimes e \ | \ \texttt{top }{x} \ | \ \texttt{empty }{x}\\
-                 &  |  & {x}[ e]\oplus= e &     & {c} & ::= & 0\ | \ 1\ |\ \cdots\ |\ 4294967295\\
+      {a} & ::= & {x}\mathrel{\oplus}= e & \quad\quad\quad &  e & ::= & {c} \ | \ {x} \ | \ {x}[ e] \ | \  e\otimes e \ | \ \texttt{top }{x} \ | \ \texttt{empty }{x}\\
+                 &  |  & {x}[ e]\mathrel{\oplus}= e &     & {c} & ::= & 0\ | \ 1\ |\ \cdots\ |\ 4294967295\\
                  &  |  & \texttt{push }{x}\ {x}      &     & \otimes    & ::= & \oplus \ | \ * \ | \ / \ | \ \cdots\\
                  &  |  & \texttt{pop  }{x}\ {x}      &     & \oplus     & ::= & +  \ | \  -  \ | \  \textasciicircum\\
                  &  |  & \texttt{skip}\\
