@@ -5,7 +5,7 @@ list list int l'
 
 push a l
 push l l'
-b -= ^ (^ l')
+b -= top (top l')
 pop l l'
 pop a l
 a -= 5

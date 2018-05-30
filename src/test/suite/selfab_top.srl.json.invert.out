@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "list list list int N\n\nN[2,3,3] -= ^ (^ N[2])\nfree N [4,4,4]" }
+{ "type" : "code", "code" : "list list list int N\n\nN[2,3,3] -= top (top N[2])\nfree N [4,4,4]" }

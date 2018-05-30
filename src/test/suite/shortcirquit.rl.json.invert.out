@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "int n\nlist int q\n\nend: entry\n  skip\ngoto test\n\ncount: from test\n  pop n q\n  n -= 10 - # q\ngoto test\n\ntest: fi (? q || (^ q != 1)) count end\n  skip\nif (? q) start count\n\nstart: from test\n  skip\nexit" }
+{ "type" : "code", "code" : "int n\nlist int q\n\nend: entry\n  skip\ngoto test\n\ncount: from test\n  pop n q\n  n -= 10 - size q\ngoto test\n\ntest: fi (empty q || (top q != 1)) count end\n  skip\nif (empty q) start count\n\nstart: from test\n  skip\nexit" }

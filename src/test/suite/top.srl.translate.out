@@ -32,7 +32,7 @@ l8: from l11
 goto l9
 
 l9: from l8
-  b += ^ (^ l')
+  b += top (top l')
 goto l6
 
 l6: from l9

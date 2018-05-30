@@ -3,12 +3,12 @@ int n
 list int q
 
 end: entry
-  i += # q
+  i += size q
 goto loop
 
-loop: fi (i = # q) end loop
+loop: fi (i = size q) end loop
   i -= 1
-  n -= (2 * q[# q - i - 1]) ** i
+  n -= (2 * q[size q - i - 1]) ** i
 if (i = 0) start loop
 
 start: from loop

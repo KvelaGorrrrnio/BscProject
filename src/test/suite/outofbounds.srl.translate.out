@@ -6,16 +6,16 @@ l0: entry
   skip
 goto l1
 
-l1: fi (? o) l0 l17
+l1: fi (empty o) l0 l17
   skip
 goto l14
 
-l14: fi (? i) l1 l23
+l14: fi (empty i) l1 l23
   skip
 goto l20
 
 l20: from l14
-  n += # i + # o
+  n += size i + size o
 goto l24
 
 l24: from l20
@@ -40,7 +40,7 @@ goto l14
 
 l18: from l21
   skip
-if (# i = 6) l19 l22
+if (size i = 6) l19 l22
 
 l19: from l18
   push i o
@@ -60,7 +60,7 @@ goto l1
 
 l12: from l15
   skip
-if (# o = 5) l13 l16
+if (size o = 5) l13 l16
 
 l13: from l12
   n += o[2,1]

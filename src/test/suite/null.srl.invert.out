@@ -5,8 +5,8 @@ N[1] -= null n
 n -= null N
 pop n N
 n -= null N
-from (# N = 10) do
+from (size N = 10) do
   pop n N
 loop
   skip
-until (? N)
+until (empty N)

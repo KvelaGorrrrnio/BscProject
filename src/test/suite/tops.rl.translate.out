@@ -20,7 +20,7 @@ from (q_[0,1,0]) do
     n ^= 9
     push n q
     push q p
-    n += ^ (^ p)
+    n += top (top p)
     swap q_[1,1,1] q_[1,1,2]
   else
   if (q_[1,1,2]) then

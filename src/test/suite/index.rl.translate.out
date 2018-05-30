@@ -26,7 +26,7 @@ from (v_[0,1,0]) do
       swap v_[1,2,0] v_[2,2,1]
     else
       swap v_[4,2,0] v_[2,2,1]
-    fi (? lst')
+    fi (empty lst')
   else
   if (v_[2,2,1]) then
     swap v_[2,2,1] v_[2,2,2]
@@ -63,7 +63,7 @@ from (v_[0,1,0]) do
     swap v_[4,4,1] v_[4,4,2]
   else
   if (v_[4,4,2]) then
-    if (# lst' = 5) then
+    if (size lst' = 5) then
       swap v_[4,4,2] v_[4,5,0]
     else
       swap v_[4,4,2] v_[4,2,0]

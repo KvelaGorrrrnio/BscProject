@@ -22,7 +22,7 @@ l8: from l11
   skip
 goto l9
 
-l9: fi ((? p) && v = 2) l8 l15
+l9: fi ((empty p) && v = 2) l8 l15
   skip
 goto l12
 
@@ -47,7 +47,7 @@ l20: from l23
 goto l21
 
 l21: from l20
-  v ^= ^ p
+  v ^= top p
 goto l17
 
 l17: from l21
@@ -62,7 +62,7 @@ l19: from l18
   skip
 goto l13
 
-l13: fi (not (? p) && ^ p = v) l17 l19
+l13: fi (not (empty p) && top p = v) l17 l19
   skip
 goto l6
 
@@ -79,7 +79,7 @@ l6: from l13
 if (n = 1) l7 l14
 
 l7: from l6
-  v -= ^ p
+  v -= top p
 goto l4
 
 l4: from l7

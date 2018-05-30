@@ -1,0 +1,26 @@
+\section*{Usage}
+\addcontentsline{toc}{section}{Usage}%
+
+\subsection*{Command-Line Interface}
+\addcontentsline{toc}{subsection}{Command-Line Interface}%
+
+ The Command-Line Interface for \texttt{rl} and \texttt{srl} are almost identitical, the only real difference is the naming (rl instead of srl, and vice versa).
+ Thus only the interface for \texttt{rl} will be described.
+ Both Command-Line Interfaces has \texttt{--help} flags, which displays the different modes, options and flags, of which can be chosen and set.\\
+
+ \todo{Describe modes}\\
+
+\subsection*{Web Interface}
+\addcontentsline{toc}{subsection}{Web Interface}%
+
+For starting the web server, use \shcmd{$ make server}. This should yield an output ending with
+\begin{lstlisting}
+  Server has started.
+  Web interface is running at http://localhost:3001.
+\end{lstlisting}
+
+After starting the server and the above-shown output has been printed, every api-call and index page requests to the server is logged to \texttt{stdout}.
+The log contains for each request timestamp and the requested path - along with information describing the outcome (erroneous or succesful).
+For shutting down the server, use \texttt{Ctrl-C}.
+
+\todo{Hosting on two different addresses. (webpack.prod.config.js)}

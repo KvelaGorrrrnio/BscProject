@@ -55,8 +55,8 @@ instance Show Stmt where
   show (Update id op e _) = show id ++ show op ++ show e
   show (Push id1 id2 _)   = "push " ++ show id1 ++ " " ++ show id2
   show (Pop id1 id2 _)    = "pop "  ++ show id1 ++ " " ++ show id2
-  show (Init id dim _)      = "init " ++ id ++ " " ++ showIdx dim
-  show (Free id dim _)      = "free " ++ id ++ " " ++ showIdx dim
+  show (Init id dim _)    = "init " ++ id ++ " " ++ showIdx dim
+  show (Free id dim _)    = "free " ++ id ++ " " ++ showIdx dim
   show (Swap id1 id2 _)   = "swap " ++ show id1 ++ " " ++ show id2
   show (Skip _)           = "skip"
 getStmtPos :: Stmt -> Pos
@@ -157,13 +157,13 @@ data UnOp
   | Null
   deriving (Eq,Ord)
 instance Show UnOp where
-  show Neg   = "- "
-  show Sign  = "~ "
+  show Neg   = "neg "
+  show Sign  = "sig "
   show Not   = "not "
   show Null  = "null "
-  show Size  = "# "
-  show Empty = "? "
-  show Top   = "^ "
+  show Size  = "size "
+  show Empty = "empty "
+  show Top   = "top "
 
 
 -- ================

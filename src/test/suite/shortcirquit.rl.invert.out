@@ -7,12 +7,12 @@ goto test
 
 count: from test
   pop n q
-  n -= 10 - # q
+  n -= 10 - size q
 goto test
 
-test: fi (? q || (^ q != 1)) count end
+test: fi (empty q || (top q != 1)) count end
   skip
-if (? q) start count
+if (empty q) start count
 
 start: from test
   skip

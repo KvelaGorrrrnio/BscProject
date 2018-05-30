@@ -3,7 +3,7 @@ list list int p
 list int q
 
 start: entry
-  n -= ^ (^ p)
+  n -= top (top p)
   pop q p
   pop n q
   n -= 1

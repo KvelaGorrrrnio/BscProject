@@ -7,15 +7,15 @@ l0: entry
   skip
 goto l1
 
-l1: fi (? N3) l0 l13
+l1: fi (empty N3) l0 l13
   skip
 goto l10
 
-l10: fi (? N2) l1 l19
+l10: fi (empty N2) l1 l19
   skip
 goto l16
 
-l16: fi (? N1) l10 l25
+l16: fi (empty N1) l10 l25
   skip
 goto l22
 
@@ -37,7 +37,7 @@ goto l16
 
 l20: from l23
   skip
-if (# N1 = 4) l21 l24
+if (size N1 = 4) l21 l24
 
 l21: from l20
   push N1 N2
@@ -57,7 +57,7 @@ goto l10
 
 l14: from l17
   skip
-if (# N2 = 4) l15 l18
+if (size N2 = 4) l15 l18
 
 l15: from l14
   push N2 N3
@@ -77,7 +77,7 @@ goto l1
 
 l8: from l11
   skip
-if (# N3 = 4) l9 l12
+if (size N3 = 4) l9 l12
 
 l9: from l8
   n += null N3
