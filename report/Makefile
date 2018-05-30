@@ -4,16 +4,17 @@ outdir  := out
 
 compile := pdflatex --output-directory=$(outdir) -shell-escape -file-line-error \
            -jobname $(outfile) $(main)
-bibtex  := bibtex $(outdir)/$(outfile)
+#bibtex  := bibtex $(outdir)/$(outfile)
+biber   := biber $(outdir)/$(outfile)
 
 default: compile #run
 
 compile:
-	#mkdir -p $(outdir)
+	mkdir -p $(outdir)
 	$(compile)
 	$(compile)
-	#$(bibtex)       - Commented out because it's slow and stuff
-	#$(compile)      - Commented out because it's slow and stuff
+	$(biber)
+	$(compile)
 
 clean:
 	rm -rf $(outdir)

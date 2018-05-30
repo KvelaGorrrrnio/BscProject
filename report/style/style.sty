@@ -1,8 +1,28 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Package for changing to a nicer font
 \usepackage [T1]{fontenc}
+
+% Subcaptions
 \usepackage{subcaption}
+
+% For quotes
+\usepackage{dirtytalk}
+
+% For references
+\usepackage[
+backend=biber,
+style=numeric,
+sorting=ynt,
+citestyle=alphabetic % Change this for citation styles
+]{biblatex}
+
+\addbibresource{references.bib}
+
+% Appendix
 \usepackage[toc,page]{appendix}
+
+% Language and encoding
+\usepackage{lmodern}
 
 % figure positioning
 \usepackage{float}
