@@ -3,3 +3,6 @@ out/
 *.aux
 *.out
 *.pdf
+*.toc
+*.xml
+*.bbl
