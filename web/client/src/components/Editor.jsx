@@ -166,6 +166,8 @@ class Editor extends Component {
     const options = this.options;
     options.readOnly = this.props.stepState.stepping;
     if (this.editor) {
+      // Set size
+      this.editor.setSize('100%', '100%');
       // Reset
       for (var i=0; i<this.editor.doc.size; i++) {
         this.editor.doc.removeLineClass(i, 'wrap', 'error');

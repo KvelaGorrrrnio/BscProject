@@ -37,6 +37,10 @@
       float: right;
     }
 
+    .header-wrapper .controls .actions>* {
+      float: left;
+    }
+
     .header-wrapper .mode-controls {
       position: absolute;
       left: 50%; right: 0;

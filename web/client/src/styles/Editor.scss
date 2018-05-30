@@ -16,7 +16,7 @@
     
     .editor-wrapper {
       position: fixed;
-      left: 0; width: 50%;
+      left: 0; width: calc(50% - 1px);
       top: 50px; bottom: 0;
       border-right: 1px solid $forground-color;
       z-index: 100;

@@ -13,6 +13,8 @@
   .theme-#{$name} {
     
     ul.radio-wrapper li {
+      box-sizing: border-box;
+      height: 50px;
       padding: 16px;
       display: inline-block;
       cursor: pointer;
