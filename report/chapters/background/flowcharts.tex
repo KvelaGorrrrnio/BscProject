@@ -1,0 +1,147 @@
+
+% TODO: overordnet om flowcharts og reversible flowcharts
+\section*{Reversible Flowcharts}
+\addcontentsline{toc}{section}{Reversible Flowcharts}%
+Flowcharts are a natural way to model imperative programs. Similarly, \textit{reversible} imperative programs can be naturally modeled by reversible flowcharts. The two models are similar --- however, to actually guarantee reversibility in reversible flowcharts, we may define some additional attributes. More specifically, we may want any join point between two edges in a flowchart to be acknowledged through an assertion which can determine the origin of the control flow. The definition as seen in~\cite{REV} says that \\
+
+\say{A \textit{reversible flowchart $F$} is a finite directed graph with three types of nodes, each of which represents an \textit{atomic operation}} \\
+
+\noindent T. Yokotama et al.\ move on to describe the three atomic operations:
+\begin{description}
+  \item[(a)] the \textit{step} operation performs some injective (i.e.\ reversible) operation and passes the control flow to the outgoing edge,
+  \item[(b)] the \textit{test} passes the control flow to one of two outgoing edges depending on a predicate $e$, and
+  \item[(c)] the \textit{assertion} joins two edges and passes the control flow depending on a predicate $e$.
+\end{description}
+\noindent The atomic operations can be seen in Figure~\ref{fig:atop}. Having these as elementary building blocks of our reversible flowcharts, it is trivial to invert a program; simply invert each edge and, naturally, any step operation in the flowchart. This, in turn, means that the inversion of a test is an assertion and vice versa. The inversion of each atomic operation can be seen in Figure~\ref{fig:atopinv}.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \scalebox{0.8}{%
+      \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+        \node (a) [stmt] {$a$};
+        \node [output] (up)    [above of=a, node distance=1.1cm]{};
+        \node [input]  (end)   [right of=a, node distance=1.5cm]{};
+        \node [output] (start) [left  of=a, node distance=1.5cm]{};
+        \node [output] (down)  [below of=a, node distance=1.1cm]{};
+
+        \path[->] (start) edge node {} (a);
+        \path[->] (a) edge node {} (end) ;
+
+        \path[draw=none] (up) node {} (a);
+        \path[draw=none] (down) node {} (a);
+      \end{tikzpicture}
+    }
+    \caption{Step}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \scalebox{0.8}{%
+      \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+        \node (a) [test] {$e$};
+        \node [input]  (start) [left of=a, node distance=1.5cm]{};
+        \node [output]  (up)   [above of=a, node distance=1.2cm]{};
+        \node [output]  (ur)   [right of=up, node distance=1.2cm]{};
+        \node [output] (down)  [below of=a, node distance=1.2cm]{};
+        \node [output] (dr)    [right of=down, node distance=1.2cm]{};
+
+        \path[->] (start) edge node {} (a);
+        \path[-] (a) edge node {$t$} (up);
+        \path[->] (up) edge node {} (ur);
+        \path[-] (a) edge node {$f$} (down);
+        \path[->] (down) edge node {} (dr);
+      \end{tikzpicture}
+    }
+    \caption{Test}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \scalebox{0.8}{%
+      \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+        \node [assert] (a)    {$e$};
+        \node [input]  (up)   [below of=a, node distance=1.2cm]{};
+        \node [input]  (dr)   [left of=up, node distance=1.2cm]{};
+        \node [input]  (down) [above of=a, node distance=1.2cm]{};
+        \node [input]  (ur)   [left of=down, node distance=1.2cm]{};
+        \node [output] (end)  [right of=a, node distance=1.5cm]{};
+
+        \path[-] (dr) edge node {} (up);
+        \path[->] (up) edge node {$f$} (a);
+        \path[-] (ur) edge node {} (down);
+        \path[->] (down) edge node {$t$} (a);
+        \path[->] (a) edge node {} (end);
+      \end{tikzpicture}
+    }
+    \caption{Assertion}
+  \end{subfigure}
+  \caption{The three atomic operations of reversible flowcharts}\label{fig:atop}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \scalebox{0.8}{%
+      \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+        \node (a) [stmt] {$a^{-1}$};
+        \node [output] (up)    [above of=a, node distance=1.3cm]{};
+        \node [input]  (end)   [right of=a, node distance=1.5cm]{};
+        \node [output] (start) [left  of=a, node distance=1.5cm]{};
+        \node [output] (down)  [below of=a, node distance=1.3cm]{};
+
+        \path[->] (a) edge node {} (start);
+        \path[->] (end) edge node {} (a) ;
+
+        \path[draw=none] (up) node {} (a);
+        \path[draw=none] (down) node {} (a);
+      \end{tikzpicture}
+    }
+    \caption{Step}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \scalebox{0.8}{%
+      \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+        \node [assert] (a)    {$e$};
+        \node [input]  (up)   [below of=a, node distance=1.2cm]{};
+        \node [input]  (dr)   [right of=up, node distance=1.2cm]{};
+        \node [input]  (down) [above of=a, node distance=1.2cm]{};
+        \node [input]  (ur)   [right of=down, node distance=1.2cm]{};
+        \node [output] (end)  [left of=a, node distance=1.5cm]{};
+
+        \path[-] (dr) edge node {} (up);
+        \path[->] (up) edge node {$f$} (a);
+        \path[-] (ur) edge node {} (down);
+        \path[->] (down) edge node {$t$} (a);
+        \path[->] (a) edge node {} (end);
+      \end{tikzpicture}
+    }
+    \caption{Assertion}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \scalebox{0.8}{%
+      \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+        \node (a) [test] {$e$};
+        \node [input]  (start) [right of=a, node distance=1.5cm]{};
+        \node [output]  (up)   [above of=a, node distance=1.2cm]{};
+        \node [output]  (ur)   [left of=up, node distance=1.2cm]{};
+        \node [output] (down)  [below of=a, node distance=1.2cm]{};
+        \node [output] (dr)    [left of=down, node distance=1.2cm]{};
+
+        \path[->] (start) edge node {} (a);
+        \path[-] (a) edge node {$t$} (up);
+        \path[->] (up) edge node {} (ur);
+        \path[-] (a) edge node {$f$} (down);
+        \path[->] (down) edge node {} (dr);
+      \end{tikzpicture}
+    }
+    \caption{Test}
+  \end{subfigure}
+  \caption{Inversion of the three atomic operations of reversible flowcharts}\label{fig:atopinv}
+\end{figure}
+
+% figurer af de forskellige byggeklodser her tak
+
+\noindent This is the general idea of reversible flowcharts, and two incarnations of this model are RL and SRL.\
