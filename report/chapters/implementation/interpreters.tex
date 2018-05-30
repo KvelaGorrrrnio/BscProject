@@ -6,46 +6,57 @@
 \subsection*{Changes}
 \addcontentsline{toc}{subsection}{Changes}%
 
-Step operations added:
-  swap
-  init
-  free
+%Features:
+%  Explicit type variable type declaration
+%  Indexing in an arbitrary number of dimensions
+%  Larger integers
+%
+%Step operations added:
+%  swap
+%  init
+%  free
+%
+%Update operators added:
+%  multiplication
+%  division
+%
+%exp operators added:
+%  Binary:
+%    Power
+%    Equality
+%    Inequality
+%    Less than
+%    Less than or equal to
+%    Greater than
+%    Greater than or equal to
+%    Modulo
+%    Logical or
+%    Logical and
+%
+%  Unary:
+%    Negation
+%    Sign
+%    Logical negation
+%    Size
+%    Null
+%
+%Syntax:
+%  Shorthands:
+%    Skip  - .
+%    Empty - ?
+%    Not   - !
+%  Changes:
+%    RL: if e l1 l2 instead of if e goto l1 else l2
+%        fi e l1 l2 instead of fi e from l1 else l2
 
-Update operators added:
-  multiplication
-  division
 
-exp operators added:
-  Binary:
-    Power
-    Equality
-    Inequality
-    Less than
-    Less than or equal to
-    Greater than
-    Greater than or equal to
-    Modulo
-    Logical or
-    Logical and
+It is important to note that we have made a few changes to the languages. We have modified some of the syntax described in Figure~\ref{fig:rl_srl_grammar_and_structure}, but also added some new step operations and core features. Finally, we have added some shorthands for some common --- but a bit verbose --- structures of the proposed language. We have not, however, altered the very nature of any of the languages.\\
 
-  Unary:
-    Negation
-    Sign
-    Logical negation
-    Size
-    Null
+\noindent We found the paper\cite{REV} to be a bit unclear regarding types. The languages are described on the more abstract level, and the paper seems to assume som kind of (more or less) sophisticated type inference. We tried implementing a static check similar to type inference, but we deemed it too unrobust. This brings us to one of the most fundamental additions: explicit variable declarations. \\
 
-Features:
-  Explicit type variable type declaration
-  Indexing in an arbitrary number of dimensions
-
-Syntax:
-  Shorthands:
-    Skip  - .
-    Empty - ?
-    Not   - !
-
-It is important to note that we have made a few changes to the languages. We have modified some of the syntax described in Figure~\ref{fig:rl_srl_grammar_and_structure}, but also added some new step operations and core features.
+\noindent We have added three new step operations to the languages: \texttt{swap}, \texttt{init}, and \texttt{free}. \texttt{swap} has actually already been described in \cite[p.~99]{REV}, however, it was not included in the formal grammar of the languages. It is a simple, but powerful, step operation that is imperative for the \textit{Fibonacci-pair function} shown as an unstructured flowchart on \cite[p.~99]{REV} and as a structured flowchart on \cite[p.~93]{REV}. \texttt{swap} works simply by swapping the two variable operands and is, thus, its own inverse. Trying to swap two variables of different types will throw a runtime error. \\
+\indent \texttt{init} was defined and implemented by us as a way to quickly obtain a list of zero-values in an arbitrary number of dimensions. That is, $\texttt{init} \ l \ [x,y,z]$ will initialise list $l$ to be a 3-dimensional table of lengths $x$, $y$, and $z$ consisting of zeroes. This is, in particular, useful in the translation from RL to SRL; Here, we must begin the resulting SRL program by initialising an $n \times n \times 3$ table, where $n$ is the number of blocks in the source RL program. This would, if we did not have \texttt{init} at our disposal, require three nested loops and three temporary variables which are never used again. The inverse of \texttt{init} is \texttt{free}, which has a very similar syntax: $\texttt{free} \ l \ [x,y,z]$ will, if the dimensions and lengths of the list match $[x,y,z]$, reset list $l$ to an empty list. Do they not match, however, a runtime error will be thrown. The inverse of \texttt{free} is, naturally, \texttt{init}.\\
+\indent We did not consider the addition of \texttt{init} and \texttt{free} to be \textit{too} radical; after all, the same functionality could be simulated by simply having a sufficiently long sequence of \texttt{push}- (if \texttt{init}) or \texttt{pop} (if \texttt{free}) operations.
 
 \subsection*{Common}
 \addcontentsline{toc}{subsection}{Common}%
