@@ -19,15 +19,19 @@
 \BOOKMARK [2][-]{section*.23}{Client Interface}{section*.22}% 19
 \BOOKMARK [2][-]{section*.34}{Server \046 API}{section*.22}% 20
 \BOOKMARK [1][-]{section*.37}{Further Improvements}{chapter*.9}% 21
-\BOOKMARK [0][-]{chapter*.38}{Documentation}{}% 22
-\BOOKMARK [1][-]{section*.39}{Installation}{chapter*.38}% 23
-\BOOKMARK [2][-]{section*.40}{Command-Line Interface}{section*.39}% 24
-\BOOKMARK [2][-]{section*.41}{Web Interface}{section*.39}% 25
-\BOOKMARK [1][-]{section*.42}{Usage}{chapter*.38}% 26
+\BOOKMARK [2][-]{section*.38}{Interpretation}{section*.37}% 22
+\BOOKMARK [2][-]{section*.39}{Parsing}{section*.37}% 23
+\BOOKMARK [2][-]{section*.40}{Optimisation}{section*.37}% 24
+\BOOKMARK [0][-]{chapter*.41}{Documentation}{}% 25
+\BOOKMARK [1][-]{section*.42}{Installation}{chapter*.41}% 26
 \BOOKMARK [2][-]{section*.43}{Command-Line Interface}{section*.42}% 27
 \BOOKMARK [2][-]{section*.44}{Web Interface}{section*.42}% 28
-\BOOKMARK [0][-]{section*.48}{Appendices}{}% 29
-\BOOKMARK [0][-]{Appendix.a.A}{Source Code}{}% 30
-\BOOKMARK [1][-]{section.a.A.1}{Interpreter}{Appendix.a.A}% 31
-\BOOKMARK [1][-]{section.a.A.2}{Inversion}{Appendix.a.A}% 32
-\BOOKMARK [1][-]{section.a.A.3}{Translation}{Appendix.a.A}% 33
+\BOOKMARK [1][-]{section*.45}{Usage}{chapter*.41}% 29
+\BOOKMARK [2][-]{section*.46}{Command-Line Interface}{section*.45}% 30
+\BOOKMARK [2][-]{section*.47}{Web Interface}{section*.45}% 31
+\BOOKMARK [0][-]{section*.51}{Appendices}{}% 32
+\BOOKMARK [0][-]{Appendix.a.A}{Source Code}{}% 33
+\BOOKMARK [1][-]{section.a.A.1}{Interpreter}{Appendix.a.A}% 34
+\BOOKMARK [1][-]{section.a.A.2}{Inversion}{Appendix.a.A}% 35
+\BOOKMARK [1][-]{section.a.A.3}{Translation}{Appendix.a.A}% 36
+\BOOKMARK [0][-]{chapter*.52}{References}{}% 37

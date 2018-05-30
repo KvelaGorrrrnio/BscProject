@@ -1,41 +1,90 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
 \babel@toc {english}{}
+\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{Introduction}{1}{chapter*.2}
+\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{Background}{3}{chapter*.3}
+\defcounter {refsection}{0}\relax 
 \contentsline {section}{Reversible Flowcharts}{3}{section*.4}
+\defcounter {refsection}{0}\relax 
 \contentsline {section}{RL and SRL}{4}{section*.7}
+\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{Implementation}{7}{chapter*.9}
+\defcounter {refsection}{0}\relax 
 \contentsline {section}{The Interpreters}{7}{section*.10}
+\defcounter {refsection}{0}\relax 
 \contentsline {subsection}{Changes}{7}{section*.11}
-\contentsline {subsection}{Common}{7}{section*.12}
-\contentsline {subsection}{RL}{7}{section*.13}
-\contentsline {subsection}{SRL}{7}{section*.14}
-\contentsline {section}{Program Inversion}{7}{section*.15}
-\contentsline {subsection}{Common}{7}{section*.16}
-\contentsline {subsection}{RL}{7}{section*.17}
-\contentsline {subsection}{SRL}{7}{section*.18}
-\contentsline {section}{Program Translation}{7}{section*.19}
-\contentsline {subsection}{SRL to RL}{7}{section*.20}
-\contentsline {subsection}{RL to SRL}{7}{section*.21}
-\contentsline {section}{The Web Interface}{7}{section*.22}
-\contentsline {subsection}{Client Interface}{7}{section*.23}
-\contentsline {subsubsection}{Features}{7}{section*.24}
-\contentsline {subsubsection}{Features}{7}{section*.24}
-\contentsline {subsubsection}{Implementation}{11}{section*.33}
-\contentsline {subsubsection}{}{11}{section*.33}
-\contentsline {subsection}{Server \& API}{12}{section*.34}
-\contentsline {section}{Further Improvements}{14}{section*.37}
-\contentsline {chapter}{Documentation}{15}{chapter*.38}
-\contentsline {section}{Installation}{15}{section*.39}
-\contentsline {subsection}{Command-Line Interface}{15}{section*.40}
-\contentsline {subsection}{Web Interface}{15}{section*.41}
-\contentsline {section}{Usage}{16}{section*.42}
-\contentsline {subsection}{Command-Line Interface}{16}{section*.43}
-\contentsline {subsection}{Web Interface}{16}{section*.44}
-\contentsline {chapter}{Appendices}{19}{section*.48}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Common}{8}{section*.12}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{RL}{8}{section*.13}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{SRL}{8}{section*.14}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{Program Inversion}{8}{section*.15}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Common}{8}{section*.16}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{RL}{8}{section*.17}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{SRL}{8}{section*.18}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{Program Translation}{8}{section*.19}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{SRL to RL}{8}{section*.20}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{RL to SRL}{8}{section*.21}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{The Web Interface}{8}{section*.22}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Client Interface}{8}{section*.23}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Features}{8}{section*.24}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Features}{8}{section*.24}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Implementation}{12}{section*.33}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{}{12}{section*.33}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Server \& API}{13}{section*.34}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{Further Improvements}{16}{section*.37}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Interpretation}{16}{section*.38}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Parsing}{16}{section*.39}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Optimisation}{16}{section*.40}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Documentation}{17}{chapter*.41}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{Installation}{17}{section*.42}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Command-Line Interface}{17}{section*.43}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Web Interface}{17}{section*.44}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{Usage}{18}{section*.45}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Command-Line Interface}{18}{section*.46}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{Web Interface}{18}{section*.47}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Appendices}{21}{section*.51}
+\defcounter {refsection}{0}\relax 
 \setcounter {tocdepth}{2}
+\defcounter {refsection}{0}\relax 
 \begingroup \let \l@chapter \l@section \let \l@section \l@subsection 
-\contentsline {chapter}{\numberline {A}Source Code}{21}{Appendix.a.A}
-\contentsline {section}{\numberline {1}Interpreter}{21}{section.a.A.1}
-\contentsline {section}{\numberline {2}Inversion}{21}{section.a.A.2}
-\contentsline {section}{\numberline {3}Translation}{21}{section.a.A.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {A}Source Code}{23}{Appendix.a.A}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1}Interpreter}{23}{section.a.A.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2}Inversion}{23}{section.a.A.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3}Translation}{23}{section.a.A.3}
+\defcounter {refsection}{0}\relax 
 \endgroup 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{References}{25}{chapter*.52}
