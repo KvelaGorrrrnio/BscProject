@@ -1,0 +1,15 @@
+int S
+int s
+int v
+int y
+
+from (y <= 0) do
+  skip
+loop
+  s -= 1
+  v -= 981
+  y += v / S
+until (v = 0)
+y /= S
+S ^= 10000
+y ^= 16400

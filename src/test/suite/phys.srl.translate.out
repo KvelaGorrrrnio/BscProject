@@ -1,0 +1,76 @@
+int S
+int s
+int v
+int y
+
+l0: entry
+  skip
+goto l1
+
+l1: from l0
+  y ^= 16400
+goto l8
+
+l8: from l1
+  skip
+goto l9
+
+l9: from l8
+  S ^= 10000
+goto l6
+
+l6: from l9
+  skip
+goto l7
+
+l7: from l6
+  y *= S
+goto l4
+
+l4: from l7
+  skip
+goto l5
+
+l5: fi (v = 0) l4 l13
+  skip
+goto l10
+
+l10: from l5
+  skip
+goto l11
+
+l11: from l10
+  skip
+goto l2
+
+l12: from l2
+  y -= v / S
+goto l16
+
+l16: from l12
+  skip
+goto l17
+
+l17: from l16
+  v += 981
+goto l14
+
+l14: from l17
+  skip
+goto l15
+
+l15: from l14
+  s += 1
+goto l13
+
+l13: from l15
+  skip
+goto l5
+
+l2: from l11
+  skip
+if (y <= 0) l3 l12
+
+l3: from l2
+  skip
+exit

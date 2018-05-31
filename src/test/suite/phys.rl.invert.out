@@ -1,0 +1,20 @@
+int S
+int s
+int v
+int y
+
+end: entry
+  skip
+goto loop
+
+loop: fi (y <= 0) end loop
+  s -= 1
+  v -= 981
+  y += v / S
+if (v = 0) start loop
+
+start: from loop
+  y /= S
+  S ^= 10000
+  y ^= 16400
+exit

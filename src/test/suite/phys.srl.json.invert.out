@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int S\nint s\nint v\nint y\n\nfrom (y <= 0) do\n  skip\nloop\n  s -= 1\n  v -= 981\n  y += v / S\nuntil (v = 0)\ny /= S\nS ^= 10000\ny ^= 16400" }

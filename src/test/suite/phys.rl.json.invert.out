@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int S\nint s\nint v\nint y\n\nend: entry\n  skip\ngoto loop\n\nloop: fi (y <= 0) end loop\n  s -= 1\n  v -= 981\n  y += v / S\nif (v = 0) start loop\n\nstart: from loop\n  y /= S\n  S ^= 10000\n  y ^= 16400\nexit" }
