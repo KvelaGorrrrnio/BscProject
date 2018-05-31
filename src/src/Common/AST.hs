@@ -43,7 +43,7 @@ sort' :: Ord a => [(a, b)] -> [(a, b)]
 sort' = sortBy (compare `on` fst)
 
 -- Statements
-data Stmt = Update Id UpdOp Exp Pos
+data Step = Update Id UpdOp Exp Pos
           | Push Id Id Pos
           | Pop  Id Id Pos
           | Swap Id Id Pos
@@ -51,7 +51,7 @@ data Stmt = Update Id UpdOp Exp Pos
           | Init String [Exp] Pos
           | Free String [Exp] Pos
           deriving Eq
-instance Show Stmt where
+instance Show Step where
   show (Update id op e _) = show id ++ show op ++ show e
   show (Push id1 id2 _)   = "push " ++ show id1 ++ " " ++ show id2
   show (Pop id1 id2 _)    = "pop "  ++ show id1 ++ " " ++ show id2
@@ -59,14 +59,14 @@ instance Show Stmt where
   show (Free id dim _)    = "free " ++ id ++ " " ++ showIdx dim
   show (Swap id1 id2 _)   = "swap " ++ show id1 ++ " " ++ show id2
   show (Skip _)           = "skip"
-getStmtPos :: Stmt -> Pos
-getStmtPos (Update _ _ _ p) = p
-getStmtPos (Push _ _ p)     = p
-getStmtPos (Pop _ _ p)      = p
-getStmtPos (Swap _ _ p)     = p
-getStmtPos (Skip p)         = p
-getStmtPos (Init _ _ p)     = p
-getStmtPos (Free _ _ p)     = p
+getStepPos :: Step -> Pos
+getStepPos (Update _ _ _ p) = p
+getStepPos (Push _ _ p)     = p
+getStepPos (Pop _ _ p)      = p
+getStepPos (Swap _ _ p)     = p
+getStepPos (Skip p)         = p
+getStepPos (Init _ _ p)     = p
+getStepPos (Free _ _ p)     = p
 
 data UpdOp = PlusEq | MinusEq | XorEq| MultEq | DivEq deriving Eq
 instance Show UpdOp where

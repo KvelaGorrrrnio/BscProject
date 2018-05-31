@@ -48,7 +48,7 @@ interp from l = do
       unless (from == l') $
         lift $logError $ RuntimeError p $ FromFail from l'
 
-  lift $ execStmts ss
+  lift $ execSteps ss
 
   let msg = show j
 
@@ -62,6 +62,6 @@ interp from l = do
 
       if q then interp l l1 else interp l l2
 
-execStmts :: [Stmt] -> VarState ()
-execStmts = mapM_ logStmt
+execSteps :: [Step] -> VarState ()
+execSteps = mapM_ logStep
 

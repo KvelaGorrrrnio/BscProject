@@ -41,10 +41,10 @@ getIdx p (ListV lst _) idx = eval idx >>= \case
   where index :: [Value] -> Integer -> Maybe Value
         index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
 
-logStmt :: Stmt -> VarState ()
-logStmt s = do
+logStep :: Step -> VarState ()
+logStep s = do
     exec s
-    msg <- gets (MsgStmt s)
+    msg <- gets (MsgStep s)
     tell [msg]
 
 logError :: Error -> VarState a
@@ -75,7 +75,7 @@ adjust' op (e:es) p vo = do
 -- ==========
 -- Statements
 -- ==========
-exec :: Stmt -> VarState ()
+exec :: Step -> VarState ()
 
 -- variable updates
 exec (Update (Id id exps) op e p) = do

@@ -23,19 +23,19 @@ instance JSON Log where
     ++ " }"
 msgsToJSON :: [Message] -> String
 msgsToJSON ms = intercalate ", " $ map jsonMsg ms
-  where jsonMsg (MsgStmt stmt vtab) =
-          let (l,c) = getStmtPos stmt in
-             "{ \"type\" : \"statement\", "
+  where jsonMsg (MsgStep step vtab) =
+          let (l,c) = getStepPos step in
+             "{ \"type\" : \"step\", "
           ++ "\"position\" : { \"line\" : "++ show l ++ ", \"column\" : " ++ show c ++ " }, "
-          ++ "\"statement\" : \"" ++ (escStr . show) stmt ++ "\", "
+          ++ "\"step\" : \"" ++ (escStr . show) step ++ "\", "
           ++ "\"state\" : " ++ jsonTab "vartab" vtab ++ " }"
         jsonMsg (MsgError e) = stringify e
 
-data Message = MsgStmt   Stmt VarTab
+data Message = MsgStep   Step VarTab
              | MsgError  Error
 instance Show Message where
-  show (MsgStmt s vtab)  =
-    "line " ++ (show . fst . getStmtPos) s ++ "\n> " ++
+  show (MsgStep s vtab)  =
+    "line " ++ (show . fst . getStepPos) s ++ "\n> " ++
     case s of
       Skip{}  -> show s
       _       -> show s ++ "\n" ++ showTab vtab

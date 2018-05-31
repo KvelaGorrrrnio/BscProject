@@ -10,7 +10,7 @@ invert :: AST -> AST
 invert = reverse . map (\(l,b) -> (l, invertBlock b))
 
 invertBlock :: Block -> Block
-invertBlock (f,s,j) = (invertJump j, invertStmts s, invertFrom f)
+invertBlock (f,s,j) = (invertJump j, invertSteps s, invertFrom f)
 
 invertOp :: UpdOp -> UpdOp
 invertOp PlusEq  = MinusEq
@@ -29,5 +29,5 @@ invertFrom (From l p)     = Goto l p
 invertFrom (Fi e l1 l2 p) = If e l1 l2 p
 invertFrom (Entry p)      = Exit p
 
-invertStmts :: [Stmt] -> [Stmt]
-invertStmts = reverse . map invertStmt
+invertSteps :: [Step] -> [Step]
+invertSteps = reverse . map invertStep

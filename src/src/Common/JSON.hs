@@ -6,7 +6,7 @@ module Common.JSON
 , jsonError
 , jsonTab
 , jsonCode
-, getStmtPos
+, getStepPos
 ) where
 
 import Common.AST

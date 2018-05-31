@@ -24,10 +24,10 @@ block :: Parser Block
 block = foldl1 Seq <$> many1 block'
 
 block' :: Parser Block
-block' = stmtBlock <|> ifBlock <|> untilBlock
+block' = stepBlock <|> ifBlock <|> untilBlock
 
-stmtBlock :: Parser Block
-stmtBlock = Step <$> statement
+stepBlock :: Parser Block
+stepBlock = Step <$> step
 
 ifBlock :: Parser Block
 ifBlock = do

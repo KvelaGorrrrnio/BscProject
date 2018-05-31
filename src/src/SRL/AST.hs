@@ -35,7 +35,7 @@ showBlock lvl b = case b of
 
   where indent = doIndent lvl
 
-data Block = Step Stmt
+data Block = Step Step
            | If Exp Block Block Exp
            | Until Bool Exp Block Block Exp
            | Seq Block Block

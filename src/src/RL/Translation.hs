@@ -155,7 +155,7 @@ trlFrom (Fi e lj lk _) i b2 = do
 
 
 -- steps
-trlSteps :: [Stmt] -> Int -> SRL.Block -> TrlReader SRL.Block
+trlSteps :: [Step] -> Int -> SRL.Block -> TrlReader SRL.Block
 trlSteps ss i b2 = do
   x <- vec
 

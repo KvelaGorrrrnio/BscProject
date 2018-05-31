@@ -28,7 +28,7 @@ block = do
   l <- identifier'
   colon
   f <- from
-  s <- many statement
+  s <- many step
   j <- jump
   return (l, (f,s,j))
 

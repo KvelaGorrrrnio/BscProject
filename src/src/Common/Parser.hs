@@ -25,7 +25,7 @@ languageDef =
                                       , "exit"
                                       , "goto"
                                       , "if"
-                                      -- statements
+                                      -- steps
                                       , "skip" , "." -- for consice notation
                                       , "swap"
                                       , "push"
@@ -103,18 +103,18 @@ typet = (reserved "int" >> return IntT)
     <|> (reserved "list" >> ListT <$> typet)
     <|> (ListT <$> brackets typet)
 
-statement :: Parser Stmt
-statement = pos >>= \p -> (\s->s p)
-        <$> (try updateStmt
-        <|> swapStmt
-        <|> skipStmt
-        <|> pushStmt
-        <|> popStmt
-        <|> initStmt
-        <|> freeStmt)
+step :: Parser Step
+step = pos >>= \p -> (\s->s p)
+        <$> (try updateStep
+        <|> swapStep
+        <|> skipStep
+        <|> pushStep
+        <|> popStep
+        <|> initStep
+        <|> freeStep)
 
-updateStmt :: Parser (Pos -> Stmt)
-updateStmt = Update <$> identifier <*> update <*> expression
+updateStep :: Parser (Pos -> Step)
+updateStep = Update <$> identifier <*> update <*> expression
 
 update = (reservedOp "+=" >> return PlusEq)
      <|> (reservedOp "-=" >> return MinusEq)
@@ -122,26 +122,26 @@ update = (reservedOp "+=" >> return PlusEq)
      <|> (reservedOp "*=" >> return MultEq)
      <|> (reservedOp "/=" >> return DivEq)
 
-skipStmt :: Parser (Pos -> Stmt)
-skipStmt = (reserved "skip" <|> reserved ".") >> return Skip
+skipStep :: Parser (Pos -> Step)
+skipStep = (reserved "skip" <|> reserved ".") >> return Skip
 
-swapStmt :: Parser (Pos -> Stmt)
-swapStmt = reserved "swap" >> Swap <$> identifier <*> identifier
+swapStep :: Parser (Pos -> Step)
+swapStep = reserved "swap" >> Swap <$> identifier <*> identifier
 
-pushStmt :: Parser (Pos -> Stmt)
-pushStmt = reserved "push" >> Push <$> identifier <*> identifier
+pushStep :: Parser (Pos -> Step)
+pushStep = reserved "push" >> Push <$> identifier <*> identifier
 
-popStmt :: Parser (Pos -> Stmt)
-popStmt = reserved "pop" >> Pop <$> identifier <*> identifier
+popStep :: Parser (Pos -> Step)
+popStep = reserved "pop" >> Pop <$> identifier <*> identifier
 
-initStmt :: Parser (Pos -> Stmt)
-initStmt = do
+initStep :: Parser (Pos -> Step)
+initStep = do
   reserved "init"
   id  <- identifier'
   Init id <$> indices1
 
-freeStmt :: Parser (Pos -> Stmt)
-freeStmt = do
+freeStep :: Parser (Pos -> Step)
+freeStep = do
   reserved "free"
   id  <- identifier'
   Free id <$> indices1
