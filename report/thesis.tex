@@ -3,38 +3,44 @@
 % Load styles
 \usepackage{style/style}
 
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{1}
 
 \begin{document}
 
-\input{frontpage}
+% Front page
+\title{%
+  Reversible Programming Languages\\
+  and Program Transformations
+}%
+\author{Lars Vadgaard \& Anders JÃ¸rgensen}
+\date{Juni 2018}%
 
-\begin{abstract}
-Each report must include an abstract that summarizes the results.Recommended length is at most 150 words.  The abstract should notcontain any references or displayed equations.
-\end{abstract}
+\ThisCenterWallPaper{1.0}{figures/nat-farve.pdf}
+\ThisCenterWallPaper{1.0}{figures/nat-en.pdf}
 
+\maketitle
+\clearpage\maketitle
+\thispagestyle{empty}
+\newpage
+\setcounter{page}{1}
+
+% Abstract
+\input{chapters/abstract}
+
+% Table of contents
 \tableofcontents
 
-
 % Inner chapters
-% Appendices
-
 \input{chapters/introduction}
 \input{chapters/background}
 \input{chapters/implementation}
 \input{chapters/documentation}
 \input{chapters/conclusion}
+
+% Appendices
 \input{chapters/appendices}
 
-% Bibliography
-
-%% \begin{acknowledgements}
-%% Den danske tekst i dette dokument er fremstillet ved hjælp af Google
-%% Translate.
-%% \end{acknowledgements}
-
-%\bibliographystyle{style/DIKU}
-%\bibliography{references}
+% References
 \newpage
 \printbibliography[heading=bibintoc,title={References}]
 
