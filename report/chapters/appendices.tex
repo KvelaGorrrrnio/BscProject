@@ -1,8 +1,18 @@
 \begin{appendices}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+\makeatletter
+\addtocontents{toc}{%
+  \begingroup
+  \let\protect\l@chapter\protect\l@section
+  \let\protect\l@section\protect\l@subsection
+}
+\makeatother
+  \chapter{Source Code}
+  \section{Interpreter}
+  \section{Inversion}
+  \section{Translation}
 
-\chapter{Source Code}
-\section{Interpreter}
-\section{Inversion}
-\section{Translation}
+  \chapter{Other stuff}
 
+\addtocontents{toc}{\endgroup}
 \end{appendices}
