@@ -4,7 +4,7 @@ import * as c from './colors';
 
 // Constants
 const maxBuffer = 1024 * 3000; // 3 MB
-const timeout   = 1000; // 1 s
+const timeout   = 10000; // 10 s
 
 // Setup
 const api = Router();
