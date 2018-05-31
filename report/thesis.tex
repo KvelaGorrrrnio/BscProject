@@ -1,49 +1,13 @@
 \documentclass[12pt,twoside,openright,pdftex]{report}
 
-% KU-forside
-%\usepackage[babel, en, titelside]{style/ku-forside}
+% Load styles
 \usepackage{style/style}
 
-%% Frontmatter
-% Title page
-% Abstract
-% Table of contents
-% Preface
-
-%% Titelsideinformation
-%\title{Reversible Programming Languages} %
-%\undertitle{--- and Program Transformations} %
-%\opgave{Bachelor's Thesis} % Findes kun under 'titleside'
-%\forfatter{Lars Vadgaard \& Anders Jørgensen}
-%\dato{Juni 2018}%
-%\vejleder{Robin Kaarsgaard} %  Findes kun under 'titleside'
-
-
-
-\title{
-    \vspace{5cm}
-    \Huge{\textsc{Something}}\\
-    \huge{\textsc{Something}}
-}
-
-% Author
-\author{\textsc{lalalalal}}
-
-\ThisCenterWallPaper{1.0}{figures/nat-farve.pdf}
-\ThisCenterWallPaper{1.0}{figures/nat-en.pdf}
-
-
-
-
-
 \setcounter{tocdepth}{2}
+
 \begin{document}
 
-\maketitle
-\clearpage\maketitle
-\thispagestyle{empty}
-\newpage
-\setcounter{page}{1}
+\input{frontpage}
 
 \begin{abstract}
 Each report must include an abstract that summarizes the results.Recommended length is at most 150 words.  The abstract should notcontain any references or displayed equations.
