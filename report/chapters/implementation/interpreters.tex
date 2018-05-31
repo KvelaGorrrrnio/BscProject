@@ -1,8 +1,8 @@
 
 %% The interpreters
-\section*{The Interpreters}
+\section{The Interpreters}
 
-\subsection*{Changes}
+\subsection{Changes}
 
 %Features:
 %  Explicit type variable type declaration
@@ -57,10 +57,11 @@ It is important to note that we have made a few changes to the languages. We hav
 \indent \texttt{init} was defined and implemented by us as a way to quickly obtain a list of zero-values in an arbitrary number of dimensions. That is, $\texttt{init} \ l \ [x,y,z]$ will initialise list $l$ to be a 3-dimensional table of lengths $x$, $y$, and $z$ consisting of zeroes. This is, in particular, useful in the translation from RL to SRL; Here, we must begin the resulting SRL program by initialising an $n \times n \times 3$ table, where $n$ is the number of blocks in the source RL program. This would, if we did not have \texttt{init} at our disposal, require three nested loops and three temporary variables which are never used again. The inverse of \texttt{init} is \texttt{free}, which has a very similar syntax; $\texttt{free} \ l \ [x,y,z]$ will, if the dimensions and lengths of the list match $[x,y,z]$, reset list $l$ to an empty list. Do they not match, however, a runtime error will be thrown. This guarantees the reversibility of \texttt{init} and \texttt{free}. The inverse of \texttt{free} is, naturally, \texttt{init}.\\
 \indent We did not consider the addition of \texttt{init} and \texttt{free} to be \textit{too} radical; after all, the same functionality could be simulated by simply having a sufficiently long sequence of \texttt{push}- (if \texttt{init}) or \texttt{pop} (if \texttt{free}) operations.\\
 
-\noindent We have also added two update operators: multiplication and division. Here we must be cautious: The right-hand side of a multiplication update must not be zero. This would lead to loss of information and make the program irreversible. Also, the right-hand side of a division update must be a divisor of the left-hand side --- a potential division rest would be lost, and the program would therefore not be reversible. If these rules are not respected, a runtime error is thrown. We have that $x \timeseq e$ is an inverse to $x \diveq e$ and vice versa.
+\noindent
+We have also added two update operators: multiplication and division. Here we must be cautious: The right-hand side of a multiplication update must not be zero. This would lead to loss of information and make the program irreversible. Also, the right-hand side of a division update must be a divisor of the left-hand side --- a potential division rest would be lost, and the program would therefore not be reversible. If these rules are not respected, a runtime error is thrown. We have that $x \timeseq e$ is an inverse to $x \diveq e$ and vice versa.
 
-\subsection*{Common}
+\subsection{Common}
 
-\subsection*{RL}
+\subsection{RL}
 
-\subsection*{SRL}
+\subsection{SRL}

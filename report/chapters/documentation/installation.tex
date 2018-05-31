@@ -1,4 +1,4 @@
-\section*{Installation}
+\section{Installation}
 
 Both the interpreters for RL and SRL and the web interface can be found at the same github repository: \href{https://github.com/KvelaGorrrrnio/BscProject}{KvelaGorrrrnio/BscProject}.\\
 To get the code, clone the repository with:
@@ -6,7 +6,7 @@ To get the code, clone the repository with:
 
 The different parts of the project use different build systems. To simplify the build-flow Makefiles are used as a wrapping build-system, to supply a uniform build interface for the project.
 
-\subsection*{Command-Line Interface}
+\subsection{Command-Line Interface}
 The Interpreters and the Command-Line Interface are located under the \path{/src} directory, but can be build from the project root directory.
 The underlying dependency manager and build system for the Command-Line Interface is Stack, which can be installed by one of following:\\
 \shcmd{$ brew install haskell-stack cabal-install ghc # MacOS}\\
@@ -18,7 +18,7 @@ When standing at the project root, there are two ways of installing the Command-
 First option is to \shcmd{$ make src}, which builds the \texttt{rl} and \texttt{srl} executables into \path{/src/bin}. Copy the executables to your local bin, for system wide usage.\\
 Second option is to \shcmd{$ make install}, which installs the \texttt{rl} and \texttt{srl} executables directly to the stack local bin, for system wide usage. This requires that the stack local bin is in your \texttt{\$PATH}.
 
-\subsection*{Web Interface}
+\subsection{Web Interface}
 
 The web client interface is found under \path{/web/client} and the web server is found under \path{/web/server}.
 Both the server and the client application is build and runned with NodeJS. NodeJS can be installed by one of the following:\\

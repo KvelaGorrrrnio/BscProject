@@ -1,6 +1,6 @@
 
 %% Web interface
-\section*{The Web Interface}
+\section{The Web Interface}
 
 The purpose of the web interface is to grant a simpler way to users for interacting with the interpreters.
 This is split up in two parts:
@@ -8,11 +8,13 @@ The server, which handles the routing of the web server and serves the client in
 The client part, which is the actual web interface that the user sees.
 The implementation of these are described in the following subsections.
 
-\subsection*{Client Interface}
+\subsection{Client Interface}
 
 %%%%%%%%%%%%%%%%%%%
 %%% Features
 %%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Features}
 
 \noindent
 Before explaining the implementation of the client interface, the features of the interface will be described.
@@ -122,6 +124,8 @@ All the above modes have the ability to fail. Figure \ref{fig:web_client_error} 
 %%% Implementation
 %%%%%%%%%%%%%%%%%%%
 
+\subsubsection{Implementation}
+
 \noindent
 Now that the features has been introduced, we can look at the implementation hereof.
 The web client interface is a nodeJS project written in ECMAScript 6, using the library ReactJS, for creating modularised components.
@@ -155,7 +159,7 @@ ReactJS components are found under \path{src/components} and the corresponding s
 
 
 
-\subsection*{Server \& API}
+\subsection{Server \& API}
 
 The web server is an independent node project, when built uses the Client Web Interface and the Command-Line Interface as dependencies.
 These are build and copied into the web server project folder.
