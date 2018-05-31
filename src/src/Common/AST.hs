@@ -46,8 +46,8 @@ sort' = sortBy (compare `on` fst)
 data Step = Update Id UpdOp Exp Pos
           | Push Id Id Pos
           | Pop  Id Id Pos
-          | Swap Id Id Pos
           | Skip Pos
+          | Swap Id Id Pos
           | Init String [Exp] Pos
           | Free String [Exp] Pos
           deriving Eq
@@ -171,9 +171,7 @@ instance Show UnOp where
 -- ================
 
 type TypeTab = M.HashMap String Type
-data Type = IntT
-          | ListT Type
-          deriving (Eq)
+data Type = IntT | ListT Type deriving Eq
 instance Show Type where
   show IntT = "int"
   show (ListT tp) = "list " ++ show tp

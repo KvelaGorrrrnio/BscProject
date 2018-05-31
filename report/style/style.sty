@@ -17,6 +17,9 @@
 %%%%%%%%%%%%%%%%%%%%
 % Figures
 
+% Wrapping figures
+\usepackage{wrapfig}
+
 % Subcaptions
 \usepackage{subcaption}
 
@@ -47,6 +50,10 @@
 \usepackage{listings}
 \usepackage{color,xcolor}
 
+% Set path to source
+%\lstset{inputpath=../../src/src/}
+%\lstset{inputpath=./}
+
 % Colors
 \definecolor{graybg}{RGB}{246,247,248}
 \definecolor{codeblue}{RGB}{15,126,227}
@@ -73,7 +80,7 @@
   basicstyle        = \fontsize{9}{9}\ttfamily,
   backgroundcolor   = \color{graybg},
   commentstyle      = \color{gray},
-  keywordstyle      = \color{codeblue}
+  keywordstyle      = \color{codeblue},
   ndkeywordstyle    = \color{magenta},
   stringstyle       = \color{purple},
   numberstyle       = \tiny\color{gray},
