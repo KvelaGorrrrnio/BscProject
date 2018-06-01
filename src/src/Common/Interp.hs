@@ -27,17 +27,17 @@ execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 
 rd :: Id -> Pos -> VarState Value
 rd (Id id exps) p = gets (mLookup id) >>= \case
-  Just v  -> foldM (\acc e -> getIdx (getExpPos e) acc e) v exps
+  Just v  -> foldM getIdx v exps
   Nothing -> logError $ RuntimeError p $ NonDefinedId id
 
-getIdx :: Pos -> Value -> Exp -> VarState Value
-getIdx p (IntV n) _ = logError $ RuntimeError p IndexOnNonListExp
-getIdx p (ListV lst _) idx = eval idx >>= \case
+getIdx :: Value -> Exp -> VarState Value
+getIdx (IntV n) idx = logError $ RuntimeError (getExpPos idx) IndexOnNonListExp
+getIdx (ListV lst _) idx = eval idx >>= \case
   IntV i | i < 0     -> logError $ RuntimeError (getExpPos idx) NegativeIndex
     | otherwise -> case index lst i of
       Just v  -> return v
       Nothing -> logError $ RuntimeError (getExpPos idx) IndexOutOfBounds
-  w -> logError $ RuntimeError p NonIntegerIndex
+  w -> logError $ RuntimeError (getExpPos idx) NonIntegerIndex
   where index :: [Value] -> Integer -> Maybe Value
         index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
 
@@ -53,17 +53,17 @@ logError err = do
   throwError err
 
 adjust :: (Value -> Value) -> Id -> Pos -> VarState ()
-adjust op (Id id []) p = modify $ M.adjust op id
+adjust op (Id id []) _ = modify $ M.adjust op id
 adjust op (Id id exps) p = do
   v <- rd (Id id []) p
-  mn <- adjust' op exps p v
+  mn <- adjust' op exps v
   modify $ M.insert id mn
 
-adjust' :: (Value -> Value) -> [Exp] -> Pos -> Value -> VarState Value
-adjust' op [] p vo = return $ op vo
-adjust' op (e:es) p vo = do
-  v <- getIdx p vo e
-  vi <- adjust' op es p v
+adjust' :: (Value -> Value) -> [Exp] -> Value -> VarState Value
+adjust' op [] vo = return $ op vo
+adjust' op (e:es) vo = do
+  v <- getIdx vo e
+  vi <- adjust' op es v
   case vo of
     ListV lst t -> eval e >>= \case
       IntV i -> return $ ListV (replace lst i vi) t
@@ -85,7 +85,7 @@ exec (Update (Id id exps) op e p) = do
   v1 <- rd (Id id exps) p
   n <- case v1 of
     IntV n -> return n
-    w      -> logError $ RuntimeError p $ UpdateOnNonIntager (Id id exps) (getType w)
+    w      -> logError $ RuntimeError p $ UpdateOnNonInteger (Id id exps) (getType w)
 
   v2 <- eval e
   m <- case v2 of
@@ -168,8 +168,10 @@ exec (Swap id1 id2 p) = do
   v1 <- rd id1 p
   v2 <- rd id2 p
 
-  unless (getType v1 == getType v2)
-    $ logError $ RuntimeError p $ SwapNotSameType (getType v1) (getType v2)
+  let t1 = getType v1
+      t2 = getType v2
+  unless (t1 == t2)
+    $ logError $ RuntimeError p $ SwapNotSameType t1 t2
 
   adjust (const v2) id1 p >> adjust (const v1) id2 p
 
@@ -260,10 +262,8 @@ eval (Binary op l r p)
     case (vl, vr) of
       (IntV n, IntV m) -> return $ IntV (mapBinOp op n m)
       (ListV ls1 t1, ListV ls2 t2)
-        | t1 == t2 -> case op of
-          Equal     -> return $ IntV (boolToInt $ ls1==ls2)
-          Neq       -> return $ IntV (boolToInt $ ls1/=ls2)
-        | otherwise -> logError $ RuntimeError p $ ConflictingTypes [t1,t1] [t1,t2]
+        | op == Equal && t1 == t2 -> return $ IntV (boolToInt $ ls1==ls2)
+        | op == Neq   && t1 == t2 -> return $ IntV (boolToInt $ ls1/=ls2)
       (v,w) -> logError $ RuntimeError p $ ConflictingTypes [IntT,IntT] [getType v, getType w]
 
   -- binary div and mod

@@ -38,7 +38,7 @@ data RuntimeError
   | DivByZero
   | DivHasRest
   | MultByZero
-  | UpdateOnNonIntager Id Type
+  | UpdateOnNonInteger Id Type
   | InitOnNonList String
   | InitNonEmptyList String
   | ConflictingDimensions
@@ -93,7 +93,7 @@ instance Show RuntimeError where
   show DivByZero = "Division by zero."
   show DivHasRest = "Division has rest."
   show MultByZero = "Multiplication update by zero."
-  show (UpdateOnNonIntager idx t) = "Tried updating non-" ++ show IntT ++ " identifier '" ++ show idx ++ "' of type " ++ show t
+  show (UpdateOnNonInteger idx t) = "Tried updating non-" ++ show IntT ++ " identifier '" ++ show idx ++ "' of type " ++ show t
   show (InitOnNonList id) = "Tried initializing non-list identifier '" ++ id ++ "'"
   show (InitNonEmptyList id) = "Tried initliazing non-empty list identifier '" ++ id ++ "'"
   show ConflictingDimensions = "The number of dimensions specified does not match depth of list type."

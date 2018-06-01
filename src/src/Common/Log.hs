@@ -16,7 +16,7 @@ logToString :: Log -> String
 logToString (Log _ ms) = intercalate "\n\n" . map show $ ms
 
 instance JSON Log where
-  stringify (Log vt ms) = 
+  stringify (Log vt ms) =
     "{ \"type\" : \"log\", "
     ++ "\"state\" : " ++ jsonTab "vartab" vt ++ ", "
     ++ "\"table\" : [" ++ msgsToJSON ms ++ "]"

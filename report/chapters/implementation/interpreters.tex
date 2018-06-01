@@ -84,7 +84,7 @@ Values in the languages are, as previously stated, either integers or lists. The
   \caption{Implementation of the types}\label{fig:type}
 \end{figure}
 
-\noindent The store of our interpreters --- that is, the variable state --- is represented as a hashmap with strings as keys and \texttt{Value}s as values. Thus, reading a variable in an expression amounts to simply do a lookup in the store, while an update simply has to, well, update the store.\\
+\noindent The store of our interpreters --- that is, the variable state --- is represented by the type synonym \texttt{VarTab} as a hashmap with strings as keys and \texttt{Value}s as values. Thus, reading a variable in an expression amounts to simply do a lookup on the hashmap, while an update simply has to, well, update the store.\\
 
 \noindent Next, we have expressions. These are exactly as described in the paper, but with the additions covered in \ref{sec:changes}. The implementation can be seen in Figure~\ref{fig:exp}. As expected, \texttt{Exp} is a recursive data type terminated by a literal value or a variable lookup. Since we do not support list literals, a literal value is assumed to be an integer.
 
@@ -125,7 +125,65 @@ where $([e,\dots])$ means that you can optionally index in an arbitrary number o
   \caption{Implementation of the step operations}\label{fig:step}
 \end{figure}
 
-This module also contains the code for errors and the log, but we won't go into too much detail as to how they are implemented. The log is simply a list of specialised messages that can either be a step operation or an error.
+\subsubsection{Errors and Log}
+The \textit{Common} module also contains the implementation of the error- and log types, but we won't go into too much detail as to \textit{how} they are implemented. To understand the interpreters, however, a few things about these must be clear.\\
+
+\noindent Each error type is represented in a data structure \texttt{Error} in \texttt{Common/Error.hs}:
+\begin{description}
+  \item[\texttt{RuntimeError}] covers the errors thrown at runtime. This includes type errors, division by zero, etc.
+  \item[\texttt{ParseError}] is simply a wrapper for potential parse errors. This is to be able to handle all errors in a single place.
+  \item[\texttt{StaticError}] covers the errors that can be identified in a static check. While this is in the \textit{Common} module, static errors are exclusive to RL. This includes errors thrown because of duplicate entries, duplicate exits, etc.
+  \item[\texttt{Custom}] is a generic error type used for anything that we did not feel was covered by any of the previous types. Namely, if no file (or code, if the \texttt{-c} has been set --- more on that later) has been given to the interpreter in the command-line interface, a `custom` error is thrown.
+\end{description}
+
+\noindent Having specialised error types makes it easier to handle the concrete messages, all in one place, using the \texttt{Show} typeclass.\\
+
+\noindent The log (found in \texttt{Common/Log.hs}) is simply a list of specialised messages (our own \texttt{Message} type) that can either be a step operation or an error. When a program is interpreted, each step operation that is executed, along with the state of the program after the execution, is recorded in the log. If an error is thrown, this is recorded as well before the interpretation terminates. This gives us a simple debugger that will work with both the command-line interface and the web user interface.
+
+\subsubsection{Interpretation}
+\texttt{Common/Interp.hs} contains the core interpreting engine --- that is, the execution of step operations and evaluation of expressions. We define the core monad transformer, with type synonym \texttt{VarState}, to contain the state monad (for the store), the except monad (for error handling), and the writer monad (for the log). The concrete \texttt{VarState} can be seen in Figure~\ref{fig:varstate}.
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=24, lastline=24]{../src/src/Common/Interp.hs}
+  \caption{The core monad transformer}\label{fig:varstate}
+\end{figure}
+
+\noindent The \texttt{exec} function, whose type signature can be seen in Figure~\ref{fig:exec}, is the function that executes a step operation and updates the program state (\texttt{VarTab}) accordingly.
+
+%% Type signature of exec
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=78, lastline=78]{../src/src/Common/Interp.hs}
+  \caption{Type signature of \texttt{exec}}\label{fig:exec}
+\end{figure}
+
+\noindent It would consume too much space to show the complete implementation of \texttt{exec}, so an example or two (as seen in Figure~\ref{fig:examples}) should be enough. Figure~\ref{fig:exupdate} shows the implementation of the variable update; here, we first check if the identifier being updated occurs in the expression on the right-hand side. If it does, we throw a runtime error. Next, we get the value of the variable being updated and then evaluate the right-hand expression. If one of these is not an integer, we throw an error. Before actually updating, we check if the update is either a multiplication update or division update, and if so, if they respect the rules mentioned in \ref{sec:changes}. Finally, we update the store with the new value. This implicitly handles indexing; \texttt{rd}, seen on line 5 of Figure~\ref{fig:exupdate}, reads a variable from the store and, if one or more indices are provided, digs deeper into the list to return the corresponding entry. \texttt{adjust}, seen on the last line of the same example, works in the same way, but replaces each list on the path and performs a given operation on the innermost index of the list.
+
+Figure~\ref{fig:exswap} shows the implementation of the swap operation;
+
+
+
+
+%% The two examples of exec
+\begin{figure}
+
+  \begin{subfigure}{\textwidth}
+    \lstinputlisting[language=haskell, firstline=81, lastline=104]{../src/src/Common/Interp.hs}
+    \caption{Implementation of the variable update.}\label{fig:exupdate}
+  \end{subfigure}
+
+  \begin{subfigure}{\textwidth}
+    \lstinputlisting[language=haskell, firstline=167, lastline=176]{../src/src/Common/Interp.hs}
+    \caption{Implementation of the swap operation.}\label{fig:exswap}
+  \end{subfigure}
+
+  \caption{Two examples of step operation execution.}\label{fig:examples}
+
+\end{figure}
+
+\subsubsection{Parser}
+The parser was implemented using Parsec.
+\todo{Snak om Parsec}
+
 
 \subsection{The \textit{RL} Module}
 
