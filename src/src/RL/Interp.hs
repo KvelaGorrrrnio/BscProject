@@ -30,38 +30,39 @@ runProgram ast ttab =
 
 interp :: Label -> Label -> ProgState ()
 interp from l = do
-  blks <- ask
+
   Just (f,ss,j) <- asks (lookup l)
 
   case f of
     Entry p      -> unless (null from)
-      $ lift $ logError $ RuntimeError p $ FromFail (show $ Entry p) from -- (CustomRT $ "From-clause not consistent.\nComing from entry\nExpecting label: " ++ from ))
+      $ llogError $ RuntimeError p $ FromFail (show $ Entry p) from
+
     From l' p    -> unless (from == l')
-      $ lift $ logError $ RuntimeError p $ FromFail from l' -- CustomRT $ "From-clause not consistent.\nComing from label: " ++ from ++ "\nExpecting label:   " ++ l' ))
+      $ llogError $ RuntimeError p $ FromFail from l'
+
     Fi a l1 l2 p -> do
-      q <- lift $ eval a >>= \case
+      q <- leval a >>= \case
         IntV q -> return $ q/=0
-        w      -> logError $ RuntimeError (getExpPos a) $ ConflictingType IntT (getType w)
+        w      -> llogError $ RuntimeError (getExpPos a) $ ConflictingType IntT (getType w)
 
       let l' = if q then l1 else l2
 
-      unless (from == l') $
-        lift $logError $ RuntimeError p $ FromFail from l'
+      unless (from == l')
+        $ llogError $ RuntimeError p $ FromFail from l'
 
-  lift $ execSteps ss
-
-  let msg = show j
+  logSteps ss
 
   case j of
-    Exit _         -> return ()
-    Goto l' _      -> interp l l'
+    Exit _       -> return ()
+    Goto l' _    -> interp l l'
     If c l1 l2 p -> do
-      q <- lift $ eval c >>= \case
+      q <- leval c >>= \case
         IntV q -> return $ q/=0
-        w      -> logError $ RuntimeError (getExpPos c) $ ConflictingType IntT (getType w)
+        w      -> llogError $ RuntimeError (getExpPos c) $ ConflictingType IntT (getType w)
 
       if q then interp l l1 else interp l l2
 
-execSteps :: [Step] -> VarState ()
-execSteps = mapM_ logStep
+  where logSteps  = lift . mapM_ logStep
+        leval     = lift . eval
+        llogError = lift . logError
 
