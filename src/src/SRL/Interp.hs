@@ -1,9 +1,9 @@
 {-# LANGUAGE LambdaCase #-}
 module SRL.Interp (module SRL.Interp, module Common.Log, module SRL.AST) where
 
-import SRL.Error
 import SRL.AST
 
+import Common.Error
 import Common.Interp
 import Common.Log
 

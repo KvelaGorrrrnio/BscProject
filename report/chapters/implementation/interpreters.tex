@@ -56,59 +56,76 @@ We do not consider the addition of \texttt{init} and \texttt{free} to be \textit
 
 % Values
 % Types
-% Step operations
 % Expressions
+% Step operations
 
 % Errors
 % Log
 
-The \textit{Common} module contains the implementation of the subset of features that is shared between the two languages. At the most fundamental level are the identifiers, the values, and their types. Identifiers mark a variable in the program and can contain zero or more indices. No indices correspond, naturally, to just a variable $x$, while one or more indices correspond to indexing on a list $x[e,\dots]$. The implementation can be seen in~\ref{fig:identifier}. Values in the languages are, as previously stated, either integers or listst. The implementation can be seen in Figure~\ref{fig:val}. Note that list values have an extra field that specifies their type -- that is, essentially, the depth of the list; this makes it trivial to perform dynamic type checks in the interpreter. The definition of \texttt{Type} can be seen in~\ref{fig:type}.
+The \textit{Common} module contains the implementation of the subset of features that is shared between the two languages.
+
+\subsubsection{Abstract syntax tree and utilities}
+\texttt{Common/AST.hs} contains the parts of the specific abstract syntax trees that are shared between the two languages. Furthermore, it contains some extra data types and functions that are used in both the RL- and SRL modules.
+
+At the most fundamental level are the identifiers, the values, and their types. Identifiers mark a variable in the program and can contain zero or more indices. No indices correspond, naturally, to just a variable $x$, while one or more indices correspond to indexing on a list $x[e,\dots]$. The implementation can be seen in~\ref{fig:identifier}.
+
+Values in the languages are, as previously stated, either integers or lists. The implementation of \texttt{Value} can be seen in Figure~\ref{fig:val}. Note that list values have an extra field that specifies their type -- that is, essentially, the depth of the list; this makes it trivial to perform dynamic type checks in the interpreter. The implementation of \texttt{Type} as a recursive data type can be seen in~\ref{fig:type}.
 
 \begin{figure}[H]
   \lstinputlisting[language=haskell, firstline=21, lastline=21]{../src/src/Common/AST.hs}
-  \caption{The fundamental value types of RL and SRL}\label{fig:identifier}
+  \caption{Implementation of identifiers}\label{fig:identifier}
 \end{figure}
 \begin{figure}[H]
   \lstinputlisting[language=haskell, firstline=9, lastline=9]{../src/src/Common/AST.hs}
-  \caption{The fundamental value types of RL and SRL}\label{fig:val}
+  \caption{Implementation of the fundamental value types}\label{fig:val}
 \end{figure}
 \begin{figure}[H]
   \lstinputlisting[language=haskell, firstline=174, lastline=174]{../src/src/Common/AST.hs}
-  \caption{The types}\label{fig:type}
+  \caption{Implementation of the types}\label{fig:type}
 \end{figure}
 
-\noindent Next, we have step operations. Revisiting~\ref{fig:common}, we can focus on the definition of the step operations. We have that a step operation $a$ is given by
+\noindent The store of our interpreters --- that is, the variable state --- is represented as a hashmap with strings as keys and \texttt{Value}s as values. Thus, reading a variable in an expression amounts to simply do a lookup in the store, while an update simply has to, well, update the store.\\
+
+\noindent Next, we have expressions. These are exactly as described in the paper, but with the additions covered in \ref{sec:changes}. The implementation can be seen in Figure~\ref{fig:exp}. As expected, \texttt{Exp} is a recursive data type terminated by a literal value or a variable lookup. Since we do not support list literals, a literal value is assumed to be an integer.
+
+\begin{figure}[h]
+  \lstinputlisting[language=haskell, firstline=79, lastline=85]{../src/src/Common/AST.hs}
+  \caption{Implementation of expressions}\label{fig:exp}
+\end{figure}
+
+\noindent Other than that, we have the \texttt{Binary} structure which takes a binary operator (\texttt{BinOp}) and two expressions, recursively, as arguments. Binary operators can easily be defined separately. The same goes for the \texttt{Unary} structure; this takes a unary operator (\texttt{UnOp}) and an expression, recursively. Unary operators, as binary operators, can easily be defined separately. The final expression is simply to mark parentheses; this makes it trivial to write a program to a file which, when parsed, has the guaranteed same expression precedences, and thus, same behaviour as the original.\\
+
+\noindent Finally, we have step operations. Revisiting~\ref{fig:common}, we can focus on the definition of the step operations. We have that a step operation $a$ is given by
 \[
 \begin{matrix*}[l]
   {a} & ::= & {x}\mathrel{\oplus}= e \\
              &  |  & {x}[ e]\mathrel{\oplus}= e \\
              &  |  & \texttt{push }{x}\ {x} \\
              &  |  & \texttt{pop  }{x}\ {x} \\
-             &  |  & \texttt{skip}.
+             &  |  & \texttt{skip}
 \end{matrix*}
 \]
-If we add our additional step operations (as described in~\ref{sec:changes}), we have
+If we add our additional step operations and features (as described in~\ref{sec:changes}), we have
 \[
 \begin{matrix*}[l]
-%  {a} & ::= & {x}\mathrel{\oplus}= e \\
-%             &  |  & {x}[ e]\mathrel{\oplus}= e \\
-%             &  |  & \texttt{push }{x}\ {x} \\
-%             &  |  & \texttt{pop  }{x}\ {x} \\
-%             &  |  & \texttt{skip} \\
-%             &  |  & \texttt{swap} \ x \ x \\
-  \dots \\
-             &  |  & \texttt{init} \ [e,\dots] \\
-             &  |  & \texttt{free} \ [e,\dots]
+  {a} & ::= & {x}([ e,\dots])\mathrel{\oplus}= e \\
+      &  |  & \texttt{push }{x}([e,\dots])\ {x}([e,\dots]) \\
+      &  |  & \texttt{pop  }{x}([e,\dots])\ {x}([e,\dots]) \\
+      &  |  & \texttt{skip} \\
+%  \dots \\
+      &  |  & \texttt{swap} \ x([e,\dots]) \ x([e,\dots]) \\
+      &  |  & \texttt{init} \ x \ [e,\dots] \\
+      &  |  & \texttt{free} \ x \ [e,\dots],
 \end{matrix*}
 \]
-
-\noindent This was pretty straightforward to implement, and the corresponding code can be seen in Figure~\ref{fig:step}.
+where $([e,\dots])$ means that you can optionally index in an arbitrary number of dimensions. The implementation of this was straightforward, and the corresponding code can be seen in Figure~\ref{fig:step}.
 
 \begin{figure}[H]
   \lstinputlisting[language=haskell, firstline=46, lastline=53]{../src/src/Common/AST.hs}
-  \caption{The step operations}\label{fig:step}
+  \caption{Implementation of the step operations}\label{fig:step}
 \end{figure}
 
+This module also contains the code for errors and the log, but we won't go into too much detail as to how they are implemented. The log is simply a list of specialised messages that can either be a step operation or an error.
 
 \subsection{The \textit{RL} Module}
 

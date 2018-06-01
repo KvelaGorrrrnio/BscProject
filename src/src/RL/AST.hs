@@ -5,7 +5,7 @@ import Data.Bits (xor)
 import Data.List (intercalate)
 
 import Common.AST
-import RL.Error
+import Common.Error
 
 -- ===
 -- AST

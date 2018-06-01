@@ -1,11 +1,11 @@
 {-# LANGUAGE LambdaCase #-}
 module RL.Interp (module RL.Interp, module Common.Log, module RL.AST) where
 
-import RL.Error
 import RL.AST
 
 import Common.Interp
 import Common.Log
+import Common.Error
 
 import Control.Monad.Reader
 import Control.Monad.Except

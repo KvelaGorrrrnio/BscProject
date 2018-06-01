@@ -9,8 +9,8 @@ import SRL.Parser
 import SRL.Translation
 import SRL.Inversion
 import SRL.Interp
-import SRL.Error
 
+import Common.Error
 import Common.HandleArgs
 import Common.JSON
 

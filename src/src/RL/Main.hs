@@ -10,8 +10,8 @@ import RL.Translation
 import RL.Inversion
 import RL.Static
 import RL.Interp
-import RL.Error
 
+import Common.Error
 import Common.HandleArgs
 import Common.JSON
 

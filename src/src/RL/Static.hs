@@ -3,7 +3,8 @@ module RL.Static
 ) where
 
 import RL.AST
-import RL.Error
+
+import Common.Error
 
 import Control.Monad
 import Control.Monad.Reader
