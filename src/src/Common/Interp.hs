@@ -281,23 +281,24 @@ eval (Binary op l r p)
     IntV 0 | op==And        -> return $ IntV 0
     IntV v | v/=0 && op==Or -> return $ IntV 1
     IntV _ -> eval r >>= \case
-        IntV n -> return $ IntV (norm n)
+        IntV n -> return $ IntV (if n==0 then 0 else 1)
         w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
     w -> logError $ RuntimeError p $ NonIntegerExp (getType w)
 
-  -- unary arithmetic
 eval (Unary op exp p)
+
+  -- unary arithmetic
   | op <= Sign = eval exp >>= \case
     IntV n -> return $ IntV (mapUnOp op n)
     w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
 
   -- unary logical
-  | op < Size = eval exp >>= \case
+  | op <= Not = eval exp >>= \case
     IntV n -> return $ IntV (mapUnOp op n)
     w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
 
-  | op == Null = IntV . boolToInt . allZero <$> eval exp
   -- unary list
+  | op == Null = IntV . boolToInt . allZero <$> eval exp
   | otherwise = eval exp >>= \case
     ListV ls t -> case op of
       Top   -> case ls of

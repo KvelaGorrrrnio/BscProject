@@ -150,11 +150,11 @@ data UnOp
   -- v Logical
   | Not
   -- ^ Logical
-  -- v Stack
+  -- v List
+  | Null
   | Size
   | Empty
   | Top
-  | Null
   deriving (Eq,Ord)
 instance Show UnOp where
   show Neg   = "neg "
@@ -212,11 +212,6 @@ mapBinOp Geq     = \n -> boolToInt . (n>=)
 mapUnOp Neg  = negate
 mapUnOp Sign = signum
 mapUnOp Not  = boolToInt . (==0)
-
--- normalise
-norm :: Integer -> Integer
-norm 0 = 0
-norm _ = 1
 
 -- converting bool to val
 boolToInt :: Bool -> Integer

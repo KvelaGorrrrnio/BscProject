@@ -52,7 +52,7 @@ We do not consider the addition of \texttt{init} and \texttt{free} to be \textit
 \noindent to simply
 \[\texttt{if} \ e \ l \ l.\]
 
-\subsection{The \textit{Common} Module}
+\subsection{Interpreter Core}
 
 % Values
 % Types
@@ -62,7 +62,7 @@ We do not consider the addition of \texttt{init} and \texttt{free} to be \textit
 % Errors
 % Log
 
-The \textit{Common} module contains the implementation of the subset of features that is shared between the two languages.
+The \textit{Common} module contains the implementation of the core features that are shared between the two languages.
 
 \subsubsection{Abstract syntax tree and utilities}
 \texttt{Common/AST.hs} contains the parts of the specific abstract syntax trees that are shared between the two languages. Furthermore, it contains some extra data types and functions that are used in both the RL- and SRL modules.
@@ -156,15 +156,12 @@ The \textit{Common} module also contains the implementation of the error- and lo
   \caption{Type signature of \texttt{exec}}\label{fig:exec}
 \end{figure}
 
-\noindent It would consume too much space to show the complete implementation of \texttt{exec}, so an example or two (as seen in Figure~\ref{fig:examples}) should be enough. Figure~\ref{fig:exupdate} shows the implementation of the variable update; here, we first check if the identifier being updated occurs in the expression on the right-hand side. If it does, we throw a runtime error. Next, we get the value of the variable being updated and then evaluate the right-hand expression. If one of these is not an integer, we throw an error. Before actually updating, we check if the update is either a multiplication update or division update, and if so, if they respect the rules mentioned in \ref{sec:changes}. Finally, we update the store with the new value. This implicitly handles indexing; \texttt{rd}, seen on line 5 of Figure~\ref{fig:exupdate}, reads a variable from the store and, if one or more indices are provided, digs deeper into the list to return the corresponding entry. \texttt{adjust}, seen on the last line of the same example, works in the same way, but replaces each list on the path and performs a given operation on the innermost index of the list.
+\noindent It would consume too much space to show the complete implementation of \texttt{exec}, so an example or two (as seen in Figure~\ref{fig:examples}) should be enough. Figure~\ref{fig:exupdate} shows the implementation of the variable update; we first check if the identifier being updated occurs in the expression on the right-hand side. If it does, we throw a runtime error. Next, we fetch the value of the variable being updated and then evaluate the right-hand expression. If one of these is not an integer, we throw an error. Before actually updating, we check if the update is either a multiplication update or division update, and if so, if they respect the rules mentioned in \ref{sec:changes}. Finally, we update the store with the new value. This implicitly handles indexing; \texttt{rd}, seen on line 5 of Figure~\ref{fig:exupdate}, reads a variable from the store and, if one or more indices are provided, digs deeper into the list to return the corresponding entry. \texttt{adjust}, seen on the last line of the same example, works in the same way, but replaces each list on the path and performs a given operation on the innermost index of the list.
 
-Figure~\ref{fig:exswap} shows the implementation of the swap operation;
-
-
-
+Figure~\ref{fig:exswap} shows the implementation of the swap operation; we first fetch the value of the two variables being swapped, then check if they are of the same type. If not, we throw a runtime error. Otherwise, we update the first operand to the value of the second and vice versa.
 
 %% The two examples of exec
-\begin{figure}
+\begin{figure}[h]
 
   \begin{subfigure}{\textwidth}
     \lstinputlisting[language=haskell, firstline=81, lastline=104]{../src/src/Common/Interp.hs}
@@ -180,9 +177,39 @@ Figure~\ref{fig:exswap} shows the implementation of the swap operation;
 
 \end{figure}
 
+\noindent Evaluation of expressions takes place in the \texttt{eval} function. The type signature can be seen in Figure~\ref{fig:eval}.
+
+%% Type signature of eval
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=250, lastline=250]{../src/src/Common/Interp.hs}
+  \caption{Type signature of \texttt{eval}}\label{fig:eval}
+\end{figure}
+
+\noindent Again, two concrete examples (as seen in Figure~\ref{fig:evalexamples}) should suffice. In Figure~\ref{fig:exbinary} we handle the case of the binary operators denoting addition, subtraction, bitwise exclusive or, power, multiplication, equality, and inequality. We first evaluate the left and right operands and check their types. Except for the case of equality, only integer values are supported. Thus, if the operator is not `equals` or `not equals`, the two operands \textit{have} to be integers. If this rule is not respected, a runtime error is thrown. If nothing fails, the operator is applied and the resulting value is returned.
+
+  In Figure~\ref{fig:exunary} we handle the case where an arithmetic negation or the sign function occurs. The approach here is very similar to that in Figure~\ref{fig:exbinary}, however, having only one operand to handle, we can do in a more concise manner. We evaluate the operand and make sure that it results in an integer. If i doesn't, we throw a runtime error. Otherwise, we apply the operator and return the resulting value.
+
+%% The two examples of eval
+\begin{figure}[h]
+
+  \begin{subfigure}{\textwidth}
+    \lstinputlisting[language=haskell, firstline=256, lastline=267]{../src/src/Common/Interp.hs}
+    \caption{Partly implementation of binary operator expression evaluation.}\label{fig:exbinary}
+  \end{subfigure}
+
+  \begin{subfigure}{\textwidth}
+    \lstinputlisting[language=haskell, firstline=288, lastline=293]{../src/src/Common/Interp.hs}
+    \caption{Partly implementation of unary operator expression evaluation.}\label{fig:exunary}
+  \end{subfigure}
+
+  \caption{Two examples of expression evaluation.}\label{fig:evalexamples}
+
+\end{figure}
+
+\noindent Note that \texttt{logError} (for example seen on line 3 of \ref{fig:exupdate}) is simply a function that records a given error in the log before throwing it and halting the execution.
+
 \subsubsection{Parser}
-The parser was implemented using Parsec.
-\todo{Snak om Parsec}
+The parser was implemented using Parsec along with the Token helper module to perform a lexical analysis implicitly. Not surprisingly, the common parser module defines the parsers of the common language structures. These will be use in the specialised parsers.
 
 
 \subsection{The \textit{RL} Module}

@@ -12,9 +12,9 @@ default: compile #run
 compile:
 	mkdir -p $(outdir)
 	$(compile)
-	#$(compile)
-	#$(biber)
-	#$(compile)
+	$(compile)
+	$(biber)
+	$(compile)
 
 clean:
 	rm -rf $(outdir)
