@@ -2,9 +2,9 @@
 % går så videre til det mere specifikke med RL og SRL
 % og snakker om den formelle syntaks
 \section{RL and SRL}\label{sec:rlandsrl}
-\noindent Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps, while SRL, as the name indicates, is a similar language but with control structures and no jumps. The two languages share a common subset of features --- namely their expressions and step operations. The grammar of the two languages along with the common structures are given in~\cite[p.~99]{REV} and can be seen in Figure~\ref{fig:rl_srl_grammar_and_structure}.\\
+\noindent Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps, while SRL, as the name indicates, is a similar language but with control structures and no jumps. The two languages share a common subset of features --- namely their expressions and step operations. The syntax of the two languages along with the common structures are given in~\cite[p.~99]{REV} and can be seen in Figure~\ref{fig:rl_srl_syntax_and_structure}.\\
 
-\noindent As we see, RL, described in Figure~\ref{fig:rlspec}, consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program. Note that a well-formed RL program must contain exactly one entry and one exit.
+\noindent As we see, RL, described in Figure~\ref{fig:rlspec}, consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program. Come-from assertions can either be conditional, unconditional, or an entry point. Similarly, jumps can either be conditional, unconditional, or an exit point. Note that a well-formed RL program must contain exactly one entry and one exit.
 
 SRL is more linear; as we see in Figure~\ref{fig:srlspec}, a program consists of exactly one (SRL-)block, where a block may either be an atomic step operation, a control structure --- that is, an \texttt{if}- or a \texttt{do-until} structure --- or recursively a sequence of two blocks. Sequences of blocks are executed in order, and thus, an SRL program looks a lot like a program written in common programming languages such as Python or C, to name a few. Note that a block in RL is different from a block in SRL.\\
 
@@ -80,6 +80,6 @@ SRL is more linear; as we see in Figure~\ref{fig:srlspec}, a program consists of
   \end{subfigure}
 
   \caption{Syntax of the two reversible flowchart languages.}
-  \label{fig:rl_srl_grammar_and_structure}
+  \label{fig:rl_srl_syntax_and_structure}
 
 \end{figure}

@@ -4,7 +4,7 @@
 
 \subsection{Changes}\label{sec:changes}
 
-It is important to note that we have made a few changes to the languages. We have modified some of the syntax described in Figure~\ref{fig:rl_srl_grammar_and_structure}, but also added some new step operations and core features. We have not, however, altered the very nature of any of the languages.\\
+It is important to note that we have made a few changes to the languages. We have modified some of the syntax described in Figure~\ref{fig:rl_srl_syntax_and_structure}, but also added some new step operations and core features. We have not, however, altered the very nature of any of the languages.\\
 
 \noindent We found the paper\cite{REV} to be a bit unclear regarding types. The languages are described on the more hypothetical level, and the paper seems to assume some kind of type inference. We tried implementing a static check similar to type inference, but we deemed it too unrobust. This brings us to one of our most fundamental additions: explicit variable declarations. Each program must start with zero or more variable declarations with a specified type. For example, \texttt{list int a} declares variable \texttt{a} to be of type \texttt{list int}, etc. Using a variable in the program that has not been declared throws a runtime error.
 
@@ -12,7 +12,7 @@ Also, while the languages as described in the paper have lists limited to one di
 
 %Furthermore, in order to make the languages more user friendly we have tried to remove the concept of overflow. That is, instead of representing integers
 
-\noindent We have added three new step operations to the languages: \texttt{swap}, \texttt{init}, and \texttt{free}. \texttt{swap} has already been described in \cite[p.~99]{REV}, however, it was not included in the formal grammar of the languages. It is a simple, but powerful, step operation that is imperative for the \textit{Fibonacci-pair function} shown as an unstructured flowchart on \cite[p.~99]{REV} and as a structured flowchart on \cite[p.~93]{REV}. \texttt{swap} works simply by swapping the two variable operands and is, thus, its own inverse. Trying to swap two variables of different types will throw a runtime error.
+\noindent We have added three new step operations to the languages: \texttt{swap}, \texttt{init}, and \texttt{free}. \texttt{swap} has already been described in \cite[p.~99]{REV}, however, it was not included in the formal syntax of the languages. It is a simple, but powerful, step operation that is imperative for the \textit{Fibonacci-pair function} shown as an unstructured flowchart on \cite[p.~99]{REV} and as a structured flowchart on \cite[p.~93]{REV}. \texttt{swap} works simply by swapping the two variable operands and is, thus, its own inverse. Trying to swap two variables of different types will throw a runtime error.
 
 \texttt{init} was defined and implemented by us as a way to quickly obtain a list of zero-values in an arbitrary number of dimensions. That is, $\texttt{init} \ l \ [x,y,z]$ will initialise list $l$ to be a 3-dimensional table of lengths $x$, $y$, and $z$ consisting of zeroes. This is, in particular, useful in the translation from RL to SRL; Here, we must begin the resulting SRL program by initialising an $n \times n \times 3$ table, where $n$ is the number of blocks in the source RL program. This would, if we did not have \texttt{init} at our disposal, require three nested loops and three temporary variables which are never used again.
 
@@ -22,7 +22,7 @@ We do not consider the addition of \texttt{init} and \texttt{free} to be \textit
 
 \noindent We have also added two update operators: multiplication and division. Here we must be cautious: The right-hand side of a multiplication update must not be zero. This would lead to loss of information and make the program irreversible. Also, the right-hand side of a division update must be a divisor of the left-hand side --- a potential division rest would be lost, and the program would therefore not be reversible. If these rules are not respected, a runtime error is thrown. We have that $x \timeseq e$ is an inverse to $x \diveq e$ and vice versa. \\
 
-\noindent Because expressions do not influence reversibility, one can add any arbitray operator to the languages. We found a few known operators to be a nice addition to the languages --- some of them are even mentioned in the paper, but not included in the formal grammar. We will keep this description brief:
+\noindent Because expressions do not influence reversibility, one can add any arbitray operator to the languages. We found a few known operators to be a nice addition to the languages --- some of them are even mentioned in the paper, but not included in the formal syntax. We will keep this description brief:
 \begin{description}
 \item[Binary operators]~
   \begin{itemize}
@@ -55,7 +55,7 @@ We do not consider the addition of \texttt{init} and \texttt{free} to be \textit
 %% Core of the interpreter
 \subsection{Interpreter Core}
 
-The \textit{Common} module contains the implementation of the core features that are shared between the two languages.
+The core features shared between the two languages are contained in the \textit{Common} module.
 
 \subsubsection{Abstract syntax tree and utilities}
 \texttt{Common/AST.hs} contains the parts of the specific abstract syntax trees that are shared between the two languages. Furthermore, it contains some extra data types and functions that are used in both the RL- and SRL modules.
@@ -118,7 +118,7 @@ where $([e,\dots])$ means that you can optionally index in an arbitrary number o
   \caption{Implementation of the step operations}\label{fig:step}
 \end{figure}
 
-\subsubsection{Errors and Log}
+\subsubsection{Errors and log}
 The \textit{Common} module also contains the implementation of the error- and log types, but we won't go into too much detail as to \textit{how} they are implemented. To understand the interpreters, however, a few things about these must be clear.\\
 
 \noindent Each error type is represented in a data structure \texttt{Error} in \texttt{Common/Error.hs}:
@@ -187,12 +187,12 @@ Figure~\ref{fig:exswap} shows the implementation of the swap operation; we first
 
   \begin{subfigure}{\textwidth}
     \lstinputlisting[language=haskell, firstline=256, lastline=267]{../src/src/Common/Interp.hs}
-    \caption{Partly implementation of binary operator expression evaluation.}\label{fig:exbinary}
+    \caption{Partial implementation of binary operator expression evaluation.}\label{fig:exbinary}
   \end{subfigure}
 
   \begin{subfigure}{\textwidth}
     \lstinputlisting[language=haskell, firstline=288, lastline=293]{../src/src/Common/Interp.hs}
-    \caption{Partly implementation of unary operator expression evaluation.}\label{fig:exunary}
+    \caption{Partial implementation of unary operator expression evaluation.}\label{fig:exunary}
   \end{subfigure}
 
   \caption{Two examples of expression evaluation.}\label{fig:evalexamples}
@@ -209,15 +209,39 @@ The parser was implemented using Parsec along with the Token helper module to pe
 
 
 %% RL specific interpreter
-\subsection{The \textit{RL} Interpreter}
+\subsection{RL Interpreter}
 
-In section~\ref{sec:rlandsrl} we considered the formal grammar (
+The RL-specifics regarding the interpreter are contained in the \textit{RL} module.
 
+\subsubsection{Abstract syntax tree}
 
+In section~\ref{sec:rlandsrl} we considered the syntax of RL; a program must consist of one or more blocks, where a block is defined by its label and has a come-from assertion, zero or more step operations and a jump. With the step operations already implemented, the only thing to worry about was to structure the abstract syntax tree. We decided to represent the abstract syntax tree as an association list with strings (labels) as keys and blocks as values (Figure~\ref{fig:rlast}). A block, then, is defined as a triple consisting of a come-from assertion, a list of step operations, and a jump (Figure~\ref{fig:rlblock}).
 
+It comes to no surprise that \texttt{From} and \texttt{Jump} are the data types that represent come-from assertions and unstructured jumps, respectively. Their implementations can be seen in
+ Figure~\ref{fig:from} and Figure~\ref{fig:jump}.
+
+\begin{figure}
+  \lstinputlisting[language=haskell, firstline=21, lastline=21]{../src/src/RL/AST.hs}
+  \caption{The representation of an RL block.}\label{fig:rlblock}
+\end{figure}
+
+\begin{figure}
+  \lstinputlisting[language=haskell, firstline=17, lastline=17]{../src/src/RL/AST.hs}
+  \caption{The abstract syntax tree for RL.}\label{fig:rlast}
+\end{figure}
+
+\begin{figure}
+  \lstinputlisting[language=haskell, firstline=30, lastline=33]{../src/src/RL/AST.hs}
+  \caption{The representation of come-from assertions.}\label{fig:from}
+\end{figure}
+
+\begin{figure}
+  \lstinputlisting[language=haskell, firstline=39, lastline=42]{../src/src/RL/AST.hs}
+  \caption{The representation of unstructured jumps.}\label{fig:jump}
+\end{figure}
 
 
 
 
 %% SRL specific interpreter
-\subsection{The \textit{SRL} Interpreter}
+\subsection{SRL Interpreter}

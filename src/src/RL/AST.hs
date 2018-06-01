@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module RL.AST (module RL.AST, module Common.AST) where
 
 import Data.Bits (xor)
@@ -39,7 +38,7 @@ instance Show From where
 data Jump = Goto Label Pos
           | If Exp Label Label Pos
           | Exit Pos
-        deriving Eq
+          deriving Eq
 instance Show Jump where
   show (Goto l _)     = "goto " ++ l
   show (If e l1 l2 _) = "if "  ++ showPar e ++ " "  ++ l1 ++ " " ++ l2
