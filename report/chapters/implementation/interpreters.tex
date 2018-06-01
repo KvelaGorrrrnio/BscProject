@@ -52,15 +52,8 @@ We do not consider the addition of \texttt{init} and \texttt{free} to be \textit
 \noindent to simply
 \[\texttt{if} \ e \ l \ l.\]
 
+%% Core of the interpreter
 \subsection{Interpreter Core}
-
-% Values
-% Types
-% Expressions
-% Step operations
-
-% Errors
-% Log
 
 The \textit{Common} module contains the implementation of the core features that are shared between the two languages.
 
@@ -212,8 +205,19 @@ Figure~\ref{fig:exswap} shows the implementation of the swap operation; we first
 The parser was implemented using Parsec along with the Token helper module to perform a lexical analysis implicitly. Not surprisingly, the common parser module defines the parsers of the common language structures. These will be use in the specialised parsers.
 
 
-\subsection{The \textit{RL} Module}
 
 
 
-\subsection{The \textit{SRL} Module}
+%% RL specific interpreter
+\subsection{The \textit{RL} Interpreter}
+
+In section~\ref{sec:rlandsrl} we considered the formal grammar (
+
+
+
+
+
+
+
+%% SRL specific interpreter
+\subsection{The \textit{SRL} Interpreter}

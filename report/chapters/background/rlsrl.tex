@@ -1,7 +1,7 @@
 
 % går så videre til det mere specifikke med RL og SRL
 % og snakker om den formelle syntaks
-\section{RL and SRL}
+\section{RL and SRL}\label{sec:rlandsrl}
 \noindent Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps, while SRL, as the name indicates, is a similar language but with control structures and no jumps. The two languages share a common subset of features --- namely their expressions and step operations. The grammar of the two languages along with the common structures are given in~\cite[p.~99]{REV} and can be seen in Figure~\ref{fig:rl_srl_grammar_and_structure}.\\
 
 \noindent As we see, RL, described in Figure~\ref{fig:rlspec}, consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program. Note that a well-formed RL program must contain exactly one entry and one exit.
