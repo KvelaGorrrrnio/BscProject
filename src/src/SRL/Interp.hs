@@ -1,13 +1,13 @@
 {-# LANGUAGE LambdaCase #-}
-module SRL.Interp (module SRL.Interp, module Common.Log, module SRL.AST) where
+module SRL.Interp (module SRL.Interp, module SRL.AST, module Common.Error) where
 
 import SRL.AST
 
 import Common.Error
 import Common.Interp
-import Common.Log
 
 import Control.Monad.Reader
+import Control.Monad.Loops (whileM_)
 
 -- ==================
 -- Running the program
@@ -26,32 +26,27 @@ interp :: Block -> VarState ()
 interp (Step s) = logStep s
 
 interp (If t b1 b2 a) = do
-  q  <- eval t >>= \case
-    IntV q -> return $ q/=0
-    w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
+  q <- checkCond t
 
   interp $ if q then b1 else b2
 
-  r <- eval a >>= \case
-    IntV r -> return $ r/=0
-    w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
+  r <- checkCond a
 
-  when (q /= r)
-    $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a (IntV . boolToInt $ q) (IntV $ boolToInt r)
+  unless (q == r)
+    $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a r q
 
-interp (Until d a b1 b2 t) = do -- log this
-  q <- eval a >>= \case
-    IntV q -> return $ q/=0
-    w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
-
-  unless (q == d) $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a (IntV . boolToInt $ q) (IntV . boolToInt $ d)
+interp (Loop a b1 b2 t) = do
+  qo <- checkCond a
+  unless qo $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a False True
 
   interp b1
 
-  r <- eval t >>= \case
-    IntV r -> return $ r/=0
-    w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
+  whileM_ (not <$> checkCond t) $ do
+    interp b2
 
-  unless r $ interp b2 >> interp (Until False a b1 b2 t)
+    qi <- checkCond a
+    when qi $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a True False
+
+    interp b1
 
 interp (Seq b1 b2) = interp b1 >> interp b2

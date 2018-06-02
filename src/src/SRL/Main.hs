@@ -10,7 +10,7 @@ import SRL.Translation
 import SRL.Inversion
 import SRL.Interp
 
-import Common.Error
+import Common.Log
 import Common.HandleArgs
 import Common.JSON
 
