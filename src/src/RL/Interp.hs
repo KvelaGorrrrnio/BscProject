@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module RL.Interp (module RL.Interp, module RL.AST, module Common.Error) where
 
 import RL.AST
@@ -36,14 +35,14 @@ interp from l = do
 
   case f of
     Entry p      -> unless (null from)
-      $ llogError $ RuntimeError p $ FromFail (show $ Entry p) from
+      $ logFromErr p (show $ Entry p) from
     From l' p    -> unless (from == l')
-      $ llogError $ RuntimeError p $ FromFail from l'
+      $ logFromErr p from l'
     Fi a l1 l2 p -> do
       q <- lcheckCond a
       let l' = if q then l1 else l2
       unless (from == l')
-        $ llogError $ RuntimeError p $ FromFail from l'
+        $ logFromErr p from l'
 
   logSteps ss
 
@@ -55,5 +54,7 @@ interp from l = do
       if q then interp l l1 else interp l l2
 
   where logSteps   = lift . mapM_ logStep
-        llogError  = lift . logError
         lcheckCond = lift . checkCond
+
+-- helper
+logFromErr p from to = lift $ logError (RuntimeError p $ FromFail from to)

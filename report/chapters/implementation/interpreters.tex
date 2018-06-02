@@ -252,7 +252,7 @@ First thing is that we have extended our monad transformer to also contain the r
 \noindent The \texttt{interp} function, which interprets a single block and passes control flow to the next, works by receiving two arguments: the label of the block that we currently in and the label of the block we are jumping to. We assume that an empty label as first operand means that we are at the entry of the program. When interpreting a block, we simply make sure that we have gone down the right path (that is, our come-from assertion passes the test). Then we execute the list of step operations and jump to the next block as dictated by the unstructured jump associated with our block. The \texttt{interp} function can be seen in Figure~\ref{fig:interp}.
 
 \begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=32, lastline=66]{../src/src/RL/Interp.hs}
+  \lstinputlisting[language=haskell, firstline=31, lastline=57]{../src/src/RL/Interp.hs}
   \caption{The \texttt{interp} function.}\label{fig:interp}
 \end{figure}
 
@@ -282,4 +282,11 @@ The process of interpreting the abstract syntax tree --- that is, a single block
 
 If it is a step operation, we simply execute it.
 If it is a conditional, we determine which block to execute depending on the test. After executing the block, we evaluate the assertion and compare it to the evaluation of the test. If they match, we are done. If not, the program breaks the rules of reversibility and we have to throw a runtime error.
-If the block is a loop, the assertion must hold at the entry of the loop. We then execute the first block and evaluate the test. If the test evaluates to true, we are done. If not, we execute the second block and make sure that the assertion now does not hold. If it still holds, the program breaks the rules of reversibility and we have to throw a runtime error. Finally, if it is a sequence of two block, we recursively interpret the first block and the the second, as described, and in that order.
+If the block is a loop, the assertion must hold at the entry of the loop. We then execute the first block and evaluate the test. If the test evaluates to true, we are done. If not, we execute the second block and make sure that the assertion now does not hold. If it still holds, the program breaks the rules of reversibility and we have to throw a runtime error. Finally, if it is a sequence of two blocks, we recursively interpret the first block and the the second, as described, and in that order.
+
+All this is done in the \texttt{interp} function in \texttt{SRL/Interp.hs}, and the implementation can be seen in Figure~\ref{fig:srlinterp}.
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=24, lastline=51]{../src/src/SRL/Interp.hs}
+  \caption{The \texttt{interp} function that interprets a block and thus a program.}\label{fig:srlinterp}
+\end{figure}
