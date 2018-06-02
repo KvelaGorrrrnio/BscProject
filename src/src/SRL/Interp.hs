@@ -36,7 +36,7 @@ interp (If t b1 b2 a) = do
 
 interp (Loop a b1 b2 t) = do
   qo <- checkCond a
-  unless qo $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a False True
+  unless qo $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a True False
 
   interp b1
 
@@ -44,7 +44,7 @@ interp (Loop a b1 b2 t) = do
     interp b2
 
     qi <- checkCond a
-    when qi $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a True False
+    when qi $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a False True
 
     interp b1
 
