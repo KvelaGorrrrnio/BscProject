@@ -5,11 +5,11 @@ Inverting a program is actually, in our case, very simple. On \cite[p.~104]{REV}
 
 \subsection{Common}
 
-The \textit{Common} module contains the inverter that is shared between RL and SRL. The task of this inverter is to invert step operations. As stated earlier, expressions are not invertible, so we can keep them as they are. It is very intuitive: inverting an update with a given operator should result in an update with the operator inverted; inverting a push operation whould result in a pop operation and vice versa; inverting a skip operation should result in a skip. We also have the three added step operations \texttt{swap}, \texttt{init}, and \texttt{free}. We have already gone over these in section~\ref{sec:changes}, but we will
+The \textit{Common} module contains the inverter that is shared between RL and SRL. The task of this inverter is to invert step operations. As stated earlier, expressions are not invertible, so we can keep them as they are. It is very intuitive: inverting an update with a given operator should result in an update with the operator inverted; inverting a push operation whould result in a pop operation and vice versa; inverting a skip operation should result in a skip. We also have the three added step operations \texttt{swap}, \texttt{init}, and \texttt{free}. We have already gone over these in section~\ref{sec:changes}, but we will reiterate: \texttt{swap} is self-inverse, the inverse of \texttt{init} is \texttt{free} and vice versa. The implementation can be seen in Figure~\ref{fig:commoninvert}.
 
 \begin{figure}[H]
   \lstinputlisting[language=haskell, firstline=5, lastline=19]{../src/src/Common/Inversion.hs}
-  \caption{The step operation inverter.}\label{fig:srlinterp}
+  \caption{The step operation inverter.}\label{fig:commoninvert}
 \end{figure}
 
 \subsection{RL}
