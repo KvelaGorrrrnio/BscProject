@@ -1,10 +1,8 @@
 module RL.AST (module RL.AST, module Common.AST) where
 
-import Data.Bits (xor)
 import Data.List (intercalate)
 
 import Common.AST
-import Common.Error
 
 -- ===
 -- AST

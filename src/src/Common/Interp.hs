@@ -311,7 +311,19 @@ eval (Unary op exp p)
 -- parantheses
 eval (Parens e p) = eval e
 
+
+-- =======
+-- Helpers
+-- =======
+
+-- helper for null and free
 allZero :: Value -> Bool
 allZero v = case v of
   ListV ls _ -> foldl (\acc e -> acc && allZero e) True ls
   IntV  n    -> n == 0
+
+-- helper for RL and SRL interp
+checkCond :: Exp -> VarState Bool
+checkCond e = eval e >>= \case
+  IntV q -> return $ q/=0
+  w      -> logError $ RuntimeError (getExpPos e) $ ConflictingType IntT (getType w)

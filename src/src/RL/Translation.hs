@@ -47,7 +47,7 @@ genOr e1 e2       = Binary Or e1 e2 p
 genIf             = SRL.If
 genSwap id1 id2   = Step $ Swap id1 id2 p
 genUpdate id op e = Step $ Update id op e p
-genUntil          = Until True
+genLoop           = Loop
 genPush id1 id2   = Step $ Push id1 id2 p
 genSeq []         = genSkip
 genSeq s          = foldl1 Seq s
@@ -91,7 +91,7 @@ trlProg ast = do
       b2 = genUpdate (genId x [0,1,0]) XorEq (genLit 1)
 
   bs <- trlBlocks ast
-  let b3 = genUntil (genVar x [0,1,0]) bs genSkip (genVar x [n,n+1,0])
+  let b3 = genLoop (genVar x [0,1,0]) bs genSkip (genVar x [n,n+1,0])
       b4 = genUpdate (genId x [n,n+1,0]) XorEq (genLit 1)
       b5 = b1
       b6 = genFree x (n + 2)

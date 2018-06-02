@@ -53,7 +53,7 @@ untilBlock = do
   b2 <- block
   reserved "until"
   t <- expression
-  return $ Until True a b1 b2 t
+  return $ Loop a b1 b2 t
 
 -- let until and let only have one body
 

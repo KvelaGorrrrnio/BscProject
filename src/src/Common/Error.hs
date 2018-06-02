@@ -48,7 +48,7 @@ data RuntimeError
   | FreeOnNonList String
   | FreeNonEmptyList String
   -- RL specific runtime errors
-  | AssertionFailed Exp Value Value
+  | AssertionFailed Exp Bool Bool
   | FromFail String String
 
 data StaticError

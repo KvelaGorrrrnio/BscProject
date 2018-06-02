@@ -11,7 +11,7 @@ import RL.Inversion
 import RL.Static
 import RL.Interp
 
-import Common.Error
+import Common.Log
 import Common.HandleArgs
 import Common.JSON
 
