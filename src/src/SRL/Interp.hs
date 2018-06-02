@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 module SRL.Interp (module SRL.Interp, module SRL.AST, module Common.Error) where
 
 import SRL.AST
@@ -33,7 +32,7 @@ interp (If t b1 b2 a) = do
   r <- checkCond a
 
   unless (q == r)
-    $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a r q
+    $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a q r
 
 interp (Loop a b1 b2 t) = do
   qo <- checkCond a

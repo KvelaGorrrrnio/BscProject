@@ -263,7 +263,7 @@ The SRL-specific interpreter implementation can be found in the \textit{SRL} mod
 
 \subsubsection{Abstract syntax tree}
 
-As with RL, we have already looked at the syntax of SRL in section~\ref{sec:rlandsrl}. To summarise: A program consists of exactly one block. This block can either be a step operation, a conditional control structure ($\texttt{if} \ e \ \texttt{then} \ b_1 \ \texttt{else} \ b_2$), a loop control structure ($\texttt{from} \ e \ \texttt{do} \ b_1 \ \texttt{loop} \ b_2 \ \texttt{until} \ e$), or recursively a sequence of two blocks. Fortunately, this translates nicely into an implementation in Haskell. For the block, we have defined the \texttt{Block} data type (as seen in Figure~\ref{fig:rlblock}). Note the extra boolean field in \texttt{Loop}; this simply indicates whether we are coming from the outside (\texttt{True}) of the loop or from the inside (\texttt{False}) of the loop. Since a program is represented as a single block, we have defined the abstract syntax tree (as seen in Figure~\ref{fig:srlast}) accordingly.
+As with RL, we have already looked at the syntax of SRL in section~\ref{sec:rlandsrl}. To summarise: A program consists of exactly one block. This block can either be a step operation, a conditional control structure ($\texttt{if} \ e_1 \ \texttt{then} \ b_1 \ \texttt{else} \ b_2 \ \texttt{fi} \ e_2$), a loop control structure ($\texttt{from} \ e_1 \ \texttt{do} \ b_1 \ \texttt{loop} \ b_2 \ \texttt{until} \ e_2$), or recursively a sequence of two blocks ($b_1 \ b_2$). Fortunately, this translates nicely into an implementation in Haskell. For the block, we have defined the \texttt{Block} data type (as seen in Figure~\ref{fig:rlblock}). Since a program is represented as a single block, we have defined the abstract syntax tree (as seen in Figure~\ref{fig:srlast}) accordingly: \texttt{AST} is simply a type synonym for \texttt{Block}.
 
 \begin{figure}[H]
   \lstinputlisting[language=haskell, firstline=17, lastline=20]{../src/src/SRL/AST.hs}
@@ -275,4 +275,11 @@ As with RL, we have already looked at the syntax of SRL in section~\ref{sec:rlan
   \caption{The abstract syntax tree for SRL.}\label{fig:srlast}
 \end{figure}
 
+
 \subsubsection{Interpretation}
+
+The process of interpreting the abstract syntax tree --- that is, a single block --- is fairly simple;
+
+If it is a step operation, we simply execute it.
+If it is a conditional, we determine which block to execute depending on the test. After executing the block, we evaluate the assertion and compare it to the evaluation of the test. If they match, we are done. If not, the program breaks the rules of reversibility and we have to throw a runtime error.
+If the block is a loop, the assertion must hold at the entry of the loop. We then execute the first block and evaluate the test. If the test evaluates to true, we are done. If not, we execute the second block and make sure that the assertion now does not hold. If it still holds, the program breaks the rules of reversibility and we have to throw a runtime error. Finally, if it is a sequence of two block, we recursively interpret the first block and the the second, as described, and in that order.
