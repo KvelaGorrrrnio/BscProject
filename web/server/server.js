@@ -44,4 +44,6 @@ function _sendFile(p, res, log=true) {
 }
 
 // Start server
-app.listen(port, () => console.log('Server has started.\nWeb interface is running at ' + c.url('http://localhost:' + port.toString()) + '.'));
+app.listen(port, () => {
+  console.log('Server has started.\nWeb interface is running at ' + c.url('http://localhost:' + port.toString()) + '.');
+});
