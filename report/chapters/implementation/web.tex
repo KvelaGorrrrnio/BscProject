@@ -4,7 +4,7 @@
 
 The purpose of the web interface is to grant a simpler way to users for interacting with the interpreters.
 This is split up in two parts:
-The server, which handles the routing of the web server and serves the client interface, along with api-calls for the actual interaction with the Command-Line Interpreters;
+The server, which handles the routing of the web server and serves the client interface, along with API-calls for the actual interaction with the Command-Line Interpreters;
 The client part, which is the actual web interface that the user sees.
 The implementation of these are described in the following subsections.
 
@@ -127,7 +127,7 @@ All the above modes have the ability to fail. Figure \ref{fig:web_client_error} 
 \subsubsection{Implementation}
 
 \noindent
-Now that the features has been introduced, we can look at the implementation hereof.
+Now that the features has been introduced, we can look at the implementation hereof briefly.
 The web client interface is a nodeJS project written in ECMAScript 6, using the library ReactJS, for creating modularised components.
 We chose to use ReactJS, instead of vanilla javascript and html, since it allows component rendering based on state.
 This way focus was primarily on state and logic, instead of design and propagating state to the application.
@@ -145,17 +145,30 @@ The root of the web client is \path{/web/client}. Configuration files for node p
 Under the subdirectory \path{src/} are all source files and resources located.
 ReactJS components are found under \path{src/components} and the corresponding styling/ SASS files are found under \path{src/styles} along with the theme color schemes in the subdirectory \path{src/styles/themes}.\\
 
-\todo{App component}
-\todo{Header component}
-  \todo{Radio, Button, Dropdown component}
-\todo{Editor component}
-  \todo{CodeMirror}
-\todo{Result component}
-\todo{Modals}
-  \todo{HelpModal}
-  \todo{OpenModal}
-  \todo{SaveModal}
+\noindent
+The root component is the App component, which contains all the major components as children.
+The App component is wrapped in a redux Provider, which allows the App and all its children access to the application state and state modifiers.
+The children components of the App component are:
 
+\begin{description}
+
+  \item[Header]~\\
+    The utilises the Button, Radio and Dropdown components for letting the user interact with the application.\\
+
+  \item[Editor]~\\
+    The editor has two areas, the coding area, which is visible at all times --- and the error area, which only is visible when an error is present.\\
+    The code editor component is the javascript library CodeMirror \cite{CM} delivered through the react-wrapper React CodeMirror 2.
+    CodeMirror was chosen since it have a library for lexing, used for syntax highlighting, along with a lot of customisation options and extendibility through plugin support.\\
+
+  \item[Result]~\\
+    The result area presents the different modes' results through either lists of values and statements or a read-only CodeMirror instance.\\
+
+  \item[Modals]~\\
+    Modals covers the HelpModal, OpenModal and SaveModal components, which uses the same Button, Radio and Dropwdown components as the Header.\\
+
+\end{description}
+
+For more information regarding the implementation, refer to the source code.\\
 
 
 
@@ -172,7 +185,7 @@ We run the transpiled code with node, and uses the Express package for opening p
 All communication between the API server and the client-side, is formatted as JSON; as is the results from the interpreters.
 This way it is easy to parse data from the interpreter to the client interface via the API.
 
-The server has Cross Origin Resource Sharing (CORS) enabled, to allow for separation of the api server and the client web interface.
+The server has Cross Origin Resource Sharing (CORS) enabled, to allow for separation of the API server and the client web interface.
 This allows for the server to be hosted at one address, while the interface is hosted at another.
 CORS is enabled by setting the appropriate headers shown in Listing \ref{lst:cors_setup}.
 
@@ -183,7 +196,7 @@ The routing has two responsibilities: To handle API calls, which can be seen in 
 \begin{figure}[H]
   \begin{tabular}{|l|p{8.7cm}|}\hline
     \textbf{Route} & \textbf{Responsibility}\\\hline
-    \texttt{/}     & Fetch the built client interface index page from (\path{/web/server/client/index.html}).\\\hline
+    \texttt{/}     & Fetch the built client interface index page from \path{/web/server/client/index.html}.\\\hline
     \texttt{/api*} & Here \texttt{*} is everything after \texttt{/api}, which is forwarded to the API router. The API routes are described in Figure \ref{fig:full_api}. \\\hline
     \texttt{/:filename.:ext}     & Here \texttt{:filename.:ext} matches a static resource, e.g. \texttt{bundle.js}. All static files are fetched from \path{/web/server/client}. Thus only files that the client interface uses can be requested.\\\hline
   \end{tabular}
@@ -191,9 +204,10 @@ The routing has two responsibilities: To handle API calls, which can be seen in 
   \label{fig:server_routes}
 \end{figure}
 
-If the client interface is hosted at a different address than the api, the \path{/web/server/client} folder can be removed, causing the route for the index page and the static pages to respond with a 404 (page not found) status and page.\\
+If the client interface is hosted at a different address than the API, the \path{/web/server/client} folder can be removed, causing the route for the index page and the static pages to respond with a 404 (page not found) status and page.
+In this case, to get the client to point to the correct API address, change the API\_URL found variable in \path{/web/client/webpack.prod.config.js} and rebuild the client interface.\\
 
-\todo{API - features}\\
+The API sub-urls along with their valid request method(s) and functionality is described in Figure \ref{fig:full_api}.
 
 \begin{figure}[H]
   \begin{tabular}{|l|l|p{6.7cm}|}\hline
@@ -217,19 +231,15 @@ If the client interface is hosted at a different address than the api, the \path
   \label{fig:full_api}
 \end{figure}
 
-\todo{Security}
-For accessing the Command-Line interface, listing and fetching template-files, the interface execFile(file, [arguments], callback) from the node module
+For accessing the Command-Line interface, listing and fetching template-files, the interface execFile(file, [arguments], callback) from the node module child\_process is used.
+execFile takes the arguments to the file as a list, where each element is treated as one argument.
+Instead of opening a shell and calling the file, execFile executes the file directly, which disallows for injections, like '" \&\& ls \#' for getting information regarding the host system.
 
-% To secure the application, and the hosting system, most input parameters are validated before the shell commands are executed; the input code is one of the parameters which is not validated.
-% To avoid command injections via code input, the execFile interface from nodes child\_process module, is used.
-% execFile does not by default open a new shell, but spawns the specified command/ file directly, which minimizes the overhead.
-% The
-
-\begin{lstlisting}[language=javascript]
-execFile(cmd,
-        [mode, code, flags],
-        {maxBuffer, timeout},
-        (err, stdout, stderr) => {
-  // ... callback content
-});
-\end{lstlisting}
+% \begin{lstlisting}[language=javascript]
+% execFile(cmd,
+%         [mode, code, flags],
+%         {maxBuffer, timeout},
+%         (err, stdout, stderr) => {
+%   // ... callback content
+% });
+% \end{lstlisting}
