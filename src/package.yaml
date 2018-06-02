@@ -29,6 +29,7 @@ dependencies:
 - mtl >= 2.2
 - filepath >= 1.4
 - regex-compat >= 0.95.1
+- directory >= 1.3.0
 
 library:
   source-dirs: src
