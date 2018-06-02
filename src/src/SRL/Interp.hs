@@ -51,4 +51,4 @@ interp (Loop a b1 b2 t) = do
 interp (Seq b1 b2) = interp b1 >> interp b2
 
 -- helper
-logAssertErr a q r = logError $ RuntimeError (getExpPos a) (AssertionFailed a q r)
+logAssertErr a q r = logError (getExpPos a) (AssertionFailed a q r)

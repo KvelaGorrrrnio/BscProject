@@ -57,4 +57,4 @@ interp from l = do
         lcheckCond = lift . checkCond
 
 -- helper
-logFromErr p from to = lift $ logError (RuntimeError p $ FromFail from to)
+logFromErr p from to = lift $ logError p (FromFail from to)

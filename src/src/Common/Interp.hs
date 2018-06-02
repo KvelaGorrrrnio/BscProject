@@ -28,16 +28,16 @@ execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 rd :: Id -> Pos -> VarState Value
 rd (Id id exps) p = gets (mLookup id) >>= \case
   Just v  -> foldM getIdx v exps
-  Nothing -> logError $ RuntimeError p $ NonDefinedId id
+  Nothing -> logError p $ NonDefinedId id
 
 getIdx :: Value -> Exp -> VarState Value
-getIdx (IntV n) idx = logError $ RuntimeError (getExpPos idx) IndexOnNonListExp
+getIdx (IntV n) idx = logError (getExpPos idx) IndexOnNonListExp
 getIdx (ListV lst _) idx = eval idx >>= \case
-  IntV i | i < 0     -> logError $ RuntimeError (getExpPos idx) NegativeIndex
+  IntV i | i < 0     -> logError (getExpPos idx) NegativeIndex
     | otherwise -> case index lst i of
       Just v  -> return v
-      Nothing -> logError $ RuntimeError (getExpPos idx) IndexOutOfBounds
-  w -> logError $ RuntimeError (getExpPos idx) NonIntegerIndex
+      Nothing -> logError (getExpPos idx) IndexOutOfBounds
+  w -> logError (getExpPos idx) NonIntegerIndex
   where index :: [Value] -> Integer -> Maybe Value
         index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
 
@@ -47,8 +47,8 @@ logStep s = do
     msg <- gets (MsgStep s)
     tell [msg]
 
-logError :: Error -> VarState a
-logError err = do
+logError :: Pos -> RuntimeError -> VarState a
+logError p err' | err <- RuntimeError p err' = do
   tell [MsgError err]
   throwError err
 
@@ -67,8 +67,8 @@ adjust' op (e:es) vo = do
   case vo of
     ListV lst t -> eval e >>= \case
       IntV i -> return $ ListV (replace lst i vi) t
-      w     -> logError $ RuntimeError (getExpPos e) NonIntegerIndex
-    _ -> logError $ RuntimeError (getExpPos e) IndexOnNonListExp
+      w     -> logError (getExpPos e) NonIntegerIndex
+    _ -> logError (getExpPos e) IndexOnNonListExp
   where replace :: [Value] -> Integer -> Value -> [Value]
         replace lst i v | i' <- fromIntegral i = take i' lst ++ [v] ++ drop (i' + 1) lst
 
@@ -80,23 +80,23 @@ exec :: Step -> VarState ()
 -- variable updates
 exec (Update (Id id exps) op e p) = do
   cont <- contains e (Id id exps) []
-  when cont $ logError $ RuntimeError p $ SelfAbuse (Id id exps)
+  when cont $ logError p $ SelfAbuse (Id id exps)
 
   v1 <- rd (Id id exps) p
   n <- case v1 of
     IntV n -> return n
-    w      -> logError $ RuntimeError p $ UpdateOnNonInteger (Id id exps) (getType w)
+    w      -> logError p $ UpdateOnNonInteger (Id id exps) (getType w)
 
   v2 <- eval e
   m <- case v2 of
     IntV m -> return m
-    w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
+    w      -> logError p $ NonIntegerExp (getType w)
 
   case op of
-    DivEq  | m == 0       -> logError $ RuntimeError p DivByZero
-           | mod n m /= 0 -> logError $ RuntimeError p DivHasRest
+    DivEq  | m == 0       -> logError p DivByZero
+           | mod n m /= 0 -> logError p DivHasRest
            | otherwise    -> return ()
-    MultEq | m == 0       -> logError $ RuntimeError p MultByZero
+    MultEq | m == 0       -> logError p MultByZero
            | otherwise    -> return ()
     _ -> return ()
 
@@ -141,8 +141,8 @@ exec (Push id1 id2 p) = do
       | t == getType v1 -> do
         adjust clear id1 p
         adjust (push v1) id2 p
-      | otherwise -> logError $ RuntimeError p $ ConflictingType t (getType v1)
-    _ -> logError $ RuntimeError p $ PushToNonList id2
+      | otherwise -> logError p $ ConflictingType t (getType v1)
+    _ -> logError p $ PushToNonList id2
   where push v (ListV ls t) = ListV (ls++[v]) t
         clear (IntV _)      = IntV 0
         clear (ListV _ t)   = ListV [] t
@@ -150,18 +150,18 @@ exec (Push id1 id2 p) = do
 exec (Pop id1 id2 p) = do
   v1 <- rd id1 p
   unless (isClear v1) $
-    logError $ RuntimeError p $ PopToNonEmpty id1
+    logError p $ PopToNonEmpty id1
 
   v2 <- rd id2 p
   case v2 of
-    ListV [] _ -> logError $ RuntimeError p $ PopFromEmpty id2
+    ListV [] _ -> logError p $ PopFromEmpty id2
     ListV ls (ListT t)
       | t == getType v1 -> do
         adjust (const $ last ls) id1 p
         adjust (const $ ListV (init ls) (ListT t)) id2 p
       | otherwise ->
-        logError $ RuntimeError p $ ConflictingType t (getType v1)
-    _  -> logError $ RuntimeError p $ PopFromNonList id2
+        logError p $ ConflictingType t (getType v1)
+    _  -> logError p $ PopFromNonList id2
 
 -- swapping variables
 exec (Swap id1 id2 p) = do
@@ -171,7 +171,7 @@ exec (Swap id1 id2 p) = do
   let t1 = getType v1
       t2 = getType v2
   unless (t1 == t2)
-    $ logError $ RuntimeError p $ SwapNotSameType t1 t2
+    $ logError p $ SwapNotSameType t1 t2
 
   adjust (const v2) id1 p >> adjust (const v1) id2 p
 
@@ -180,13 +180,13 @@ exec (Init id exps p) = do
   v <- rd (Id id []) p
 
   case v of
-    IntV _ -> logError $ RuntimeError p $ InitOnNonList id
+    IntV _ -> logError p $ InitOnNonList id
     ListV ls t
       | getDim t /= length exps ->
-        logError $ RuntimeError p ConflictingDimensions
+        logError p ConflictingDimensions
     _ -> return ()
 
-  unless (isClear v) $ logError $ RuntimeError p $ InitNonEmptyList id
+  unless (isClear v) $ logError p $ InitNonEmptyList id
 
   nv <- foldrM repl (IntV 0) exps
 
@@ -201,25 +201,25 @@ exec (Init id exps p) = do
         | n >= 0 -> case acc of
           ListV ls t  -> return $ ListV (replicate (fromIntegral n) acc) (ListT t)
           IntV _      -> return $ ListV (replicate (fromIntegral n) acc) (ListT IntT)
-        | otherwise -> logError $ RuntimeError (getExpPos e) NegativeDimension
-      ListV _ t  -> logError $ RuntimeError (getExpPos e) $ NonIntegerDimension t -- TODO: Maybe List t
+        | otherwise -> logError (getExpPos e) NegativeDimension
+      ListV _ t  -> logError (getExpPos e) $ NonIntegerDimension t -- TODO: Maybe List t
 
 -- freeing a list
 exec (Free id exps p) = do
   v <- rd (Id id []) p
 
   case v of
-    IntV _ -> logError $ RuntimeError p $ FreeOnNonList id
+    IntV _ -> logError p $ FreeOnNonList id
     ListV ls t
       | getDim t /= length exps ->
-        logError $ RuntimeError p ConflictingDimensions
+        logError p ConflictingDimensions
     _ -> return ()
 
-  unless (allZero v) $ logError $ RuntimeError p $ FreeNonEmptyList id
+  unless (allZero v) $ logError p $ FreeNonEmptyList id
 
   eql <- equalLengths v exps
   unless eql
-    $ logError $ RuntimeError p ConflictingLengths
+    $ logError p ConflictingLengths
 
   adjust (const . getDefaultValue . getType $ v) (Id id []) p
 
@@ -229,9 +229,9 @@ exec (Free id exps p) = do
       IntV n
         | n >= 0 -> case v of
           ListV ls t  -> (&&) (length ls == fromIntegral n) <$> allM (`equalLengths` exps) ls
-          IntV _      -> logError $ RuntimeError p $ FreeOnNonList id
-        | otherwise -> logError $ RuntimeError (getExpPos e) NegativeDimension
-      ListV _ t -> logError $ RuntimeError (getExpPos e) $ NonIntegerDimension t -- Maybe ListT t
+          IntV _      -> logError p $ FreeOnNonList id
+        | otherwise -> logError (getExpPos e) NegativeDimension
+      ListV _ t -> logError (getExpPos e) $ NonIntegerDimension t -- Maybe ListT t
     equalLengths ListV{} [] = return False
     equalLengths IntV{}  [] = return True
 
@@ -264,7 +264,7 @@ eval (Binary op l r p)
       (ListV ls1 t1, ListV ls2 t2)
         | op == Equal && t1 == t2 -> return $ IntV (boolToInt $ ls1==ls2)
         | op == Neq   && t1 == t2 -> return $ IntV (boolToInt $ ls1/=ls2)
-      (v,w) -> logError $ RuntimeError p $ ConflictingTypes [IntT,IntT] [getType v, getType w]
+      (v,w) -> logError p $ ConflictingTypes [IntT,IntT] [getType v, getType w]
 
   -- binary div and mod
   | op <= Mod = do
@@ -272,9 +272,9 @@ eval (Binary op l r p)
     vr <- eval r
     case (vl, vr) of
       (IntV n, IntV m)
-        | m == 0    -> logError $ RuntimeError (getExpPos l) DivByZero
+        | m == 0    -> logError (getExpPos l) DivByZero
         | otherwise -> return $ IntV (mapBinOp op n m)
-      (v,w)         -> logError $ RuntimeError (getExpPos l) $ ConflictingTypes [IntT,IntT] [getType v, getType w]
+      (v,w)         -> logError (getExpPos l) $ ConflictingTypes [IntT,IntT] [getType v, getType w]
 
   -- binary logical
   | otherwise = eval l >>= \case
@@ -282,31 +282,31 @@ eval (Binary op l r p)
     IntV v | v/=0 && op==Or -> return $ IntV 1
     IntV _ -> eval r >>= \case
         IntV n -> return $ IntV (if n==0 then 0 else 1)
-        w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
-    w -> logError $ RuntimeError p $ NonIntegerExp (getType w)
+        w      -> logError p $ NonIntegerExp (getType w)
+    w -> logError p $ NonIntegerExp (getType w)
 
 eval (Unary op exp p)
 
   -- unary arithmetic
   | op <= Sign = eval exp >>= \case
     IntV n -> return $ IntV (mapUnOp op n)
-    w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
+    w      -> logError p $ NonIntegerExp (getType w)
 
   -- unary logical
   | op <= Not = eval exp >>= \case
     IntV n -> return $ IntV (mapUnOp op n)
-    w      -> logError $ RuntimeError p $ NonIntegerExp (getType w)
+    w      -> logError p $ NonIntegerExp (getType w)
 
   -- unary list
   | op == Null = IntV . boolToInt . allZero <$> eval exp
   | otherwise = eval exp >>= \case
     ListV ls t -> case op of
       Top   -> case ls of
-        []    -> logError $ RuntimeError p EmptyTop
+        []    -> logError p EmptyTop
         ls    -> return $ last ls
       Empty -> return $ IntV (boolToInt . null $ ls)
       Size  -> return $ IntV (fromIntegral . length $ ls)
-    w  -> logError $ RuntimeError p $ NonListExp (getType w)
+    w  -> logError p $ NonListExp (getType w)
 
 -- parantheses
 eval (Parens e p) = eval e
@@ -326,4 +326,4 @@ allZero v = case v of
 checkCond :: Exp -> VarState Bool
 checkCond e = eval e >>= \case
   IntV q -> return $ q/=0
-  w      -> logError $ RuntimeError (getExpPos e) $ ConflictingType IntT (getType w)
+  w      -> logError (getExpPos e) $ ConflictingType IntT (getType w)
