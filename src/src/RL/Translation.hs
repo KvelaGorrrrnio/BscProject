@@ -21,8 +21,7 @@ vec = asks fst
 initTypeDec :: TrlReader TypeTab
 initTypeDec = do
   x <- vec
-  return $ M.fromList
-    [ (x,  ListT (ListT (ListT IntT))) ]
+  return [ (x,  ListT (ListT (ListT IntT))) ]
 
 -- TODO: Make sure Entry gets 0 Exit n
 genLabelMap :: TypeTab -> RL.AST -> LabelMap
@@ -31,7 +30,7 @@ genLabelMap ttab ast =
     in (genVec ttab,lm)
 
 genVec :: TypeTab -> String
-genVec ttab = if M.null ttab then "x" else maximum (M.keys ttab) ++ "_"
+genVec ttab = if null ttab then "x" else (maximum . map fst) ttab ++ "_"
 
 -- Code generation
 genInit id n      = Step $ Init id [genLit n, genLit n, genLit 3] p
@@ -79,7 +78,7 @@ p = (0,0)
 translate :: TypeTab -> RL.AST -> String
 translate ttab ast =
   let (ttab',ast') = runReader (trlProg ast) (genLabelMap ttab ast)
-    in SRL.showAST (ttab `M.union` ttab') ast'
+    in SRL.showAST (ttab ++ ttab') ast'
 
 trlProg :: RL.AST -> TrlReader (TypeTab,SRL.AST)
 trlProg ast = do

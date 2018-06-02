@@ -6,9 +6,7 @@ import System.Console.CmdArgs
 import Prelude hiding (log)
 
 data Prog
-  = Typeof    { file  :: FilePath, out   :: FilePath
-              , json  :: Bool,     code  :: Bool }
-  | Translate { file  :: FilePath, out   :: FilePath
+  = Translate { file  :: FilePath, out   :: FilePath
               , json  :: Bool,     code  :: Bool }
   | Invert    { file  :: FilePath, out   :: FilePath
               , json  :: Bool,     code  :: Bool }
@@ -20,13 +18,6 @@ data Prog
 helpOutput = help "Write the output to the specified file"
 helpCode   = help "Give a string to be treated as [S]RL code"
 helpJSON   = help "Format the output as JSON"
-
-typeof    = record Typeof{} [
-    file  := def += args += typFile
-  , out   := def         += typFile  += helpOutput
-  , json  := def                     += helpJSON
-  , code  := def                     += helpCode
-  ] += help "Print the types of the variables in the program"
 
 translate_ = record Translate{} [
     file  := def += args += typFile
@@ -50,7 +41,7 @@ interpret = record Run{} [
   , log   := def += help "Output log instead of final state"
   ] += help "Interpret an [S]RL program" += auto
 
-mode = cmdArgsMode_ $ modes_ [interpret, invert_, translate_, typeof]
+mode = cmdArgsMode_ $ modes_ [interpret, invert_, translate_]
   += help    "Interpret, invert or translate an [S]RL program"
   += summary "The Glorious [S]RL Interpreter System, version 1.0.0"
   += program "[s]rl"

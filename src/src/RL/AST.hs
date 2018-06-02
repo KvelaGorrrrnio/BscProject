@@ -13,7 +13,7 @@ type Label = String
 
 type AST = [(Label, Block)]
 showAST :: TypeTab -> AST -> String
-showAST ttab ast = showTypeDecs ttab ++ (intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ showBlock b)) ast
+showAST ttab ast = showTypeTab ttab ++ (intercalate "\n\n" . map (\(l,b) -> l ++ ": " ++ showBlock b)) ast
 
 type Block = (From, [Step], Jump)
 showBlock (f,s,j) = show f ++ "\n  "

@@ -36,9 +36,6 @@ showTab mtab =
 insert id val = M.insert id val
 mLookup id    = M.lookup id
 
-showTypeDecs :: TypeTab -> String
-showTypeDecs = (++"\n") . concatMap (\(id,t) -> show t ++ " " ++ id ++ "\n") . sort' . M.toList
-
 sort' :: Ord a => [(a, b)] -> [(a, b)]
 sort' = sortBy (compare `on` fst)
 
@@ -170,13 +167,21 @@ instance Show UnOp where
 -- Type declaration
 -- ================
 
-type TypeTab = M.HashMap String Type
+type TypeTab = [(String, Type)]
 data Type = IntT | ListT Type deriving Eq
+showTypeTab :: TypeTab -> String
+showTypeTab = (++"\n") . concatMap (\(id,t) -> show t ++ " " ++ id ++ "\n") . sort'
+
+hasDupDec :: TypeTab -> Maybe String
+hasDupDec = hasDupDec' . map fst
+  where hasDupDec' []     = Nothing
+        hasDupDec' (n:ns) = if n `elem` ns then Just n else hasDupDec' ns
+
 instance Show Type where
   show IntT = "int"
   show (ListT tp) = "list " ++ show tp
 buildVTab :: TypeTab -> VarTab
-buildVTab = M.map getDefaultValue
+buildVTab = M.map getDefaultValue . M.fromList
 getType :: Value -> Type
 getType (IntV _)    = IntT
 getType (ListV _ t) = t

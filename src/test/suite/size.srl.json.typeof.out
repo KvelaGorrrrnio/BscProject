@@ -1,1 +1,0 @@
-{ "type" : "type", "table" : [{ "id" : "a", "value" : "int" }, { "id" : "l", "value" : "list int" }] }

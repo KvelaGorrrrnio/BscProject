@@ -90,7 +90,7 @@ indices1 = try (many1 $ brackets expression) <|> brackets (sepBy1 expression com
 
 -- type declarations
 typedecs :: Parser TypeTab
-typedecs = M.fromList <$> many typedec
+typedecs = many typedec
 
 typedec :: Parser (String, Type)
 typedec = do

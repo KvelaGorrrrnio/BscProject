@@ -31,16 +31,18 @@ main = do
     Run f o j c l  -> let eout' = eout j o in
       getAST c f >>= \case
         Left err  -> eout' err
-        Right (ttab,ast) -> case runProgram ast ttab of
-          (_,log)        | l && j && null o -> putStrLn $ stringify log
-                         | l && j           -> writeFile o $ (++"\n") (stringify log)
-                         | l && null o      -> putStrLn $ logToString log
-                         | l                -> writeFile o $ (++"\n") (logToString log)
-          (Right vtab,_) | j && null o      -> putStrLn $ jsonTab "variable" vtab
-                         | j                -> writeFile o $ (++"\n") (jsonTab "variable" vtab)
-                         | null o           -> putStrLn $ showTab vtab
-                         | otherwise        -> writeFile o $ (++"\n") (showTab vtab)
-          (Left err,_)                      -> eout' err
+        Right (ttab,ast) -> case hasDupDec ttab of
+          Nothing -> case runProgram ast ttab of
+            (_,log)        | l && j && null o -> putStrLn $ stringify log
+                           | l && j           -> writeFile o $ (++"\n") (stringify log)
+                           | l && null o      -> putStrLn $ logToString log
+                           | l                -> writeFile o $ (++"\n") (logToString log)
+            (Right vtab,_) | j && null o      -> putStrLn $ jsonTab "variable" vtab
+                           | j                -> writeFile o $ (++"\n") (jsonTab "variable" vtab)
+                           | null o           -> putStrLn $ showTab vtab
+                           | otherwise        -> writeFile o $ (++"\n") (showTab vtab)
+            (Left err,_)                      -> eout' err
+          Just n  -> eout' (StaticError (0,0) $ DuplicateVarDec n)
     Invert [] o j c -> if c then noCode j o else noFile j o
     Invert f o j c -> let eout' = eout j o in
       getAST c f >>= \case
@@ -59,12 +61,3 @@ main = do
            | j           -> writeFile o $ (++"\n") (jsonCode code)
            | null o      -> putStrLn code
            | otherwise   -> writeFile o $ (++"\n") code
-    Typeof [] o j c -> if c then noCode j o else noFile j o
-    Typeof f o j c -> let eout' = eout j o in
-      getAST c f >>= \case
-        Left err  -> eout' err
-        Right (ttab,_)
-          | j && null o -> putStrLn $ jsonTab "type" ttab
-          | j           -> writeFile o $ (++"\n") (jsonTab "type" ttab)
-          | null o      -> putStrLn $ showTab ttab
-          | otherwise   -> writeFile o $ (++"\n") (showTab ttab)

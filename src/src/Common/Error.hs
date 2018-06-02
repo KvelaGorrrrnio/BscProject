@@ -53,6 +53,7 @@ data RuntimeError
 
 data StaticError
   = DuplicateLabel String
+  | DuplicateVarDec String
   | DuplicateEntry
   | DuplicateExit
   | NotDefinedLabel String
@@ -107,6 +108,7 @@ instance Show RuntimeError where
 
 instance Show StaticError where
   show (DuplicateLabel l)  = "Label '" ++ l ++ "' has been defined multiple times."
+  show (DuplicateVarDec v) = "Variable '" ++ v ++ "' was declared multiple times."
   show (NotDefinedLabel l) = "Label '" ++ l ++ "' has not been defined."
   show DuplicateEntry      = "Only one entry-point is allowed."
   show DuplicateExit       = "Only one exit-point is allowed."

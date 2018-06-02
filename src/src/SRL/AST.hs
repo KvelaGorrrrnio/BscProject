@@ -12,7 +12,7 @@ import Common.AST
 
 type AST = Block
 showAST :: TypeTab -> AST -> String
-showAST ttab ast = showTypeDecs ttab ++ showBlock 0 ast
+showAST ttab ast = showTypeTab ttab ++ showBlock 0 ast
 
 data Block = Step Step
            | If Exp Block Block Exp
