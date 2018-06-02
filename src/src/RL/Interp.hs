@@ -8,10 +8,11 @@ import Common.Log
 import Common.Error
 
 import Control.Monad.Reader
-import Control.Monad.Except
+
 
 -- The program state
 type ProgState = ReaderT AST VarState
+
 
 -- ==================
 -- Running the program
@@ -24,9 +25,10 @@ runProgram ast ttab =
       (vt,ms) = execVarState vtab . runReaderT (interp [] entry) $ ast
     in (vt, Log vtab ms)
 
--- ======
--- Blocks
--- ======
+
+-- ============
+-- Interpreting
+-- ============
 
 interp :: Label -> Label -> ProgState ()
 interp from l = do
@@ -36,10 +38,8 @@ interp from l = do
   case f of
     Entry p      -> unless (null from)
       $ llogError $ RuntimeError p $ FromFail (show $ Entry p) from
-
     From l' p    -> unless (from == l')
       $ llogError $ RuntimeError p $ FromFail from l'
-
     Fi a l1 l2 p -> do
       q <- leval a >>= \case
         IntV q -> return $ q/=0
@@ -65,4 +65,3 @@ interp from l = do
   where logSteps  = lift . mapM_ logStep
         leval     = lift . eval
         llogError = lift . logError
-

@@ -17,6 +17,11 @@ runProgram :: AST -> TypeTab -> (Either Error VarTab, Log)
 runProgram ast ttab = let (vt,ms) = (execVarState vtab . interp) ast in (vt, Log vtab ms)
   where vtab = buildVTab ttab
 
+
+-- ============
+-- Interpreting
+-- ============
+
 interp :: Block -> VarState ()
 interp (Step s) = logStep s
 
@@ -32,7 +37,7 @@ interp (If t b1 b2 a) = do
     w      -> logError $ RuntimeError (getExpPos t) $ ConflictingType IntT (getType w)
 
   when (q /= r)
-    $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a (IntV . boolToInt $ q) (IntV . boolToInt $ r)
+    $ logError $ RuntimeError (getExpPos a) $ AssertionFailed a (IntV . boolToInt $ q) (IntV $ boolToInt r)
 
 interp (Until d a b1 b2 t) = do -- log this
   q <- eval a >>= \case

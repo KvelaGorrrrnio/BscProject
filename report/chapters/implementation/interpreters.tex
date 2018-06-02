@@ -215,33 +215,56 @@ The RL-specifics regarding the interpreter are contained in the \textit{RL} modu
 
 \subsubsection{Abstract syntax tree}
 
-In section~\ref{sec:rlandsrl} we considered the syntax of RL; a program must consist of one or more blocks, where a block is defined by its label and has a come-from assertion, zero or more step operations and a jump. With the step operations already implemented, the only thing to worry about was to structure the abstract syntax tree. We decided to represent the abstract syntax tree as an association list with strings (labels) as keys and blocks as values (Figure~\ref{fig:rlast}). A block, then, is defined as a triple consisting of a come-from assertion, a list of step operations, and a jump (Figure~\ref{fig:rlblock}).
+In section~\ref{sec:rlandsrl} we considered the syntax of RL; a program must consist of one or more blocks, where a block is defined by its label and has a come-from assertion, zero or more step operations and a jump. With the step operations already implemented, the only thing to worry about is how to structure the abstract syntax tree. We decided to represent the abstract syntax tree as an association list with labels as keys and blocks as values (Figure~\ref{fig:rlast}). A block, then, is defined as a three-tuple consisting of a come-from assertion, a list of step operations, and a jump (Figure~\ref{fig:rlblock}). Note that \texttt{Label} is simply a type synonym for \texttt{String}.
 
-It comes to no surprise that \texttt{From} and \texttt{Jump} are the data types that represent come-from assertions and unstructured jumps, respectively. Their implementations can be seen in
- Figure~\ref{fig:from} and Figure~\ref{fig:jump}.
-
-\begin{figure}
+ \begin{figure}[h]
   \lstinputlisting[language=haskell, firstline=20, lastline=20]{../src/src/RL/AST.hs}
   \caption{The representation of an RL block.}\label{fig:rlblock}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
   \lstinputlisting[language=haskell, firstline=16, lastline=16]{../src/src/RL/AST.hs}
   \caption{The abstract syntax tree for RL.}\label{fig:rlast}
 \end{figure}
 
-\begin{figure}
+\noindent It should come to no surprise that \texttt{From} and \texttt{Jump} are the data types that represent come-from assertions and unstructured jumps, respectively. Their implementations, practically copied from the paper, can be seen in Figure~\ref{fig:from} and Figure~\ref{fig:jump}.
+
+\begin{figure}[h]
   \lstinputlisting[language=haskell, firstline=29, lastline=32]{../src/src/RL/AST.hs}
   \caption{The representation of come-from assertions.}\label{fig:from}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[H]
   \lstinputlisting[language=haskell, firstline=38, lastline=41]{../src/src/RL/AST.hs}
   \caption{The representation of unstructured jumps.}\label{fig:jump}
 \end{figure}
 
+\subsubsection{Interpretation}
+The interpreter for RL can be found in \texttt{RL/Interp.hs}. It is pretty simple and essentially a small wrapper around the core feature set from the Common module.
 
+First thing is that we have extended our monad transformer to also contain the reader monad. This is in order to read from our abstract syntrax tree --- that is, our association list of blocks --- from a constant resource without having to throw it around in every recursive call. The new monad transformer has \texttt{ProgState} as type synonym and its definition can be seen in Figure~\ref{fig:progstate}.
 
+\begin{figure}[h]
+  \lstinputlisting[language=haskell, firstline=14, lastline=14]{../src/src/RL/Interp.hs}
+  \caption{The extended monad transformer \texttt{ProgState}.}\label{fig:progstate}
+\end{figure}
+
+\noindent The \texttt{interp} function, which interprets a single block and passes control flow to the next, works by receiving two arguments: the label of the block that we currently in and the label of the block we are jumping to. We assume that an empty label as first operand means that we are at the entry of the program. When interpreting a block, we simply make sure that we have gone down the right path (that is, our come-from assertion passes the test). Then we execute the list of step operations and jump to the next block as dictated by the unstructured jump associated with our block. The \texttt{interp} function can be seen in Figure~\ref{fig:interp}.
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=33, lastline=67]{../src/src/RL/Interp.hs}
+  \caption{The \texttt{interp} function.}\label{fig:interp}
+\end{figure}
 
 %% SRL specific interpreter
 \subsection{SRL Interpreter}
+
+The SRL-specific interpreter implementation can be found in the \textit{SRL} module.
+
+\subsubsection{Abstract syntax tree}
+
+As with RL, we have already looked at the syntax of SRL in section~\ref{sec:rlandsrl}. To summarise:
+We managed to translate this directly:
+
+
+\subsubsection{Interpretation}
