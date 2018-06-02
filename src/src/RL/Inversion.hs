@@ -12,13 +12,6 @@ invert = reverse . map (\(l,b) -> (l, invertBlock b))
 invertBlock :: Block -> Block
 invertBlock (f,s,j) = (invertJump j, invertSteps s, invertFrom f)
 
-invertOp :: UpdOp -> UpdOp
-invertOp PlusEq  = MinusEq
-invertOp MinusEq = PlusEq
-invertOp MultEq  = DivEq
-invertOp DivEq   = MultEq
-invertOp op      = op
-
 invertJump :: Jump -> From
 invertJump (Goto l p)     = From l p
 invertJump (If e l1 l2 p) = Fi e l1 l2 p

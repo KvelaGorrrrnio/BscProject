@@ -40,8 +40,8 @@ main = do
             Nothing -> case runProgram ast ttab of
               (_,log)        | l && j && null o -> putStrLn $ stringify log
                              | l && j           -> writeFile o $ (++"\n") (stringify log)
-                             | l && null o      -> putStrLn $ logToString log
-                             | l                -> writeFile o $ (++"\n") (logToString log)
+                             | l && null o      -> print log
+                             | l                -> writeFile o $ (++"\n") (show log)
               (Right vtab,_) | j && null o      -> putStrLn $ jsonTab "variable" vtab
                              | j                -> writeFile o $ (++"\n") (jsonTab "variable" vtab)
                              | null o           -> putStrLn $ showTab vtab

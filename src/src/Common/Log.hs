@@ -11,9 +11,8 @@ import Data.List (intercalate)
 -- ===
 
 data Log = Log VarTab [Message]
-
-logToString :: Log -> String
-logToString (Log _ ms) = intercalate "\n\n" . map show $ ms
+instance Show Log where
+  show (Log _ ms) = intercalate "\n\n" . map show $ ms
 
 instance JSON Log where
   stringify (Log vt ms) =
