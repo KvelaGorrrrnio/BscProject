@@ -31,8 +31,9 @@ main = do
   case args of
     Run [] o j c _ -> if c then noCode j o else noFile j o
     Run f o j c l  -> do
-      exists <- doesFileExist f
-      unless exists $ noFileExist j o f
+      unless c $ do
+        exists <- doesFileExist f
+        unless exists $ noFileExist j o f
 
       let eout' = eout j o
       getAST c f >>= \case
@@ -52,8 +53,9 @@ main = do
 
     Invert [] o j c -> if c then noCode j o else noFile j o
     Invert f o j c -> do
-      exists <- doesFileExist f
-      unless exists $ noFileExist j o f
+      unless c $ do
+        exists <- doesFileExist f
+        unless exists $ noFileExist j o f
 
       let eout' = eout j o
       getAST c f >>= \case
@@ -66,8 +68,9 @@ main = do
 
     Translate [] o j c -> if c then noCode j o else noFile j o
     Translate f o j c -> do
-      exists <- doesFileExist f
-      unless exists $ noFileExist j o f
+      unless c $ do
+        exists <- doesFileExist f
+        unless exists $ noFileExist j o f
 
       let eout' = eout j o
       getAST c f >>= \case
