@@ -128,7 +128,6 @@ trlFrom (From l _) i b2 = do
   let a = genVar x [i,i,1]
 
   return $ genIf t b1 b2 a
-trlFrom (Entry _) n _ = fail "Entry not the starting state."
 
 trlFrom (Fi e lj lk _) i b2 = do
   x <- vec
@@ -171,6 +170,7 @@ trlSteps ss i b2 = do
 trlJump :: Jump -> Int -> SRL.Block -> TrlReader SRL.Block
 trlJump (Exit _) n b2 = do
   n' <- asks length
+  -- should not happen because of static check:
   unless (n == n') $ fail "Exit not the ending state."
 
   x <- vec
