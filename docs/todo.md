@@ -1,14 +1,4 @@
-## Test
-  - Skriv test til test-suite (LA)
-    - Turing Machine test
-    - Fourier Transformation
-    - Integer Physics
-  √ Lav test til translation RL => SRL
-  - Tests til web server og web client (Anders)
-    - UI testing (bliver nok ikke lavet helt)
-    - Test call to API
-
-## Ellers
+## Rapport
   - Rapporten skal sættes op. (LA)
     - Opsætning af pakker (lstset e.g.)
   - Rapport skal skrives
@@ -21,6 +11,9 @@
       √ Install
       - Usage
       - Testing
+    - Conclusion
+    - Referencer laves
+    - Appendices
 
 ## Finpudsninger
   - Kommentarer skal tjekkes igennem
@@ -31,3 +24,6 @@
   - README skal skrives. (Anders)
     - Standard github readme for project
     - Ret help til web-interface
+  o Tests til web server og web client (Anders)
+    - UI testing (bliver nok ikke lavet helt)
+    - Test call to API

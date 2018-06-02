@@ -111,6 +111,7 @@ const rootReducer = (state = initState, action) => {
         }
       }
     case 'change-theme':
+      localStorage.theme = action.payload;
       return { ...state,
         theme: action.payload,
       }

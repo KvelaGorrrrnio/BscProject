@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { changeCode } from '../actions/index';
+import { changeCode, changeTheme } from '../actions/index';
 import Header from './Header';
 import Editor from './Editor';
 import Result from './Result';
@@ -16,6 +16,7 @@ function isASCII(str) {
 class App extends Component {
 
   componentDidMount() {
+    // Check if has share-link content
     const url = new URL(location.href);
     try {
       const code = atob(url.searchParams.get("code"));
@@ -24,6 +25,10 @@ class App extends Component {
       }
     }
     catch (err) {}
+    // Get last used theme
+    if (localStorage.theme !== undefined) {
+      this.props.changeTheme(localStorage.theme);
+    }
   }
 
   render() {
@@ -45,7 +50,8 @@ const mapStateToProps = state => { return {
 }};
 
 const mapDispatchToProps = dispatch => { return {
-  changeCode: code => dispatch(changeCode(code))
+  changeCode:  code  => dispatch(changeCode(code)),
+  changeTheme: theme => dispatch(changeTheme(theme))
 }};
 
 export default connect(mapStateToProps,mapDispatchToProps)(App);

@@ -29,7 +29,7 @@ cserver:
 release:
 	@zip -r src.zip release
 
-test: test-src test-web
+test: test-src
 test-src:
 	@make -C src test
 test-web: test-web-client test-web-server
