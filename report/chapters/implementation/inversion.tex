@@ -1,7 +1,16 @@
 % Inversion
 \section{Program Inversion}
 
+Inverting a program is actually, in our case, very simple. On \cite[p.~104]{REV} we are given a concise definition.
+
 \subsection{Common}
+
+The \textit{Common} module contains the inverter that is shared between RL and SRL. The task of this inverter is to invert step operations. As stated earlier, expressions are not invertible, we can keep them as they are.
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=5, lastline=19]{../src/src/Common/Inversion.hs}
+  \caption{The step operation inverter.}\label{fig:srlinterp}
+\end{figure}
 
 \subsection{RL}
 

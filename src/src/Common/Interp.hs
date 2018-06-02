@@ -69,8 +69,10 @@ adjust' op (e:es) vo = do
       IntV i -> return $ ListV (replace lst i vi) t
       w     -> logError (getExpPos e) NonIntegerIndex
     _ -> logError (getExpPos e) IndexOnNonListExp
-  where replace :: [Value] -> Integer -> Value -> [Value]
-        replace lst i v | i' <- fromIntegral i = take i' lst ++ [v] ++ drop (i' + 1) lst
+
+  where replace :: [Value]  -> Integer -> Value -> [Value]
+        replace (_:vs) 0 nv = nv:vs
+        replace (v:vs) i nv = v : replace vs (i-1) nv
 
 -- ==========
 -- Statements

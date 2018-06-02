@@ -145,7 +145,7 @@ The \textit{Common} module also contains the implementation of the error- and lo
 
 %% Type signature of exec
 \begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=78, lastline=78]{../src/src/Common/Interp.hs}
+  \lstinputlisting[language=haskell, firstline=80, lastline=80]{../src/src/Common/Interp.hs}
   \caption{Type signature of \texttt{exec}}\label{fig:exec}
 \end{figure}
 
@@ -157,12 +157,12 @@ Figure~\ref{fig:exswap} shows the implementation of the swap operation; we first
 \begin{figure}[h]
 
   \begin{subfigure}{\textwidth}
-    \lstinputlisting[language=haskell, firstline=81, lastline=104]{../src/src/Common/Interp.hs}
+    \lstinputlisting[language=haskell, firstline=83, lastline=106]{../src/src/Common/Interp.hs}
     \caption{Implementation of the variable update.}\label{fig:exupdate}
   \end{subfigure}
 
   \begin{subfigure}{\textwidth}
-    \lstinputlisting[language=haskell, firstline=167, lastline=176]{../src/src/Common/Interp.hs}
+    \lstinputlisting[language=haskell, firstline=169, lastline=178]{../src/src/Common/Interp.hs}
     \caption{Implementation of the swap operation.}\label{fig:exswap}
   \end{subfigure}
 
@@ -174,7 +174,7 @@ Figure~\ref{fig:exswap} shows the implementation of the swap operation; we first
 
 %% Type signature of eval
 \begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=250, lastline=250]{../src/src/Common/Interp.hs}
+  \lstinputlisting[language=haskell, firstline=252, lastline=252]{../src/src/Common/Interp.hs}
   \caption{Type signature of \texttt{eval}}\label{fig:eval}
 \end{figure}
 
@@ -186,12 +186,12 @@ Figure~\ref{fig:exswap} shows the implementation of the swap operation; we first
 \begin{figure}[h]
 
   \begin{subfigure}{\textwidth}
-    \lstinputlisting[language=haskell, firstline=256, lastline=267]{../src/src/Common/Interp.hs}
+    \lstinputlisting[language=haskell, firstline=258, lastline=269]{../src/src/Common/Interp.hs}
     \caption{Partial implementation of binary operator expression evaluation.}\label{fig:exbinary}
   \end{subfigure}
 
   \begin{subfigure}{\textwidth}
-    \lstinputlisting[language=haskell, firstline=288, lastline=293]{../src/src/Common/Interp.hs}
+    \lstinputlisting[language=haskell, firstline=290, lastline=295]{../src/src/Common/Interp.hs}
     \caption{Partial implementation of unary operator expression evaluation.}\label{fig:exunary}
   \end{subfigure}
 
@@ -281,8 +281,12 @@ As with RL, we have already looked at the syntax of SRL in section~\ref{sec:rlan
 The process of interpreting the abstract syntax tree --- that is, a single block --- is fairly simple;
 
 If it is a step operation, we simply execute it.
+
 If it is a conditional, we determine which block to execute depending on the test. After executing the block, we evaluate the assertion and compare it to the evaluation of the test. If they match, we are done. If not, the program breaks the rules of reversibility and we have to throw a runtime error.
-If the block is a loop, the assertion must hold at the entry of the loop. We then execute the first block and evaluate the test. If the test evaluates to true, we are done. If not, we execute the second block and make sure that the assertion now does not hold. If it still holds, the program breaks the rules of reversibility and we have to throw a runtime error. Finally, if it is a sequence of two blocks, we recursively interpret the first block and the the second, as described, and in that order.
+
+If the block is a loop, the assertion must hold at the entry of the loop. We then execute the first block and evaluate the test. If the test evaluates to true, we are done. If not, we execute the second block and make sure that the assertion now does not hold. If it still holds, the program breaks the rules of reversibility and we have to throw a runtime error. Otherwise, we repeat.
+
+Finally, if it is a sequence of two blocks, we recursively interpret the first block and the the second, as described, and in that order.
 
 All this is done in the \texttt{interp} function in \texttt{SRL/Interp.hs}, and the implementation can be seen in Figure~\ref{fig:srlinterp}.
 
