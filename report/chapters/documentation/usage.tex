@@ -2,11 +2,35 @@
 
 \subsection{Command-Line Interface}
 
- The Command-Line Interface for \texttt{rl} and \texttt{srl} are almost identitical, the only real difference is the naming (rl instead of srl, and vice versa).
- Thus only the interface for \texttt{rl} will be described.
- Both Command-Line Interfaces has \texttt{--help} flags, which displays the different modes, options and flags, of which can be chosen and set.\\
+The Command-Line Interface for \texttt{rl} and \texttt{srl} are almost identitical, the only real difference is the naming (rl instead of srl, and vice versa).
+Thus only the interface for SRL will be described.
+Both Command-Line Interfaces has \texttt{--help} flags, which displays the different modes, options and flags, of which can be chosen and set.\\
 
- \todo{Describe modes}\\
+\noindent
+Firstly the executable is named \shcmd{$ srl}.
+There are 3 modes for the SRL interpreter, as described in Section \ref{sec:implementation_cli}.
+Modes are specified as the first argument. The default interface for SRL is \shcmd{$ srl [mode] <file.srl>}.
+For a quick recap the modes are:\\
+
+\begin{description}
+
+  \item[Run]~\\
+    Which interprets a SRL program. Run is the default mode, thus can be omitted.
+    To interpret the file my-first-script.srl we either call \shcmd{$ srl my-first-script.srl} or \shcmd{$ srl run my-first-script.srl}.\\
+
+  \item[Translate]~\\
+    Which translates a SRL program to RL.
+    To translate the file my-first-script.srl we call \shcmd{$ srl translate my-first-script.srl}.\\
+
+  \item[Invert]~\\
+    Which inverts a SRL program.
+    To invert the file my-first-script.srl we call\\ \shcmd{$ srl invert my-first-script.srl}.\\
+
+\end{description}
+
+Instead of using a file as input, a string of SRL code can be given with the c option as \shcmd{$ srl -c "...SRL code..."}. This applies for all modes.\\
+If output is wanted as a json-format, set the -j or {-}{-}json flag.\\
+By default output is directed to stdout. Output can be redirected to a file with th -o option as \shcmd{$ srl input.srl -o output.ext}.\\
 
 \subsection{Web Interface}
 
@@ -16,8 +40,8 @@ For starting the web server, use \shcmd{$ make server}. This should yield an out
   Web interface is running at http://localhost:3001.
 \end{lstlisting}
 
+\noindent
 After starting the server and the above-shown output has been printed, every api-call and index page requests to the server is logged to \texttt{stdout}.
 The log contains for each request timestamp and the requested path - along with information describing the outcome (erroneous or succesful).
 For shutting down the server, use \texttt{Ctrl-C}.
-
-\todo{Hosting on two different addresses. (webpack.prod.config.js)}
+Open the link \url{http://localhost:3001}, and the interface described in Section \ref{sec:implementation_web_client} should appear.\\
