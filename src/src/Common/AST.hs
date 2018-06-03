@@ -78,6 +78,7 @@ data Exp
   | Var    Id Pos
   | Binary BinOp Exp Exp Pos
   | Unary  UnOp  Exp Pos
+  | Index  Exp Exp Pos
   | Parens Exp Pos
   deriving Eq
 instance Show Exp where
@@ -85,6 +86,7 @@ instance Show Exp where
   show (Var id _)         = show id
   show (Binary op l r _)  = show l ++ show op ++ show r
   show (Unary  op exp _)  = show op ++ show exp
+  show (Index  l r _)     = show l ++ " . " ++ show r
   show (Parens exp _)     = case exp of
     Parens exp' _ -> show exp
     _             -> "("++show exp++")"

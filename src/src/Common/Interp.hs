@@ -109,30 +109,15 @@ exec (Update (Id id exps) op e p) = do
         contains Lit{} _ _ = return False
         contains (Var (Id id2 exps2) _) (Id id1 exps1) is
           | id1 == id2 = let exps2' = exps2 ++ is in
-            (&&) (length exps2 == length exps2') <$>
+            (&&) (length exps1 == length exps2') <$>
             ( (==) <$> mapM eval exps1 <*> mapM eval exps2' )
           | otherwise = return False
         contains (Binary _ e1 e2 _) id is = (||) <$> contains e1 id is <*> contains e2 id is
-        contains (Unary Top e p) (Id id exps) is = do
-          (Id id' exps') <- getIdentifier (Unary Top e p)
-          let id'' = if null id' then Id id exps' else Id id' exps'
-          contains (Var id'' p) (Id id exps) []
+        contains (Unary Top e p) id is = contains e id (Binary Minus (Unary Size e p) (Lit (IntV 1) p) p : is)
+        contains (Index l r _) id is = contains l id (r:is)
         contains (Unary Size _ _) _ _ = return False
         contains (Unary _ e _) id is = contains e id is
         contains (Parens e _) id is = contains e id is
-        ----------------------------------------------
-        getIdentifier :: Exp -> VarState Id
-        getIdentifier (Var id p) = return id
-        getIdentifier (Unary Top exp p) = do
-          (Id id' exps') <- getIdentifier exp
-          if null id' then return (Id id' exps')
-          else do
-            v <- rd (Id id' exps') p
-            case v of
-              ListV l _ -> return $ Id id' (exps' ++ [Lit (IntV . fromIntegral $ length l - 1) p])
-              IntV _    -> return $ Id id' exps'
-        getIdentifier (Parens e p) = getIdentifier e
-        getIdentifier _ = return (Id "" [])
 
 -- list modification
 exec (Push id1 id2 p) = do
@@ -310,8 +295,13 @@ eval (Unary op exp p)
       Size  -> return $ IntV (fromIntegral . length $ ls)
     w  -> logError p $ NonListExp (getType w)
 
+-- index
+eval (Index l r _) = do
+  v <- eval l
+  getIdx v r
+
 -- parantheses
-eval (Parens e p) = eval e
+eval (Parens e _) = eval e
 
 
 -- =======

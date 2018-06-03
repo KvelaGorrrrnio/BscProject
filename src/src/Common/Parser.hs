@@ -53,6 +53,7 @@ languageDef =
                                       , "+", "-", "^", "*", "**", "/", "%"
                                       , "=", "!=", "<", "<=", ">", ">="
                                       , "!", "&&", "||"
+                                      , "."
                                       ]
            }
 
@@ -152,7 +153,8 @@ expression :: Parser Exp
 expression = buildExpressionParser operators term
 
 operators = [
-              [Prefix ((reservedOp "^"  <|> (reserved "top">>pos) )
+              [Infix  ( reservedOp "."   >>= \p -> return (\l r->Index              l r p)) AssocLeft ]
+            , [Prefix ((reservedOp "^"  <|> (reserved "top">>pos) )
                                          >>= \p -> return (\e->  Unary     Top      e   p))           ]
             , [Prefix ((reservedOp "#"  <|> (reserved "size">>pos) )
                                          >>= \p -> return (\e->  Unary     Size     e   p))           ]
