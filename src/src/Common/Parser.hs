@@ -153,7 +153,7 @@ expression :: Parser Exp
 expression = buildExpressionParser operators term
 
 operators = [
-              [Infix  ( reservedOp "."   >>= \p -> return (\l r->Index              l r p)) AssocLeft ]
+              [Infix  ((colon>>pos)      >>= \p -> return (\l r-> Index             l r p)) AssocLeft ]
             , [Prefix ((reservedOp "^"  <|> (reserved "top">>pos) )
                                          >>= \p -> return (\e->  Unary     Top      e   p))           ]
             , [Prefix ((reservedOp "#"  <|> (reserved "size">>pos) )
