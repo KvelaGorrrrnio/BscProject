@@ -1,0 +1,5 @@
+list list list list list int a
+
+a[4,1,4,2,4] -= (top (top (top a)[1])[2])
+a[4,1,4,2,4] ^= 10
+free a [5,5,5,5,5]
