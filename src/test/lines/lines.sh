@@ -15,9 +15,9 @@ do
   echo t, l    >  $filename.csv
   echo 0, $num >> $filename.csv
 
-  for i in {1..5}
+  for i in {1..6}
   do
-    code=$(/home/larsvadgaard/.local/bin/$interp translate <(echo $code) )
+    code=$($interp translate <(echo $code) )
     num=$(echo $code | sed '/^\s*$/d' | wc -l)
     echo $i, $num >> $filename.csv
 

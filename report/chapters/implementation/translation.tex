@@ -1,7 +1,18 @@
 % Translation
 \section{Program Translation}
+Translating a program from one of the two languages to the other is not quite as simple as inverting a program. However, when following the program translators presented in \cite{REV}, the task becomes more doable.
 
 \subsection{SRL to RL}
+
+Generally speaking, translating a structured program in one language to an unstructured program in another language is pretty straightforward. When and where to jump depending on the control structure is very well defined. While we are dealing with a reversible language, it is not much different.
+
+\cite[Fig.~21]{REV} shows the exact definition of the `clean translator` from SRL to RL.\\
+
+\noindent To translate an SRL program, we start by creating the entry- and exit blocks of the resulting RL program with fresh labels. We then translate the SRL block, which is the program, and put the result between these. We feed the entry- and exit labels to the translation of the program block along with two additional fresh labels which will each be assigned to an RL block later in the translation. The intuition in the block translator is that we always pass 4 labels; the first and last labels are assigned to prevously generated blocks, but labels two have yet to be assigned.\\
+
+\noindent Translating an SRL block naturally depends on which type of block it is. If we have a step operation
+
+
 \noindent \todo{SRL translation}
 
 % snak om opskriften fra artiklen
