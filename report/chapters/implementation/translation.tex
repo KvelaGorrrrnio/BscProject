@@ -4,27 +4,62 @@ Translating a program from one of the two languages to the other is not quite as
 
 \subsection{SRL to RL}
 
-Generally speaking, translating a structured program in one language to an unstructured program in another language is pretty straightforward. When and where to jump depending on the control structure is very well defined. While we are dealing with a reversible language, it is not much different.
+Generally speaking, translating a structured program in one language to an unstructured program in another language is pretty straightforward. When and where to jump depending on the control structure is very well defined. Dealing with a reversible language is not much diffierent.\\
 
-\cite[Fig.~21]{REV} shows the exact definition of the `clean translator` from SRL to RL.\\
+\noindent \cite[Fig.~21]{REV} shows the exact definition of the `clean translator` from SRL to RL.\\
 
-\noindent To translate an SRL program, we start by creating the entry- and exit blocks of the resulting RL program with fresh labels. We then translate the SRL block, which is the program, and put the result between these. We feed the entry- and exit labels to the translation of the program block along with two additional fresh labels which will each be assigned to an RL block later in the translation. The intuition in the block translator is that we always pass 4 labels; the first and last labels are assigned to prevously generated blocks, but labels two have yet to be assigned.\\
+\noindent To translate an SRL program, we start by creating the entry- and exit blocks of the resulting RL program with fresh labels. We then translate the main SRL block and put the result between these. We feed the entry- and exit labels to the translation of the main block along with two additional fresh labels which will each be assigned to an RL block later in the translation. The intuition in the block translator is that we always pass 4 labels; the first and last labels have been assigned to prevously generated blocks, but labels two and three have yet to be assigned. The labels that have already been assigned --- that is, the first and the last label --- represent the RL block we are coming from and the RL block we are jumping to, respectively. See Figure~\ref{fig:trlProg}.\\
 
-\noindent Translating an SRL block naturally depends on which type of block it is. If we have a step operation
+\noindent Translating an SRL block naturally depends on which type of block it is. If we have a step operation, we simply generate two blocks from the two unassigned labels: one that contains the step operation and one that contains a skip. The first of these will be coming from the first assigned label and have a \texttt{goto} jump to the next. This will naturally be coming from the first RL block, but have a jump to the last assigned label. See Figure~\ref{fig:trlBlkStep}.\\
 
+\noindent If we have a conditional SRL block we first generate the start- and end blocks of the corresponding sequence of RL blocks. Between these we individually translate both blocks contained in the conditional SRL block. These are then connected to the generated start- and end blocks with the given labels and four fresh ones. See Figure~\ref{fig:trlBlkIf}.\\
 
-\noindent \todo{SRL translation}
+\noindent If we have a loop, we do something very similar. The only difference is that the end block has a conditional jump that may jump back to the start block depending on the test from the SRL block. See Figure~\ref{fig:trlBlkLoop}.\\
+
+\noindent Finally, if we have a sequence, we translate both SRL blocks individually and chain them together with two fresh labels. See Figure~\ref{fig:trlBlkSeq}.
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=28, lastline=43]{../src/src/SRL/Translation.hs}
+  \caption{Translation of an SRL program.}\label{fig:trlProg}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=46, lastline=54]{../src/src/SRL/Translation.hs}
+  \caption{Translation of a block containing a step operation.}\label{fig:trlBlkStep}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=56, lastline=71]{../src/src/SRL/Translation.hs}
+  \caption{Translation of a conditional block.}\label{fig:trlBlkIf}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=73, lastline=88]{../src/src/SRL/Translation.hs}
+  \caption{Translation of a loop block.}\label{fig:trlBlkLoop}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=90, lastline=95]{../src/src/SRL/Translation.hs}
+  \caption{Translation of a sequence of blocks.}\label{fig:trlBlkSeq}
+\end{figure}
+
+\noindent Note that we use a monad transformer consisting of the writer monad and the state monad. The state monad keeps track of a counter that is used to generate fresh labels, and the writer is simply used for pushing generated RL block onto a stack of RL blocks. Thus, the result of the writer monad is the translated program.
 
 % snak om opskriften fra artiklen
 % vis, hvordan det er implementeret nærmest 1:1
 
 \subsection{RL to SRL}
-\noindent \todo{RL translation}
-
 % snak om opskriften fra artiklen
 % vis, hvordan det er implementeret nærmest 1:1
 % dog med setup og alt muligt
 
+Translating an unstructured program in one language to a structured program in another language is not \textit{that} straightforward. Deciding whether a certain pattern of conditional jumps is a loop or or an if-then-else body is not a trivial task. Reversible languages are no different; translating an RL program to a corresponding SRL program is messy. However, \cite[p.~107]{REV} presents a very neat translator for RL.
+
+
+\subsection{Comments}
+The translators described in the previous sections are very interesting but are not ideal in practice. When translating from SRL to RL, a \textit{lot} of unnecessary blocks are generated. When translating from RL to SRL, a large loop of \textit{lots} of conditional blocks is generated. In fact, when translating back and forth multiple times, we will start to see an exponential growth on the number of lines of the resulting program. Figure~\ref{fig:linesfig} shows the actual growth in number of lines of two programs; \texttt{fib.srl}, which consists of $l_0=10$ lines, and \texttt{skip}, which consists of a $l_0=1$ line. That is, after translating \texttt{fib.srl} and \texttt{skip.srl} six times, we the resulting programs will consist of more than $60,000$ and $20,000$ lines, respectively!
+
+\pgfplotsset{compat = 1.3}
 \begin{figure}[H]
 \centering
 
@@ -33,8 +68,15 @@ Generally speaking, translating a structured program in one language to an unstr
   \begin{axis} [
       xlabel=\#translations,
       ylabel=\#lines,
-      width=0.8\textwidth
+      ylabel shift=-2 pt,
+      width=0.8\textwidth,
+      legend style={at={(0.02,0.98)},anchor=north west},
+      y tick label style={/pgf/number format/.cd,%
+                scaled y ticks = false,
+                set thousands separator={},
+                fixed}
     ]
+
 
     \addplot table [
       x=t,
@@ -54,5 +96,5 @@ Generally speaking, translating a structured program in one language to an unstr
 
   \end{tikzpicture}
 
-  \caption{Growth of a program for each translation.}% ($10.1e^{1.45x}$)
+  \caption{Growth of a program for each translation.}\label{fig:linesfig}% ($10.1e^{1.45x}$)
 \end{figure}
