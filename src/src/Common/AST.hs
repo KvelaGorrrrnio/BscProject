@@ -75,18 +75,18 @@ instance Show UpdOp where
 
 data Exp
   = Lit    Value Pos
-  | Var    Id Pos
+  | Var    String Pos
   | Binary BinOp Exp Exp Pos
   | Unary  UnOp  Exp Pos
-  | Index  Exp Exp Pos
+  | Index  Exp [Exp] Pos
   | Parens Exp Pos
   deriving Eq
 instance Show Exp where
   show (Lit v _)          = show v
-  show (Var id _)         = show id
+  show (Var id _)         = id
   show (Binary op l r _)  = show l ++ show op ++ show r
   show (Unary  op exp _)  = show op ++ show exp
-  show (Index  l r _)     = show l ++ " . " ++ show r
+  show (Index  l exps _)  = show l ++ showIdx exps
   show (Parens exp _)     = case exp of
     Parens exp' _ -> show exp
     _             -> "("++show exp++")"
@@ -95,6 +95,7 @@ getExpPos (Lit _ p)        = p
 getExpPos (Var _ p)        = p
 getExpPos (Binary _ _ _ p) = p
 getExpPos (Unary _ _ p)    = p
+getExpPos (Index _ _ p)    = p
 getExpPos (Parens _ p)     = p
 showPar :: Exp -> String
 showPar e = case e of

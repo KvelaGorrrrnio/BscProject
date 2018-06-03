@@ -150,11 +150,13 @@ freeStep = do
 
 -- expressions
 expression :: Parser Exp
-expression = buildExpressionParser operators term
+expression = expressionGen termLst
+
+-- subscript
+expressionGen term = buildExpressionParser operators term <?> "expression"
 
 operators = [
-              [Infix  ((colon>>pos)      >>= \p -> return (\l r-> Index             l r p)) AssocLeft ]
-            , [Prefix ((reservedOp "^"  <|> (reserved "top">>pos) )
+              [Prefix ((reservedOp "^"  <|> (reserved "top">>pos) )
                                          >>= \p -> return (\e->  Unary     Top      e   p))           ]
             , [Prefix ((reservedOp "#"  <|> (reserved "size">>pos) )
                                          >>= \p -> return (\e->  Unary     Size     e   p))           ]
@@ -185,7 +187,15 @@ operators = [
             , [Infix  ((reservedOp "||" <|> (reserved "or">>pos))
                                          >>= \p -> return (\l r->Binary    Or       l r p)) AssocLeft ]
             ]
-term = pos >>= \p ->(\s->s p)
+termStd = pos >>= \p ->(\s->s p)
    <$> (Parens    <$> parens expression
-   <|> Var        <$> identifier
+   <|> Var        <$> identifier'
    <|> Lit . IntV <$> integer)
+
+termLst = do
+  exp <- termStd
+  p   <- pos
+  ind <- indices
+  if null ind
+  then return exp
+  else return $ Index exp ind p

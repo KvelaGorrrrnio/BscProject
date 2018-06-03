@@ -107,17 +107,16 @@ exec (Update (Id id exps) op e p) = do
 
   where contains :: Exp -> Id -> [Exp] -> VarState Bool
         contains Lit{} _ _ = return False
-        contains (Var (Id id2 exps2) _) (Id id1 exps1) is
-          | id1 == id2 = let exps2' = exps2 ++ is in
-            (&&) (length exps1 == length exps2') <$>
-            ( (==) <$> mapM eval exps1 <*> mapM eval exps2' )
+        contains (Var id2 _) (Id id1 exps1) exps2
+          | id1 == id2 = (&&) (length exps1 == length exps2) <$>
+                         ( (==) <$> mapM eval exps1 <*> mapM eval exps2 )
           | otherwise = return False
         contains (Binary _ e1 e2 _) id is = (||) <$> contains e1 id is <*> contains e2 id is
-        contains (Unary Top e p) id is = contains e id (Binary Minus (Unary Size e p) (Lit (IntV 1) p) p : is)
-        contains (Index l r _) id is = contains l id (r:is)
-        contains (Unary Size _ _) _ _ = return False
-        contains (Unary _ e _) id is = contains e id is
-        contains (Parens e _) id is = contains e id is
+        contains (Unary Top e p) id is    = contains e id (Binary Minus (Unary Size e p) (Lit (IntV 1) p) p : is)
+        contains (Index l exps _) id is   = contains l id (exps ++ is)
+        contains (Unary Size _ _) _ _     = return False
+        contains (Unary _ e _) id is      = contains e id is
+        contains (Parens e _) id is       = contains e id is
 
 -- list modification
 exec (Push id1 id2 p) = do
@@ -238,7 +237,7 @@ eval :: Exp -> VarState Value
 
 -- terminals
 eval (Lit v _)  = return v
-eval (Var id p) = rd id p
+eval (Var id p) = rd (Id id []) p
 
 eval (Binary op l r p)
 
@@ -296,9 +295,9 @@ eval (Unary op exp p)
     w  -> logError p $ NonListExp (getType w)
 
 -- index
-eval (Index l r _) = do
+eval (Index l exps _) = do
   v <- eval l
-  getIdx v r
+  foldM getIdx v exps
 
 -- parantheses
 eval (Parens e _) = eval e
