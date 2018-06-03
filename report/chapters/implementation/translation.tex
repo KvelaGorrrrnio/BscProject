@@ -13,3 +13,35 @@
 % snak om opskriften fra artiklen
 % vis, hvordan det er implementeret nærmest 1:1
 % dog med setup og alt muligt
+
+\begin{figure}[H]
+\centering
+
+  \begin{tikzpicture}
+
+  \begin{axis} [
+      xlabel=\#translations,
+      ylabel=\#lines,
+      width=0.8\textwidth
+    ]
+
+    \addplot table [
+      x=t,
+      y=l,
+      col sep=comma,
+    ] {../src/test/lines/fib.csv};
+    \addlegendentry{fib.srl ($l_0 = 10$)}
+
+    \addplot table [
+      x=t,
+      y=l,
+      col sep=comma,
+    ] {../src/test/lines/skip.csv};
+    \addlegendentry{skip.srl ($l_0 = 1$)}
+
+  \end{axis}
+
+  \end{tikzpicture}
+
+  \caption{Growth of a program for each translation.}% ($10.1e^{1.45x}$)
+\end{figure}
