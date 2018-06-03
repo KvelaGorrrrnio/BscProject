@@ -16,11 +16,11 @@ syn match   srlComment      "\/\/.*$"
 syn region  srlComment      start="\/\*" end="\*\/"
 
 hi def link srlConditional  Conditional
-hi def link srlVariable	    Underlined
+hi def link srlVariable     Underlined
 hi def link srlComment      Comment
 hi def link srlOperator     Operator
 hi def link srlFunctionlike Function
 hi def link srlInteger      Number
-hi def link srlType	        Type
+hi def link srlType         Type
 
 let b:current_syntax = "srl"
