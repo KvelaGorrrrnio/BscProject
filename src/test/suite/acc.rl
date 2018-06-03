@@ -1,3 +1,5 @@
+// Compute the accumulated sum
+
 int n
 int v
 
@@ -11,5 +13,4 @@ loop: fi (v = 0) start loop
 if (n) loop end
 
 end: from loop
-  .
 exit

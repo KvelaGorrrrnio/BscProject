@@ -1,4 +1,5 @@
-// Reversible factorial program
+// Compute n!
+
 int n int v
 
 n ^= 5

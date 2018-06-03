@@ -1,9 +1,9 @@
-// Program to compute the prime factors of n
+// Compute the prime factors of n
 
 int v int n
 list int p
 
-n += 315
+n += 1829
 v += 2
 from ((empty p) and v = 2) do
   if (n % v = 0) then

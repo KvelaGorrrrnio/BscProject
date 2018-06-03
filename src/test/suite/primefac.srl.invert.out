@@ -16,4 +16,4 @@ loop
   skip
 until ((empty p) && v = 2)
 v -= 2
-n -= 315
+n -= 1829

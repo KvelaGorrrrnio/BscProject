@@ -1,10 +1,10 @@
-int a
 int n
+int v
 
 from (n = 0) do
   n += 1
-  a -= n
+  v -= n
 loop
   skip
-until (a = 0)
+until (v = 0)
 n ^= 10

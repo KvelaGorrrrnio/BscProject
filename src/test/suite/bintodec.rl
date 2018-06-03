@@ -1,3 +1,5 @@
+// Convert binary to decimal
+
 int n int i
 list int q
 
@@ -7,6 +9,7 @@ start: entry
   q[2] += 1
   q[5] += 1
   q[9] += 1
+  q[8] += 1
 goto loop
 
 loop: fi (i = 0) start loop

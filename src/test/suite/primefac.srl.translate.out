@@ -7,7 +7,7 @@ l0: entry
 goto l1
 
 l1: from l0
-  n += 315
+  n += 1829
 goto l10
 
 l10: from l1

@@ -1,10 +1,1 @@
-// Reversible factorial program
-int n int v
-
-n ^= 5
-v ^= 1
-from (v = 1) do
-  v *= n
-  n -= 1
-loop .
-until (n = 0)
+../../../src/test/suite/fac.srl

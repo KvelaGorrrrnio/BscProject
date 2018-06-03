@@ -12,6 +12,7 @@ loop: fi (i = size q) end loop
 if (i = 0) start loop
 
 start: from loop
+  q[8] -= 1
   q[9] -= 1
   q[5] -= 1
   q[2] -= 1

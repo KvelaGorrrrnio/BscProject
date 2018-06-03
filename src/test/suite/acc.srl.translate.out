@@ -1,5 +1,5 @@
-int a
 int n
+int v
 
 l0: entry
   skip
@@ -13,12 +13,12 @@ l4: from l1
   skip
 goto l5
 
-l5: fi (a = 0) l4 l9
+l5: fi (v = 0) l4 l9
   skip
 goto l6
 
 l6: from l5
-  a += n
+  v += n
 goto l10
 
 l10: from l6

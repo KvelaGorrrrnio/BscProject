@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "int n\nlist int q\nint w\n\nend: entry\n  skip\ngoto loop\n\nloop: fi (n = 0) end loop\n  n += 1\n  pop w q\n  w -= n * n\nif (n = 10) start loop\n\nstart: from loop\n  n ^= 10\nexit" }
+{ "type" : "code", "code" : "int n\nlist int q\n\nend: entry\n  skip\ngoto loop\n\nloop: fi (size q = 10) end loop\n  pop n q\n  n -= size q ** 2\nif (empty q) start loop\n\nstart: from loop\n  skip\nexit" }
