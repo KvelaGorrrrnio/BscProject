@@ -53,11 +53,74 @@ Generally speaking, translating a structured program in one language to an unstr
 % vis, hvordan det er implementeret nærmest 1:1
 % dog med setup og alt muligt
 
-Translating an unstructured program in one language to a structured program in another language is not \textit{that} straightforward. Deciding whether a certain pattern of conditional jumps is a loop or or an if-then-else body is not a trivial task. Reversible languages are no different; translating an RL program to a corresponding SRL program is messy. However, \cite[p.~107]{REV} presents a very neat translator for RL.
+Translating an unstructured program in one language to a structured program in another language is not \textit{that} straightforward. Deciding whether a certain pattern of conditional jumps is a loop or or an if-then-else body is not a trivial task. Reversible languages are no different; translating an RL program to a corresponding SRL program is a messy affair. However, the paper (\cite[p.~107]{REV}) presents a very neat translator for RL that is, in fact, quite intuitive: We simply keep track of an $(n+1) \times (n+1) \times 3$ table (where $n$ is the number of blocks in the original RL program) of boolean state values which indicates where we are, and where we came from, in our program. The extra row and column are `imaginary states which simulate where we come from when reaching the entry and where we go after reaching the exit. The number $3$ comes from simulating either (0) the come-from assertion (1) the step operations (2) the jump. We construct a resulting SRL program which consists of one single loop with one or more conditional blocks. Each of these will simply check (in the table of states) if we are in a certain RL block from the original program. If we are, we perform the operations contained in the original RL block and flip the states in the table corresponding the original unstructured jump.\\
 
+\noindent When translating an RL program, we will first set up the state table, the entry assertion, the main loop, and the exit assertion of the resulting SRL program. The entry assertion is simply a sanity check which makes sure that the state table has no true entry at the beginning of the program. Likewise, the exit assertion makes sure that no entry in the state table is true at program exit. Furthermore, before entering the loop and after asserting the entry condition, we set the entry in the state table that corresponds to the entry block to true, and after the loop, before asserting the exit condition, we set the entry in the state table corresponding to the exit block to false. Finally, inside the loop, we will put the translation of the list of RL blocks. See Figure~\ref{fig:rltrlProg}.\\
+
+\noindent Translating a list of blocks corresponds to translating the last block of the list with $E_{false}$ as argument, then using the result as argument when translating the second to last block in the list, etc. This can be achieved by simply folding the list from right to left using block translation as the operator and $E_{false}$ as starting value. $E_{false}$ is defined in the paper as an edge block (\texttt{if 0 then skip else skip fi 1}) that should halt the program if reached. See Figure~\ref{fig:rltrlBlks}.\\
+
+\noindent The block translation takes, other than an RL block $l_i \, : \, k \ a^* \ j$, an SRL block $F$ as argument (as described when explaining the right fold). The translation works by first translating the jump with $i$ and $F$ as arguments. The result is then used as argument, alongside $i$, when translating the list af step operations $a^*$. \textit{This} result is then used as argument, once again alongside $i$, when translating the come-from assertion. This is similar to a small fold and it accumulates an SRL block for the resulting SRL program. See Figure~\ref{fig:rltrlBlk}.\\
+
+\noindent When translating a come-from assertion, we receive an integer $i$ and an SRL block as arguments. If the come-from assertion is an entry, we simply generate a conditional SRL block which, if the first entry in the state table is true, will pass control the the step operations of the entry RL block. If it is not true, it will execute $F$. See Figure~\ref{fig:rltrlFromEntry}.
+
+If we reach an unconditional come-from assertion $\texttt{from} \ l_j$ we generate a conditional SRL block which, if the entry in the state table corresponding to the RL block with label $l_j$ is true, we pass control to the RL block with label $l_i$, where $i$, as mentioned, is an argument passed to this translation function. If it is not true, it will execute $F$. See Figure~\ref{fig:rltrlFromFrom}.
+
+Similarly, if we reach a conditional come-from assertion we will pass control flow depending on the expression inside. This particular case will result in a nested conditional block. See Figure~\ref{fig:rltrlFromFi}.\\
+
+\noindent The translation of jumps is symmetric to the translation of come-from assertion, and thus, we will not go into too much detail here. The intuition is the same: If the corresponding state is true in the state table, we will pass control accordingly. If not, we move on the the next SRL block. The translation implementation of \texttt{exit}, \texttt{goto}, and \texttt{if} can be seen in Figures~\ref{fig:rltrlJumpExit},~\ref{fig:rltrlJumpGoto}, and~\ref{fig:rlTrlJumpIf}, respectively.
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=83, lastline=100]{../src/src/RL/Translation.hs}
+  \caption{Translating an RL program.}\label{fig:rltrlProg}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=102, lastline=104]{../src/src/RL/Translation.hs}
+  \caption{Translating a list of blocks.}\label{fig:rltrlBlks}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=106, lastline=109]{../src/src/RL/Translation.hs}
+  \caption{Translating a single block.}\label{fig:rltrlBlk}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=113, lastline=120]{../src/src/RL/Translation.hs}
+  \caption{Translating a come-from assertion.}\label{fig:rltrlFromEntry}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=113, lastline=120]{../src/src/RL/Translation.hs}
+  \caption{Translating a come-from assertion (entry).}\label{fig:rltrlFromEntry}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=122, lastline=131]{../src/src/RL/Translation.hs}
+  \caption{Translating a come-from assertion (unconditional).}\label{fig:rltrlFromFrom}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=133, lastline=153]{../src/src/RL/Translation.hs}
+  \caption{Translating a come-from assertion (conditional).}\label{fig:rltrlFromFi}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=172, lastline=183]{../src/src/RL/Translation.hs}
+  \caption{Translating a jump (exit).}\label{fig:rltrlJumpExit}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=185, lastline=194]{../src/src/RL/Translation.hs}
+  \caption{Translating a jump (unconditional).}\label{fig:rltrlJumpGoto}
+\end{figure}
+
+\begin{figure}[H]
+  \lstinputlisting[language=haskell, firstline=196, lastline=216]{../src/src/RL/Translation.hs}
+  \caption{Translating a jump (conditional).}\label{fig:rltrlJumpIf}
+\end{figure}
 
 \subsection{Comments}
-The translators described in the previous sections are very interesting but are not ideal in practice. When translating from SRL to RL, a \textit{lot} of unnecessary blocks are generated. When translating from RL to SRL, a large loop of \textit{lots} of conditional blocks is generated. In fact, when translating back and forth multiple times, we will start to see an exponential growth on the number of lines of the resulting program. Figure~\ref{fig:linesfig} shows the actual growth in number of lines of two programs; \texttt{fib.srl}, which consists of $l_0=10$ lines, and \texttt{skip}, which consists of a $l_0=1$ line. That is, after translating \texttt{fib.srl} and \texttt{skip.srl} six times, we the resulting programs will consist of more than $60,000$ and $20,000$ lines, respectively!
+The translators described in the previous sections are very interesting, but not ideal in practice. When translating from SRL to RL, a \textit{lot} of blocks are produced. When translating from RL to SRL, a large loop of \textit{lots} of conditional blocks is produced. In fact, when translating back and forth multiple times, we will start to see an exponential growth on the number of lines of the resulting program. Figure~\ref{fig:linesfig} shows the actual growth in number of lines of two programs; \texttt{fib.srl}, which consists of $l_0=10$ lines, and \texttt{skip}, which consists of a $l_0=1$ line. As we see, after translating \texttt{fib.srl} and \texttt{skip.srl} six times the resulting programs will consist of more than $60,000$ and $20,000$ lines, respectively!
 
 \pgfplotsset{compat = 1.3}
 \begin{figure}[H]
