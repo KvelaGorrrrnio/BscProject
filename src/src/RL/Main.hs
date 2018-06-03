@@ -52,8 +52,11 @@ main = do
             (Left err,_)                      -> eout' err
           Just n  -> eout' (StaticError (0,0) $ DuplicateVarDec n)
 
-    Invert [] o j c -> if c then noCode j o else noFile j o
-    Invert f o j c  -> do
+    m -> do
+      (f,o,j,c,transform) <- case m of
+        Invert    f o j c -> return (f, o, j, c, \ttab -> showAST ttab . invert)
+        Translate f o j c -> return (f, o, j, c, translate)
+
       unless c $ do
         exists <- doesFileExist f
         unless exists $ noFileExist j o f
@@ -61,23 +64,8 @@ main = do
       let eout' = eout j o
       (staticcheck <$> getAST c f) >>= \case
         Left err  -> eout' err
-        Right (ttab,ast) -> case (showAST ttab . invert) ast of
-            code | j && null o -> putStrLn $ jsonCode code
-                 | j           -> writeFile o $ (++"\n") (jsonCode code)
-                 | null o      -> putStrLn code
-                 | otherwise   -> writeFile o $ (++"\n") code
-
-    Translate [] o j c -> if c then noCode j o else noFile j o
-    Translate f o j c -> do
-      unless c $ do
-        exists <- doesFileExist f
-        unless exists $ noFileExist j o f
-
-      let eout' = eout j o
-      (staticcheck <$> getAST c f) >>= \case
-       Left err  -> eout' err
-       Right (ttab,ast) | code <- translate ttab ast -> case ast of
-         _ | j && null o -> putStrLn $ jsonCode code
-           | j           -> writeFile o $ (++"\n") (jsonCode code)
-           | null o      -> putStrLn code
-           | otherwise   -> writeFile o $ (++"\n") code
+        Right (ttab,ast) -> case transform ttab ast of
+          code | j && null o -> putStrLn $ jsonCode code
+               | j           -> writeFile o $ (++"\n") (jsonCode code)
+               | null o      -> putStrLn code
+               | otherwise   -> writeFile o $ (++"\n") code
