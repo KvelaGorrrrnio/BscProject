@@ -1,12 +1,13 @@
 % Translation
 \section{Program Translation}
-Translating a program from one of the two languages to the other is not quite as simple as inverting a program. However, when following the program translators presented in \cite{REV}, the task becomes more doable.
+Translating a program from one of the two languages to the other is not quite as simple as inverting a program. %However, when following the program translators presented in \cite{REV}, the task becomes more doable.
+However, after proving what we call the Reversible Structured Program Theorem --- that is, the Structured Program Theorem for reversible languages --- the paper presents a program translator for each of the languages, which, if followed closely, makes the task of translating the languages more doable.
 
 \subsection{SRL to RL}
 
 Generally speaking, translating a structured program in one language to an unstructured program in another language is pretty straightforward. When and where to jump depending on the control structure is very well defined. Dealing with a reversible language is not much diffierent.\\
 
-\noindent \cite[Fig.~21]{REV} shows the exact definition of the `clean translator` from SRL to RL.\\
+\noindent \cite[Fig.~21]{REV} shows the exact definition of the translator from SRL to RL.\\
 
 \noindent To translate an SRL program, we start by creating the entry- and exit blocks of the resulting RL program with fresh labels. We then translate the main SRL block and put the result between these. We feed the entry- and exit labels to the translation of the main block along with two additional fresh labels which will each be assigned to an RL block later in the translation. The intuition in the block translator is that we always pass 4 labels; the first and last labels have been assigned to prevously generated blocks, but labels two and three have yet to be assigned. The labels that have already been assigned --- that is, the first and the last label --- represent the RL block we are coming from and the RL block we are jumping to, respectively. See Figure~\ref{fig:trlProg}.\\
 
@@ -67,7 +68,9 @@ If we reach an unconditional come-from assertion $\texttt{from} \ l_j$ we genera
 
 Similarly, if we reach a conditional come-from assertion we will pass control flow depending on the expression inside. This particular case will result in a nested conditional block. See Figure~\ref{fig:rltrlFromFi}.\\
 
-\noindent The translation of jumps is symmetric to the translation of come-from assertion, and thus, we will not go into too much detail here. The intuition is the same: If the corresponding state is true in the state table, we will pass control accordingly. If not, we move on the the next SRL block. The translation implementation of \texttt{exit}, \texttt{goto}, and \texttt{if} can be seen in Figures~\ref{fig:rltrlJumpExit},~\ref{fig:rltrlJumpGoto}, and~\ref{fig:rlTrlJumpIf}, respectively.
+\noindent The translation of jumps is symmetric to the translation of come-from assertion, and thus, we will not go into too much detail here. The intuition is the same: If the corresponding state is true in the state table, we will pass control accordingly. If not, we move on the the next SRL block. The translation implementations of \texttt{exit}, \texttt{goto}, and \texttt{if} can be seen in Figures~\ref{fig:rltrlJumpExit},~\ref{fig:rltrlJumpGoto}, and~\ref{fig:rltrlJumpIf}, respectively.\\
+
+\noindent Here, we use the reader monad to read the name of the state table --- it must be unique and thus, generated when translating the program --- and to read the association list which maps a label to an integer --- as used in the translation process.
 
 \begin{figure}[H]
   \lstinputlisting[language=haskell, firstline=83, lastline=100]{../src/src/RL/Translation.hs}
