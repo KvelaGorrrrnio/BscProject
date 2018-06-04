@@ -1,6 +1,6 @@
 // Compute the prime factors of n
-
-int v int n
+int n
+int v
 list int p
 
 n += 1829
