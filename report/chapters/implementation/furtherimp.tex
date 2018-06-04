@@ -1,21 +1,18 @@
-
 \section{Further Improvements}
+In this section, we will discuss what can be further improved on our implementation.
 
 \subsection{Interpretation}
+An obvious bottleneck is the efficiency of our interpreters; they are both relatively slow and can thus not be used efficiently for more demanding programs. There are many parts of our implementation that can be optimised. One example is the representation of an RL program: having to do a linear lookup on an association table on every jump is simply too inefficient and unnecessary. We kept this representation, however, because it was the simplest way to keep the order of the blocks intact. Using a hashmap could potentially change the order of blocks dramatically, and the result of a program transformation could therefore be ill formed or harder to understand. This, of course, could be resolved by mapping each label to an integer in the right order --- a bit like the map we used in the translator from RL to SRL. However, we did not want to introduce too much processing on that front.
 
-\todo{faster interpretation, optimising the code}
+Another nice representation would be a zipper (as described in \cite{ZIP}). If we would calculate each relative position, we could perform a jump by simply moving forward or backward in the zipper a number of times corresponding to the relative positions.
+
+An even better representation would be a cyclic graph where each node represents an RL block. This would allow for some efficient optimisation such as graph reduction.
 
 \subsection{Parsing}
-
-\todo{not ignoring newlines, generates better error messages and allows more syntactic sugar}
+A flaw in our parser is that that all whitespace is ignored. This means that we can't define step operations to terminate with a newline --- which is a shame, because this would allow for better error messages and more syntactic sugar. Also, a sequence of the same prefix operator is not allowed without using parantheses. For example, \texttt{top top a} is not allowed --- to achieve this functionality we have to write \texttt{top (top a)}. This becomes especially gruesome when having an even longer such sequence.
 
 \subsection{Optimisation}
-\todo{Talk about zippers with a reference}
-\todo{Graph AST for RL?}
-\todo{Better use of typeclasses/other?}
-
-\todo{optimisation of Common: merge updates, compute constants, remove redundant stuff, remove skips}
-\todo{optimisation of RL: AST as a cyclic graph, reduce the graph}
+It would be nice to have a pass that optimises an RL- or SRL program. By this we mean removing redundant step operations and subexpressions, merging sequences of variable updates, computing constants statically, removing skips, etc.
 
 \subsection{Web}
 \todo{API-keys}

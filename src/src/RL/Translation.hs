@@ -66,7 +66,7 @@ rMac i' (j,i,k) = do
   return $ genSwap (genId x [j,i,k]) (genId x [j,i',k'])
 
 -- Sanity check
-ef t = genIf t genSkip genSkip (genLit 1)
+efalse = genIf (genLit 0) genSkip genSkip (genLit 1)
 
 -- Generic position
 p = (0,0)
@@ -82,7 +82,9 @@ translate ttab ast =
 
 trlProg :: RL.AST -> TrlReader (TypeTab,SRL.AST)
 trlProg ast = do
-  x  <- getVec ()
+
+  ttab <- initTypeDec
+  x    <- getVec ()
 
   let n  = fromIntegral . length $ ast
       b0 = genInit x (n + 2)
@@ -95,11 +97,10 @@ trlProg ast = do
       b5 = b1
       b6 = genFree x (n + 2)
 
-  ttab <- initTypeDec
   return (ttab, genSeq [b0,b1,b2,b3,b4,b5,b6])
 
 trlBlocks :: RL.AST -> TrlReader SRL.Block
-trlBlocks = foldrM trlBlock (ef . genLit $ 0)
+trlBlocks = foldrM trlBlock efalse
   where foldrM f e = foldr ((=<<) . f) (return e)
 
 trlBlock :: (Label,RL.Block) -> SRL.Block -> TrlReader SRL.Block
@@ -109,7 +110,7 @@ trlBlock (l,(f,ss,j)) sb = do
 
 -- comefroms
 trlFrom :: From -> Int -> SRL.Block -> TrlReader SRL.Block
-trlFrom (Entry _) 1 b2 = do -- TODO: i skal være 1?
+trlFrom (Entry _) 1 b2 = do
   x  <- getVec ()
 
   let t = genVar x [0,1,0]
