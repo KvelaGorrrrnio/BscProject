@@ -1,3 +1,25 @@
-- inverteret program og starting state????
-- Integer vs. Int ???
-- Ints i stedet for bool
+- Hvornår afleverer vi?
+- Tjek mail:
+  - Rapport:
+    - henvisning til vores filer?
+    - flette henvisninger pænt ind i rapporten
+    - pænere beskrivelser af hvad der foregår?
+
+TODO:
+  - introduktioner til chapters
+  -
+kommentarer:
+  mange figurer
+  kun vigtige ting inline
+  ellers henvis til appendix
+
+  nogle inline kodeeksempler behøver ikke figure
+
+  translation:
+    overordnet idé
+    så mere specifikt?
+
+  formel beskrivelse:
+    iota = indeksering
+
+  background skal beskrive reversivibilitet

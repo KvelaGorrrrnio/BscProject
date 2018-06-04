@@ -12,14 +12,15 @@ Also, while the languages as described in the paper have lists limited to one di
 
 We have added three new step operations to the languages: \texttt{swap}, \texttt{init}, and \texttt{free}. \texttt{swap} has already been described in \cite[p.~99]{REV}, however, it was not included in the formal syntax of the languages. It is a simple, but powerful, step operation that is imperative for the \textit{Fibonacci-pair function} shown as an unstructured flowchart on \cite[p.~99]{REV} and as a structured flowchart on \cite[p.~93]{REV}. \texttt{swap} works simply by swapping the two variable operands and is, thus, its own inverse. Trying to swap two variables of different types will throw a runtime error.
 
-\texttt{init} was defined and implemented by us as a way to quickly obtain a list of zero-values in an arbitrary number of dimensions. That is, $\texttt{init} \ l \ [x,y,z]$ will initialise list $l$ to be a 3-dimensional table of lengths $x$, $y$, and $z$ consisting of zeroes. This is, in particular, useful in the translation from RL to SRL; Here, we must begin the resulting SRL program by initialising an $n \times n \times 3$ table, where $n$ is the number of blocks in the source RL program. This would, if we did not have \texttt{init} at our disposal, require three nested loops and three temporary variables which are never used again.
+\texttt{init} was defined and implemented by us as a way to quickly obtain a list of zero-values of arbitrary dimensions. That is, $\texttt{init} \ l \ [x,y,z]$ will initialise variable $l$ to be a 3-dimensional table of lengths $x$, $y$, and $z$ consisting of zeroes. This is, in particular, useful in the translation from RL to SRL; Here, we must begin the resulting SRL program by initialising an $(n+1) \times (n+1) \times 3$ table, where $n$ is the number of blocks in the source RL program. This would, if we did not have \texttt{init} at our disposal, require three nested loops and three temporary variables which are never used again. One strict rule to ensure reversibility is that the variable being initialised \textit{must} be an empty list before the execution. If this is not the case, a runtime error is thrown.
 
-The inverse to \texttt{init} is \texttt{free}, which has a very similar syntax; $\texttt{free} \ l \ [x,y,z]$ will, if the dimensions and lengths of the list match $[x,y,z]$, reset list $l$ to an empty list. Do they not match, however, a runtime error will be thrown. This guarantees the reversibility of \texttt{init} and \texttt{free}. The inverse to \texttt{free} is, naturally, \texttt{init}.
-We do not consider the addition of \texttt{init} and \texttt{free} to be \textit{too} radical; after all, the same functionality could be simulated by simply having a sufficiently long sequence of \texttt{push}- (if \texttt{init}) or \texttt{pop} (if \texttt{free}) operations.
+The inverse to \texttt{init} is \texttt{free}, which has a very similar syntax; $\texttt{free} \ l \ [x,y,z]$ for some variable $l$ and expressions $x$, $y$, and $z$ will, if the dimensions and lengths of the list match $[x,y,z]$, reset list $l$ to an empty list. Do they not match, however, a runtime error will be thrown. This guarantees the reversibility of \texttt{init} and \texttt{free}. The inverse to \texttt{free} is, naturally, \texttt{init}.
+
+We do not consider the addition of \texttt{init} and \texttt{free} to be \textit{too} radical; after all, the same functionality could be simulated by simply having a sufficiently long sequence of push- (if \texttt{init}) or pop (if \texttt{free}) operations.
 
 We have also added two update operators: multiplication and division. Here we must be cautious: The right-hand side of a multiplication update must not be zero. This would lead to loss of information and make the program irreversible. Also, the right-hand side of a division update must be a divisor of the left-hand side --- a potential division rest would be lost, and the program would therefore not be reversible. If these rules are not respected, a runtime error is thrown. We have that $x \timeseq e$ is an inverse to $x \diveq e$ and vice versa.
 
-Because expressions do not influence reversibility, one can add any arbitrary operator to the languages. We found a few known operators to be a nice addition to the languages --- some of them are even mentioned in the paper, but not explicitly included in the formal syntax:
+Because expressions do not influence reversibility, one can add any arbitrary operator to the languages. We found a few common operators to be a nice addition to the languages --- some of them are even mentioned in the paper, but not explicitly included in the formal syntax. More specifically, we have added
 \begin{description}
 \item[Binary operators]~
   \begin{itemize}
@@ -40,7 +41,7 @@ Because expressions do not influence reversibility, one can add any arbitrary op
 \end{itemize}
 \end{description}
 
-The addition of arbitrary indexing applies to expressions as well; we can express \texttt{(top a)[i]} without a problem by evaluation \texttt{(top a)} and then index on the resulting value.
+The addition of arbitrary indexing applies to expressions as well; we can now express \texttt{(top a)[i]} without a problem by evaluating \texttt{(top a)} and then index on the resulting value.
 
 Finally, some of the RL-specific syntax has undergone some minor changes. The rather verbose syntax of the conditional come-from assertion has been changed from $\texttt{fi} \ e \ \texttt{from} \ l_1 \ \texttt{else} \ l_2$ to simply $\texttt{fi} \ e \ l_1 \ l_2$. Similarly, the syntax of the conditional jump has been changed from $\texttt{if} \ e \ \texttt{goto} \ l_1 \ \texttt{else} \ l_2$ to simply $\texttt{if} \ e \ l_1 \ l_2$.
 
@@ -48,22 +49,26 @@ Finally, some of the RL-specific syntax has undergone some minor changes. The ra
 \subsection{Interpreter Core}
 
 \subsubsection{Abstract syntax tree and utilities}
-\texttt{AST.hs} under the \textit{Common} module (Appendix~\ref{app:RL_AST_hs}) contains the parts of the specific abstract syntax trees that are shared between the two languages. Furthermore, it contains some extra data types and functions that are used in both the RL- and SRL modules.
+\texttt{AST.hs} under the \textit{Common} module (Appendix~\ref{app:Common_AST_hs}) contains the parts of the specific abstract syntax trees that are shared between the two languages. Furthermore, it contains some extra data types and functions that are used in both the RL- and SRL modules.
 
-At the most fundamental level are the identifiers, the values, and their types. Identifiers mark a variable in the program and can contain zero or more indices. Having no indices corresponds, naturally, to just a variable $x$, while having one or more indices corresponds to indexing on a variable $x$. The implementation is as follows:
+At the most fundamental level are the identifiers, the values, and their types. An identifiers marks a variable in a step operation and can contain zero or more indices. Having no indices corresponds, naturally, to just a variable $x$, while having one or more indices corresponds to indexing on a variable $x$. The implementation is as follows:
 \lstinputlisting[language=haskell, firstline=21, lastline=21]{../src/src/Common/AST.hs}
 Values in the languages are, as previously stated, either integers or lists. The implementation looks as follows:
 \lstinputlisting[language=haskell, firstline=9, lastline=9]{../src/src/Common/AST.hs}
-Note that list values have an extra field that specifies their type -- that is, essentially, the depth of the list; this makes it trivial to perform dynamic type checks in the interpreter. The implementation of \texttt{Type} as a recursive data type can be seen in~\ref{fig:type}.
+Note that the list value has an extra field that specifies its type -- that is, essentially, the depth of the list. More specifically, it is a recurive data type such that
 \lstinputlisting[language=haskell, firstline=174, lastline=174]{../src/src/Common/AST.hs}
-The store of our interpreters --- that is, the variable state --- is represented by the type synonym \texttt{VarTab} as a hashmap with strings as keys and \texttt{Value}s as values. Thus, reading a variable in an expression amounts to simply do a lookup on the hashmap, while an update simply has to, well, update the store.
+This makes it trivial to perform dynamic type checks in the interpreter.
+
+The store of our interpreters --- that is, the variable table --- is represented as a hashmap with strings as keys and \texttt{Value}s as values:
+\lstinputlisting[language=haskell, firstline=30, lastline=30]{../src/src/Common/AST.hs}
+Thus, reading a variable in an expression amounts to simply doing a lookup on the hashmap, while an update simply has to, well, update the store.
 
 Next, we have expressions. These are exactly as described in the paper, but with the additions covered in \ref{sec:changes}. The definition is as follows:
 \lstinputlisting[language=haskell, firstline=76, lastline=83]{../src/src/Common/AST.hs}
-As expected, \texttt{Exp} is a recursive data type terminated by a literal value or a variable lookup. Since we do not support list literals, a literal value is assumed to be an integer.
+Just as described, \texttt{Exp} is a recursive data type terminated by a literal value or a variable lookup. Since we do not support list literals, a literal value is assumed to be an integer.
 
 
-Other than that, we have the \texttt{Binary} structure which takes a binary operator (\texttt{BinOp}) and two expressions, recursively, as arguments. Binary operators can easily be defined separately. The same goes for the \texttt{Unary} structure; this takes a unary operator (\texttt{UnOp}) and an expression, recursively. Unary operators, as binary operators, can easily be defined separately. The final expression is simply to mark parentheses; this makes it trivial to write a program to a file which, when parsed, has the guaranteed same expression precedences, and thus, same behaviour as the original.
+Other than that, we have the \texttt{Binary} construct which takes a binary operator (\texttt{BinOp}) and two expressions, recursively, as arguments. Binary operators can easily be defined separately. The same goes for the \texttt{Unary} construct; this takes a unary operator (\texttt{UnOp}) and an expression, recursively. Unary operators, as binary operators, can easily be defined separately. The \texttt{Index} construct is simply for indexing on subexpressions. The \texttt{Parens} construct is simply to mark parentheses occurring in the original program; this makes it trivial to write a program to a file which, when parsed, has the guaranteed same expression precedences, and thus, same behaviour as the original.
 
 Finally, we have step operations. Revisiting~\ref{fig:common}, we can focus on the definition of the step operations. We have that a step operation $a$ is given by
 \[
@@ -75,30 +80,23 @@ Finally, we have step operations. Revisiting~\ref{fig:common}, we can focus on t
              &  |  & \texttt{skip}
 \end{matrix*}
 \]
-If we add our additional step operations and features (as described in~\ref{sec:changes}), we have
+If we add our additional step operations --- \texttt{swap}, \texttt{init}, and \texttt{free} --- and features --- namely arbitrary indexing --- described in~\ref{sec:changes}, we have
 \[
 \begin{matrix*}[l]
-  {a} & ::= & {x}([ e,\dots])\mathrel{\oplus}= e \\
-      &  |  & \texttt{push }{x}([e,\dots])\ {x}([e,\dots]) \\
-      &  |  & \texttt{pop  }{x}([e,\dots])\ {x}([e,\dots]) \\
-      &  |  & \texttt{skip} \\
-%  \dots \\
-      &  |  & \texttt{swap} \ x([e,\dots]) \ x([e,\dots]) \\
-      &  |  & \texttt{init} \ x \ [e,\dots] \\
-      &  |  & \texttt{free} \ x \ [e,\dots],
+  {a} & ::= & {x}\iota\mathrel{\oplus}= e       \quad\quad\quad  & \iota  & ::= & \epsilon \\
+      &  |  & \texttt{push }{x}\iota \ {x}\iota                   &        & |   & \iota' \\
+      &  |  & \texttt{pop  }{x}\iota \ {x}\iota \\
+      &  |  & \texttt{skip}                                      & \iota' & ::= & [e] \\
+      &  |  & \texttt{swap} \ x\iota \ x\iota                    &        & |   & [e]\iota' \\
+      &  |  & \texttt{init} \ x \ \iota' \\
+      &  |  & \texttt{free} \ x \ \iota'
 \end{matrix*}
 \]
-where $([e,\dots])$ means that you can optionally index in an arbitrary number of dimensions. The implementation of this was straightforward, and the corresponding code can be seen in Figure~\ref{fig:step}.
-
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=43, lastline=50]{../src/src/Common/AST.hs}
-  \caption{Implementation of the step operations}\label{fig:step}
-\end{figure}
+The implementation of this (Appendix~\ref{app:CommonASThs}) was straightforward:
+\lstinputlisting[language=haskell, firstline=43, lastline=50]{../src/src/Common/AST.hs}
 
 \subsubsection{Errors and log}
-The \textit{Common} module also contains the implementation of the error- and log types, but we won't go into too much detail as to \textit{how} they are implemented. To understand the interpreters, however, a few things about these must be clear.
-
-Each error type is represented in a data structure \texttt{Error} in \texttt{Common/Error.hs}:
+The \textit{Common} module also contains the implementation of the error- (Appendix~\ref{app:Common_Error_hs}) and log (Appendix~\ref{app:Common_Log_hs}) types, but we won't go into too much detail as to \textit{how} they are implemented. To understand the interpreters, however, we must know which errors can be potentially thrown:
 \begin{description}
   \item[\texttt{RuntimeError}] covers the errors thrown at runtime. This includes type errors, division by zero, etc.
   \item[\texttt{ParseError}] is simply a wrapper for potential parse errors. This is to be able to handle all errors in a single place.
@@ -108,75 +106,20 @@ Each error type is represented in a data structure \texttt{Error} in \texttt{Com
 
 Having specialised error types makes it easier to handle the concrete messages, all in one place, using the \texttt{Show} typeclass.
 
-The log (found in \texttt{Common/Log.hs}) is simply a list of specialised messages (our own \texttt{Message} type) that can either be a step operation or an error. When a program is interpreted, each step operation that is executed, along with the state of the program after the execution, is recorded in the log. If an error is thrown, this is recorded as well before the interpretation terminates. This gives us a simple debugger that will work with both the command-line interface and the web user interface.
+The log is simply a list of specialised messages that can either be a step operation or an error. When a program is interpreted, each step operation that is executed, along with the state of the program after the execution, is recorded in the log. If an error is thrown, this is recorded as well before the interpretation halts. This gives us a simple debugger that will work with both the command-line interface and the web user interface.
 
 \subsubsection{Interpretation}
-\texttt{Common/Interp.hs} contains the core interpreting engine --- that is, the execution of step operations and evaluation of expressions. We define the core monad transformer, with type synonym \texttt{VarState}, to contain the state monad (for the store), the except monad (for error handling), and the writer monad (for the log). The concrete \texttt{VarState} can be seen in Figure~\ref{fig:varstate}.
+\texttt{Interp.hs} under the \textit{Common} module (Appendix~\ref{app:Common_Interp_hs}) contains the core interpreting engine --- that is, the execution of step operations and evaluation of expressions. We define the core monad transformer to contain the state monad (for the store), the except monad (for error handling), and the writer monad (for the log). The \texttt{exec} function (lines 80-225), is the one that executes a step operation and updates the program state accordingly.
 
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=24, lastline=24]{../src/src/Common/Interp.hs}
-  \caption{The core monad transformer}\label{fig:varstate}
-\end{figure}
+It would consume too much space to describe the complete implementation of \texttt{exec}, so an example or two should be suffice. Lines 83-106 show the implementation of the variable update; we first check if the identifier being updated occurs in the expression on the right-hand side. If it does, we throw a runtime error. Next, we fetch the value of the variable being updated and then evaluate the right-hand expression. If one of these is not an integer, we throw an error. Before actually updating, we check if the update is either a multiplication update or division update, and if so, if they respect the rules mentioned in \ref{sec:changes}. Finally, we update the store with the new value. This implicitly handles indexing; \texttt{rd}, occurring on line 87, reads a variable from the store and, if one or more indices are provided, digs deeper into the list to return the corresponding entry. \texttt{adjust}, seen on line 106, works in the same way, but replaces each list on the path and performs a given operation on the innermost index of the list.
 
-The \texttt{exec} function, whose type signature can be seen in Figure~\ref{fig:exec}, is the function that executes a step operation and updates the program state (\texttt{VarTab}) accordingly.
+Lines 153-162 show the implementation of the swap operation; we first fetch the value of the two variables being swapped, then check if they are of the same type. If not, we throw a runtime error. Otherwise, we update the first operand to the value of the second and vice versa.
 
-%% Type signature of exec
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=80, lastline=80]{../src/src/Common/Interp.hs}
-  \caption{Type signature of \texttt{exec}}\label{fig:exec}
-\end{figure}
+Lines 236-303 show how the evaluation of expressions has been implemented. Again, two concrete examples should suffice. On lines 242-253 we handle the case of the binary operators denoting addition, subtraction, bitwise exclusive or, power, multiplication, equality, and inequality, since these can be handled in the same manner. We first evaluate the left and right operands and check their types. Except for the case of equality, only integer values are supported. Thus, if the operator is not `equals` or `not equals`, the two subexpressions \textit{have} to evaluated to integers. If this rule is not respected, a runtime error is thrown. If nothing fails, the operator is applied and the resulting value is returned.
 
-It would consume too much space to show the complete implementation of \texttt{exec}, so an example or two (as seen in Figure~\ref{fig:examples}) should be enough. Figure~\ref{fig:exupdate} shows the implementation of the variable update; we first check if the identifier being updated occurs in the expression on the right-hand side. If it does, we throw a runtime error. Next, we fetch the value of the variable being updated and then evaluate the right-hand expression. If one of these is not an integer, we throw an error. Before actually updating, we check if the update is either a multiplication update or division update, and if so, if they respect the rules mentioned in \ref{sec:changes}. Finally, we update the store with the new value. This implicitly handles indexing; \texttt{rd}, seen on line 5 of Figure~\ref{fig:exupdate}, reads a variable from the store and, if one or more indices are provided, digs deeper into the list to return the corresponding entry. \texttt{adjust}, seen on the last line of the same example, works in the same way, but replaces each list on the path and performs a given operation on the innermost index of the list.
+On lines 274-279 we handle the case where an arithmetic negation or the sign function occurs. The approach here is very similar to that of the binary operator evaluation, however, having only one operand to handle, we can do in a more concise manner. We evaluate the operand and make sure that it results in an integer. If it doesn't, we throw a runtime error. Otherwise, we apply the operator and return the resulting value.
 
-Figure~\ref{fig:exswap} shows the implementation of the swap operation; we first fetch the value of the two variables being swapped, then check if they are of the same type. If not, we throw a runtime error. Otherwise, we update the first operand to the value of the second and vice versa.
-
-%% The two examples of exec
-\begin{figure}[h]
-
-  \begin{subfigure}{\textwidth}
-    \lstinputlisting[language=haskell, firstline=83, lastline=106]{../src/src/Common/Interp.hs}
-    \caption{Implementation of the variable update.}\label{fig:exupdate}
-  \end{subfigure}
-
-  \begin{subfigure}{\textwidth}
-    \lstinputlisting[language=haskell, firstline=153, lastline=163]{../src/src/Common/Interp.hs}
-    \caption{Implementation of the swap operation.}\label{fig:exswap}
-  \end{subfigure}
-
-  \caption{Two examples of step operation execution.}\label{fig:examples}
-
-\end{figure}
-
-Evaluation of expressions takes place in the \texttt{eval} function. The type signature can be seen in Figure~\ref{fig:eval}.
-
-%% Type signature of eval
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=236, lastline=236]{../src/src/Common/Interp.hs}
-  \caption{Type signature of \texttt{eval}}\label{fig:eval}
-\end{figure}
-
-Again, two concrete examples (as seen in Figure~\ref{fig:evalexamples}) should suffice. In Figure~\ref{fig:exbinary} we handle the case of the binary operators denoting addition, subtraction, bitwise exclusive or, power, multiplication, equality, and inequality. We first evaluate the left and right operands and check their types. Except for the case of equality, only integer values are supported. Thus, if the operator is not `equals` or `not equals`, the two operands \textit{have} to be integers. If this rule is not respected, a runtime error is thrown. If nothing fails, the operator is applied and the resulting value is returned.
-
-  In Figure~\ref{fig:exunary} we handle the case where an arithmetic negation or the sign function occurs. The approach here is very similar to that in Figure~\ref{fig:exbinary}, however, having only one operand to handle, we can do in a more concise manner. We evaluate the operand and make sure that it results in an integer. If i doesn't, we throw a runtime error. Otherwise, we apply the operator and return the resulting value.
-
-%% The two examples of eval
-\begin{figure}[h]
-
-  \begin{subfigure}{\textwidth}
-    \lstinputlisting[language=haskell, firstline=242, lastline=253]{../src/src/Common/Interp.hs}
-    \caption{Partial implementation of binary operator expression evaluation.}\label{fig:exbinary}
-  \end{subfigure}
-
-  \begin{subfigure}{\textwidth}
-    \lstinputlisting[language=haskell, firstline=274, lastline=280]{../src/src/Common/Interp.hs}
-    \caption{Partial implementation of unary operator expression evaluation.}\label{fig:exunary}
-  \end{subfigure}
-
-  \caption{Two examples of expression evaluation.}\label{fig:evalexamples}
-
-\end{figure}
-
-Note that \texttt{logError} (for example seen on line 3 of \ref{fig:exupdate}) is simply a function that records a given error in the log before throwing it and halting the execution.
+%Note that \texttt{logError} (for example seen on line 3 of \ref{fig:exupdate}) is simply a function that records a given error in the log before throwing it and halting the execution.
 
 \subsubsection{Parser}
 The parser was implemented using Parsec along with the Token helper module to perform a lexical analysis implicitly. Not surprisingly, the common parser module defines the parsers of the common language structures. These will be use in the specialised parsers.
@@ -188,32 +131,25 @@ The parser was implemented using Parsec along with the Token helper module to pe
 %% RL specific interpreter
 \subsection{RL Interpreter}
 
-The RL-specifics regarding the interpreter are contained in the \textit{RL} module.
-
 \subsubsection{Abstract syntax tree}
 
-In section~\ref{sec:rlandsrl} we considered the syntax of RL; a program must consist of one or more blocks, where a block is defined by its label and has a come-from assertion, zero or more step operations and a jump. With the step operations already implemented, the only thing to worry about is how to structure the abstract syntax tree. We decided to represent the abstract syntax tree as an association list with labels as keys and blocks as values (Figure~\ref{fig:rlast}). A block, then, is defined as a three-tuple consisting of a come-from assertion, a list of step operations, and a jump (Figure~\ref{fig:rlblock}). Note that \texttt{Label} is simply a type synonym for \texttt{String}.
+In section~\ref{sec:rlandsrl} we considered the syntax of RL; a program must consist of one or more blocks, where a block is defined by its label and has a come-from assertion, zero or more step operations and a jump. With the step operations already implemented, the only thing to worry about is how to represent our program. \texttt{AST.hs} under the \textit{RL} module (Appendix~\ref{app:RL_AST_hs}) contains the complete representation. We decided to define the abstract syntax tree as an association list with labels as keys and blocks as values:
+\lstinputlisting[language=haskell, firstline=14, lastline=14]{../src/src/RL/AST.hs}
+Note that \texttt{Label} is simply a type synonym for \texttt{String}.
 
- \begin{figure}[h]
-  \lstinputlisting[language=haskell, firstline=18, lastline=18]{../src/src/RL/AST.hs}
-  \caption{The representation of an RL block.}\label{fig:rlblock}
-\end{figure}
+A block, then, is defined as a three-tuple consisting of a come-from assertion, a list of step operations, and a jump. Thus, we have
+\lstinputlisting[language=haskell, firstline=18, lastline=18]{../src/src/RL/AST.hs}
 
-\begin{figure}[h]
-  \lstinputlisting[language=haskell, firstline=14, lastline=14]{../src/src/RL/AST.hs}
-  \caption{The abstract syntax tree for RL.}\label{fig:rlast}
-\end{figure}
-
-It should come to no surprise that \texttt{From} and \texttt{Jump} are the data types that represent come-from assertions and unstructured jumps, respectively. Their implementations, practically copied from the paper, can be seen in Figure~\ref{fig:from} and Figure~\ref{fig:jump}.
-
-\begin{figure}[h]
-  \lstinputlisting[language=haskell, firstline=27, lastline=30]{../src/src/RL/AST.hs}
-  \caption{The representation of come-from assertions.}\label{fig:from}
-\end{figure}
-
+It should come to no surprise that \texttt{From} and \texttt{Jump} are the data types that represent come-from assertions and unstructured jumps, respectively. Their implementations, practically copied from the paper, are as follows:
 \begin{figure}[H]
+  \centering
+\begin{subfigure}{0.45\textwidth}
+  \lstinputlisting[language=haskell, firstline=27, lastline=30]{../src/src/RL/AST.hs}
+\end{subfigure}
+\qquad
+\begin{subfigure}{0.45\textwidth}
   \lstinputlisting[language=haskell, firstline=36, lastline=39]{../src/src/RL/AST.hs}
-  \caption{The representation of unstructured jumps.}\label{fig:jump}
+\end{subfigure}
 \end{figure}
 
 \subsubsection{Interpretation}
