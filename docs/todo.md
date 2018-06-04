@@ -1,19 +1,18 @@
 ## Rapport
-  - Rapporten skal sættes op. (LA)
-    - Opsætning af pakker (lstset e.g.)
   - Rapport skal skrives
+    - Abstract
     - Implementering
-      - Interpreters
-      - Web
-        - Client
-        - Server
+      - Beskriv interpreter file structure.
+      - CLI
     - Dokumentation
-      √ Install
-      - Usage
       - Testing
     - Conclusion
     - Referencer laves
     - Appendices
+  - Ret help
+  - Introduktion til alle sektions og chapters
+  - Ret test-lib til ikke at bruge typeof (og .err)
+    - Samme for gentest.sh
 
 ## Finpudsninger
   - Kommentarer skal tjekkes igennem
@@ -27,3 +26,7 @@
   o Tests til web server og web client (Anders)
     - UI testing (bliver nok ikke lavet helt)
     - Test call to API
+
+## Post-deadline
+  - Tegnfølger
+  - Flyt help-page til sin egen side
