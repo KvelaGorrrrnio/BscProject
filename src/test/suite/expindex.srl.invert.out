@@ -1,0 +1,6 @@
+list list int a
+int t
+
+t ^= (top a)[1]
+a[2,1] ^= 30
+free a [3,3]

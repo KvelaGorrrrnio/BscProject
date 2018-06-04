@@ -30,7 +30,4 @@ then
 
   $(stack exec "$interp" -- translate "$file" > "$destfile.translate.out")
   $(stack exec "$interp" -- translate -j "$file" > "$destfile.json.translate.out")
-
-  $(stack exec "$interp" -- typeof "$file" > "$destfile.typeof.out")
-  $(stack exec "$interp" -- typeof -j "$file" > "$destfile.json.typeof.out")
 fi
