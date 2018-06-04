@@ -1,4 +1,4 @@
-// Computing the n first squares
+// Compute the n first squares
 
 int n
 list int q

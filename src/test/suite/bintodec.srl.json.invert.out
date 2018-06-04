@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int i\nint n\nlist int q\n\ni += size q\nfrom (i = size q) do\n  i -= 1\n  n -= (2 * q[size q - i - 1]) ** i\nloop\n  skip\nuntil (i = 0)\nq[8] -= 1\nq[9] -= 1\nq[5] -= 1\nq[2] -= 1\nfree q [10]" }

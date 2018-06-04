@@ -1,0 +1,42 @@
+int n
+list int q
+
+l0: entry
+  skip
+goto l1
+
+l1: fi (empty q) l0 l7
+  skip
+goto l4
+
+l4: from l1
+  n += size q ** 2
+goto l8
+
+l8: from l4
+  skip
+goto l9
+
+l9: from l8
+  push n q
+goto l5
+
+l5: from l9
+  skip
+goto l2
+
+l6: from l2
+  skip
+goto l7
+
+l7: from l6
+  skip
+goto l1
+
+l2: from l5
+  skip
+if (size q = 10) l3 l6
+
+l3: from l2
+  skip
+exit
