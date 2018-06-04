@@ -4,20 +4,20 @@
   "description": "",
   "main": "index.jsx",
   "scripts": {
-    "test": "mocha-webpack \"test/test.js\"",
     "start": "webpack-dev-server",
-    "build": "rimraf dist && webpack --config webpack.prod.config.js --progress --profile --color"
+    "build": "rimraf dist && webpack --config webpack.prod.config.js --progress --profile --color",
+    "test": "mocha-webpack \"test/test.js\""
   },
   "proxy": 3001,
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "chai": "^4.1.2",
-    "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
     "mocha": "^5.2.0",
     "mocha-webpack": "^1.1.0",
     "sinon": "^5.0.7",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "webpack-dev-server": "^2.9.1"
   },
   "dependencies": {

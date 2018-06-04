@@ -2,7 +2,7 @@
 
 
 \subsection{Command-Line Interface}
-\todo{CLI testing}\\
+\todo{Cleanup this}\\
 
 %% Usage
 When located at the root of the project, tests for the interpreters/cli can be executed by \shcmd{$ make test}.
@@ -93,7 +93,13 @@ v : 0
 \subsection{Web Interface}
 
 %% Client: Packages (Mocha - Chai - Enzyme) - Kun leaf components
-%% Server: Not done yet. Same tool-chain som Client.
+The web client is not fully tested, but a test framework is set up and simple tests has been implemented. Components without direct access to application state has been tested. This includes the Button, Radio and Dropdown components.
+These files can be found in Appendix \ref{app:test_web_files}.
 
-\todo{Web client testing}\\
-\todo{Web server testing}\\
+The framework uses Mocha as its test-framework, Chai as assertion-library and Enzyme for shallow-rendering of components (simulates the rendering of single component-tree).
+To run the tests, when standing at the root of the project, run the command \shcmd{$ make test-web}.
+This executes tests for both the client and server.
+
+%% Server: Not done yet. Same tool-chain som Client.
+For writing server tests, Mocha and Chai has been setup, but no tests has been written.
+

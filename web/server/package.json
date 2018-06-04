@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node babel-server.js",
     "devstart": "nodemon babel-server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha-webpack \"test/test.js\""
   },
   "author": "",
   "license": "ISC",
@@ -18,6 +18,10 @@
     "npm-audit": "0.0.3"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "mocha-webpack": "^1.1.0",
+    "sinon": "^5.0.7",
     "nodemon": "^1.17.3"
   }
 }
