@@ -8,6 +8,7 @@ Another nice representation would be a zipper (as described in \cite{ZIP}). If w
 
 An even better representation would be a cyclic graph where each node represents an RL block. This would allow for some efficient optimisation such as graph reduction.
 
+
 \subsection{Parsing}
 A flaw in our parser is that that all whitespace is ignored. This means that we can't define step operations to terminate with a newline --- which is a shame, because this would allow for better error messages and more syntactic sugar. Also, a sequence of the same prefix operator is not allowed without using parantheses. For example, \texttt{top top a} is not allowed --- to achieve this functionality we have to write \texttt{top (top a)}. This becomes especially gruesome when having an even longer such sequence.
 
