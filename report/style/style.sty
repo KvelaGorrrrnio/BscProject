@@ -78,6 +78,18 @@
   morestring=[b]',
   morestring=[b]"
 }
+\lstdefinelanguage{srl}{
+  keywords={init, free, swap, push, pop, skip, from, do, until, if, then, else, fi},
+  ndkeywords={list, int},
+  sensitive=false,
+  comment=[l]{//},
+}
+\lstdefinelanguage{rl}{
+  keywords={init, free, swap, push, pop, skip, from, goto, if, fi},
+  ndkeywords={list, int, entry, exit},
+  sensitive=false,
+  comment=[l]{//},
+}
 
 % Styling
 \lstdefinestyle{thesis}{

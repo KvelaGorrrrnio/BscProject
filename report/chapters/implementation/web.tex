@@ -169,7 +169,7 @@ The children components of the App component are:
 
 \end{description}
 
-For more information regarding the implementation, refer to the source code.\\
+For more information regarding the implementation, refer to the source code in Appendix \ref{app:web_client}.\\
 
 
 
@@ -188,9 +188,9 @@ This way it is easy to parse data from the interpreter to the client interface v
 
 The server has Cross Origin Resource Sharing (CORS) enabled, to allow for separation of the API server and the client web interface.
 This allows for the server to be hosted at one address, while the interface is hosted at another.
-CORS is enabled by setting the appropriate headers shown in Listing \ref{lst:cors_setup}.
+CORS is enabled by setting the appropriate headers shown below.
 
-\lstinputlisting[language=javascript,caption={CORS headers from /web/server/server.js.},label={lst:cors_setup},firstline=10,firstnumber=10,lastline=15]{../web/server/server.js}
+\lstinputlisting[language=javascript,firstline=10,firstnumber=10,lastline=15]{../web/server/server.js}
 
 The routing has two responsibilities: To handle API calls, which can be seen in Figure \ref{fig:full_api}; serve static files, when the client interface is requested. The defined routes are listed in Figure \ref{fig:server_routes}. Routes are divided into 3 categories: API routes, root requests and static files; where static files are the bundled css and javascript files, that the client interface requires.\\
 
