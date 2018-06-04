@@ -17,63 +17,61 @@ The implementation of these are described in the following subsections.
 
 \subsubsection{Features}
 
-\noindent
 Before explaining the implementation of the client interface, the features of the interface will be described.
 If we look at the User Interface seen in Figure \ref{fig:web_client_ui}, we have 3 rectangular areas: The toolbar at the top; the code editor, located below the toolbar on the left hand side; the result area, located below the toolbar on the right hand side.
 
-\begin{figure}[H]
+\begin{figure}
   \includegraphics[width=\textwidth]{web_client_ui.png}
   \caption{Screenshot of web client UI.}
   \label{fig:web_client_ui}
 \end{figure}
 
-\noindent
-At the far left of the toolbar a radio button group with the options SRL and RL. The highlighted option indicates how the code in the code editor should be interpreted. If RL is chosen, the code is interpreted as if it were a RL program; likewise for SRL.\\
-On the left hand side of the middle, the toolbar has some icons:\\
+At the far left of the toolbar a radio button group with the options SRL and RL. The highlighted option indicates how the code in the code editor should be interpreted. If RL is chosen, the code is interpreted as if it were a RL program; likewise for SRL.
+On the left hand side of the middle, the toolbar has some icons:
 
 \begin{description}
 
   \item[\inlineicon{themes.png} Themes]~\\
-    By hovering over the icon a dropdown menu, for choosing the color scheme/ theme of the client interface, appears as illustrated in Figure \ref{fig:web_client_themes}.\\
-    Figure \ref{fig:web_client_white_ui} shows the color scheme when the white theme is chosen.\\
-    \begin{figure}[H]
+    By hovering over the icon a dropdown menu, for choosing the color scheme/ theme of the client interface, appears as illustrated in Figure \ref{fig:web_client_themes}.
+    Figure \ref{fig:web_client_white_ui} shows the color scheme when the white theme is chosen.
+    \begin{figure}
       \includegraphics[width=\textwidth]{web_client_themes.png}
       \caption{Web client themes dropdown menu.}
       \label{fig:web_client_themes}
     \end{figure}
-    \begin{figure}[H]
+    \begin{figure}
       \includegraphics[width=\textwidth]{web_client_white_ui.png}
       \caption{Web client UI in white theme color scheme.}
       \label{fig:web_client_white_ui}
     \end{figure}
 
   \item[\inlineicon{help.png} Help]~\\
-    By clicking on this icon a modal window opens, illustrated in Figure \ref{fig:web_client_help}, with help for the web interface, the modes and the languages.\\
-    \begin{figure}[H]
+    By clicking on this icon a modal window opens, illustrated in Figure \ref{fig:web_client_help}, with help for the web interface, the modes and the languages.
+    \begin{figure}
       \includegraphics[width=\textwidth]{web_client_help.png}
       \caption{Web client help modal window displaying the Run mode help page.}
       \label{fig:web_client_help}
     \end{figure}
 
   \item[\inlineicon{template.png} Templates]~\\
-    By hovering over this icon a dropdown menu, where template programs for both RL and SRL can be loaded into the code editor, appears as illustrated in Figure \ref{fig:web_client_templates}.\\
-    \begin{figure}[H]
+    By hovering over this icon a dropdown menu, where template programs for both RL and SRL can be loaded into the code editor, appears as illustrated in Figure \ref{fig:web_client_templates}.
+    \begin{figure}
       \includegraphics[width=\textwidth]{web_client_templates.png}
       \caption{Web client templates dropdown menu.}
       \label{fig:web_client_templates}
     \end{figure}
 
   \item[\inlineicon{open.png} Open]~\\
-    By click on this icon a modal window opens, as illustrated in Figure \ref{fig:web_client_open}. Here it is possible to import and open previously stored programs.\\
-    \begin{figure}[H]
+    By click on this icon a modal window opens, as illustrated in Figure \ref{fig:web_client_open}. Here it is possible to import and open previously stored programs.
+    \begin{figure}
       \includegraphics[width=\textwidth]{web_client_open.png}
       \caption{Web client open modal window.}
       \label{fig:web_client_open}
     \end{figure}
 
   \item[\inlineicon{save.png} Save]~\\
-    By clicking on this icon a modal window opens, as illustrated in Figure \ref{fig:web_client_save}. Here it is possible to export, share and store the code currently loaded into the code editor.\\
-    \begin{figure}[H]
+    By clicking on this icon a modal window opens, as illustrated in Figure \ref{fig:web_client_save}. Here it is possible to export, share and store the code currently loaded into the code editor.
+    \begin{figure}
       \includegraphics[width=\textwidth]{web_client_save.png}
       \caption{Web client save modal window.}
       \label{fig:web_client_save}
@@ -81,13 +79,12 @@ On the left hand side of the middle, the toolbar has some icons:\\
 
 \end{description}
 
-\noindent
-The right hand side of the toolbar is dedicated to modes and their associated actions. There are 4 modes which are selected from the radio button group at the far right:\\
+The right hand side of the toolbar is dedicated to modes and their associated actions. There are 4 modes which are selected from the radio button group at the far right:
 
 \begin{description}
 
   \item[Run]~\\
-    The Run mode utilises the run mode from the Command-Line Interface. The only action associated with the Run mode is \inlineicon{play} \textbf{run}, which executes the code written in the code editor, and displays the final program-state in the result area.\\
+    The Run mode utilises the run mode from the Command-Line Interface. The only action associated with the Run mode is \inlineicon{play} \textbf{run}, which executes the code written in the code editor, and displays the final program-state in the result area.
 
   \item[Step]~\\
     The Step mode utilises the run mode as the Run mode, but sets the \-\-log flag, to get the execution log instead of only the final state. This way, it is easy to step through the program step by step operation, and see how the individual statements alters the state.
@@ -100,22 +97,21 @@ The right hand side of the toolbar is dedicated to modes and their associated ac
     \inlineicon{next} \textbf{next step} executes the next step operation;
     \inlineicon{reset} \textbf{reset} undoes all executed step operations;
     \inlineicon{exec} \textbf{end} executes all remaining step operations;
-    \inlineicon{stop} \textbf{stop} stops the execution and deactivates the Step mode.\\
-    While Step mode is activated, all other features are disabled.\\
+    \inlineicon{stop} \textbf{stop} stops the execution and deactivates the Step mode.
+    While Step mode is activated, all other features are disabled.
 
   \item[Invert]~\\
-    The Invert mode utilises the invert mode from the Command-Line Interface. The only action associated with the Invert mode is \inlineicon{play} \textbf{invert}, which inverts the code and displays it in the result area.\\
+    The Invert mode utilises the invert mode from the Command-Line Interface. The only action associated with the Invert mode is \inlineicon{play} \textbf{invert}, which inverts the code and displays it in the result area.
 
   \item[Translate]~\\
     The Translate mode utilises the translate mode from the Command-Line Interface.
-    The only action associated with the Translate mode is \inlineicon{play} \textbf{translate}, which translates the code and displays it in the result area.\\
+    The only action associated with the Translate mode is \inlineicon{play} \textbf{translate}, which translates the code and displays it in the result area.
 
 \end{description}
 
-\noindent
 All the above modes have the ability to fail. Figure \ref{fig:web_client_error} illustrates a case where a parse error occurs.
 
-\begin{figure}[H]
+\begin{figure}
   \includegraphics[width=\textwidth]{web_client_error.png}
   \caption{Web client with parse error.}
   \label{fig:web_client_error}
@@ -127,26 +123,22 @@ All the above modes have the ability to fail. Figure \ref{fig:web_client_error} 
 
 \subsubsection{Implementation}
 
-\noindent
 Now that the features has been introduced, we can look at the implementation hereof briefly.
 The web client interface is a nodeJS project written in ECMAScript 6, using the library ReactJS, for creating modularised components.
 We chose to use ReactJS, instead of vanilla javascript and html, since it allows component rendering based on state.
 This way focus was primarily on state and logic, instead of design and propagating state to the application.
 To separate state and logic from UI even further, we chose to handle state through Redux.
 This way we could move state and alteration to state outside of the ReactJS components. Hereby giving the individual components access to only the absolute necessary state variables, and state alterations methods.
-This way the possibilities where a specific state alteration can fail is limited to the components with access, and hereby making it easier to debug and fix.\\
+This way the possibilities where a specific state alteration can fail is limited to the components with access, and hereby making it easier to debug and fix.
 
-\noindent
 The web client interface uses babel and webpack to compile and bundle scripts and resources.
 Webpack uses babel to convert JSX to React components and transpile ECMAScript 6 to ECMAScript 5, to allow for \texttt{import} statements.
-Webpack itself is used to precompile SASS, which is used for styling, to CSS, appending prefixes to the CSS for better cross-browser support and bundling scripts, styles and assets for minimal HTTP requests.\\
+Webpack itself is used to precompile SASS, which is used for styling, to CSS, appending prefixes to the CSS for better cross-browser support and bundling scripts, styles and assets for minimal HTTP requests.
 
-\noindent
 The root of the web client is \path{/web/client}. Configuration files for node package dependencies and the webpack build flow are found here.
 Under the subdirectory \path{src/} are all source files and resources located.
-ReactJS components are found under \path{src/components} and the corresponding styling/ SASS files are found under \path{src/styles} along with the theme color schemes in the subdirectory \path{src/styles/themes}.\\
+ReactJS components are found under \path{src/components} and the corresponding styling/ SASS files are found under \path{src/styles} along with the theme color schemes in the subdirectory \path{src/styles/themes}.
 
-\noindent
 The root component is the App component, which contains all the major components as children.
 The App component is wrapped in a redux Provider, which allows the App and all its children access to the application state and state modifiers.
 The children components of the App component are:
@@ -154,32 +146,32 @@ The children components of the App component are:
 \begin{description}
 
   \item[Header]~\\
-    The utilises the Button, Radio and Dropdown components for letting the user interact with the application.\\
+    The utilises the Button, Radio and Dropdown components for letting the user interact with the application.
 
   \item[Editor]~\\
-    The editor has two areas, the coding area, which is visible at all times --- and the error area, which only is visible when an error is present.\\
+    The editor has two areas, the coding area, which is visible at all times --- and the error area, which only is visible when an error is present.
     The code editor component is the javascript library CodeMirror \cite{CM} delivered through the react-wrapper React CodeMirror 2.
-    CodeMirror was chosen since it have a library for lexing, used for syntax highlighting, along with a lot of customisation options and extendibility through plugin support.\\
+    CodeMirror was chosen since it have a library for lexing, used for syntax highlighting, along with a lot of customisation options and extendibility through plugin support.
 
   \item[Result]~\\
-    The result area presents the different modes' results through either lists of values and statements or a read-only CodeMirror instance.\\
+    The result area presents the different modes' results through either lists of values and statements or a read-only CodeMirror instance.
 
   \item[Modals]~\\
-    Modals covers the HelpModal, OpenModal and SaveModal components, which uses the same Button, Radio and Dropwdown components as the Header.\\
+    Modals covers the HelpModal, OpenModal and SaveModal components, which uses the same Button, Radio and Dropwdown components as the Header.
 
 \end{description}
 
-For more information regarding the implementation, refer to the source code in Appendix \ref{app:web_client}.\\
+For more information regarding the implementation, refer to the source code in Appendix \ref{app:web_client}.
 
 
 
 \subsection{Server \& API}
+\label{sec:server_and_api}
 
 The web server is an independent node project, when built uses the Client Web Interface and the Command-Line Interface as dependencies.
 These are build and copied into the web server project folder.
-The executables for the Command-Line Interfaces are placed under \path{/web/server/bin} and the Web Client Interface is placed under \path{/web/server/client}.\\
+The executables for the Command-Line Interfaces are placed under \path{/web/server/bin} and the Web Client Interface is placed under \path{/web/server/client}.
 
-\noindent
 The server is written in ECMAScript 6, but since nodeJS (version 9 and below) does not support \texttt{import} statements natively, the Babel transpiler is used for running the ECMAScript 6 code as ECMAScript 5.
 This is done in the entry-file \path{babel-server.js}, as a wrapper for the actual server configuration in \path{server.js}.
 We run the transpiled code with node, and uses the Express package for opening ports, setting up the server and handling web-routes.
@@ -192,7 +184,7 @@ CORS is enabled by setting the appropriate headers shown below.
 
 \lstinputlisting[language=javascript,firstline=10,firstnumber=10,lastline=15]{../web/server/server.js}
 
-The routing has two responsibilities: To handle API calls, which can be seen in Figure \ref{fig:full_api}; serve static files, when the client interface is requested. The defined routes are listed in Figure \ref{fig:server_routes}. Routes are divided into 3 categories: API routes, root requests and static files; where static files are the bundled css and javascript files, that the client interface requires.\\
+The routing has two responsibilities: To handle API calls, which can be seen in Figure \ref{fig:full_api}; serve static files, when the client interface is requested. The defined routes are listed in Figure \ref{fig:server_routes}. Routes are divided into 3 categories: API routes, root requests and static files; where static files are the bundled css and javascript files, that the client interface requires.
 
 \begin{figure}[H]
   \begin{tabular}{|l|p{8.7cm}|}\hline
@@ -206,7 +198,7 @@ The routing has two responsibilities: To handle API calls, which can be seen in 
 \end{figure}
 
 If the client interface is hosted at a different address than the API, the \path{/web/server/client} folder can be removed, causing the route for the index page and the static pages to respond with a 404 (page not found) status and page.
-In this case, to get the client to point to the correct API address, change the API\_URL found variable in \path{/web/client/webpack.prod.config.js} and rebuild the client interface.\\
+In this case, to get the client to point to the correct API address, change the API\_URL found variable in \path{/web/client/webpack.prod.config.js} and rebuild the client interface.
 
 The API sub-urls along with their valid request method(s) and functionality is described in Figure \ref{fig:full_api}.
 

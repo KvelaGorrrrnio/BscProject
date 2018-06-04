@@ -15,5 +15,6 @@ A flaw in our parser is that that all whitespace is ignored. This means that we 
 It would be nice to have a pass that optimises an RL- or SRL program. By this we mean removing redundant step operations and subexpressions, merging sequences of variable updates, computing constants statically, removing skips, etc.
 
 \subsection{Web}
-\todo{API-keys}
-\todo{Resize each part}
+As the server is implemented now, the API is fully public, and every origin can access and request from here. This way requests with programs, that has infinity loops, can quickly occupy and kill the server. To disallow this, one could whitelisted domains in the CORS headers, as described in Section \ref{sec:server_and_api}. An alternative could be to use API keys to limit which traffic is allowed to access the API. The latter approach is a more complex solution, that may involve building a authentication API system with corresponding database.
+
+For the user experience, and expansion of the current interface could be the opportunity for resizing each area of the interface.

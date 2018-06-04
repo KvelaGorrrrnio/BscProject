@@ -2,11 +2,10 @@
 
 
 \subsection{Command-Line Interface}
-\todo{Cleanup this}\\
 
 %% Usage
 When located at the root of the project, tests for the interpreters/cli can be executed by \shcmd{$ make test}.
-For only getting output relevant for testing, build all targets with \shcmd{\$ make} before running the tests.\\
+For only getting output relevant for testing, build all targets with \shcmd{\$ make} before running the tests.
 
 %% Setup
 The test-system is being build and executed by \shcmd{$ stack test}.
@@ -14,12 +13,12 @@ The test-system is written in Haskell and is located at \path{/src/test} in Lib.
 The test-system searches for .rl and .srl files in \path{/src/test/suite}.
 For each script, every file with the script filename (including extension) prefixed and .out suffixed are listed.
 The script file along with all its .out files is a single test suite.
-Outfiles in a test-suite can have the formats described in Figure \ref{fig:test_suite_formats}.
+Outfiles in a test-suite can have the formats described in the table below.
 
 \begin{figure}[H]
   \center
   \begin{tabular}{|l|l|}\hline
-    \textbf{Format}             & \textbf{Expected command output}\\\hline
+    \textbf{Format}             & \textbf{Expected command}\\\hline
     test.srl.out                & \texttt{\$ srl.rl test.srl}\\\hline
     test.srl.log.out            & \texttt{\$ srl.rl test.srl {-}{-}log}\\\hline
     test.srl.invert.out         & \texttt{\$ srl.rl invert test.srl}\\\hline
@@ -33,58 +32,29 @@ Outfiles in a test-suite can have the formats described in Figure \ref{fig:test_
   \label{fig:test_suite_formats}
 \end{figure}
 
-%
-\noindent
 There are currently written 45 tests, some trivial to test correct behavior of specific features, and some less trivial, to test the overall usefulness of the implemented languages.
-Two of the less trivial programs are phys.\{rl,srl\} and primefac.\{rl,srl\}.
-The phys.\{rl,srl\} can be seen in Figure \ref{fig:phys_files}.
-Running the programs yield the result found in Listing \ref{lst:phys_result}.
+Two of the less trivial programs are phys and primefac, written both in RL and SRL.
+
+The phys program can be seen found in Appendix \ref{app:phys_srl} and \ref{app:phys_rl}.
 The programs simulate a drop from \texttt{y} cm, here set to 16400, with a start velocity \texttt{v} of 0.
 In the final state every value is scaled by 10,000.
 Here \texttt{y} denotes the distance bias, \texttt{v} is the final velocity and \texttt{s} is the duration of the fall in seconds.
+Running any the phys programs yield the following result.
 
-\begin{figure}[H]
-  \center
-  \begin{subfigure}[b]{0.4\textwidth}
-    \lstinputlisting[language=srl]{../src/test/suite/phys.srl}
-    \caption{phys.srl}
-  \end{subfigure}\qquad%
-  \begin{subfigure}[b]{0.4\textwidth}
-    \lstinputlisting[language=rl]{../src/test/suite/phys.rl}
-    \caption{phys.rl}
-  \end{subfigure}
-  \caption{Program simulating simple physics drop.}
-  \label{fig:phys_files}
-\end{figure}
-
-\begin{lstlisting}[language=sh,caption={Result for phys.srl},label={lst:phys_result}]
+\begin{lstlisting}[language=sh]
 S : 10000
 s : 57829
 v : 56730249
 y : -930
 \end{lstlisting}
 
-The primefac programs can be seen in Figure \ref{fig:primefac_files}.
-Running the programs yield the result found in Listing \ref{lst:primefac_result}.
+The primefac programs can be found in Appendix \ref{app:primefac_srl} and \ref{app:primefac_rl}.
 The programs calculates prime factorials for the given number \texttt{n}.
 \texttt{v} is the incrementing counter, to determine the prime factorials and \texttt{p} is the list containing the found numbers.
-In the final state \texttt{n} and \texttt{v} should be empty and \texttt{p} a list of prime factorials.\\
+In the final state \texttt{n} and \texttt{v} should be empty and \texttt{p} a list of prime factorials.
+Running any of the primefac programs yield the following result.
 
-\begin{figure}[H]
-  \center
-  \begin{subfigure}[b]{0.4\textwidth}
-    \lstinputlisting[language=srl]{../src/test/suite/primefac.srl}
-    \caption{primefac.srl}
-  \end{subfigure}\qquad%
-  \begin{subfigure}[b]{0.4\textwidth}
-    \lstinputlisting[language=rl]{../src/test/suite/primefac.rl}
-    \caption{primefac.rl}
-  \end{subfigure}
-  \caption{Program simulating prime factorisation.}
-  \label{fig:primefac_files}
-\end{figure}
-
-\begin{lstlisting}[language=sh,caption={Result for primefac.srl},label={lst:primefac_result}]
+\begin{lstlisting}[language=sh]
 n : 0
 p : [31,59]
 v : 0
