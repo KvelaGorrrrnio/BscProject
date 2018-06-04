@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int n\nlist int q\n\nfrom (size q = 10) do\n  pop n q\n  n -= size q ** 2\nloop\n  skip\nuntil (empty q)" }

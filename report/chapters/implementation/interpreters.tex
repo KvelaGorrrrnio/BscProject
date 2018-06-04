@@ -111,7 +111,7 @@ If we add our additional step operations and features (as described in~\ref{sec:
 where $([e,\dots])$ means that you can optionally index in an arbitrary number of dimensions. The implementation of this was straightforward, and the corresponding code can be seen in Figure~\ref{fig:step}.
 
 \begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=46, lastline=53]{../src/src/Common/AST.hs}
+  \lstinputlisting[language=haskell, firstline=43, lastline=50]{../src/src/Common/AST.hs}
   \caption{Implementation of the step operations}\label{fig:step}
 \end{figure}
 
@@ -171,7 +171,7 @@ Figure~\ref{fig:exswap} shows the implementation of the swap operation; we first
 
 %% Type signature of eval
 \begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=237, lastline=237]{../src/src/Common/Interp.hs}
+  \lstinputlisting[language=haskell, firstline=236, lastline=236]{../src/src/Common/Interp.hs}
   \caption{Type signature of \texttt{eval}}\label{fig:eval}
 \end{figure}
 
@@ -253,6 +253,9 @@ First thing is that we have extended our monad transformer to also contain the r
   \caption{The \texttt{interp} function.}\label{fig:interp}
 \end{figure}
 
+\subsubsection{Parser}
+When parsing, we simply parse for a list of one or more \texttt{(Label,Block)} pairs. Each pair is parsed by identifying a block label followed by a colon, a come-from assertion, a list of zero or more step operations as defined in the common parser, and a jump.
+
 %% SRL specific interpreter
 \subsection{SRL Interpreter}
 
@@ -291,3 +294,7 @@ The process of interpreting the abstract syntax tree --- that is, a single block
   \lstinputlisting[language=haskell, firstline=24, lastline=51]{../src/src/SRL/Interp.hs}
   \caption{The \texttt{interp} function that interprets a block and thus a program.}\label{fig:srlinterp}
 \end{figure}
+
+\subsubsection{Parser}
+
+This parser simply parses a block as one of the block types defined for SRL. When parsing more than one block, we convert the list to a sequence by folding the list of blocks.

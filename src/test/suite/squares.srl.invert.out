@@ -1,0 +1,9 @@
+int n
+list int q
+
+from (size q = 10) do
+  pop n q
+  n -= size q ** 2
+loop
+  skip
+until (empty q)

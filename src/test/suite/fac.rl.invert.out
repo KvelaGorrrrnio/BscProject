@@ -1,0 +1,16 @@
+int n
+int v
+
+end: entry
+  skip
+goto loop
+
+loop: fi (n = 0) end loop
+  n += 1
+  v /= n
+if (v = 1) start loop
+
+start: from loop
+  v ^= 1
+  n ^= 5
+exit

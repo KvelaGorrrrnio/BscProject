@@ -1,0 +1,16 @@
+int i
+int n
+list int q
+
+i += size q
+from (i = size q) do
+  i -= 1
+  n -= (2 * q[size q - i - 1]) ** i
+loop
+  skip
+until (i = 0)
+q[8] -= 1
+q[9] -= 1
+q[5] -= 1
+q[2] -= 1
+free q [10]

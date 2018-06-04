@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int n\nint v\n\nend: entry\n  skip\ngoto loop\n\nloop: fi (n = 0) end loop\n  n += 1\n  v /= n\nif (v = 1) start loop\n\nstart: from loop\n  v ^= 1\n  n ^= 5\nexit" }
