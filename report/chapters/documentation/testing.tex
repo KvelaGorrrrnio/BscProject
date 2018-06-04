@@ -1,10 +1,44 @@
 \section{Testing}
 
-When located at the root of the project, all tests, for both interpreters/cli and the web interface can be executed by \shcmd{$ make test}. For only getting output relevant for testing, build all targets with \shcmd{$ make} before running the tests.
 
 \subsection{Command-Line Interface}
 \todo{CLI testing}\\
 
+%% Usage
+When located at the root of the project, tests for the interpreters/cli can be executed by \shcmd{$ make test}.
+For only getting output relevant for testing, build all targets with \shcmd{\$ make} before running the tests.\\
+
+%% Setup
+The test-system is being build and executed by \shcmd{$ stack test}.
+The test-system is written in Haskell and is located at \path{/src/test} in Lib.hs and Spec.hs, where Spec.hs is the entry point.
+The test-system searches for .rl and .srl files in \path{/src/test/suite}.
+For each script, every file with the script filename (including extension) prefixed and .out suffixed are listed.
+The script file along with all its .out files is a single test suite.
+Outfiles in a test-suite can have the formats described in Figure \ref{fig:test_suite_formats}.
+
+\begin{figure}[H]
+  \center
+  \begin{tabular}{|l|l|}\hline
+    \textbf{Format}             & \textbf{Expected command output}\\\hline
+    test.srl.out                & \texttt{\$ srl.rl test.srl}\\\hline
+    test.srl.log.out            & \texttt{\$ srl.rl test.srl {-}{-}log}\\\hline
+    test.srl.invert.out         & \texttt{\$ srl.rl invert test.srl}\\\hline
+    test.srl.translate.out      & \texttt{\$ srl.rl translate test.srl}\\\hline
+    test.json.srl.out           & \texttt{\$ srl.rl test.srl {-}{-}json}\\\hline
+    test.json.srl.log.out       & \texttt{\$ srl.rl test.srl {-}{-}log {-}{-}json}\\\hline
+    test.json.srl.invert.out    & \texttt{\$ srl.rl invert test.srl {-}{-}json}\\\hline
+    test.json.srl.translate.out & \texttt{\$ srl.rl translate test.srl {-}{-}json}\\\hline
+  \end{tabular}
+  \caption{Possible outfiles for the file test.srl.}
+  \label{fig:test_suite_formats}
+\end{figure}
+
+%
+
 \subsection{Web Interface}
+
+%% Client: Packages (Mocha - Chai - Enzyme) - Kun leaf components
+%% Server: Not done yet. Same tool-chain som Client.
+
 \todo{Web client testing}\\
 \todo{Web server testing}\\

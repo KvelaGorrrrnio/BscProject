@@ -1,1 +1,0 @@
-{ "type" : "code", "code" : "list list list int S\nlist list int S1\nlist int S2\nint n\nlist list int p\nlist int q\nint s\n\nfrom (size S = 1) do\n  pop S1 S\n  from (size S1 = 1) do\n    pop S2 S1\n    from (size S2 = 3) do\n      pop s S2\n    loop\n      skip\n    until (empty S2)\n  loop\n    skip\n  until (empty S1)\nloop\n  skip\nuntil (empty S)" }
