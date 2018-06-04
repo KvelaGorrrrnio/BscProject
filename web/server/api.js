@@ -1,5 +1,5 @@
 import { Router, json } from 'express';
-import { execFile } from 'child_process';
+import { exec, execFile } from 'child_process';
 import * as c from './colors';
 
 // Constants
@@ -22,7 +22,7 @@ api.post('/run/log/:lng',   (req,res) => { runMode('run',req,res,true) });
 api.post('/invert/:lng',    (req,res) => { runMode('invert',req,res) });
 api.post('/translate/:lng', (req,res) => { runMode('translate',req,res) });
 api.get('/template/list',   (req,res) => {
-  execFile('find', ['templates', '-maxdepth', '1', '-type', 'f', '\\( -iname "*.srl" -o -iname "*.rl"  \\)'], { shell: true },(err,stdout) => {
+  exec('ls templates/*.*rl | sort', (err,stdout) => {
     if (err) {
       console.log(c.error('  Execution failed with: ' + err.message));
       res.json({
