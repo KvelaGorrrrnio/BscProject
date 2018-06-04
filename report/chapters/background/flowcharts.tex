@@ -1,7 +1,5 @@
-
-% TODO: overordnet om flowcharts og reversible flowcharts
 \section{Reversible Flowcharts}
-Flowcharts are a natural way to model imperative programs. Similarly, \textit{reversible} imperative programs can be naturally modeled by reversible flowcharts. The two models are similar --- however, to actually guarantee reversibility in reversible flowcharts, we may define some additional attributes. More specifically, we may want any join point between two edges in a flowchart to be acknowledged through an assertion which can determine the origin of the control flow. The definition (as seen in~\cite[p.~89]{REV}) states that \\
+Flowcharts are a natural way to model imperative programs. Similarly, \textit{reversible} imperative programs can be naturally modeled by reversible flowcharts. The two models are similar --- however, to actually guarantee reversibility in reversible flowcharts, we may define some additional attributes. More specifically, we may want any join point between two edges in a flowchart to be acknowledged through an assertion which can determine the origin of the control flow. The definition~\cite[p.~89]{REV} states that \\
 
 \say{A \textit{reversible flowchart $F$} is a finite directed graph with three types of nodes, each of which represents an \textit{atomic operation} [...]} \\
 
@@ -13,7 +11,8 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
 \end{description}
 \noindent The atomic operations (as illustrated in the paper) can be seen in Fig.~\ref{fig:atop}. Having these as elementary building blocks of our reversible flowcharts, it is trivial to invert a program; one simply has to invert each edge and, naturally, any step operation in the flowchart. This, in turn, means that the inversion of a test is an assertion and vice versa. The inversion of each atomic operation can be seen in Fig.~\ref{fig:atopinv}.
 
-\begin{figure}[H]
+This outlines the basic theory behind these reversible flowcharts. We can put this theory into practice and yield a \textit{reversible flowchart language} --- an incarnation of reversible flowcharts. Two such languages are RL and SRL. %is the general idea of reversible flowcharts, and two incarnations of this model are RL and SRL.
+\begin{figure}
   \centering
   \begin{subfigure}[t]{0.3\textwidth}
     \centering
@@ -77,7 +76,7 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
   \caption{The three atomic operations of reversible flowcharts}\label{fig:atop}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}
   \centering
   \begin{subfigure}[t]{0.3\textwidth}
     \centering
@@ -140,7 +139,3 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
   \end{subfigure}
   \caption{Inversion of the three atomic operations of reversible flowcharts}\label{fig:atopinv}
 \end{figure}
-
-% figurer af de forskellige byggeklodser her tak
-
-\noindent This is the general idea of reversible flowcharts, and two incarnations of this model are RL and SRL.\
