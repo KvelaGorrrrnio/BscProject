@@ -5,14 +5,17 @@
       - Beskriv interpreter file structure.
       - CLI
     - Dokumentation
+      - Usage (Indsæt referencer til billeder under web features)
       - Testing
     - Conclusion
     - Referencer laves
     - Appendices
   - Ret help
   - Introduktion til alle sektions og chapters
+  - Primefac til RL
   - Ret test-lib til ikke at bruge typeof (og .err)
     - Samme for gentest.sh
+  - Tilføj HS test framework files til appendix og referr til dem.
 
 ## Finpudsninger
   - Kommentarer skal tjekkes igennem
