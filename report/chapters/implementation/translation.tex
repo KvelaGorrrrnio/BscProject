@@ -100,14 +100,18 @@ One may notice that we use the reader monad for this implementation. This lets u
 
 \pgfplotsset{compat = 1.3}
 \subsection{Comments}
-\begin{wrapfigure}{R}{9.5cm}
+\begin{wrapfigure}[19]{r}{8cm}
   \begin{tikzpicture}
   \begin{axis} [
       xlabel=\#translations,
       ylabel=\#lines,
       %ylabel shift=-2 pt,
       width=0.6\textwidth,
-      legend style={at={(0.02,0.98)},anchor=north west},
+      legend style={at={(0.3,1)},anchor=north west},
+      axis x line=middle,
+      axis y line=middle,
+      every axis x label/.style=
+                  {at={(ticklabel cs: 0.5,0)}, anchor=north},
       %y tick label style={/pgf/number format/.cd,%
       %          scaled y ticks = false,
       %          set thousands separator={},
@@ -129,6 +133,6 @@ One may notice that we use the reader monad for this implementation. This lets u
     \addlegendentry{skip.srl ($l_0 = 1$)}
   \end{axis}
   \end{tikzpicture}
-  \caption{Growth of a program for each translation.}\label{fig:linesfig}% ($10.1e^{1.45x}$)
+\caption{Program size after translation. }\label{fig:linesfig}% ($10.1e^{1.45x}$)
 \end{wrapfigure}
 The translators described in the previous sections are very interesting, but not ideal in practice. When translating from SRL to RL, a \textit{lot} of blocks are produced. When translating from RL to SRL, a large loop of \textit{lots} of conditional blocks is produced. In fact, when translating back and forth multiple times, we will start to see an exponential growth on the number of lines of the resulting program. Fig.~\ref{fig:linesfig} shows the actual growth in number of lines of two programs; \texttt{fib.srl}, which consists of $l_0=10$ lines, and \texttt{skip}, which consists of a $l_0=1$ line. As we see, after translating \texttt{fib.srl} and \texttt{skip.srl} six times the resulting programs will consist of more than $60,000$ and $20,000$ lines, respectively! As we will dicuss later, this makes room for a lot of optimisation.
