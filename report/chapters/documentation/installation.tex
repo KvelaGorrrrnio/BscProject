@@ -1,32 +1,37 @@
 \section{Installation}
 
-Both the interpreters for RL and SRL and the web interface can be found at the same github repository: \href{https://github.com/KvelaGorrrrnio/BscProject}{KvelaGorrrrnio/BscProject}.\\
-To get the code, clone the repository with:
-\shcmd{$ git clone https://github.com/KvelaGorrrrnio/BscProject.git}
-
-The different parts of the project use different build systems. To simplify the build-flow Makefiles are used as a wrapping build-system, to supply a uniform build interface for the project.
+Both the interpreters for RL and SRL and the web interface can be found at the same github repository: \href{https://github.com/KvelaGorrrrnio/BscProject}{KvelaGorrrrnio/BscProject}. To get the full project, clone the repository using
+\begin{align*}
+\texttt{\$ git clone https://github.com/KvelaGorrrrnio/BscProject.git}
+\end{align*}
+\noindent Note that the different parts of the project use different build systems. To simplify the process of building the whole project we have written some makefiles used as a wrapping build-system to provide a uniform build interface for the project.
 
 \subsection{Command-Line Interface}
-The Interpreters and the Command-Line Interface are located under the \path{/src} directory, but can be build from the project root directory.
-The underlying dependency manager and build system for the Command-Line Interface is Stack, which can be installed by one of following:\\
-\shcmd{$ brew install haskell-stack cabal-install ghc # MacOS}\\
-\shcmd{$ curl -sSL https://get.haskellstack.org/ | sh # Unix}\\
-\shcmd{$ wget -qO- https://get.haskellstack.org/ | sh # Unix alternative}\\
+The source code for the interpreters and command-line interfaces are located under the \path{/src} directory but can be built from the root of the project.
+The underlying dependency manager and build system for the command-line interfaces is Stack, which can be installed by using one of following:
+\begin{flalign*}
+&\texttt{\$ brew install haskell-stack cabal-install ghc \color{gray} \# MacOS} && \\
+&\texttt{\$ curl -sSL https://get.haskellstack.org/ | sh \color{gray} \# Unix} && \\
+&\texttt{\$ wget -qO- https://get.haskellstack.org/ | sh \color{gray} \# Unix alternative}
+\end{flalign*}
+When standing at the project root, there are two ways of building the command-line interfaces:
+\begin{itemize}
+\item \texttt{\$ make src}, which builds the \texttt{rl} and \texttt{srl} executables and puts them into \path{/src/bin}. Copy the executables to your local \texttt{bin} directory for system wide usage.
 
-\noindent
-When standing at the project root, there are two ways of installing the Command-Line Interface.\\
-First option is to \shcmd{$ make src}, which builds the \texttt{rl} and \texttt{srl} executables into \path{/src/bin}. Copy the executables to your local bin, for system wide usage.\\
-Second option is to \shcmd{$ make install}, which installs the \texttt{rl} and \texttt{srl} executables directly to the stack local bin, for system wide usage. This requires that the stack local bin is in your \texttt{\$PATH}.
+\item \texttt{\$ make install}, which installs the \texttt{rl} and \texttt{srl} executables directly into the local \texttt{bin} directory for system wide usage. Note that this requires that the stack-local bin is in your \texttt{\$PATH}.
+\end{itemize}
 
 \subsection{Web Interface}
 
 The web client interface is found under \path{/web/client} and the web server is found under \path{/web/server}.
-Both the server and the client application is build and runned with NodeJS. NodeJS can be installed by one of the following:\\
-\shcmd{$ brew install node               # MacOS}\\
-\shcmd{$ sudo apt-get install nodejs npm # Ubuntu}\\
-\shcmd{$ sudo pacman -S nodejs npm       # Arch}\\
+Both the server and the client application is built and run with NodeJS. NodeJS can be installed by using one of the following:
+\begin{flalign*}
+&\texttt{\$ brew install node \color{gray} \qquad \qquad  \ \ \ \ \ \ \ \# MacOS} && \\
+&\texttt{\$ sudo apt-get install nodejs npm \color{gray} \ \# Ubuntu} && \\
+&\texttt{\$ sudo pacman -S nodejs npm \color{gray} \quad \ \ \ \ \ \# Arch}
+\end{flalign*}
+The default build command, soon to be described, combines the interpreters and the client web interface with the web server such that the server has access to the interpreters and the client interface is accessible through the running server.
 
-\noindent
-The default build command, soon to be described, combines the interpreters and the client web interface with the web server, such that the server has access to the interpreters and the client interface is accessible through the running server.\\
-By running \shcmd{$ make web}, when standing at the project root, the web servers dependencies are installed, the Command-Line Interface and the web client interface is built and copied to the web server.
-If builded successfully the last line should be \texttt{"Web server has been built."}.
+By running \texttt{\$ make web} when standing at the project root, the web server dependencies are installed, the command-line interfaces and the web client interface are built and copied to the web server.
+
+If the web interface was built successfully, the last line displayed should be \texttt{"Web server has been built."}.

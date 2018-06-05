@@ -13,9 +13,9 @@ An even better representation would be a cyclic graph where each node represents
 A flaw in our parser is that that all whitespace is ignored. This means that we can't define step operations to terminate with a newline --- which is a shame, because this would allow for better error messages and more syntactic sugar. Also, a sequence of the same prefix operator is not allowed without using parantheses. For example, \texttt{top top a} is not allowed --- to achieve this functionality we have to write \texttt{top (top a)}. This becomes especially gruesome when having an even longer such sequence.
 
 \subsection{Optimisation}
-It would be nice to have a pass that optimises an RL- or SRL program. By this we mean removing redundant step operations and subexpressions, merging sequences of variable updates, computing constants statically, removing skips, etc.
+It would be nice to have a pass that optimises an RL- or SRL program. By this we mean removing redundant step operations and subexpressions, computing constants statically, removing skips, merging two RL blocks connected by an unnecessary jump, etc.
 
 \subsection{Web}
-As the server is implemented now, the API is fully public, and every origin can access and request from here. This way requests with programs, that has infinity loops, can quickly occupy and kill the server. To disallow this, one could whitelisted domains in the CORS headers, as described in Section \ref{sec:server_and_api}. An alternative could be to use API keys to limit which traffic is allowed to access the API. The latter approach is a more complex solution, that may involve building a authentication API system with corresponding database.
+As the server is implemented now, the API is fully public, and every origin can access and request from here. This way requests with programs that have infinite loops can quickly occupy and kill the server. To disallow this, one could whitelist domains in the CORS headers, as described in section~\ref{sec:server_and_api}. An alternative could be to use API keys to limit which traffic is allowed to access the API. The latter approach is a more complex solution that may involve building a authentication API system with corresponding database.
 
-For the user experience, and expansion of the current interface could be the opportunity for resizing each area of the interface.
+For the user experience, an expansion of the current interface could be the possibility of resizing each area of the interface.
