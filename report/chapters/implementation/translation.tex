@@ -164,3 +164,63 @@ The translators described in the previous sections are very interesting, but not
 
   \caption{Growth of a program for each translation.}\label{fig:linesfig}% ($10.1e^{1.45x}$)
 \end{figure}
+
+\begin{figure}[H]
+  $$\begin{aligned}
+    & \mathcal{T}_{SRL}\llbracket b\rrbracket =        &  \quad  & \mathcal{T}\llbracket\begin{matrix}\texttt{if }e_1\texttt{ then }b_1\\\texttt{else }b_2\texttt{ fi }e_2\end{matrix}\rrbracket(l_0,l_1,l_6,l_7) = \\
+    & \quad l_0: \texttt{entry}                          &         & \quad l_1:  \texttt{from }l_0 \\
+    & \quad \quad \texttt{goto }l_1                      &         & \quad \quad \texttt{if }e_1\texttt{ goto }l_2\texttt{ else }l_4\\
+    & \quad \mathcal{T}\llbracket b\rrbracket(l_0,l_1,l_2,l_3) & & \quad \mathcal{T}\llbracket b_1\rrbracket(l_1,l_2,l_3,l_6)\\
+    & \quad l_3: \texttt{from }l_2                       &         & \quad \mathcal{T}\llbracket b_2\rrbracket(l_1,l_4,l_5,l_6)\\
+    & \quad \quad \texttt{exit}                          &         & \quad l_6: \texttt{fi }e_2\texttt{ from }l_3\texttt{ else }l_5\\
+    & \quad \texttt{where $l_0,l_1,l_2,l_3$ are fresh}   &         & \quad \quad \texttt{goto }l_7\\
+    &                                                  &         & \quad \texttt{where $l_2,l_3,l_4,l_5$ are fresh}\\
+    & \mathcal{T}\llbracket b_1\ b_2\rrbracket(l_0,l_1,l_4,l_5) = \\
+    & \quad \mathcal{T}\llbracket b_1\rrbracket(l_0,l_1,l_2,l_3) & & \mathcal{T}\llbracket\begin{matrix*}[l]\texttt{from }e_1\texttt{ do }b_1\\\texttt{loop }b_2\texttt{ until }e_2\end{matrix*}\rrbracket(l_0,l_1,l_4,l_7) = \\
+    & \quad \mathcal{T}\llbracket b_2\rrbracket(l_2,l_3,l_4,l_5) & & \quad l_1: \texttt{fi }e_1\texttt{ from }l_0\texttt{ else }l_6\\
+    & \quad \texttt{where $l_2,l_3$ are fresh}                     & & \quad \quad \texttt{goto }l_2\\
+    &                                                            & & \quad \mathcal{T}\llbracket b_1\rrbracket(l_1,l_2,l_3,l_4)\\
+    & \mathcal{T}\llbracket a\rrbracket(l_0,l_1,l_2,l_3) =       & & \quad \mathcal{T}\llbracket b_2\rrbracket(l_4,l_5,l_6,l_1)\\
+    & \quad l_1: \texttt{from }l_0                                 & & \quad l_4: \texttt{from }l_3\\
+    & \quad \quad a                                              & & \quad \quad \texttt{if }e_2\texttt{ goto }l_7\texttt{ else }l_5\\
+    & \quad l_2: \texttt{from } l_1                                & & \quad \texttt{where $l_2,l_3,l_5,l_6$ are fresh}\\
+    & \quad \quad \texttt{goto } l_3\\
+  \end{aligned}$$
+  \caption{Translation from SRL to RL.}
+  \label{fig:translation_srl_to_rl}
+\end{figure}
+
+\begin{figure}[H]
+  $$\begin{aligned}
+    & \mathcal{T}_{RL}\llbracket q\rrbracket  & =\ & \texttt{if } \land_{i=0}^n\land_{j=1}^{n+1}\land_{k=0}^2\neg x_{i,j}^k\texttt{ fi true}\\
+    &                                         &    & x{0,1}^{0} \xoreq \texttt{true}\\
+    &                                         &    & \texttt{from }x_{0,1}^0\texttt{ do}\\
+    &                                         &    & \quad \mathcal{T}_{blks}\llbracket q\rrbracket\\
+    &                                         &    & \texttt{until } n_{n,n+1}^0\\
+    &                                         &    & x_{n,n+1}^0 \xoreq \texttt{ true}\\
+    &                                         &    & \texttt{if } \land_{i=1}^n\land_{j=0}^{n+1}\land_{k=0}^2\neg x_{i,j}^k\texttt{ fi true}\\
+    & \mathcal{T}_{blks}\llbracket d_1\ d_2\ \dots\ d_n\rrbracket & =\ &
+      \mathcal{T}_{blk}\llbracket d_1 \rrbracket(\mathcal{T}_{blk}\llbracket d_2\rrbracket(\dots(\mathcal{T}_{blk}\llbracket d_n\rrbracket(E_\texttt{false}))\dots))\\
+    & \mathcal{T}_{blk}\llbracket l_i : k a^* j \rrbracket(F) & =\ &
+      \mathcal{T}_{flow}\llbracket k\rrbracket(i,\mathcal{T}_{steps}\llbracket a^*\rrbracket(i,\mathcal{T}_{flow}\llbracket j\rrbracket(i,F)))\\
+    & \mathcal{T}_{flow}\llbracket\begin{matrix*}[r]\texttt{fi }e\texttt{ from }l_j\\\texttt{else }l_k\end{matrix*}\rrbracket(i,F) & =\ &
+      \begin{matrix*}[l]
+        \texttt{if }x_{j,i}^0\lor x_{k,i}^0\texttt{ then}\\
+        \quad\text{if }x_{j,i}^0\texttt{ then }P_{j,i}\texttt{ else }P_{k,i}\texttt{ fi }e\\
+        \texttt{else }F\texttt{ fi }x_{i,i}^1\\
+      \end{matrix*}\\
+    & \mathcal{T}_{flow}\llbracket\begin{matrix*}[r]\texttt{if }e\texttt{ goto }l_j\\\texttt{else }l_k\end{matrix*}\rrbracket(i,F) & =\ &
+      \begin{matrix*}[l]
+        \texttt{if }x_{i,i}^2\texttt{ then}\\
+        \quad\text{if }e\texttt{ then }R_{i,j}\texttt{ else }R_{i,k}\texttt{ fi }x_{i,j}^0\\
+        \texttt{else }F\texttt{ fi }x_{i,j}^0\lor x_{i,k}^0\\
+      \end{matrix*}\\
+    & \mathcal{T}_{flow}\llbracket\texttt{from }l_j\rrbracket(i,F) & =\ & \texttt{if }x_{j,i}^0\texttt{ then }P_{j,i}\texttt{ else }F\texttt{ fi }x_{i,i}^1\\
+    & \mathcal{T}_{flow}\llbracket\texttt{goto }l_j\rrbracket(i,F) & =\ & \texttt{if }x_{i,i}^2\texttt{ then }R_{i,j}\texttt{ else }F\texttt{ fi }x_{i,j}^0\\
+    & \mathcal{T}_{flow}\llbracket\texttt{entry}\rrbracket(1,F)    & =\ & \texttt{if }x_{0,1}^0\texttt{ then }P_{0,1}\texttt{ else }F\texttt{ fi }x_{1,1}^1\\
+    & \mathcal{T}_{flow}\llbracket\texttt{exit}\rrbracket(n,F)     & =\ & \texttt{if }x_{n,n}^2\texttt{ then }R_{n,n+1}\texttt{ else }F\texttt{ fi }x_{n,n+1}^0\\
+    & \mathcal{T}_{flow}\llbracket a^*\rrbracket(i,F)     & =\ & \texttt{if }x_{i,i}^1\texttt{ then }P_{i,i}\texttt{ else }F\texttt{ fi }x_{i,i}^2\\
+  \end{aligned}$$
+  \caption{Translation from RL to SRL.}
+  \label{fig:translation_rl_to_srl}
+\end{figure}
