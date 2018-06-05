@@ -1,54 +1,34 @@
 % Inversion
 \section{Program Inversion}
 
-Inverting a program is actually, in our case, very simple. On \cite[p.~104]{REV} we are given a concise inverter for each of the languages along with the shared core. We will now go through the implementation of these inverters.
+Inverting a program is, in fact, in our case very simple. On \cite[p.~104]{REV} we are given a concise inverter for each of the languages along with the shared core. We will now go through the implementation of these inverters in our project.
 
 \subsection{Common}
 \label{sec:invcommon}
 
-\texttt{Inversion.hs} in the \textit{Common} module contains the inverter that is shared between RL and SRL. The task of this inverter is to invert step operations. As stated earlier, expressions are not invertible, so we can keep them as they are. It is (as seen in \cite[Fig.~20]{REV}) very intuitive: inverting an update with a given operator should result in an update with the operator inverted; inverting a push operation whould result in a pop operation and vice versa; inverting a skip operation should result in a skip. We also have the three added step operations \texttt{swap}, \texttt{init}, and \texttt{free}. We have already gone over these in section~\ref{sec:changes}, but we will reiterate: \texttt{swap} is self-inverse, the inverse of \texttt{init} is \texttt{free} and vice versa. The implementation can be seen in Figure~\ref{fig:commoninvert}.
-
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=5, lastline=19]{../src/src/Common/Inversion.hs}
-  \caption{The step operation inverter.}\label{fig:commoninvert}
-\end{figure}
+\texttt{Inversion.hs} under the \textit{Common} module (Appendix~\ref{app:Common_Inversion_hs}) contains the implementation of the inverter that is shared between RL and SRL (\cite[Fig.~20]{REV}). The task of this inverter is simply to invert step operations. As stated earlier, expressions should not be inverted, and thus, we keep them as they are. The inverter is very intuitive: inverting an update with a given operator should result in an update with the operator inverted; inverting a push operation whould result in a pop operation and vice versa; inverting a skip operation should result in a skip. We also have the three added step operations \texttt{swap}, \texttt{init}, and \texttt{free}. We have already gone over these in section~\ref{sec:changes}, but we will reiterate: \texttt{swap} is self-inverse, the inverse of \texttt{init} is \texttt{free} and vice versa.
 
 \subsection{Inverting RL Programs}
 
-The RL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{RL} module and is, of course, based on the inverter described in \cite[Fig.~19]{REV}.\\
+The implementation of the RL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{RL} module (Appendix~\ref{app:RL_Inversion_hs}) and is, to no surprise, based on the inverter described in~\cite[Fig.~19]{REV}. The implementation covers the following cases:
+\begin{itemize}
+  \item If we want to invert an RL program --- that is, a list of blocks --- we simply reverse the list of blocks and invert each individual block.
 
-\noindent If we want to invert an RL program --- that is, a list of blocks --- we want to reverse the list of blocks and invert each individual block.\\
+  \item To invert a block, we first want to invert the come-from assertion and use the result as the jump. Next, we will reverse the list of step operations and invert each of these individually. Finally, we will invert the jump and use the result as the come-from assertion.
 
-\noindent To invert a block, we first want to invert the come-from assertion and use the result as the jump. Next, we will reverse the list of step operations and invert each of these individually. Finally, we will invert the jump and use the result as the come-from assertion.\\
-
-\noindent The inversion of come-from assertions and jumps is rather simple. A \texttt{goto} becomes a \texttt{from}, an \texttt{if} becomes a \texttt{fi}, an exit becomes an entry and vice versa.\\
-
-\noindent The implementation can be seen in Figure~\ref{fig:rlinvert}.
-
-%\noindent \todo{More stuff on inversion.}
-
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=9, lastline=26]{../src/src/RL/Inversion.hs}
-  \caption{The RL program inverter.}\label{fig:rlinvert}
-\end{figure}
+  \item The inversion of come-from assertions and jumps is rather simple. A \texttt{goto} becomes a \texttt{from}, an \texttt{if} becomes a \texttt{fi}, an exit becomes an entry and vice versa.
+\end{itemize}
 
 \subsection{Inverting SRL Programs}
 
-The SRL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{SRL} module. This is based on the inverter presented in \cite[Fig.~18]{REV}.\\
+The implementation of the SRL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_Inversion_hs}). This is, also to no surprise, based on the inverter presented in \cite[Fig.~18]{REV}. Note that inverting an SRL program corresponds to inverting a single block. The implementation covers the following cases:
 
-\noindent Inverting an SRL program corresponds to inverting a block.\\
+\begin{itemize}
+  \item If the block is a step operation, we simply invert the step operation as described in section~\ref{sec:invcommon}.
 
-\noindent If the block is a step operation, we simply invert the step operation as described in section~\ref{sec:invcommon}.\\
+  \item If the block is a conditional, we swap the test and the assertion and recursively invert the two blocks inside.
 
-\noindent If the block is a conditional, we swap the test and the assertion and recursively invert the two blocks inside.\\
+  \item Similarly, if the block is a loop, we swap the test and the assertion and invert the two blocks inside.
 
-\noindent Similarly, if the block is a loop, we swap the test and the assertion and invert the two blocks inside.\\
-
-\noindent Finally, if the block is a sequence of two blocks, we invert each and reverse the order.\\
-
-\noindent The implementation can be seen in Figure~\ref{fig:srlinvert}.
-
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=7, lastline=11]{../src/src/SRL/Inversion.hs}
-  \caption{The RL program inverter.}\label{fig:srlinvert}
-\end{figure}
+  \item Finally, if the block is a sequence of two blocks, we invert each block individually and reverse the order.
+\end{itemize}

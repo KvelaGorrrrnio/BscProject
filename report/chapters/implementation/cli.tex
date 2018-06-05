@@ -1,4 +1,15 @@
+\newpage
 \section{The Command-Line Interface}
 \label{sec:implementation_cli}
 
-\todo{Talk a bit about the implementation of \texttt{HandleArgs.hs} and \texttt{Main.hs}.}
+This will be a rather short section describing the command-line interface. We will briefly explain how we parse command-line arguments and how the result is handle in the specific interpreters.
+
+\subsection{Common}
+
+\texttt{HandleArgs.hs} under the \textit{Common} module (Appendix~\ref{app:Common_HandleArgs_hs}) implements the parsing of the command-line arguments that is used for both interpreters. This is done using the CmdArgs library. Here, we define a record for each mode:
+\lstinputlisting[language=Haskell, firstline=8, lastline=16]{../src/src/Common/HandleArgs.hs}
+We can then specify the nature of each field; whether it is optional, whether it is a flag or a simple argument, what its help message should be, etc. The \texttt{handleArgs} function (line 52) does the job of fetching the command-line input, parsing it and returning the resulting record. The main program file for each interpreter must then handle this record depending on the values of the various fields.
+
+\subsection{RL and SRL}
+\texttt{Main.hs} under the \textit{RL} module (Appendix~\ref{app:RL_Main_hs}) and \texttt{Main.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_Main_hs}) simply parse the command line arguments (as described in the previous subsection) and handle the resulting record. For example, given a \texttt{Run} record with the \texttt{file} field set to \texttt{"fib.srl"} and the \texttt{json} field set to \texttt{True}, the SRL interpreter would run the program (assuming that it exists) and print the output formatted as JSON to stdout.
+

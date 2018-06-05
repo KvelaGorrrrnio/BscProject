@@ -2,11 +2,13 @@
 %% The interpreters
 \section{The Interpreters}
 
+This section describes the implementation of the interpreters. Note that this excludes the program transformations.
+
 \subsection{Changes}\label{sec:changes}
 
-It is important to note that we have made a few changes to the languages. We have modified some of the syntax described in Figure~\ref{fig:rl_srl_syntax_and_structure}, but also added some new step operations and core features. We have not, however, altered the very nature of any of the languages.
+It is important to note that we have made a few changes to the languages. We have modified some of the syntax described in Fig.~\ref{fig:rl_srl_syntax_and_structure}, but also added some new step operations and core features. We have not, however, altered the very nature of any of the languages.
 
-We found the paper\cite{REV} to be a bit unclear regarding types. The languages are described on the more hypothetical level, and the paper seems to assume some kind of type inference. We tried implementing a static check similar to type inference, but we deemed it too unrobust. This brings us to one of our most fundamental additions: explicit variable declarations. Each program must start with zero or more variable declarations with a specified type. For example, \texttt{list int a} declares variable \texttt{a} to be of type \texttt{list int}, etc. Declaring a varibale multiple times, and using a variable in the program that has not been declared, throws a runtime error.
+We found the paper~\cite{REV} to be a bit unclear regarding types. The languages are described on the more hypothetical level, and the paper seems to assume some kind of type inference. We tried implementing a static check similar to type inference, but we deemed it too unrobust. This brings us to one of our most fundamental additions: explicit variable declarations. Each program must start with zero or more variable declarations with a specified type. For example, \texttt{list int a} declares variable \texttt{a} to be of type \texttt{list int}, etc. Declaring a varibale multiple times, and using a variable in the program that has not been declared, throws a runtime error.
 
 Also, while the languages as described in the paper have lists limited to one dimension, our implementation of the core feature set supports indexing in an arbitrary number of dimensions. That is, you could declare a list variable as \texttt{list list int l} and index on this list with i.e. \texttt{l[2,5]} (assuming that the indices are not out of bounds). This, in particular, makes it a non-trivial task to implement robust type inference.
 
@@ -26,7 +28,7 @@ Because expressions do not influence reversibility, one can add any arbitrary op
   \begin{itemize}
   \item Power
   \item Equality
-  \item Relational
+  \item Comparison
   \item Modulo
   \item Logical conjunction
   \item Logical disjunction
@@ -40,8 +42,7 @@ Because expressions do not influence reversibility, one can add any arbitrary op
   \item A predicate to determine if a variable contains only zero-values
 \end{itemize}
 \end{description}
-
-The addition of arbitrary indexing applies to expressions as well; we can now express \texttt{(top a)[i]} without a problem by evaluating \texttt{(top a)} and then index on the resulting value.
+The addition of arbitrary indexing applies to expressions as well; we can now express e.g. \texttt{(top a)[i]} without a problem by evaluating \texttt{(top a)} and then index on the resulting value.
 
 Finally, some of the RL-specific syntax has undergone some minor changes. The rather verbose syntax of the conditional come-from assertion has been changed from $\texttt{fi} \ e \ \texttt{from} \ l_1 \ \texttt{else} \ l_2$ to simply $\texttt{fi} \ e \ l_1 \ l_2$. Similarly, the syntax of the conditional jump has been changed from $\texttt{if} \ e \ \texttt{goto} \ l_1 \ \texttt{else} \ l_2$ to simply $\texttt{if} \ e \ l_1 \ l_2$.
 
@@ -92,7 +93,7 @@ If we add our additional step operations --- \texttt{swap}, \texttt{init}, and \
       &  |  & \texttt{free} \ x \ \iota'
 \end{matrix*}
 \]
-The implementation of this (Appendix~\ref{app:CommonASThs}) was straightforward:
+The implementation of this was straightforward:
 \lstinputlisting[language=haskell, firstline=43, lastline=50]{../src/src/Common/AST.hs}
 
 \subsubsection{Errors and log}
@@ -103,7 +104,6 @@ The \textit{Common} module also contains the implementation of the error- (Appen
   \item[\texttt{StaticError}] covers the errors that can be identified in a static check. While this is in the \textit{Common} module, static errors are mostly exclusive to RL. This includes errors thrown because of duplicate entries, duplicate exits, etc. An important thing to note is that it throws an error if the first block of an RL program is not the entry point or if the last block is not an exit point. This makes the translator from RL to SRL more similar to the one described in the paper.
   \item[\texttt{Custom}] is a generic error type used for anything that we did not feel was covered by any of the previous types. Namely, if no file (or code, if the \texttt{-c} has been set --- more on that later) has been given to the interpreter in the command-line interface, a `custom` error is thrown.
 \end{description}
-
 Having specialised error types makes it easier to handle the concrete messages, all in one place, using the \texttt{Show} typeclass.
 
 The log is simply a list of specialised messages that can either be a step operation or an error. When a program is interpreted, each step operation that is executed, along with the state of the program after the execution, is recorded in the log. If an error is thrown, this is recorded as well before the interpretation halts. This gives us a simple debugger that will work with both the command-line interface and the web user interface.
@@ -133,13 +133,12 @@ The parser was implemented using Parsec along with the Token helper module to pe
 
 \subsubsection{Abstract syntax tree}
 
-In section~\ref{sec:rlandsrl} we considered the syntax of RL; a program must consist of one or more blocks, where a block is defined by its label and has a come-from assertion, zero or more step operations and a jump. With the step operations already implemented, the only thing to worry about is how to represent our program. \texttt{AST.hs} under the \textit{RL} module (Appendix~\ref{app:RL_AST_hs}) contains the complete representation. We decided to define the abstract syntax tree as an association list with labels as keys and blocks as values:
+In section~\ref{sec:rlandsrl} we considered the syntax of RL; a program must consist of one or more blocks, where a block is defined by its label and has a come-from assertion, zero or more step operations and a jump. With the step operations already implemented, the only thing to worry about is how to represent our program. \texttt{AST.hs} under the \textit{RL} module (Appendix~\ref{app:RL_AST_hs}) contains the complete representation. As one will notice, we decided to define the abstract syntax tree as an association list with labels as keys and blocks as values:
 \lstinputlisting[language=haskell, firstline=14, lastline=14]{../src/src/RL/AST.hs}
 Note that \texttt{Label} is simply a type synonym for \texttt{String}.
 
 A block, then, is defined as a three-tuple consisting of a come-from assertion, a list of step operations, and a jump. Thus, we have
 \lstinputlisting[language=haskell, firstline=18, lastline=18]{../src/src/RL/AST.hs}
-
 It should come to no surprise that \texttt{From} and \texttt{Jump} are the data types that represent come-from assertions and unstructured jumps, respectively. Their implementations, practically copied from the paper, are as follows:
 \begin{figure}[H]
   \centering
@@ -153,21 +152,22 @@ It should come to no surprise that \texttt{From} and \texttt{Jump} are the data 
 \end{figure}
 
 \subsubsection{Interpretation}
-The interpreter for RL can be found in \texttt{RL/Interp.hs}. It is pretty simple and essentially a small wrapper around the core feature set from the Common module.
+The interpreter for RL can be found in \texttt{Interp.hs} under the \textit{RL} module (Appendix~\ref{app:RL_Interp_hs}). It is pretty simple and essentially a small wrapper around the core feature set from the \textit{Common} module.
 
-First thing is that we have extended our monad transformer to also contain the reader monad. This is in order to read from our abstract syntrax tree --- that is, our association list of blocks --- from a constant resource without having to throw it around in every recursive call. The new monad transformer has \texttt{ProgState} as type synonym and its definition can be seen in Figure~\ref{fig:progstate}.
+First thing is that we have extended our core monad transformer to also contain the reader monad. This is in order to read from our abstract syntrax tree --- that is, our association list of blocks --- from a constant resource without having to throw it around in every recursive call.
 
-\begin{figure}[h]
-  \lstinputlisting[language=haskell, firstline=12, lastline=12]{../src/src/RL/Interp.hs}
-  \caption{The extended monad transformer \texttt{ProgState}.}\label{fig:progstate}
-\end{figure}
+The \texttt{interp} function (lines 31-57), which interprets a single block and passes control flow to the next, works by receiving two arguments: the label of the block that we are coming from and the label of the block we are jumping to. We assume that an empty label as first operand means that we are at the entry of the program. When calling the function, we simply look up the label of the block we are jumping to in the abstract syntax tree --- from the static check we assume that the corresponding block exists. Then, to interpret the block, we simply make sure that we have gone down the right path (that is, our come-from assertion passes the test regarding the come-from label). Then we execute the list of step operations and call \texttt{interp} recursively --- now with the current label as come-from label and with the label dictated by the unstructured jump as the label we are jumping to.
 
-The \texttt{interp} function, which interprets a single block and passes control flow to the next, works by receiving two arguments: the label of the block that we currently in and the label of the block we are jumping to. We assume that an empty label as first operand means that we are at the entry of the program. When interpreting a block, we simply make sure that we have gone down the right path (that is, our come-from assertion passes the test). Then we execute the list of step operations and jump to the next block as dictated by the unstructured jump associated with our block. The \texttt{interp} function can be seen in Figure~\ref{fig:interp}.
-
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=31, lastline=57]{../src/src/RL/Interp.hs}
-  \caption{The \texttt{interp} function.}\label{fig:interp}
-\end{figure}
+Now, we have briefly mentioned the static check of the RL interpreter, but we have not gone over what exactly it does. \texttt{Static.hs} under the \textit{RL} module (Appendix~\ref{app:RL_Static_hs}) checks that a few rules about the structure of an RL are respected --- each of which can be established statically. More specifically, we check for the following:
+\begin{itemize}
+  \item The program starts with an entry block
+  \item The program ends with an exit block
+  \item The program does not contain two or more entries
+  \item The program does not contain two or more exits
+  \item All labels that are somehow referred to are indeed assigned to a block
+  \item The program does not contain a label that is assigned twice or more
+\end{itemize}
+Thus, the static check simply makes sure that our program is well formed and that each jump and come-from assertion is well defined, so to speak.
 
 \subsubsection{Parser}
 When parsing, we simply parse for a list of one or more \texttt{(Label,Block)} pairs. Each pair is parsed by identifying a block label followed by a colon, a come-from assertion, a list of zero or more step operations as defined in the common parser, and a jump.
@@ -175,27 +175,16 @@ When parsing, we simply parse for a list of one or more \texttt{(Label,Block)} p
 %% SRL specific interpreter
 \subsection{SRL Interpreter}
 
-The SRL-specific interpreter implementation can be found in the \textit{SRL} module.
-
 \subsubsection{Abstract syntax tree}
 
-As with RL, we have already looked at the syntax of SRL in section~\ref{sec:rlandsrl}. To summarise: A program consists of exactly one block. This block can either be a step operation, a conditional control structure ($\texttt{if} \ e_1 \ \texttt{then} \ b_1 \ \texttt{else} \ b_2 \ \texttt{fi} \ e_2$), a loop control structure ($\texttt{from} \ e_1 \ \texttt{do} \ b_1 \ \texttt{loop} \ b_2 \ \texttt{until} \ e_2$), or recursively a sequence of two blocks ($b_1 \ b_2$). Fortunately, this translates nicely into an implementation in Haskell. For the block, we have defined the \texttt{Block} data type (as seen in Figure~\ref{fig:rlblock}). Since a program is represented as a single block, we have defined the abstract syntax tree (as seen in Figure~\ref{fig:srlast}) accordingly: \texttt{AST} is simply a type synonym for \texttt{Block}.
-
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=17, lastline=20]{../src/src/SRL/AST.hs}
-  \caption{The representation of blocks in SRL.}\label{fig:srlblock}
-\end{figure}
-
-\begin{figure}[H]
-  \lstinputlisting[language=haskell, firstline=13, lastline=1]{../src/src/SRL/AST.hs}
-  \caption{The abstract syntax tree for SRL.}\label{fig:srlast}
-\end{figure}
-
+As with RL, we have already looked at the syntax of SRL in section~\ref{sec:rlandsrl}. To summarise: A program consists of exactly one block. This block can either be a step operation, a conditional ($\texttt{if} \ e_1 \ \texttt{then} \ b_1 \ \texttt{else} \ b_2 \ \texttt{fi} \ e_2$), a loop ($\texttt{from} \ e_1 \ \texttt{do} \ b_1 \ \texttt{loop} \ b_2 \ \texttt{until} \ e_2$), or recursively a sequence of two blocks ($b_1 \ b_2$). Fortunately, this translates nicely into an implementation in Haskell which is found in \texttt{AST.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_AST_hs}). For the block, we have defined the \texttt{Block} data type as follows:
+\lstinputlisting[language=haskell, firstline=17, lastline=20]{../src/src/SRL/AST.hs}
+Since a program is represented as a single block, we have defined the abstract syntax tree accordingly. More specifically, we have that
+\lstinputlisting[language=haskell, firstline=13, lastline=1]{../src/src/SRL/AST.hs}
 
 \subsubsection{Interpretation}
 
-The process of interpreting the abstract syntax tree --- that is, a single block --- is fairly simple;\\
-
+The process of interpreting the abstract syntax tree --- that is, a single block --- is fairly simple. \texttt{Interp.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_Interp_hs}) contains the \texttt{interp} function (lines 24-51) which takes a block as argument and interprets it. The function covers the different types of blocks:
 \begin{itemize}
   \item If it is a step operation, we simply execute it.
 
@@ -203,10 +192,9 @@ The process of interpreting the abstract syntax tree --- that is, a single block
 
   \item If the block is a loop, the assertion must hold at the entry of the loop. We then execute the first block and evaluate the test. If the test evaluates to true, we are done. If not, we execute the second block and make sure that the assertion now does not hold. If it still holds, the program breaks the rules of reversibility and we have to throw a runtime error. Otherwise, we repeat.
 
-  \item Finally, if it is a sequence of two blocks, we recursively interpret the first block and the the second, as described, and in that order.
+  \item Finally, if it is a sequence of two blocks, we recursively interpret the first block and the the second block, as described, and in that order.
 \end{itemize}
-
-All this is done in the \texttt{interp} function in \texttt{Interp.hs} of the \textit{SRL} module and can be seen in Appendix~\ref{app:srlinterp}.
+%All this is done in the \texttt{interp} function in \texttt{Interp.hs} of the \textit{SRL} module and can be seen in Appendix~\ref{app:srlinterp}.
 
 %\begin{figure}[H]
 %  \lstinputlisting[language=haskell, firstline=24, lastline=51]{../src/src/SRL/Interp.hs}
