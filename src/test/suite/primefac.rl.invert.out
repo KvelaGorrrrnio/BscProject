@@ -1,0 +1,39 @@
+int n
+list int p
+int v
+
+end: entry
+  n += 1
+  v += top p
+goto loop_until
+
+loop_until: fi (n = 1) end loop_from
+  skip
+goto loop_loop
+
+loop_loop: from loop_until
+  skip
+goto if_assert
+
+if_assert: from loop_loop
+  skip
+if (not (empty p) && top p = v) if_true if_false
+
+if_false: from if_assert
+  v -= 1
+goto loop_from
+
+if_true: from if_assert
+  v ^= top p
+  pop v p
+  n *= v
+goto loop_from
+
+loop_from: fi (n % v = 0) if_true if_false
+  skip
+if (empty p && v = 2) start loop_until
+
+start: from loop_from
+  v -= 2
+  n -= 1829
+exit
