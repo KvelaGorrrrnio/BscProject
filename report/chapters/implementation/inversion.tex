@@ -6,11 +6,22 @@ Inverting a program is, in fact, in our case very simple. On \cite[p.~104]{REV} 
 \subsection{Common}
 \label{sec:invcommon}
 
-\texttt{Inversion.hs} under the \textit{Common} module (Appendix~\ref{app:Common_Inversion_hs}) contains the implementation of the inverter that is shared between RL and SRL (\cite[Fig.~20]{REV}). The task of this inverter is simply to invert step operations. As stated earlier, expressions should not be inverted, and thus, we keep them as they are. The inverter is very intuitive: inverting an update with a given operator should result in an update with the operator inverted; inverting a push operation whould result in a pop operation and vice versa; inverting a skip operation should result in a skip. We also have the three added step operations \texttt{swap}, \texttt{init}, and \texttt{free}. We have already gone over these in section~\ref{sec:changes}, but we will reiterate: \texttt{swap} is self-inverse, the inverse of \texttt{init} is \texttt{free} and vice versa.
+\texttt{Inversion.hs} under the \textit{Common} module (Appendix~\ref{app:Common_Inversion_hs}) contains the implementation of the inverter that is shared between RL and SRL as seen in \cite[Fig.~20]{REV} and reproduced in Fig.~\ref{fig:inversion_common}. The task of this inverter is simply to invert step operations. As stated earlier, expressions should not be inverted, and thus, we keep them as they are. The inverter is very intuitive: inverting an update with a given operator should result in an update with the operator inverted; inverting a push operation whould result in a pop operation and vice versa; inverting a skip operation should result in a skip. We also have the three added step operations \texttt{swap}, \texttt{init}, and \texttt{free}. We have already gone over these in section~\ref{sec:changes}, but we will reiterate: \texttt{swap} is self-inverse, the inverse of \texttt{init} is \texttt{free} and vice versa.
+\begin{figure}
+  $$\begin{aligned}
+    & \mathcal{I}_{step}\llbracket x \mathrel{\oplus}= e\rrbracket & =\ & x \mathrel{\ominus}= e & & \text{where }\ominus = \mathcal{I}_{op}\llbracket\oplus\rrbracket & \quad & \mathcal{I}_{op}\llbracket +\rrbracket = -\\
+    & \mathcal{I}_{step}\llbracket x[e_1] \mathrel{\oplus}= e_2\rrbracket & =\ & x[e_1] \mathrel{\ominus}= e_2 & & \text{where }\ominus = \mathcal{I}_{op}\llbracket\oplus\rrbracket & \quad & \mathcal{I}_{op}\llbracket -\rrbracket = +\\
+    & \mathcal{I}\llbracket\texttt{push }x_1\ x_2\rrbracket & =\ & \texttt{pop }x_1\ x_2 & & & \quad & \mathcal{I}_{op}\llbracket \mathrm{\textasciicircum}\rrbracket = \mathrm{\textasciicircum}\\
+    & \mathcal{I}\llbracket\texttt{pop }x_1\ x_2\rrbracket & =\ & \texttt{push }x_1\ x_2\\
+    & \mathcal{I}\llbracket\texttt{skip}\rrbracket & =\ & \texttt{skip}\\
+  \end{aligned}$$
+  \caption{Inversion of common parts.}
+  \label{fig:inversion_common}
+\end{figure}
 
 \subsection{Inverting RL Programs}
 
-The implementation of the RL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{RL} module (Appendix~\ref{app:RL_Inversion_hs}) and is, to no surprise, based on the inverter described in~\cite[Fig.~19]{REV}. The implementation covers the following cases:
+The implementation of the RL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{RL} module (Appendix~\ref{app:RL_Inversion_hs}) and is, to no surprise, based on the inverter described in~\cite[Fig.~19]{REV} and reproduced in Fig.~\ref{fig:inversion_rl}. The implementation covers the following cases:
 \begin{itemize}
   \item If we want to invert an RL program --- that is, a list of blocks --- we simply reverse the list of blocks and invert each individual block.
 
@@ -19,9 +30,22 @@ The implementation of the RL-specific inverter can be found in \texttt{Inversion
   \item The inversion of come-from assertions and jumps is rather simple. A \texttt{goto} becomes a \texttt{from}, an \texttt{if} becomes a \texttt{fi}, an exit becomes an entry and vice versa.
 \end{itemize}
 
+\begin{figure}
+  $$\begin{aligned}
+    & \mathcal{I}_{RL}\llbracket d^+\rrbracket & =\ & \mathcal{I}_{RL}\llbracket d\rrbracket^+\\
+    & \mathcal{I}_{RL}\llbracket l : k\ a^* j\rrbracket & =\ & l: \mathcal{I}_{jump}\llbracket j\rrbracket\ rev(\mathcal{I}_{step}\llbracket a\rrbracket^*)\ \mathcal{I}_{from}\llbracket k\rrbracket\\
+    & \mathcal{I}_{jump}\llbracket\texttt{goto }l\rrbracket & =\ & \texttt{from }l\\
+    & \mathcal{I}_{jump}\llbracket\texttt{if }e\texttt{ goto }l_1\texttt{ else }l_2\rrbracket & =\ & \texttt{fi }e\texttt{ from }l_1\texttt{ else }l_2\\
+    & \mathcal{I}_{jump}\llbracket\texttt{exit}\rrbracket & =\ & \texttt{entry}\\
+    & \mathcal{I}_{from}\llbracket k\rrbracket & =\ & \mathcal{I}_{jump}^{-1}\llbracket k\rrbracket\\
+  \end{aligned}$$
+  \caption{Inversion of RL.}
+  \label{fig:inversion_rl}
+\end{figure}
+
 \subsection{Inverting SRL Programs}
 
-The implementation of the SRL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_Inversion_hs}). This is, also to no surprise, based on the inverter presented in \cite[Fig.~18]{REV}. Note that inverting an SRL program corresponds to inverting a single block. The implementation covers the following cases:
+The implementation of the SRL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_Inversion_hs}). This is, also to no surprise, based on the inverter presented in \cite[Fig.~18]{REV} (and reproduced in Fig.~\ref{fig:inversion_srl}. Note that inverting an SRL program corresponds to inverting a single block. The implementation covers the following cases:
 
 \begin{itemize}
   \item If the block is a step operation, we simply invert the step operation as described in section~\ref{sec:invcommon}.
@@ -33,7 +57,7 @@ The implementation of the SRL-specific inverter can be found in \texttt{Inversio
   \item Finally, if the block is a sequence of two blocks, we invert each block individually and reverse the order.
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}
   $$\begin{aligned}
     & \mathcal{I}_{SRL}\llbracket b_1\ b_2\rrbracket & =\ & \mathcal{I}_{SRL}\llbracket b_2\rrbracket\ \mathcal{I}_{SRL}\llbracket b_1\rrbracket\\
     & \mathcal{I}_{SRL}\llbracket\texttt{if }e_1\texttt{ then }b_1\texttt{ else }b_2\texttt{ fi }e_2\rrbracket & =\ &
@@ -44,29 +68,4 @@ The implementation of the SRL-specific inverter can be found in \texttt{Inversio
   \end{aligned}$$
   \caption{Inversion of SRL.}
   \label{fig:inversion_srl}
-\end{figure}
-
-\begin{figure}[H]
-  $$\begin{aligned}
-    & \mathcal{I}_{RL}\llbracket d^+\rrbracket & =\ & \mathcal{I}_{RL}\llbracket d\rrbracket^+\\
-    & \mathcal{I}_{RL}\llbracket l : k a^* j\rrbracket & =\ & l: \mathcal{I}_{jump}\llbracket j\rrbracket\ rev(\mathcal{I}_{step}\llbracket a\rrbracket^*)\ \mathcal{I}_{from}\llbracket k\rrbracket\\
-    & \mathcal{I}_{jump}\llbracket\texttt{goto }l\rrbracket & =\ & \texttt{from }l\\
-    & \mathcal{I}_{jump}\llbracket\texttt{if }e\texttt{ goto }l_1\texttt{ else }l_2\rrbracket & =\ & \texttt{fi }e\texttt{ from }l_1\texttt{ else }l_2\\
-    & \mathcal{I}_{jump}\llbracket\texttt{exit}\rrbracket & =\ & \texttt{entry}\\
-    & \mathcal{I}_{from}\llbracket k\rrbracket & =\ & \mathcal{I}_{jump}^{-1}\llbracket k\rrbracket\\
-  \end{aligned}$$
-  \caption{Inversion of RL.}
-  \label{fig:inversion_rl}
-\end{figure}
-
-\begin{figure}[H]
-  $$\begin{aligned}
-    & \mathcal{I}_{step}\llbracket x \mathrel{\oplus}= e\rrbracket & =\ & x \mathrel{\ominus}= e & & \text{where }\ominus = \mathcal{I}_{op}\llbracket\oplus\rrbracket & \quad & \mathcal{I}_{op}\llbracket +\rrbracket = -\\
-    & \mathcal{I}_{step}\llbracket x[e_1] \mathrel{\oplus}= e_2\rrbracket & =\ & x[e_1] \mathrel{\ominus}= e_2 & & \text{where }\ominus = \mathcal{I}_{op}\llbracket\oplus\rrbracket & \quad & \mathcal{I}_{op}\llbracket -\rrbracket = +\\
-    & \mathcal{I}\llbracket\texttt{push }x_1\ x_2\rrbracket & =\ & \texttt{pop }x_1\ x_2 & & & \quad & \mathcal{I}_{op}\llbracket \mathrm{\textasciicircum}\rrbracket = \mathrm{\textasciicircum}\\
-    & \mathcal{I}\llbracket\texttt{pop }x_1\ x_2\rrbracket & =\ & \texttt{push }x_1\ x_2\\
-    & \mathcal{I}\llbracket\texttt{skip}\rrbracket & =\ & \texttt{skip}\\
-  \end{aligned}$$
-  \caption{Inversion of common parts.}
-  \label{fig:inversion_rl}
 \end{figure}
