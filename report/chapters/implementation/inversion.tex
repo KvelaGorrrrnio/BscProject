@@ -32,3 +32,41 @@ The implementation of the SRL-specific inverter can be found in \texttt{Inversio
 
   \item Finally, if the block is a sequence of two blocks, we invert each block individually and reverse the order.
 \end{itemize}
+
+\begin{figure}[H]
+  $$\begin{aligned}
+    & \mathcal{I}_{SRL}\llbracket b_1\ b_2\rrbracket & =\ & \mathcal{I}_{SRL}\llbracket b_2\rrbracket\ \mathcal{I}_{SRL}\llbracket b_1\rrbracket\\
+    & \mathcal{I}_{SRL}\llbracket\texttt{if }e_1\texttt{ then }b_1\texttt{ else }b_2\texttt{ fi }e_2\rrbracket & =\ &
+      \texttt{if }e_2\texttt{ then }\mathcal{I}_{SRL}\llbracket b_1\rrbracket\texttt{ else }\mathcal{I}_{SRL}\llbracket b_2\rrbracket\texttt{ fi }e_1\\
+    & \mathcal{I}_{SRL}\llbracket\texttt{from }e_1\texttt{ do }b_1\texttt{ loop }b_2\texttt{ until }e_2\rrbracket & =\ &
+      \texttt{from }e_2\texttt{ do }\mathcal{I}_{SRL}\llbracket b_1\rrbracket\texttt{ loop }\mathcal{I}_{SRL}\llbracket b_2\rrbracket\texttt{ until }e_1\\
+    & \mathcal{I}_{SRL}\llbracket a\rrbracket & =\ & \mathcal{I}_{step}\llbracket a\rrbracket\\
+  \end{aligned}$$
+  \caption{Inversion of SRL.}
+  \label{fig:inversion_srl}
+\end{figure}
+
+\begin{figure}[H]
+  $$\begin{aligned}
+    & \mathcal{I}_{RL}\llbracket d^+\rrbracket & =\ & \mathcal{I}_{RL}\llbracket d\rrbracket^+\\
+    & \mathcal{I}_{RL}\llbracket l : k a^* j\rrbracket & =\ & l: \mathcal{I}_{jump}\llbracket j\rrbracket\ rev(\mathcal{I}_{step}\llbracket a\rrbracket^*)\ \mathcal{I}_{from}\llbracket k\rrbracket\\
+    & \mathcal{I}_{jump}\llbracket\texttt{goto }l\rrbracket & =\ & \texttt{from }l\\
+    & \mathcal{I}_{jump}\llbracket\texttt{if }e\texttt{ goto }l_1\texttt{ else }l_2\rrbracket & =\ & \texttt{fi }e\texttt{ from }l_1\texttt{ else }l_2\\
+    & \mathcal{I}_{jump}\llbracket\texttt{exit}\rrbracket & =\ & \texttt{entry}\\
+    & \mathcal{I}_{from}\llbracket k\rrbracket & =\ & \mathcal{I}_{jump}^{-1}\llbracket k\rrbracket\\
+  \end{aligned}$$
+  \caption{Inversion of RL.}
+  \label{fig:inversion_rl}
+\end{figure}
+
+\begin{figure}[H]
+  $$\begin{aligned}
+    & \mathcal{I}_{step}\llbracket x \mathrel{\oplus}= e\rrbracket & =\ & x \mathrel{\ominus}= e & & \text{where }\ominus = \mathcal{I}_{op}\llbracket\oplus\rrbracket & \quad & \mathcal{I}_{op}\llbracket +\rrbracket = -\\
+    & \mathcal{I}_{step}\llbracket x[e_1] \mathrel{\oplus}= e_2\rrbracket & =\ & x[e_1] \mathrel{\ominus}= e_2 & & \text{where }\ominus = \mathcal{I}_{op}\llbracket\oplus\rrbracket & \quad & \mathcal{I}_{op}\llbracket -\rrbracket = +\\
+    & \mathcal{I}\llbracket\texttt{push }x_1\ x_2\rrbracket & =\ & \texttt{pop }x_1\ x_2 & & & \quad & \mathcal{I}_{op}\llbracket \mathrm{\textasciicircum}\rrbracket = \mathrm{\textasciicircum}\\
+    & \mathcal{I}\llbracket\texttt{pop }x_1\ x_2\rrbracket & =\ & \texttt{push }x_1\ x_2\\
+    & \mathcal{I}\llbracket\texttt{skip}\rrbracket & =\ & \texttt{skip}\\
+  \end{aligned}$$
+  \caption{Inversion of common parts.}
+  \label{fig:inversion_rl}
+\end{figure}
