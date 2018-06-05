@@ -188,7 +188,7 @@ exec (Init id exps p) = do
           ListV ls t  -> return $ ListV (replicate (fromIntegral n) acc) (ListT t)
           IntV _      -> return $ ListV (replicate (fromIntegral n) acc) (ListT IntT)
         | otherwise -> logError (getExpPos e) NegativeDimension
-      ListV _ t  -> logError (getExpPos e) $ NonIntegerDimension t -- TODO: Maybe List t
+      ListV _ t  -> logError (getExpPos e) $ NonIntegerDimension t
 
 -- freeing a list
 exec (Free id exps p) = do
