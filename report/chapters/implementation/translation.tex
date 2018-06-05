@@ -1,12 +1,36 @@
 % Translation
 \section{Program Translation}
-Translating a program from one of the two languages to the other is not quite as simple as inverting a program. However, after proving what it calls the Reversible Structured Program Theorem --- that is, the Structured Program Theorem for reversible languages --- the paper \cite{REV} presents a program translator for each of the languages, which, if followed closely, makes the task of translating the languages more doable.
+Translating a program from one of the two languages to the other is not quite as simple as inverting a program. However, after proving what we may call the Reversible Structured Program Theorem --- that is, the Structured Program Theorem for reversible languages --- the paper \cite{REV} presents a program translator for each of the languages, which, if followed closely, makes the task of translating the languages more doable.
 
 \subsection{SRL to RL}
 
 Generally speaking, translating a structured program in one language to an unstructured program in (possibly) another language is pretty straightforward. When and where to jump depending on the control structure is very well defined. Dealing with a reversible language is not much diffierent.
 
-\cite[Fig.~21]{REV} shows the exact translator from SRL to RL which is implemented in \texttt{Translation.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_Translation_hs}); To translate an SRL program, we start by creating the entry- and exit blocks of the resulting RL program with fresh labels. We then translate the main SRL block and put the result between these. We feed the entry- and exit labels as arguments to the translation of the main block along with two additional fresh labels which will each be assigned to an RL block later in the translation. The intuition in the block translator is that we always receive 4 labels; the first and last labels have been assigned to prevously generated blocks and indicate where we come from and where we are jumping to, respectively, but labels two and three have yet to be assigned. Translating an SRL block naturally depends on which type of block it is:
+\cite[Fig.~21]{REV} shows the exact translator (shown reproduced in Fig.~\ref{fig:translation_srl_to_rl}) from SRL to RL which is implemented in \texttt{Translation.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_Translation_hs}); To translate an SRL program, we start by creating the entry- and exit blocks of the resulting RL program with fresh labels. We then translate the main SRL block and put the result between these. We feed the entry- and exit labels as arguments to the translation of the main block along with two additional fresh labels which will each be assigned to an RL block later in the translation. The intuition in the block translator is that we always receive 4 labels; the first and last labels have been assigned to prevously generated blocks and indicate where we come from and where we are jumping to, respectively, but labels two and three have yet to be assigned. Translating an SRL block naturally depends on which type of block it is:
+\begin{figure}
+  $$\begin{aligned}
+    & \mathcal{T}_{SRL}\llbracket b\rrbracket =        &  \quad  & \mathcal{T}\llbracket\begin{matrix}\texttt{if }e_1\texttt{ then }b_1\\\texttt{else }b_2\texttt{ fi }e_2\end{matrix}\rrbracket(l_0,l_1,l_6,l_7) = \\
+    & \quad l_0: \texttt{entry}                          &         & \quad l_1:  \texttt{from }l_0 \\
+    & \quad \ \ \ \ \ \texttt{goto }l_1                      &         & \quad \ \ \ \ \ \texttt{if }e_1\texttt{ goto }l_2\texttt{ else }l_4\\
+    & \quad \mathcal{T}\llbracket b\rrbracket(l_0,l_1,l_2,l_3) & & \quad \mathcal{T}\llbracket b_1\rrbracket(l_1,l_2,l_3,l_6)\\
+    & \quad l_3: \texttt{from }l_2                       &         & \quad \mathcal{T}\llbracket b_2\rrbracket(l_1,l_4,l_5,l_6)\\
+    & \quad \ \ \ \ \ \texttt{exit}                          &         & \quad l_6: \texttt{fi }e_2\texttt{ from }l_3\texttt{ else }l_5\\
+    & \quad \text{where $l_0,l_1,l_2,l_3$ are fresh}   &         & \quad \ \ \ \ \ \texttt{goto }l_7\\
+    &                                                  &         & \quad \text{where $l_2,l_3,l_4,l_5$ are fresh}\\
+    & \mathcal{T}\llbracket b_1\ b_2\rrbracket(l_0,l_1,l_4,l_5) = \\
+    & \quad \begin{matrix*}[l]\mathcal{T}\llbracket b_1\rrbracket(l_0,l_1,l_2,l_3)\\\mathcal{T}\llbracket b_2\rrbracket(l_2,l_3,l_4,l_5)\end{matrix*} & & \mathcal{T}\llbracket\begin{matrix*}[l]\texttt{from }e_1\texttt{ do }b_1\\\texttt{loop }b_2\texttt{ until }e_2\end{matrix*}\rrbracket(l_0,l_1,l_4,l_7) = \\
+    & \quad \text{where $l_2,l_3$ are fresh}                     & & \quad l_1: \texttt{fi }e_1\texttt{ from }l_0\texttt{ else }l_6\\
+    &                                                            & & \quad \ \ \ \ \ \texttt{goto }l_2\\
+    & \mathcal{T}\llbracket a\rrbracket(l_0,l_1,l_2,l_3) =       & & \quad \mathcal{T}\llbracket b_1\rrbracket(l_1,l_2,l_3,l_4)\\
+    & \quad l_1: \texttt{from }l_0                               & & \quad \mathcal{T}\llbracket b_2\rrbracket(l_4,l_5,l_6,l_1)\\
+    & \quad \ \ \ \ \ a                                          & & \quad l_4: \texttt{from }l_3\\
+    & \quad \ \ \ \ \ \texttt{goto} \ l_2                        & & \quad \ \ \ \ \ \texttt{if }e_2\texttt{ goto }l_7\texttt{ else }l_5\\
+    & \quad l_2: \texttt{from } l_1                              & & \quad \text{where $l_2,l_3,l_5,l_6$ are fresh}\\
+    & \quad \ \ \ \ \ \texttt{goto } l_3
+  \end{aligned}$$
+  \caption{Translation from SRL to RL.}
+  \label{fig:translation_srl_to_rl}
+\end{figure}
 \begin{itemize}
   \item If we have a step operation, we simply generate two blocks from the two unassigned labels: one that contains the step operation and one that contains a skip. The first of these will be coming from the first assigned label and have an unconditional jump to the next. This next block will naturally be coming from the first RL block, but have a jump to the last assigned label.
   \item If we have a conditional SRL block we first generate two RL blocks corresponding to the branch (conditional jump) and the join point (conditional come-from assertion), and between these we individually translate both branches contained in the conditional SRL block. These are then connected to the generated start- and end blocks with the given labels and four fresh ones.
@@ -23,8 +47,41 @@ Looking at the implementation, one may notice that we use a monad transformer co
 % vis, hvordan det er implementeret nærmest 1:1
 % dog med setup og alt muligt
 
-Unfortunately, translating an unstructured program in one language to a structured program in (possibly) another language is not as straightforward. Deciding whether a certain pattern of conditional jumps forms a loop or or an if-then-else body is not a trivial. Reversible languages are no different; translating an RL program to a corresponding SRL program is a messy affair. However, the paper \cite[Fig.~22]{REV} presents a very neat translator for RL that is, in fact, quite intuitive: We simply keep track of an $(n+1) \times (n+1) \times 3$ table (where $n$ is the number of blocks in the original RL program) of boolean state values which indicates where we are, and where we came from, in our program. The extra row and column are `imaginary states which simulate where we come from when reaching the entry and where we go after reaching the exit. The number $3$ comes from simulating either (0) the come-from assertion (1) the step operations (2) the jump. We construct a resulting SRL program which consists of one single loop with one or more conditional blocks. Each of these will simply check (in the table of states) if we are in a certain RL block from the original program. If we are, we perform the operations associated with this RL block and flip the states in the table corresponding the unstructured jump. One may argue that this is not as much a translation as it is a simulation; however, we will not go further into that discussion.
-
+Unfortunately, translating an unstructured program in one language to a structured program in (possibly) another language is not as straightforward. Deciding whether a certain pattern of conditional jumps forms a loop or or an if-then-else body is not a trivial. Reversible languages are no different; translating an RL program to a corresponding SRL program is a messy affair. However, the paper \cite[Fig.~22]{REV} presents a very neat translator (reproduced in Fig.~\ref{fig:translation_rl_to_srl}) for RL that is, in fact, quite intuitive: We simply keep track of an $(n+1) \times (n+1) \times 3$ table (where $n$ is the number of blocks in the original RL program) of boolean state values which indicates where we are, and where we came from, in our program. The extra row and column are `imaginary states which simulate where we come from when reaching the entry and where we go after reaching the exit. The number $3$ comes from simulating either (0) the come-from assertion (1) the step operations (2) the jump. We construct a resulting SRL program which consists of one single loop with one or more conditional blocks. Each of these will simply check (in the table of states) if we are in a certain RL block from the original program. If we are, we perform the operations associated with this RL block and flip the states in the table corresponding the unstructured jump. One may argue that this is not as much a translation as it is a simulation; however, we will not go further into that discussion.
+\begin{figure}
+  $$\begin{aligned}
+    & \mathcal{T}_{RL}\llbracket q\rrbracket  & =\ & \texttt{if } \land_{i=0}^n\land_{j=1}^{n+1}\land_{k=0}^2\neg x_{i,j}^k\texttt{ fi true}\\
+    &                                         &    & x_{0,1}^{0} \xoreq \texttt{true}\\
+    &                                         &    & \texttt{from }x_{0,1}^0\texttt{ do}\\
+    &                                         &    & \quad \mathcal{T}_{blks}\llbracket q\rrbracket\\
+    &                                         &    & \texttt{until } x_{n,n+1}^0\\
+    &                                         &    & x_{n,n+1}^0 \xoreq \texttt{ true}\\
+    &                                         &    & \texttt{if } \land_{i=0}^n\land_{j=1}^{n+1}\land_{k=0}^2\neg x_{i,j}^k\texttt{ fi true}\\
+    & \mathcal{T}_{blks}\llbracket d_1\ d_2\ \dots\ d_n\rrbracket & =\ &
+      \mathcal{T}_{blk}\llbracket d_1 \rrbracket(\mathcal{T}_{blk}\llbracket d_2\rrbracket(\dots(\mathcal{T}_{blk}\llbracket d_n\rrbracket(E_\texttt{false}))\dots))\\
+    & \mathcal{T}_{blk}\llbracket l_i : k a^* j \rrbracket(F) & =\ &
+      \mathcal{T}_{flow}\llbracket k\rrbracket(i,\mathcal{T}_{steps}\llbracket a^*\rrbracket(i,\mathcal{T}_{flow}\llbracket j\rrbracket(i,F)))\\
+    & \mathcal{T}_{flow}\llbracket\begin{matrix*}[r]\texttt{fi }e\texttt{ from }l_j\\\texttt{else }l_k\end{matrix*}\rrbracket(i,F) & =\ &
+      \begin{matrix*}[l]
+        \texttt{if }x_{j,i}^0\lor x_{k,i}^0\texttt{ then}\\
+        \quad\text{if }x_{j,i}^0\texttt{ then }P_{j,i}\texttt{ else }P_{k,i}\texttt{ fi }e\\
+        \texttt{else }F\texttt{ fi }x_{i,i}^1\\
+      \end{matrix*}\\
+    & \mathcal{T}_{flow}\llbracket\begin{matrix*}[r]\texttt{if }e\texttt{ goto }l_j\\\texttt{else }l_k\end{matrix*}\rrbracket(i,F) & =\ &
+      \begin{matrix*}[l]
+        \texttt{if }x_{i,i}^2\texttt{ then}\\
+        \quad\text{if }e\texttt{ then }R_{i,j}\texttt{ else }R_{i,k}\texttt{ fi }x_{i,j}^0\\
+        \texttt{else }F\texttt{ fi }x_{i,j}^0\lor x_{i,k}^0\\
+      \end{matrix*}\\
+    & \mathcal{T}_{flow}\llbracket\texttt{from }l_j\rrbracket(i,F) & =\ & \texttt{if }x_{j,i}^0\texttt{ then }P_{j,i}\texttt{ else }F\texttt{ fi }x_{i,i}^1\\
+    & \mathcal{T}_{flow}\llbracket\texttt{goto }l_j\rrbracket(i,F) & =\ & \texttt{if }x_{i,i}^2\texttt{ then }R_{i,j}\texttt{ else }F\texttt{ fi }x_{i,j}^0\\
+    & \mathcal{T}_{flow}\llbracket\texttt{entry}\rrbracket(1,F)    & =\ & \texttt{if }x_{0,1}^0\texttt{ then }P_{0,1}\texttt{ else }F\texttt{ fi }x_{1,1}^1\\
+    & \mathcal{T}_{flow}\llbracket\texttt{exit}\rrbracket(n,F)     & =\ & \texttt{if }x_{n,n}^2\texttt{ then }R_{n,n+1}\texttt{ else }F\texttt{ fi }x_{n,n+1}^0\\
+    & \mathcal{T}_{steps}\llbracket a^*\rrbracket(i,F)     & =\ & \texttt{if }x_{i,i}^1\texttt{ then }a^*\ ;\ P_{i,i}\texttt{ else }F\texttt{ fi }x_{i,i}^2\\
+  \end{aligned}$$
+  \caption{Translation from RL to SRL.}
+  \label{fig:translation_rl_to_srl}
+\end{figure}
 \texttt{Translation.hs} under the \textit{RL} module (Appendix~\ref{app:RL_Translation_hs}) contains the implementation of the translator from RL to SRL; When translating an RL program, we will first set up the state table, the entry assertion, the main loop, and the exit assertion of the resulting SRL program. The entry assertion is simply a sanity check which makes sure that the state table has no true entry at the beginning of the program. Likewise, the exit assertion makes sure that no entry in the state table is true at program exit. Furthermore, before entering the loop, and after asserting the entry condition, we set the imaginary starting state to true if it was previously false and false otherwise, and after the loop, before asserting the exit condition, we set the imaginary ending state to false if it was previously true and false otherwise. Thus, the exit assertion will halt the program with a runtime error if the simulation of the program did not go as expected. Finally, inside the loop, we will put the translation of the list of RL blocks.
 
 Translating a list of blocks corresponds to translating the last block of the list with $E_{false}$ as argument, then using the result as argument when translating the second to last block in the list, etc. This can be achieved by simply folding the list from right to left using block translation as the operator and $E_{false}$ as starting value. $E_{false}$ is defined in the paper as an edge block (\texttt{if 0 then skip else skip fi 1}) that should halt the program if reached.
@@ -75,63 +132,3 @@ One may notice that we use the reader monad for this implementation. This lets u
   \caption{Growth of a program for each translation.}\label{fig:linesfig}% ($10.1e^{1.45x}$)
 \end{wrapfigure}
 The translators described in the previous sections are very interesting, but not ideal in practice. When translating from SRL to RL, a \textit{lot} of blocks are produced. When translating from RL to SRL, a large loop of \textit{lots} of conditional blocks is produced. In fact, when translating back and forth multiple times, we will start to see an exponential growth on the number of lines of the resulting program. Fig.~\ref{fig:linesfig} shows the actual growth in number of lines of two programs; \texttt{fib.srl}, which consists of $l_0=10$ lines, and \texttt{skip}, which consists of a $l_0=1$ line. As we see, after translating \texttt{fib.srl} and \texttt{skip.srl} six times the resulting programs will consist of more than $60,000$ and $20,000$ lines, respectively! As we will dicuss later, this makes room for a lot of optimisation.
-
-\begin{figure}[H]
-  $$\begin{aligned}
-    & \mathcal{T}_{SRL}\llbracket b\rrbracket =        &  \quad  & \mathcal{T}\llbracket\begin{matrix}\texttt{if }e_1\texttt{ then }b_1\\\texttt{else }b_2\texttt{ fi }e_2\end{matrix}\rrbracket(l_0,l_1,l_6,l_7) = \\
-    & \quad l_0: \texttt{entry}                          &         & \quad l_1:  \texttt{from }l_0 \\
-    & \quad \quad \texttt{goto }l_1                      &         & \quad \quad \texttt{if }e_1\texttt{ goto }l_2\texttt{ else }l_4\\
-    & \quad \mathcal{T}\llbracket b\rrbracket(l_0,l_1,l_2,l_3) & & \quad \mathcal{T}\llbracket b_1\rrbracket(l_1,l_2,l_3,l_6)\\
-    & \quad l_3: \texttt{from }l_2                       &         & \quad \mathcal{T}\llbracket b_2\rrbracket(l_1,l_4,l_5,l_6)\\
-    & \quad \quad \texttt{exit}                          &         & \quad l_6: \texttt{fi }e_2\texttt{ from }l_3\texttt{ else }l_5\\
-    & \quad \texttt{where $l_0,l_1,l_2,l_3$ are fresh}   &         & \quad \quad \texttt{goto }l_7\\
-    &                                                  &         & \quad \texttt{where $l_2,l_3,l_4,l_5$ are fresh}\\
-    & \mathcal{T}\llbracket b_1\ b_2\rrbracket(l_0,l_1,l_4,l_5) = \\
-    & \quad \mathcal{T}\llbracket b_1\rrbracket(l_0,l_1,l_2,l_3) & & \mathcal{T}\llbracket\begin{matrix*}[l]\texttt{from }e_1\texttt{ do }b_1\\\texttt{loop }b_2\texttt{ until }e_2\end{matrix*}\rrbracket(l_0,l_1,l_4,l_7) = \\
-    & \quad \mathcal{T}\llbracket b_2\rrbracket(l_2,l_3,l_4,l_5) & & \quad l_1: \texttt{fi }e_1\texttt{ from }l_0\texttt{ else }l_6\\
-    & \quad \texttt{where $l_2,l_3$ are fresh}                     & & \quad \quad \texttt{goto }l_2\\
-    &                                                            & & \quad \mathcal{T}\llbracket b_1\rrbracket(l_1,l_2,l_3,l_4)\\
-    & \mathcal{T}\llbracket a\rrbracket(l_0,l_1,l_2,l_3) =       & & \quad \mathcal{T}\llbracket b_2\rrbracket(l_4,l_5,l_6,l_1)\\
-    & \quad l_1: \texttt{from }l_0                                 & & \quad l_4: \texttt{from }l_3\\
-    & \quad \quad a                                              & & \quad \quad \texttt{if }e_2\texttt{ goto }l_7\texttt{ else }l_5\\
-    & \quad l_2: \texttt{from } l_1                                & & \quad \texttt{where $l_2,l_3,l_5,l_6$ are fresh}\\
-    & \quad \quad \texttt{goto } l_3\\
-  \end{aligned}$$
-  \caption{Translation from SRL to RL.}
-  \label{fig:translation_srl_to_rl}
-\end{figure}
-
-\begin{figure}[H]
-  $$\begin{aligned}
-    & \mathcal{T}_{RL}\llbracket q\rrbracket  & =\ & \texttt{if } \land_{i=0}^n\land_{j=1}^{n+1}\land_{k=0}^2\neg x_{i,j}^k\texttt{ fi true}\\
-    &                                         &    & x{0,1}^{0} \xoreq \texttt{true}\\
-    &                                         &    & \texttt{from }x_{0,1}^0\texttt{ do}\\
-    &                                         &    & \quad \mathcal{T}_{blks}\llbracket q\rrbracket\\
-    &                                         &    & \texttt{until } n_{n,n+1}^0\\
-    &                                         &    & x_{n,n+1}^0 \xoreq \texttt{ true}\\
-    &                                         &    & \texttt{if } \land_{i=1}^n\land_{j=0}^{n+1}\land_{k=0}^2\neg x_{i,j}^k\texttt{ fi true}\\
-    & \mathcal{T}_{blks}\llbracket d_1\ d_2\ \dots\ d_n\rrbracket & =\ &
-      \mathcal{T}_{blk}\llbracket d_1 \rrbracket(\mathcal{T}_{blk}\llbracket d_2\rrbracket(\dots(\mathcal{T}_{blk}\llbracket d_n\rrbracket(E_\texttt{false}))\dots))\\
-    & \mathcal{T}_{blk}\llbracket l_i : k a^* j \rrbracket(F) & =\ &
-      \mathcal{T}_{flow}\llbracket k\rrbracket(i,\mathcal{T}_{steps}\llbracket a^*\rrbracket(i,\mathcal{T}_{flow}\llbracket j\rrbracket(i,F)))\\
-    & \mathcal{T}_{flow}\llbracket\begin{matrix*}[r]\texttt{fi }e\texttt{ from }l_j\\\texttt{else }l_k\end{matrix*}\rrbracket(i,F) & =\ &
-      \begin{matrix*}[l]
-        \texttt{if }x_{j,i}^0\lor x_{k,i}^0\texttt{ then}\\
-        \quad\text{if }x_{j,i}^0\texttt{ then }P_{j,i}\texttt{ else }P_{k,i}\texttt{ fi }e\\
-        \texttt{else }F\texttt{ fi }x_{i,i}^1\\
-      \end{matrix*}\\
-    & \mathcal{T}_{flow}\llbracket\begin{matrix*}[r]\texttt{if }e\texttt{ goto }l_j\\\texttt{else }l_k\end{matrix*}\rrbracket(i,F) & =\ &
-      \begin{matrix*}[l]
-        \texttt{if }x_{i,i}^2\texttt{ then}\\
-        \quad\text{if }e\texttt{ then }R_{i,j}\texttt{ else }R_{i,k}\texttt{ fi }x_{i,j}^0\\
-        \texttt{else }F\texttt{ fi }x_{i,j}^0\lor x_{i,k}^0\\
-      \end{matrix*}\\
-    & \mathcal{T}_{flow}\llbracket\texttt{from }l_j\rrbracket(i,F) & =\ & \texttt{if }x_{j,i}^0\texttt{ then }P_{j,i}\texttt{ else }F\texttt{ fi }x_{i,i}^1\\
-    & \mathcal{T}_{flow}\llbracket\texttt{goto }l_j\rrbracket(i,F) & =\ & \texttt{if }x_{i,i}^2\texttt{ then }R_{i,j}\texttt{ else }F\texttt{ fi }x_{i,j}^0\\
-    & \mathcal{T}_{flow}\llbracket\texttt{entry}\rrbracket(1,F)    & =\ & \texttt{if }x_{0,1}^0\texttt{ then }P_{0,1}\texttt{ else }F\texttt{ fi }x_{1,1}^1\\
-    & \mathcal{T}_{flow}\llbracket\texttt{exit}\rrbracket(n,F)     & =\ & \texttt{if }x_{n,n}^2\texttt{ then }R_{n,n+1}\texttt{ else }F\texttt{ fi }x_{n,n+1}^0\\
-    & \mathcal{T}_{flow}\llbracket a^*\rrbracket(i,F)     & =\ & \texttt{if }x_{i,i}^1\texttt{ then }P_{i,i}\texttt{ else }F\texttt{ fi }x_{i,i}^2\\
-  \end{aligned}$$
-  \caption{Translation from RL to SRL.}
-  \label{fig:translation_rl_to_srl}
-\end{figure}

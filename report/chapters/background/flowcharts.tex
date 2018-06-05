@@ -9,7 +9,7 @@ Flowcharts are a natural way to model imperative programs. Similarly, \textit{re
   \item[(b)] the \textit{test} passes the control flow to one of two outgoing edges depending on a predicate $e$, and
   \item[(c)] the \textit{assertion} joins two edges and passes the control flow depending on a predicate $e$.
 \end{description}
-\noindent The atomic operations (as illustrated in the paper) can be seen in Fig.~\ref{fig:atop}. Having these as elementary building blocks of our reversible flowcharts, it is trivial to invert a program; one simply has to invert each edge and, naturally, any step operation in the flowchart. This, in turn, means that the inversion of a test is an assertion and vice versa. The inversion of each atomic operation can be seen in Fig.~\ref{fig:atopinv}.
+\noindent The atomic operations (as illustrated in \cite[Fig.~2]{REV}) can be seen (reproduced) in Fig.~\ref{fig:atop}. Having these as elementary building blocks of our reversible flowcharts, it is trivial to invert a program; one simply has to invert each edge and, naturally, any step operation in the flowchart. This, in turn, means that the inversion of a test is an assertion and vice versa. The inversion of each atomic operation (as illustrated in \cite[Fig.~3]{REV}) can be seen in Fig.~\ref{fig:atopinv}.
 
 This outlines the basic theory behind these reversible flowcharts. We can put this theory into practice and yield a \textit{reversible flowchart language} --- an incarnation of reversible flowcharts. Two such languages are RL and SRL. %is the general idea of reversible flowcharts, and two incarnations of this model are RL and SRL.
 \begin{figure}
