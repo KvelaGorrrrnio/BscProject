@@ -168,16 +168,8 @@ We run the transpiled code with node and use the Express package for opening por
 All communication between the API server and the client-side is formatted as JSON; as are the results from the command-line interfaces.
 This way it is easy to parse data from the interpreter to the client interface via the API.
 
-The server has Cross Origin Resource Sharing (CORS) enabled, to allow for separation of the API server and the client web interface.
-This allows for the server to be hosted at one address, while the interface is hosted at another.
-CORS is enabled by setting the appropriate headers. That is,
-\lstinputlisting[language=javascript,firstline=10,firstnumber=10,lastline=15]{../web/server/server.js}
-The routing has two responsibilities: to handle API calls, which can be seen in Fig. \ref{fig:full_api}, and to serve static files when the client interface is requested. The defined routes are listed in Fig. \ref{fig:server_routes}. Routes are divided into 3 categories: API routes, root requests and static files; where static files are the bundled css and javascript files that the client interface requires.
-If the client interface is hosted at a different address than the API, the \path{/web/server/client} folder can be removed, causing the route for the index page and the static pages to respond with a 404 (page not found) status and page.
-In this case, to get the client to point to the correct API address, change the API\_URL found variable in \path{/web/client/webpack.prod.config.js} and rebuild the client interface.
-
-The API sub-URLs, along with their valid request method(s) and functionality, are described in Fig. \ref{fig:full_api}.
 \begin{figure}
+  \center
   \begin{tabular}{|l|l|p{6.7cm}|}\hline
     \textbf{Route} & \textbf{Method} & \textbf{Responsibility}\\\hline
     \texttt{/run/:language} & \texttt{POST} & Here \texttt{:language} can either be \texttt{rl} or \texttt{srl}.
@@ -199,6 +191,7 @@ The API sub-URLs, along with their valid request method(s) and functionality, ar
   \label{fig:full_api}
 \end{figure}
 \begin{figure}
+  \center
   \begin{tabular}{|l|p{8.7cm}|}\hline
     \textbf{Route} & \textbf{Responsibility}\\\hline
     \texttt{/}     & Fetch the built client interface index page from \path{/web/server/client/index.html}.\\\hline
@@ -208,6 +201,18 @@ The API sub-URLs, along with their valid request method(s) and functionality, ar
   \caption{Routes for web server.}
   \label{fig:server_routes}
 \end{figure}
+
+
+\pagebreak
+The server has Cross Origin Resource Sharing (CORS) enabled, to allow for separation of the API server and the client web interface.
+This allows for the server to be hosted at one address, while the interface is hosted at another.
+CORS is enabled by setting the appropriate headers. That is,
+\lstinputlisting[language=javascript,firstline=10,firstnumber=10,lastline=15]{../web/server/server.js}
+The routing has two responsibilities: to handle API calls, and to serve static files when the client interface is requested. The defined routes are listed in Fig. \ref{fig:server_routes}. Routes are divided into 3 categories: API routes, root requests and static files; where static files are the bundled css and javascript files that the client interface requires.
+If the client interface is hosted at a different address than the API, the \path{/web/server/client} folder can be removed, causing the route for the index page and the static pages to respond with a 404 (page not found) status and page.
+In this case, to get the client to point to the correct API address, change the API\_URL found variable in \path{/web/client/webpack.prod.config.js} and rebuild the client interface.
+
+The API sub-URLs, along with their valid request method(s) and functionality, are described in Fig. \ref{fig:full_api}.
 
 For accessing the command-line interfaces and fetching template files, the interface \texttt{execFile(file, [arguments], callback)} from the node module child\_process is used.
 \texttt{execFile} takes the arguments to the file as a list, where each element is treated as one argument.
