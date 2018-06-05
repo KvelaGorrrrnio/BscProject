@@ -1,46 +1,36 @@
 \section{Usage}
 
+Here, we will briefly describe how to use the applications that we have implemented.
+
 \subsection{Command-Line Interface}
 
-The Command-Line Interface for \texttt{rl} and \texttt{srl} are almost identitical, the only real difference is the naming (rl instead of srl, and vice versa).
-Thus only the interface for SRL will be described.
-Both Command-Line Interfaces has \texttt{--help} flags, which displays the different modes, options and flags, of which can be chosen and set.
+The command-line interfaces for \texttt{rl} and \texttt{srl} are, in fact, used in exactly the same way. The only difference between using the RL interpreter and the SRL interpreter is the name of the language in which the given program is written. For example, if we want to translate an SRL program \texttt{fib.srl}, we call \texttt{\$ srl translate fib.srl}.% Since RL can be used in the exact same way, only explaining the usage of the SRL should suffice.
 
-\noindent
-Firstly the executable is named \shcmd{$ srl}.
-There are 3 modes for the SRL interpreter, as described in Section \ref{sec:implementation_cli}.
-Modes are specified as the first argument. The default interface for SRL is \shcmd{$ srl [mode] <file.srl>}.
-For a quick recap the modes are:
-
+The command-line interfaces support, as briefly described in section~\ref{sec:implementation_cli}, three modes. The mode that we want to use must be specified as the first command-line argument. More specifically, we have the modes
 \begin{description}
 
-  \item[Run]~\\
-    Which interprets a SRL program. Run is the default mode, thus can be omitted.
-    To interpret the file my-first-script.srl we either call \shcmd{$ srl my-first-script.srl} or \shcmd{$ srl run my-first-script.srl}.
+  \item[Run] which simply interprets a program of the chosen language. Run is the default mode and can thus be omitted. For example, to interpret the file \texttt{fib.rl} we either call \texttt{\$ rl fib.rl} or \texttt{\$ rl run fib.rl}.
 
-  \item[Translate]~\\
-    Which translates a SRL program to RL.
-    To translate the file my-first-script.srl we call \shcmd{$ srl translate my-first-script.srl}.
+  \item[Translate] which translates a program from the chosen language to the other. To translate the file \texttt{fib.srl} we call \texttt{\$ srl translate fib.srl}.
 
-  \item[Invert]~\\
-    Which inverts a SRL program.
-    To invert the file my-first-script.srl we call\newline\shcmd{$ srl invert my-first-script.srl}.
+  \item[Invert] which inverts a program of the chosen language. To invert the file \texttt{fib.srl} we call \texttt{\$ srl invert fib.srl}.
 
 \end{description}
+Instead of using a filename as argument, a string of code can be given verbatim with the `code` option (given as \texttt{-c}), e.g. \texttt{\$ srl -c "[code]"}.  If we want the output formatted as JSON, we can set the `json` flag (given as \texttt{-j} or \texttt{{-}{-}json}).
 
-Instead of using a file as input, a string of SRL code can be given with the c option as \shcmd{$ srl -c "...SRL code..."}. This applies for all modes.
-If output is wanted as a json-format, set the -j or {-}{-}json flag.
-By default output is directed to stdout. Output can be redirected to a file with th -o option as \shcmd{$ srl input.srl -o output.ext}.
+By default, output is printed to stdout. It can, however, be redirected to a file with the `out` option (given as \texttt{-o}), e.g. \texttt{\$ srl input.srl -o output.ext}.
+
+These options apply for all modes.
+
+When interpreting a program we support one additional flag, namely \texttt{-l} (or \texttt{--log}). This will print a log of the program execution instead of simply the end state of the program. This is used for the step-by-step execution feature end the web interface.
 
 \subsection{Web Interface}
 
-For starting the web server, use \shcmd{$ make server}. This should yield an output ending with
+For starting the web server, use \texttt{\$ make server}. This should yield an output ending with
 \begin{lstlisting}
   Server has started.
   Web interface is running at http://localhost:3001.
 \end{lstlisting}
-
-\noindent
 After starting the server and the above-shown output has been printed, every api-call and index page requests to the server is logged to \texttt{stdout}.
 The log contains for each request timestamp and the requested path - along with information describing the outcome (erroneous or succesful).
 For shutting down the server, use \texttt{Ctrl-C}.
