@@ -26,7 +26,7 @@ class Result extends Component {
     }
     for (var i=this.props.stepState.index - 1; i >= 0; i--) {
       if ( this.props.result.log.table[i] !== undefined
-        && this.props.result.log.table[i].type == 'statement'
+        && this.props.result.log.table[i].type == 'step'
         && this.props.result.log.table[i].state.type == 'vartab') {
         return this.props.result.log.table[i].state.table;
       }
@@ -74,10 +74,10 @@ class Result extends Component {
             </div>
             <div className="log">
               <ul className={className}>
-                
+
                 { this.props.result.log.table.slice(0,this.props.stepState.index).reverse().map((row,idx) => {
-                  if (row.type == 'statement') return (
-                    <li key={idx}>{row.statement}</li>
+                  if (row.type == 'step') return (
+                    <li key={idx}>{row.step}</li>
                   );
                   return (<li key={idx}>{row.message}</li>);
                 }) }</ul>
