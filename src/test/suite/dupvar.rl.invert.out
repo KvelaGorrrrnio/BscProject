@@ -1,0 +1,7 @@
+int a
+list int a
+int b
+
+start: entry
+  b -= a
+exit

@@ -1,0 +1,41 @@
+int a
+int t
+list list list int t_
+
+init t_ [3,3,3]
+if (null t_) then
+  skip
+else
+  skip
+fi (1)
+t_[0,1,0] ^= 1
+from (t_[0,1,0]) do
+  if (t_[0,1,0]) then
+    swap t_[0,1,0] t_[1,1,1]
+  else
+  if (t_[1,1,1]) then
+    t += null a
+    a += null t
+    swap t_[1,1,1] t_[1,1,2]
+  else
+  if (t_[1,1,2]) then
+    swap t_[1,1,2] t_[1,2,0]
+  else
+  if (0) then
+    skip
+  else
+    skip
+  fi (1)
+  fi (t_[1,2,0])
+  fi (t_[1,1,2])
+  fi (t_[1,1,1])
+loop
+  skip
+until (t_[1,2,0])
+t_[1,2,0] ^= 1
+if (null t_) then
+  skip
+else
+  skip
+fi (1)
+free t_ [3,3,3]

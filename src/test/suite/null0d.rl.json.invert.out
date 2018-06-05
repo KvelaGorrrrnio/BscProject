@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int a\nint t\n\nstart: entry\n  a -= null t\n  t -= null a\nexit" }

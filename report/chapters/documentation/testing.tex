@@ -4,72 +4,62 @@
 \subsection{Command-Line Interface}
 
 %% Usage
-When located at the root of the project, tests for the interpreters/cli can be executed by \shcmd{$ make test}.
-For only getting output relevant for testing, build all targets with \shcmd{\$ make} before running the tests.
+When located at the root of the project, tests for the interpreters command-line interface can be executed by \texttt{\$ make test}.
+For only getting output relevant for testing, build all targets with \texttt{\$ make} before running the tests.
 
 %% Setup
-The test-system is being build and executed by \shcmd{$ stack test}.
-The test-system is written in Haskell and is located at \path{/src/test} in Lib.hs and Spec.hs, where Spec.hs is the entry point.
-The test-system searches for .rl and .srl files in \path{/src/test/suite}.
-For each script, every file with the script filename (including extension) prefixed and .out suffixed are listed.
-The script file along with all its .out files is a single test suite.
-Outfiles in a test-suite can have the formats described in the table below.
+The test system is being built and executed by running \texttt{\$ stack test}. It is written in Haskell and is located at \path{/src/test} in \texttt{Lib.hs} and \texttt{Spec.hs} where \texttt{Spec.hs} is the main entry point.
 
-\begin{figure}[H]
-  \center
+It works by fetching all RL- and SRL program files located in \path{/src/test/suite} and, for each of these, testing its output against some predefined output files. Every output file follows a certain naming convention defined loosely as something like \texttt{[script].[option].[mode].out}; this makes it easy for us to test every output of a single program systematically.
+Outfiles in a test-suite can have the formats described in the table below.
+\[
   \begin{tabular}{|l|l|}\hline
     \textbf{Format}             & \textbf{Expected command}\\\hline
-    test.srl.out                & \texttt{\$ srl.rl test.srl}\\\hline
-    test.srl.log.out            & \texttt{\$ srl.rl test.srl {-}{-}log}\\\hline
-    test.srl.invert.out         & \texttt{\$ srl.rl invert test.srl}\\\hline
-    test.srl.translate.out      & \texttt{\$ srl.rl translate test.srl}\\\hline
-    test.json.srl.out           & \texttt{\$ srl.rl test.srl {-}{-}json}\\\hline
-    test.json.srl.log.out       & \texttt{\$ srl.rl test.srl {-}{-}log {-}{-}json}\\\hline
-    test.json.srl.invert.out    & \texttt{\$ srl.rl invert test.srl {-}{-}json}\\\hline
-    test.json.srl.translate.out & \texttt{\$ srl.rl translate test.srl {-}{-}json}\\\hline
+    \texttt{test.srl.out}                & \texttt{\$ srl test.srl}\\\hline
+    \texttt{test.srl.log.out}            & \texttt{\$ srl test.srl {-}{-}log}\\\hline
+    \texttt{test.srl.invert.out}         & \texttt{\$ srl invert test.srl}\\\hline
+    \texttt{test.srl.translate.out}      & \texttt{\$ srl translate test.srl}\\\hline
+    \texttt{test.srl.json.out}           & \texttt{\$ srl test.srl {-}{-}json}\\\hline
+    \texttt{test.srl.json.log.out}       & \texttt{\$ srl test.srl {-}{-}log {-}{-}json}\\\hline
+    \texttt{test.srl.json.invert.out}    & \texttt{\$ srl invert test.srl {-}{-}json}\\\hline
+    \texttt{test.srl.json.translate.out} & \texttt{\$ srl translate test.srl {-}{-}json}\\\hline
   \end{tabular}
-  \caption{Possible outfiles for the file test.srl.}
-  \label{fig:test_suite_formats}
-\end{figure}
+  %\caption{Possible outfiles for the file test.srl.}
+  %\label{fig:test_suite_formats}
+\]
+There are currently written 51 test programs; some are trivial and written simply to test the behavior of specific features, and some are less trivial in order to test the overall usefulness of the implemented languages. Two of the less trivial programs are \texttt{phys} and \texttt{primefac}, written both in RL and SRL.
 
-There are currently written 45 tests, some trivial to test correct behavior of specific features, and some less trivial, to test the overall usefulness of the implemented languages.
-Two of the less trivial programs are phys and primefac, written both in RL and SRL.
+The \texttt{phys} program can be found in Appendix~\ref{app:phys_srl} (for the SRL version) and Appendix~\ref{app:phys_rl} (for the RL version).
+The program simulates a falling object from a height of \texttt{y} cm, here set to 16400, with a start velocity \texttt{v} of 0. To improve the precision when working with integers, we have defined a scale factor \texttt{S} to be 10,000.
 
-The phys program can be seen found in Appendix \ref{app:phys_srl} and \ref{app:phys_rl}.
-The programs simulate a drop from \texttt{y} cm, here set to 16400, with a start velocity \texttt{v} of 0.
-In the final state every value is scaled by 10,000.
-Here \texttt{y} denotes the distance bias, \texttt{v} is the final velocity and \texttt{s} is the duration of the fall in seconds.
-Running any the phys programs yield the following result.
-
-\begin{lstlisting}[language=sh]
+Running any of the \texttt{phys} program yields the following result:
+\begin{verbatim}
 S : 10000
 s : 57829
 v : 56730249
 y : -930
-\end{lstlisting}
+\end{verbatim}
+Simply put, according to our simulation the ball would have hit the ground around 5.783 seconds in with a final velocity of $56.73 \frac{m}{s}$. The variable denoting elapsed time and scale factor are not necessary, but they illustrate the accuracy of the precision.
 
-The primefac programs can be found in Appendix \ref{app:primefac_srl} and \ref{app:primefac_rl}.
-The programs calculates prime factorials for the given number \texttt{n}.
-\texttt{v} is the incrementing counter, to determine the prime factorials and \texttt{p} is the list containing the found numbers.
-In the final state \texttt{n} and \texttt{v} should be empty and \texttt{p} a list of prime factorials.
-Running any of the primefac programs yield the following result.
 
-\begin{lstlisting}[language=sh]
+The \texttt{primefac} program can be found in Appendix~\ref{app:primefac_srl} (for the SRL version) and Appendix~\ref{app:primefac_rl} (for the RL version). The program simply calculates the prime factors of a given number \texttt{n}. This instance of the program has \texttt{n} set to 1829. In the end state of the program, \texttt{n} and \texttt{v} should be empty and \texttt{p} a list of prime factors. Running any of the \texttt{primefac} programs yields the following result:
+\begin{verbatim}
 n : 0
 p : [31,59]
 v : 0
-\end{lstlisting}
+\end{verbatim}
+These are the exact prime factors of 1829.
 
 \subsection{Web Interface}
 
 %% Client: Packages (Mocha - Chai - Enzyme) - Kun leaf components
-The web client is not fully tested, but a test framework is set up and simple tests has been implemented. Components without direct access to application state has been tested. This includes the Button, Radio and Dropdown components.
+The web client is not fully tested, but a test framework is set up and simple tests have been implemented. Components without direct access to application state have been tested. This includes the Button, Radio and Dropdown components.
 These files can be found in Appendix \ref{app:test_web_files}.
 
 The framework uses Mocha as its test-framework, Chai as assertion-library and Enzyme for shallow-rendering of components (simulates the rendering of single component-tree).
-To run the tests, when standing at the root of the project, run the command \shcmd{$ make test-web}.
+To run the tests when standing at the root of the project, run the command \texttt{\$ make test-web}.
 This executes tests for both the client and server.
 
 %% Server: Not done yet. Same tool-chain som Client.
-For writing server tests, Mocha and Chai has been setup, but no tests has been written.
+For writing server tests, Mocha and Chai have been setup, but as of yet no tests have been written.
 

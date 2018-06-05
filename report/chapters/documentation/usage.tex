@@ -26,12 +26,13 @@ When interpreting a program we support one additional flag, namely \texttt{-l} (
 
 \subsection{Web Interface}
 
-For starting the web server, use \texttt{\$ make server}. This should yield an output ending with
-\begin{lstlisting}
+To start the web server from the root of the project, use \texttt{\$ make server}. This should yield an output ending with
+\begin{verbatim}
   Server has started.
   Web interface is running at http://localhost:3001.
-\end{lstlisting}
-After starting the server and the above-shown output has been printed, every api-call and index page requests to the server is logged to \texttt{stdout}.
-The log contains for each request timestamp and the requested path - along with information describing the outcome (erroneous or succesful).
-For shutting down the server, use \texttt{Ctrl-C}.
-Open the link \url{http://localhost:3001} in a browser, which should bring up the interface described in Section \ref{sec:implementation_web_client}.
+\end{verbatim}
+After starting the server and the above-shown output has been printed, every API-call and index page request to the server is logged to \texttt{stdout}.
+The log contains the timestamp and the path for each request --- along with the information describing the outcome (erroneous or succesful).
+
+
+To use the interface , simply go to \url{http://localhost:3001} in a web browser. Usage of the actual interface has been described in section~\ref{sec:implementation_web_client}, so we will not go into further detail regarding this. To shut down the server, use \texttt{Ctrl-C}.

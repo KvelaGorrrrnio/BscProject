@@ -1,0 +1,7 @@
+int a
+int t
+
+start: entry
+  a -= null t
+  t -= null a
+exit
