@@ -1,7 +1,7 @@
 cd ../../
 target=./report/chapters/appendices/webfiles.tex
 serverfiles=$(find web/server -maxdepth 1 -type f -name *.js | sort)
-clientfiles=$(find web/client/src -type f \( -name *.js -o -name *.jsx \) | sort)
+clientfiles=$(find web/client/src -type f \( -name *.js -o -name *.jsx \) -a -not -name download.js | sort)
 rm -f $target
 touch "$target"
 
