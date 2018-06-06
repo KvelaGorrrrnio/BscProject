@@ -1,12 +1,10 @@
 \chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion} \markboth{CONCLUSION}{}
 
-We have implemented the interpreters and the program transformations, for the reversible flowchart-languages RL and SRL, based on the theory described in the paper \cite{REV}.
-For interacting with the interpreters corresponding command-line and web interfaces have been implemented.
+We have, as proposed in the paper \cite{REV}, implemented the interpreters for the reversible flowchart languages RL and SRL along with their respective inverters and translators. Two interfaces for these have been designed and implemented; a command-line interface and a web-based interface. The behaviour of the implementation has been tested thoroughly, and the result has strongly indicated that the interpreters indeed work as intended.
 
-As our test suite indicates, the interpreters, with the full set of intended features implemented, behave as expected.
+Potential bottlenecks of the implementation have been identified and discussed; most notable are the representations of programs and the efficiency of the interpreters. Furthermore, we have proposed some ideas that could solve these problems. Further development is definitely justified.
 
-We have discussed plausible improvements to the project --- most notably optimising efficiency for the interpreters, for faster execution, and a new program transformation for optimising code, to remove or at least reduce the exponential growth in size upon translation between RL and SRL.
+%(Janus: \cite{JAN})
 
-(Janus: \cite{JAN})
-
-We have reached the goal of this project, by implementing functional interpreters with correct behaviour and interfaces for interacting with these.
+Thus, we have reached the goal of this project by implementing interpreters with correct behaviour and interfaces for interacting with these.
