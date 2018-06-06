@@ -33,7 +33,6 @@ data Mode --  FAILS JSON LOG
   = Run       Bool  Bool Bool
   | Invert    Bool  Bool
   | Translate Bool  Bool
-  | Typeof    Bool  Bool
   deriving Show
 
 type Suite  = (String,[OutFile])
@@ -58,22 +57,15 @@ listScripts SRL = concat <$> listFiles bdir ["*.srl"]
 
 getSuite :: String -> IO Suite
 getSuite f = listFiles bdir (patterns f) >>=
-  \[o,lo,io,tro,tyo,e,le,ie,tre,tye,jo,jlo,jio,jtro,jtyo] -> return (f,concat [
+  \[o,lo,io,tro,jo,jlo,jio,jtro] -> return (f,concat [
       map (flip OutFile $ Run False False False) o,
       map (flip OutFile $ Run False False True) lo,
       map (flip OutFile $ Invert False False) io,
       map (flip OutFile $ Translate False False) tro,
-      map (flip OutFile $ Typeof False False) tyo,
-      map (flip OutFile $ Run True False False) e,
-      map (flip OutFile $ Run True False True) le,
-      map (flip OutFile $ Invert True False) ie,
-      map (flip OutFile $ Translate True False) tre,
-      map (flip OutFile $ Typeof True False) tye,
       map (flip OutFile $ Run False True False) jo,
       map (flip OutFile $ Run False True True) jlo,
       map (flip OutFile $ Invert False True) jio,
-      map (flip OutFile $ Translate False True) jtro,
-      map (flip OutFile $ Typeof False True) jtyo
+      map (flip OutFile $ Translate False True) jtro
     ])
 
 getSuites :: [String] -> IO [Suite]
@@ -84,17 +76,10 @@ patterns f = map (f++)
   , ".log.out"
   , ".invert.out"
   , ".translate.out"
-  , ".typeof.out"
-  , ".err"
-  , ".log.err"
-  , ".invert.err"
-  , ".translate.err"
-  , ".typeof.err"
   , ".json.out"
   , ".json.log.out"
   , ".json.invert.out"
   , ".json.translate.out"
-  , ".json.typeof.out"
   ]
 
 type SuiteState = ExceptT String IO
@@ -159,7 +144,6 @@ getModeFlags :: Mode -> (String,Bool,Bool,Bool)
 getModeFlags (Run e j l)     = ("run",e,j,l)
 getModeFlags (Invert e j)    = ("invert",e,j,False)
 getModeFlags (Translate e j) = ("translate",e,j,False)
-getModeFlags (Typeof e j)    = ("typeof",e,j,False)
 
 trim :: String -> String
 trim = f . f
