@@ -1,11 +1,19 @@
-\addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
 \begin{appendices}
 \lstset{style=appendix}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+\makeatletter
+\addtocontents{toc}{%
+  \begingroup
+  \let\protect\l@chapter\protect\l@section
+  \let\protect\l@section\protect\l@subsection
+}
+\makeatother
   \input{chapters/appendices/interpreter}
   \input{chapters/appendices/web}
   \input{chapters/appendices/test}
   \input{chapters/appendices/ui}
 
+\addtocontents{toc}{\endgroup}
 \end{appendices}
 
 % Appendix
