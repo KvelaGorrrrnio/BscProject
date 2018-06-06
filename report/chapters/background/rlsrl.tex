@@ -7,7 +7,7 @@ Many common programming languages are forward deterministic. That is, no matter 
 
 Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps while SRL, as the name implies, is a similar language but with control structures and no unstructured jumps. The two languages share a common subset of features --- namely their expressions and step operations. The syntax of the two languages along with the common structures are given in~\cite[Fig.~12]{REV} and reproduced in Fig.~\ref{fig:rl_srl_syntax_and_structure}.
 
-As we see, RL, described in Fig.~\ref{fig:rlspec}, consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations and an unstructured jump to any block in the program. Come-from assertions can either be conditional, unconditional, or an entry point. Similarly, jumps can either be conditional, unconditional, or an exit point. Note that a well-formed RL program must contain exactly one entry and one exit.
+As we see, RL, described in Fig.~\ref{fig:rlspec}, consists of one or more (RL-)blocks, where each block is (uniquely) defined by a label and has a come-from assertion, zero or more step operations, and an unstructured jump to any block in the program. Come-from assertions can either be conditional, unconditional, or an entry point. Similarly, jumps can either be conditional, unconditional, or an exit point. Note that a well-formed RL program must contain exactly one entry and one exit.
 
 SRL is more linear; as we see in Fig.~\ref{fig:srlspec}, a program consists of exactly one \mbox{(SRL-)block}, where a block may either be an atomic step operation, a control structure --- that is, an \texttt{if}- or a \texttt{do-until} structure --- or recursively a sequence of two blocks. Sequences of blocks are executed in order, and thus, an SRL program looks a lot like a program written in common programming languages such as Python or C, to name a few. Note that a block in RL is different from a block in SRL.
 
@@ -19,24 +19,24 @@ As mentioned, the two languages share expressions and step operations along with
   \begin{itemize}
     \item A variable can either be mapped to an integer or to a list of integers.
     \item We only have integer literals; to obtain a certain list of integers, one has to bind each of the wanted values to a variable and push it to a list.
-    \item Boolean values are represented by integers. A non-zero integer value will evaluate to true, and a zero integer value will evaluate to false.
+    \item Boolean values are represented as integers. A non-zero integer value will evaluate to true, and a zero-cleared integer value will evaluate to false.
   \end{itemize}
   \item [Step operations]~\
   \begin{itemize}
-    \item To modify a variable, we have the variable update. The variable update only supports reversible operators, namely addition and subtraction. Indexing is supported in a single dimension. One rule is that the identifier being updated must not occur in the right-hand expression since such an update is irreversible.
+    \item To modify a variable, we have the variable update. The variable update only supports reversible operators, e.g. addition and subtraction. Indexing is supported in a single dimension. One rule is that the identifier being updated must not occur in the right-hand expression since a such update is irreversible.
     \item You can push the value of a variable onto a list with the \texttt{push} step operation. The variable being pushed must be zero-cleared afterwards.
     \item You can pop the top value from a list into a variable with the \texttt{pop} step operation. The variable must be zero-cleared beforehand.
     \item The \texttt{skip} step operation does nothing.
   \end{itemize}
   \item [Expressions]~\
   \begin{itemize}
-    \item We can have any arbitrary binary operator between two expressions, recursively.
+    \item Since expressions are not supposed to be inverted, we can support any arbitrary operator.
     \item An expression terminates with an integer literal or a variable lookup.
-    \item The \texttt{top} expression is unary and returns the top of the operand.
+    \item The \texttt{top} operator is unary and returns the top of the (list) operand.
     \item The \texttt{empty} predicate is unary and returns true if the operand is an empty list.
   \end{itemize}
 \end{description}
-Other incarnations of reversible flowcharts exist; Janus \cite{JAN} is a (structured) reversible programming language that can be said to have influenced RL and SRL considerably. This thesis will not discuss other reversible programming langauges any further.
+Other incarnations of reversible flowcharts exist; Janus \cite{JAN} is a structured reversible programming language that supports parameterised procedures. In fact, Janus can be said to have influenced RL and SRL considerably. However, this thesis will not discuss other reversible programming langauges any further.
 
 % figur der viser grammatikken her tak
 \begin{figure}[b!]

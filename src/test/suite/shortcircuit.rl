@@ -1,6 +1,6 @@
 /*
   This program should throw an error if short
-  cirquiting is not implemented correctly
+  circuiting is not implemented correctly
 */
 
 list int q
