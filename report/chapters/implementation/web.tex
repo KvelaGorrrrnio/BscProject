@@ -172,7 +172,7 @@ CORS is enabled by setting the appropriate headers. That is,
 \lstinputlisting[language=javascript,firstline=10,firstnumber=10,lastline=15]{../web/server/server.js}
 The routing has two responsibilities: to handle API calls, and to serve static files when the client interface is requested. The defined routes are listed in Fig. \ref{fig:server_routes}. Routes are divided into 3 categories: API routes, root requests and static files; where static files are the bundled css and javascript files that the client interface requires.
 If the client interface is hosted at a different address than the API, the \path{/web/server/client} folder can be removed, causing the route for the index page and the static pages to respond with a 404 (page not found) status and page.
-In this case, to get the client to point to the correct API address, change the API\_URL found variable in \path{/web/client/webpack.prod.config.js} and rebuild the client interface.
+In this case, to get the client to point to the correct API address, change the API\_URL found variable in \path{/web/client/webpack.prod.config.js}, found in Appendix~\ref{app:client_webpack_prod_config_js}, and rebuild the client interface.
 
 The API sub-URLs, along with their valid request method(s) and functionality, are described in Fig. \ref{fig:full_api}.
 
