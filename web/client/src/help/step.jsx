@@ -14,12 +14,12 @@ export default (<div>
       <tr>
         <td><img className='icon' src={stepIcon}/></td>
         <td>Next Step</td>
-        <td>Available in <b>Step</b> mode. Moves to the next statement in program.</td>
+        <td>Available in <b>Step</b> mode. Moves to the next step operation in program.</td>
       </tr>
       <tr>
         <td><img className='icon' src={stepPrevIcon}/></td>
         <td>Prev Step</td>
-        <td>Available in <b>Step</b> mode. Moves to the previous statement in program.</td>
+        <td>Available in <b>Step</b> mode. Moves to the previous step operation in program.</td>
       </tr>
       <tr>
         <td><img className='icon' src={stepAllIcon}/></td>
@@ -42,8 +42,8 @@ export default (<div>
 
   <h3>Result Window</h3>
   In the <b>Result Window</b> two windows are shown. The upper half is the current state of the executing program.
-  The lower half shows a statement log containing all executed statements. The top of the log is the most recent executed statement.<br/>
-  If the last statement of the program is executed, either the last statement and an error is shown with red highlighting on failure or the last statement with green highlighting on success.<br/>
+  The lower half shows a step operation log containing all executed step operations. The top of the log is the most recent executed step operation.<br/>
+  If the last step operation of the program is executed, either the last step operation and an error is shown with red highlighting on failure or the last step operation with green highlighting on success.<br/>
   Only runtime errors will be shown via the log. Parse errors and static errors will be shown in the <b>Error Window</b> (only visible when errors are present) below the <b>Code Window</b>.
 
 </div>);

@@ -15,7 +15,7 @@ export default (<div>
 
   <h3>Variables and types</h3>
   <b>RL</b> is an explicitly strongly typed language in which every program starts by declaring the variables that it uses.
-  Variables can only be declared at the start of the program, before any statements.
+  Variables can only be declared at the start of the program, before any step operations.
   There are two types in <b>RL</b>: <i>int</i> describing integers; <i>list t</i> describing lists, where t either is a nested <i>list</i> type or an <i>int</i> type.
   Thus we see that <b>RL</b> supports multidimensional integer lists.
   An example of variable declarations:
@@ -36,8 +36,8 @@ export default (<div>
         <td>A come-from assertion can be one of 3 things: <b>entry</b>, which defines the entry point of the program. Only one entry point is allowed and must be placed in the first block of the program; <b>from</b>, which describes the previous block; <b>fi</b>, which uses a conditional to determine which of two blocks execution came from.</td>
       </tr>
       <tr>
-        <td>Statements</td>
-        <td>Statements are described further down.</td>
+        <td>Step Operations</td>
+        <td>Step Operations are described further down.</td>
       </tr>
       <tr>
         <td>Jump</td>
@@ -52,8 +52,8 @@ export default (<div>
   A sample program utilizing all above described froms and jumps:
   <CodeMirror value={'int n\n\nzero: entry\ngoto fst\n\nfst: fi n=0 zero snd\n  n+=1\nif n=0 snd trd\n\nsnd: from fst\ngoto fst\n\ntrd: from fst\nexit'} options={cmoptions} />
 
-  <h3>Statements</h3>
-  <b>RL</b> supports following statements
+  <h3>Steps</h3>
+  <b>RL</b> supports following step operations
   <table>
     <tbody>
       <tr>
@@ -84,7 +84,7 @@ export default (<div>
       <tr>
         <td>skip</td>
         <td>
-          A no-operation statement. Shorthand notation is a single dot (.).
+          A no-operation step operation. Shorthand notation is a single dot (.).
         </td>
       </tr>
       <tr>

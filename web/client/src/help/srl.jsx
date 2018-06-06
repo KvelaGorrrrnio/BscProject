@@ -15,7 +15,7 @@ export default (<div>
 
   <h3>Variables and types</h3>
   <b>SRL</b> is a explicitly strongly typed language, to which every program starts by defining the variables that it uses.
-  Variables can only be declared at the start of the program, before any statements.
+  Variables can only be declared at the start of the program, before any step operations.
   There are two types in <b>SRL</b>: <i>int</i> describing integers; <i>list t</i> describing lists, where t either is a nested <i>list</i> type or an <i>int</i> type.
   Thus we see that <b>SRL</b> supports multidimensional integer lists.
   An example of variable declarations:
@@ -48,14 +48,14 @@ export default (<div>
       <tr>
         <td><i>stmt</i></td>
         <td>
-          A statement, which is described further down.
+          A step operation, which is described further down.
         </td>
       </tr>
     </tbody>
   </table>
 
-  <h3>Statements</h3>
-  <b>SRL</b> supports following statements
+  <h3>Step Operations</h3>
+  <b>SRL</b> supports following step operations
   <table>
     <tbody>
       <tr>
@@ -86,7 +86,7 @@ export default (<div>
       <tr>
         <td>skip</td>
         <td>
-          A no-operation statement. Shorthand notation is a single dot (.).
+          A no-operation step operation. Shorthand notation is a single dot (.).
         </td>
       </tr>
       <tr>
