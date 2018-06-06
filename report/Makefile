@@ -11,9 +11,9 @@ default: compile #run
 compile:
 	mkdir -p $(outdir)
 	$(compile)
-	#$(biber)
-	#$(compile)
-	#$(compile)
+	$(biber)
+	$(compile)
+	$(compile)
 
 clean:
 	rm -rf $(outdir)

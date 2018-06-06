@@ -6,7 +6,7 @@ Inverting a program is, in fact, in our case very simple. On \cite[p.~104]{REV} 
 \subsection{Common}
 \label{sec:invcommon}
 
-\texttt{Inversion.hs} under the \textit{Common} module (Appendix~\ref{app:Common_Inversion_hs}) contains the implementation of the inverter that is shared between RL and SRL as seen in \cite[Fig.~20]{REV} and reproduced in Fig.~\ref{fig:inversion_common}. The task of this inverter is simply to invert step operations. As stated earlier, expressions should not be inverted, and thus, we keep them as they are. The inverter is very intuitive: inverting an update with a given operator should result in an update with the operator inverted; inverting a push operation whould result in a pop operation and vice versa; inverting a skip operation should result in a skip. We also have the three added step operations \texttt{swap}, \texttt{init}, and \texttt{free}. We have already gone over these in section~\ref{sec:changes}, but we will reiterate: \texttt{swap} is self-inverse, the inverse of \texttt{init} is \texttt{free} and vice versa.
+\texttt{Inversion.hs} under the \textit{Common} module (Appendix~\ref{app:Common_Inversion_hs}) contains the implementation of the inverter that is shared between RL and SRL as seen in \cite[Fig.~20]{REV} and reproduced in Fig.~\ref{fig:inversion_common}. The task of this inverter is simply to invert step operations. As stated earlier, expressions should not be inverted, and thus, we keep them as they are. The inverter is very intuitive: inverting an update with a given operator should result in an update with the operator inverted; inverting a push operation would result in a pop operation and vice versa; inverting a skip operation should result in a skip. We also have the three added step operations \texttt{swap}, \texttt{init}, and \texttt{free}. We have already gone over these in section~\ref{sec:changes}, but we will reiterate: \texttt{swap} is self-inverse, the inverse of \texttt{init} is \texttt{free} and vice versa.
 \begin{figure}
   $$\begin{aligned}
     & \mathcal{I}_{step}\llbracket x \mathrel{\oplus}= e\rrbracket & =\ & x \mathrel{\ominus}= e & & \text{where }\ominus = \mathcal{I}_{op}\llbracket\oplus\rrbracket & \quad & \mathcal{I}_{op}\llbracket +\rrbracket = -\\
@@ -45,7 +45,7 @@ The implementation of the RL-specific inverter can be found in \texttt{Inversion
 
 \subsection{Inverting SRL Programs}
 
-The implementation of the SRL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_Inversion_hs}). This is, also to no surprise, based on the inverter presented in \cite[Fig.~18]{REV} (and reproduced in Fig.~\ref{fig:inversion_srl}. Note that inverting an SRL program corresponds to inverting a single block. The implementation covers the following cases:
+The implementation of the SRL-specific inverter can be found in \texttt{Inversion.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_Inversion_hs}). This is, also to no surprise, based on the inverter presented in \cite[Fig.~18]{REV} (and reproduced in Fig.~\ref{fig:inversion_srl}). Note that inverting an SRL program corresponds to inverting a single block. The implementation covers the following cases:
 
 \begin{itemize}
   \item If the block is a step operation, we simply invert the step operation as described in section~\ref{sec:invcommon}.

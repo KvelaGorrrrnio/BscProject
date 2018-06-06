@@ -1,15 +1,15 @@
 \begin{abstract}
-  This thesis describes the implementation of two \textit{reversible flowchart languages}, RL and SRL, along with the inversion and translation of these. Two interfaces --- a command-line interface and a web-based user interface --- are designed and implemented as well.
+  This thesis describes the implementation of two \textit{reversible flowchart languages}, RL and SRL, along with the inversion and translation of these. %Two interfaces --- a command-line interface and a web-based user interface --- are designed and implemented as well.
 
   Reversible flowcharts model reversible (imperative) programs similar to how conventional flowcharts model conventional programs; reversible flowcharts, however, can be inverted and thus perform backwards program execution. Reversible flowchart languages are the product of concretising the theory behind these; two such proposed languages are RL and SRL, which resemble a low-level assembler language and a high-level structured language, respectively.
 
 For each of the two languages, we go through the definitions of their respective interpreters and, based on this, argue for our concrete implementation. Any changes to the formal definitions of the languages are explained thoroughly.
 
-Furthermore, we describe our implementation of two types of program transformations. The first of these is, not surprisingly, program inversion; we would like to be able to invert arbitrary programs written in any of the two languages.
+Furthermore, we describe the implementation of two types of program transformations. The first of these is, not surprisingly, program inversion; we would like to be able to invert arbitrary programs written in any of the two languages.
 
 The other is program translation; translating structured SRL to unstructured RL and, as proven possible by the Structured Program Theorem for reversible languages, translating unstructured RL to structured SRL.\
 
 We then go through the design and implementation of a command-line interface and web-based user interface for the interpreters and their program transformations.
 
-Finally, to test our implementation and demonstrate its usefulness a series of test programs have been written in the implemented languages.
+Finally, to test our implementation and demonstrate its usefulness, a series of test programs have been written in the implemented languages.
 \end{abstract}

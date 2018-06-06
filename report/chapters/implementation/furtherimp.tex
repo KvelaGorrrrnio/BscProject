@@ -1,5 +1,5 @@
 \section{Further Improvements}
-In this section, we will discuss what can be further improved on our implementation.
+In this section we will discuss what can be further improved on our implementation.
 
 \subsection{Interpretation}
 An obvious bottleneck is the efficiency of our interpreters; they are both relatively slow and can thus not be used efficiently for more demanding programs. There are many parts of our implementation that can be optimised. One example is the representation of an RL program: having to do a linear lookup on an association table on every jump is simply too inefficient and unnecessary. We kept this representation, however, because it was the simplest way to keep the order of the blocks intact. Using a hashmap could potentially change the order of blocks dramatically, and the result of a program transformation could therefore be ill formed or harder to understand. This, of course, could be resolved by mapping each label to an integer in the right order --- a bit like the map we used in the translator from RL to SRL. However, we did not want to introduce too much processing on that front.
