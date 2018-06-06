@@ -33,8 +33,6 @@ showTab mtab =
       m   = if null tab then 0 else maximum . map (\(n,_) -> length n) $ tab
     in intercalate "\n" $ map (\(n,v) -> n ++ pad (m-length n+1) ++ " : " ++ show v) tab
   where pad n = replicate (n-1) ' '
-insert id val = M.insert id val
-mLookup id    = M.lookup id
 
 sort' :: Ord a => [(a, b)] -> [(a, b)]
 sort' = sortBy (compare `on` fst)

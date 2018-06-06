@@ -26,7 +26,7 @@ execVarState :: VarTab -> VarState () -> (Either Error VarTab, [Message])
 execVarState vtab = runWriter . runExceptT . flip execStateT vtab
 
 rd :: Id -> Pos -> VarState Value
-rd (Id id exps) p = gets (mLookup id) >>= \case
+rd (Id id exps) p = gets (M.lookup id) >>= \case
   Just v  -> foldM getIdx v exps
   Nothing -> logError p $ NonDefinedId id
 

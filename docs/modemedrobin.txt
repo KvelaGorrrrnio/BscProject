@@ -23,3 +23,5 @@ kommentarer:
     iota = indeksering
 
   background skal beskrive reversivibilitet
+
+  TODO:
