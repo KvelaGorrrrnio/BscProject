@@ -3,7 +3,7 @@
 % og snakker om den formelle syntaks
 \section{RL and SRL}\label{sec:rlandsrl}
 
-Many common programming languages are forward deterministic. That is, no matter where in a program we are, the next state can be uniquely determined from the instruction at hand. Most all of these languages may discard some information during the execution of a program, and thus, the \textit{previous} state is not uniquely defined by the instruction at hand. Something as simple as a variable assignment, for instance, replaces --- and thus, discards --- the information contained in a variable.
+Many common programming languages are forward deterministic. That is, no matter where in a program we are, the next state can be uniquely determined from the instruction at hand. Most all of these languages may discard some information during the execution of a program, and thus, the \textit{previous} state is not uniquely defined by the instruction at hand. Something as simple as a variable assignment, for instance, replaces --- and thus, discards --- the information contained in a variable. \textit{Reversible} programming languages prevent this loss of information, which in turn means that program execution can go both forwards and backwards.
 
 Reversible Language and Structured Reversible Language --- RL and SRL for short, repectively --- are two reversible flowchart languages proposed in~\cite{REV}. RL is an assembly-like language with unstructured jumps while SRL, as the name implies, is a similar language but with control structures and no unstructured jumps. The two languages share a common subset of features --- namely their expressions and step operations. The syntax of the two languages along with the common structures are given in~\cite[Fig.~12]{REV} and reproduced in Fig.~\ref{fig:rl_srl_syntax_and_structure}.
 
@@ -13,7 +13,7 @@ SRL is more linear; as we see in Fig.~\ref{fig:srlspec}, a program consists of e
 
 Any atomic construct of each of these languages can be built using the building blocks of reversible flowcharts, and therefore it is clear that these are indeed reversible flowchart languages.
 
-As mentioned, the two languages share expressions and step operations along with the basic value types. A brief overview follows:\\
+As mentioned, the two languages share expressions and step operations along with the basic value types. A brief overview follows:
 \begin{description}
   \item[Values and types]~\
   \begin{itemize}
@@ -33,7 +33,7 @@ As mentioned, the two languages share expressions and step operations along with
     \item We can have any arbitrary binary operator between two expressions, recursively.
     \item An expression terminates with an integer literal or a variable lookup.
     \item The \texttt{top} expression is unary and returns the top of the operand.
-    \item The \texttt{empty} predicate is unary and returns true if the operand is an empty list and false otherwise.
+    \item The \texttt{empty} predicate is unary and returns true if the operand is an empty list.
   \end{itemize}
 \end{description}
 % figur der viser grammatikken her tak

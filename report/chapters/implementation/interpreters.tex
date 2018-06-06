@@ -50,7 +50,7 @@ Finally, some of the RL-specific syntax has undergone some minor changes. The ra
 \subsection{Interpreter Core}
 
 \subsubsection{Abstract syntax tree and utilities}
-\texttt{AST.hs} under the \textit{Common} module (Appendix~\ref{app:Common_AST_hs}) contains the parts of the specific abstract syntax trees that are shared between the two languages. Furthermore, it contains some extra data types and functions that are used in both the RL- and SRL modules.
+\texttt{AST.hs} under the \textit{Common} module (Appendix~\ref{app:Common_AST_hs}) contains the parts of the specific abstract syntax trees that are shared between the two languages. Furthermore, it contains some extra data types and functions that are used in both the \textit{RL}- and \textit{SRL} modules.
 
 At the most fundamental level are the identifiers, the values, and their types. An identifiers marks a variable in a step operation and can contain zero or more indices. Having no indices corresponds, naturally, to just a variable $x$, while having one or more indices corresponds to indexing on a variable $x$. The implementation is as follows:
 \lstinputlisting[language=haskell, firstline=21, lastline=21]{../src/src/Common/AST.hs}
@@ -64,7 +64,7 @@ The store of our interpreters --- that is, the variable table --- is represented
 \lstinputlisting[language=haskell, firstline=30, lastline=30]{../src/src/Common/AST.hs}
 Thus, reading a variable in an expression amounts to simply doing a lookup on the hashmap, while an update simply has to, well, update the store.
 
-Next, we have expressions. These are exactly as described in the paper, but with the additions covered in \ref{sec:changes}. The definition is as follows:
+Next, we have expressions. These are exactly as described in the paper, but with the additions covered in section~\ref{sec:changes}. The definition is as follows:
 \lstinputlisting[language=haskell, firstline=76, lastline=83]{../src/src/Common/AST.hs}
 Just as described, \texttt{Exp} is a recursive data type terminated by a literal value or a variable lookup. Since we do not support list literals, a literal value is assumed to be an integer.
 
@@ -81,7 +81,7 @@ Finally, we have step operations. Revisiting~\ref{fig:common}, we can focus on t
              &  |  & \texttt{skip}
 \end{matrix*}
 \]
-If we add our additional step operations --- \texttt{swap}, \texttt{init}, and \texttt{free} --- and features --- namely arbitrary indexing --- described in~\ref{sec:changes}, we have
+If we add our additional step operations --- \texttt{swap}, \texttt{init}, and \texttt{free} --- and features --- namely arbitrary indexing --- described in section~\ref{sec:changes}, we have
 \[
 \begin{matrix*}[l]
   {a} & ::= & {x}\iota\mathrel{\oplus}= e       \quad\quad\quad  & \iota  & ::= & \epsilon \\
@@ -111,7 +111,7 @@ The log is simply a list of specialised messages that can either be a step opera
 \subsubsection{Interpretation}
 \texttt{Interp.hs} under the \textit{Common} module (Appendix~\ref{app:Common_Interp_hs}) contains the core interpreting engine --- that is, the execution of step operations and evaluation of expressions. We define the core monad transformer to contain the state monad (for the store), the except monad (for error handling), and the writer monad (for the log). The \texttt{exec} function (lines 80-225), is the one that executes a step operation and updates the program state accordingly.
 
-It would consume too much space to describe the complete implementation of \texttt{exec}, so an example or two should be suffice. Lines 83-106 show the implementation of the variable update; we first check if the identifier being updated occurs in the expression on the right-hand side. If it does, we throw a runtime error. Next, we fetch the value of the variable being updated and then evaluate the right-hand expression. If one of these is not an integer, we throw an error. Before actually updating, we check if the update is either a multiplication update or division update, and if so, if they respect the rules mentioned in \ref{sec:changes}. Finally, we update the store with the new value. This implicitly handles indexing; \texttt{rd}, occurring on line 87, reads a variable from the store and, if one or more indices are provided, digs deeper into the list to return the corresponding entry. \texttt{adjust}, seen on line 106, works in the same way, but replaces each list on the path and performs a given operation on the innermost index of the list.
+It would consume too much space to describe the complete implementation of \texttt{exec}, so an example or two should suffice. Lines 83-106 show the implementation of the variable update; we first check if the identifier being updated occurs in the expression on the right-hand side. If it does, we throw a runtime error. Next, we fetch the value of the variable being updated and then evaluate the right-hand expression. If one of these is not an integer, we throw an error. Before actually updating, we check if the update is either a multiplication update or division update, and if so, if they respect the rules mentioned in section~\ref{sec:changes}. Finally, we update the store with the new value. This implicitly handles indexing; \texttt{rd}, occurring on line 87, reads a variable from the store and, if one or more indices are provided, digs deeper into the list to return the corresponding entry. \texttt{adjust}, seen on line 106, works in the same way, but replaces each list on the path and performs a given operation on the innermost index of the list.
 
 Lines 153-162 show the implementation of the swap operation; we first fetch the value of the two variables being swapped, then check if they are of the same type. If not, we throw a runtime error. Otherwise, we update the first operand to the value of the second and vice versa.
 
