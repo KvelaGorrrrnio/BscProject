@@ -25,7 +25,7 @@ The implementation of the RL-specific inverter can be found in \texttt{Inversion
 \begin{itemize}
   \item If we want to invert an RL program --- that is, a list of blocks --- we simply reverse the list of blocks and invert each individual block.
 
-  \item To invert a block, we first want to invert the come-from assertion and use the result as the jump. Next, we will reverse the list of step operations and invert each of these individually. Finally, we will invert the jump and use the result as the come-from assertion.
+  \item To invert a block, we first want to invert the come-from assertion and use the result as the jump. Next, we will reverse the list of step operations and invert each of these individually as described in section~\ref{sec:invcommon}. Finally, we will invert the jump and use the result as the come-from assertion.
 
   \item The inversion of come-from assertions and jumps is rather simple. A \texttt{goto} becomes a \texttt{from}, an \texttt{if} becomes a \texttt{fi}, an exit becomes an entry and vice versa.
 \end{itemize}
