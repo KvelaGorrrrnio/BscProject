@@ -100,7 +100,7 @@ One may notice that we use the reader monad for this implementation. This lets u
 
 \pgfplotsset{compat = 1.3}
 \subsection{Comments}
-\begin{wrapfigure}[19]{r}{7.4cm}
+\begin{wrapfigure}[19]{R}{8cm}
   \begin{tikzpicture}
   \begin{axis} [
       xlabel=\#translations,
@@ -135,4 +135,4 @@ One may notice that we use the reader monad for this implementation. This lets u
   \end{tikzpicture}
 \caption{Program size after translation. }\label{fig:linesfig}% ($10.1e^{1.45x}$)
 \end{wrapfigure}
-The translators described in the previous sections are very interesting, but not ideal in practice. When translating from SRL to RL, a \textit{lot} of blocks may be produced. When translating from RL to SRL, a large loop of potentially \textit{lots} of conditional blocks is produced. In fact, when translating back and forth multiple times, we will start to see an exponential growth in the number of lines of the resulting program. Fig.~\ref{fig:linesfig} shows the actual growth of two programs when translating them repeatedly; \texttt{fib.srl} (Appendix~\ref{app:fib_srl}), which consists of $l_0=10$ lines, and \texttt{skip.srl} (Appendix~\ref{app:skip_srl}), which consists of $l_0=1$ line. As we see, after translating \texttt{fib.srl} and \texttt{skip.srl} six times the resulting programs will consist of more than $60,000$ and $20,000$ lines, respectively! As we will dicuss later, this makes room for a lot of optimisation.
+The translators described in the previous sections are very interesting, but not ideal in practice. When translating from SRL to RL, a \textit{lot} of blocks may be produced. When translating from RL to SRL, a large loop of potentially \textit{lots} of conditional blocks is produced. In fact, when translating back and forth multiple times, we will start to see an exponential growth in the number of lines of the resulting program. Fig.~\ref{fig:linesfig} shows the actual growth of two programs when translating them repeatedly; \texttt{fib.srl} (Appendix~\ref{app:fib_srl}), which consists of $l_0=10$ lines, and \texttt{skip.srl} (Appendix~\ref{app:skip_srl}), which consists of $l_0=1$ line. As we see, after translating \texttt{fib.srl} and \texttt{skip.srl} six times the resulting programs will consist of more than $60,000$ and $20,000$ lines, respectively! % As we will dicuss later, this makes room for a lot of optimisation.

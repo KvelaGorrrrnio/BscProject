@@ -53,19 +53,19 @@ Finally, some of the RL-specific syntax has undergone some minor changes. The ra
 \texttt{AST.hs} under the \textit{Common} module (Appendix~\ref{app:Common_AST_hs}) contains the parts of the specific abstract syntax trees that are shared between the two languages. Furthermore, it contains some extra data types and functions that are used in both the \textit{RL}- and \textit{SRL} modules.
 
 At the most fundamental level are the identifiers, the values, and their types. An identifiers marks a variable in a step operation and can contain zero or more indices. Having no indices corresponds, naturally, to just a variable $x$, while having one or more indices corresponds to indexing on a variable $x$. The implementation is as follows:
-\lstinputlisting[language=haskell, firstline=21, lastline=21]{../src/src/Common/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=21, firstline=21, lastline=21]{../src/src/Common/AST.hs}
 Values in the languages are, as previously stated, either integers or lists. The implementation looks as follows:
-\lstinputlisting[language=haskell, firstline=9, lastline=9]{../src/src/Common/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=9, firstline=9, lastline=9]{../src/src/Common/AST.hs}
 Note that the list value has an extra field that specifies its type -- that is, essentially, the depth of the list. More specifically, it is a recurive data type such that
-\lstinputlisting[language=haskell, firstline=174, lastline=174]{../src/src/Common/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=172, firstline=172, lastline=172]{../src/src/Common/AST.hs}
 This makes it trivial to perform dynamic type checks in the interpreter.
 
 The store of our interpreters --- that is, the variable table --- is represented as a hashmap with strings as keys and \texttt{Value}s as values:
-\lstinputlisting[language=haskell, firstline=30, lastline=30]{../src/src/Common/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=30, firstline=30, lastline=30]{../src/src/Common/AST.hs}
 Thus, reading a variable in an expression amounts to simply doing a lookup on the hashmap, while an update simply has to, well, update the store.
 
 Next, we have expressions. These are exactly as described in the paper, but with the additions covered in section~\ref{sec:changes}. The definition is as follows:
-\lstinputlisting[language=haskell, firstline=76, lastline=83]{../src/src/Common/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=74, firstline=74, lastline=81]{../src/src/Common/AST.hs}
 Just as described, \texttt{Exp} is a recursive data type terminated by a literal value or a variable lookup. Since we do not support list literals, a literal value is assumed to be an integer.
 
 
@@ -94,7 +94,7 @@ where $x$ is an arbitrary variable name. If we add our additional step operation
 \end{matrix*}
 \]
 The implementation of this was straightforward:
-\lstinputlisting[language=haskell, firstline=43, lastline=50]{../src/src/Common/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=41, firstline=41, lastline=48]{../src/src/Common/AST.hs}
 
 \subsubsection{Errors and log}
 The \textit{Common} module also contains the implementation of the error- (Appendix~\ref{app:Common_Error_hs}) and log (Appendix~\ref{app:Common_Log_hs}) types, but we won't go into too much detail as to \textit{how} they are implemented. To understand the interpreters, however, we must know which errors can be potentially thrown:
@@ -134,20 +134,20 @@ The parser was implemented using Parsec along with the Token helper module to pe
 \subsubsection{Abstract syntax tree}
 
 In section~\ref{sec:rlandsrl} we considered the syntax of RL; a program must consist of one or more blocks, where a block is defined by its label and has a come-from assertion, zero or more step operations and a jump. With the step operations already implemented, the only thing to worry about is how to represent our program. \texttt{AST.hs} under the \textit{RL} module (Appendix~\ref{app:RL_AST_hs}) contains the complete representation. As one will notice, we decided to define the abstract syntax tree as an association list with labels as keys and blocks as values:
-\lstinputlisting[language=haskell, firstline=14, lastline=14]{../src/src/RL/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=14, firstline=14, lastline=14]{../src/src/RL/AST.hs}
 Note that \texttt{Label} is simply a type synonym for \texttt{String}.
 
 A block, then, is defined as a three-tuple consisting of a come-from assertion, a list of step operations, and a jump. Thus, we have
-\lstinputlisting[language=haskell, firstline=18, lastline=18]{../src/src/RL/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=18, firstline=18, lastline=18]{../src/src/RL/AST.hs}
 It should come to no surprise that \texttt{From} and \texttt{Jump} are the data types that represent come-from assertions and unstructured jumps, respectively. Their implementations, practically copied from the paper, are as follows:
 \begin{figure}[H]
   \centering
 \begin{subfigure}{0.45\textwidth}
-  \lstinputlisting[language=haskell, firstline=27, lastline=30]{../src/src/RL/AST.hs}
+  \lstinputlisting[language=haskell, firstnumber=27, firstline=27, lastline=30]{../src/src/RL/AST.hs}
 \end{subfigure}
 \qquad
 \begin{subfigure}{0.45\textwidth}
-  \lstinputlisting[language=haskell, firstline=36, lastline=39]{../src/src/RL/AST.hs}
+  \lstinputlisting[language=haskell, firstnumber=36, firstline=36, lastline=39]{../src/src/RL/AST.hs}
 \end{subfigure}
 \end{figure}
 
@@ -158,7 +158,7 @@ First thing is that we have extended our core monad transformer to also contain 
 
 The \texttt{interp} function (lines 31-57), which interprets a single block and passes control flow to the next, works by receiving two arguments: the label of the block that we are coming from and the label of the block we are jumping to. We assume that an empty label as first operand means that we are at the entry of the program. When calling the function, we simply look up the label of the block we are jumping to in the abstract syntax tree --- from the static check we assume that the corresponding block exists. Then, to interpret the block, we simply make sure that we have gone down the right path (that is, our come-from assertion passes the test regarding the come-from label). Then we execute the list of step operations and call \texttt{interp} recursively --- now with the current label as come-from label and with the label dictated by the unstructured jump as the label we are jumping to.
 
-Now, we have briefly mentioned the static check of the RL interpreter, but we have not gone over what exactly it does. \texttt{Static.hs} under the \textit{RL} module (Appendix~\ref{app:RL_Static_hs}) checks that a few rules about the structure of an RL are respected --- each of which can be established statically. More specifically, we check for the following:
+Now, we have briefly mentioned the static check of the RL interpreter, but we have not gone over what exactly it does. \texttt{Static.hs} under the \textit{RL} module (Appendix~\ref{app:RL_Static_hs}) checks that a few rules regarding the form of an RL program are respected --- each of which can be established statically. More specifically, we check for the following:
 \begin{itemize}
   \item The program starts with an entry block
   \item The program ends with an exit block
@@ -178,9 +178,9 @@ When parsing, we simply parse for a list of one or more \texttt{(Label,Block)} p
 \subsubsection{Abstract syntax tree}
 
 As with RL, we have already looked at the syntax of SRL in section~\ref{sec:rlandsrl}. To summarise: A program consists of exactly one block. This block can either be a step operation, a conditional ($\texttt{if} \ e_1 \ \texttt{then} \ b_1 \ \texttt{else} \ b_2 \ \texttt{fi} \ e_2$), a loop ($\texttt{from} \ e_1 \ \texttt{do} \ b_1 \ \texttt{loop} \ b_2 \ \texttt{until} \ e_2$), or recursively a sequence of two blocks ($b_1 \ b_2$). Fortunately, this translates nicely into an implementation in Haskell which is found in \texttt{AST.hs} under the \textit{SRL} module (Appendix~\ref{app:SRL_AST_hs}). For the block, we have defined the \texttt{Block} data type as follows:
-\lstinputlisting[language=haskell, firstline=17, lastline=20]{../src/src/SRL/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=17, firstline=17, lastline=20]{../src/src/SRL/AST.hs}
 Since a program is represented as a single block, we have defined the abstract syntax tree accordingly. More specifically, we have that
-\lstinputlisting[language=haskell, firstline=13, lastline=1]{../src/src/SRL/AST.hs}
+\lstinputlisting[language=haskell, firstnumber=13, firstline=13, lastline=13]{../src/src/SRL/AST.hs}
 
 \subsubsection{Interpretation}
 
