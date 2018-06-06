@@ -8,7 +8,7 @@ This section describes the implementation of the interpreters. Note that this ex
 
 It is important to note that we have made a few changes to the languages. We have modified some of the syntax described in Fig.~\ref{fig:rl_srl_syntax_and_structure}, but also added some new step operations and core features. We have not, however, altered the very nature of any of the languages.
 
-We found the paper~\cite{REV} to be a bit unclear regarding types. The languages are described on the more hypothetical level, and the paper seems to assume some kind of type inference. We tried implementing a static check similar to type inference, but we deemed it too unrobust. This brings us to one of our most fundamental additions: explicit variable declarations. Each program must start with zero or more variable declarations with a specified type. For example, \texttt{list int a} declares variable \texttt{a} to be of type \texttt{list int}, etc. Declaring a varibale multiple times, or using a variable in the program that has not been declared, throws a runtime error.
+We found the paper~\cite{REV} to be a bit unclear regarding types. The languages are described on the more hypothetical level, and the paper seems to assume some kind of type inference. We tried implementing a static check similar to type inference, but we deemed it too unrobust. This brings us to one of our most fundamental additions: explicit variable declarations. Each program must start with zero or more variable declarations with a specified type. For example, \texttt{list int a} declares variable \texttt{a} to be of type \texttt{list int}, etc. Declaring a variable multiple times, or using a variable in the program that has not been declared, throws a runtime error.
 
 Also, while the languages as described in the paper have lists limited to one dimension, our implementation of the core feature set supports indexing in an arbitrary number of dimensions. That is, you could declare a list variable as \texttt{list list int l} and index on this list with i.e. \texttt{l[2,5]} (assuming that the indices are not out of bounds). This, in particular, makes it a non-trivial task to implement robust type inference.
 
@@ -78,19 +78,19 @@ Finally, we have step operations. Revisiting~\ref{fig:common}, we can focus on t
              &  |  & {x}[ e]\mathrel{\oplus}= e \\
              &  |  & \texttt{push }{x}\ {x} \\
              &  |  & \texttt{pop  }{x}\ {x} \\
-             &  |  & \texttt{skip}
+             &  |  & \texttt{skip},
 \end{matrix*}
 \]
-If we add our additional step operations --- \texttt{swap}, \texttt{init}, and \texttt{free} --- and features --- namely arbitrary indexing --- described in section~\ref{sec:changes}, we have
+where $x$ is an arbitrary variable name. If we add our additional step operations --- \texttt{swap}, \texttt{init}, and \texttt{free} --- and features --- namely arbitrary indexing --- described in section~\ref{sec:changes}, we have
 \[
 \begin{matrix*}[l]
   {a} & ::= & {x}\iota\mathrel{\oplus}= e       \quad\quad\quad  & \iota  & ::= & \epsilon \\
-      &  |  & \texttt{push }{x}\iota \ {x}\iota                   &        & |   & \iota' \\
-      &  |  & \texttt{pop  }{x}\iota \ {x}\iota \\
-      &  |  & \texttt{skip}                                      & \iota' & ::= & [e] \\
-      &  |  & \texttt{swap} \ x\iota \ x\iota                    &        & |   & [e]\iota' \\
-      &  |  & \texttt{init} \ x \ \iota' \\
-      &  |  & \texttt{free} \ x \ \iota'
+      &  |  & \texttt{push }{x}\iota \mathbin{} {x}\iota                   &        & |   & \iota' \\
+      &  |  & \texttt{pop } \ \ {x}\iota \mathbin{} {x}\iota \\
+      &  |  & \texttt{skip }                                      & \iota' & ::= & [e] \\
+      &  |  & \texttt{swap } x\iota \mathbin{} x\iota                    &        & |   & [e]\iota' \\
+      &  |  & \texttt{init } x \mathbin{} \iota' \\
+      &  |  & \texttt{free } x \mathbin{} \iota'
 \end{matrix*}
 \]
 The implementation of this was straightforward:
