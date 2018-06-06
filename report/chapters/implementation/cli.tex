@@ -6,7 +6,7 @@ This will be a rather short section describing the command-line interface. We wi
 \subsection{Common}
 
 \texttt{HandleArgs.hs} under the \textit{Common} module (Appendix~\ref{app:Common_HandleArgs_hs}) implements the parsing of the command-line arguments that is used for both interpreters. This is done using the CmdArgs library. Here, we define a record for each mode:
-\lstinputlisting[language=Haskell, firstline=8, lastline=16]{../src/src/Common/HandleArgs.hs}
+\lstinputlisting[language=Haskell, firstnumber=8, firstline=8, lastline=16]{../src/src/Common/HandleArgs.hs}
 We can then specify the nature of each field; whether it is optional, whether it is a flag or a simple argument, what its help message should be, etc. The \texttt{handleArgs} function (line 52) does the job of fetching the command-line input, parsing it and returning the resulting record. The main program file for each interpreter must then handle this record depending on the values of the various fields.
 
 \subsection{RL and SRL}
