@@ -6,25 +6,25 @@ rm -f $target
 touch "$target"
 
 # SRL
-echo "\\subsection{SRL Files}" >> $target
-echo "\\label{app:test_srl_files}" >> $target
+echo "\\section{SRL}" >> $target
+echo "\\label{app:testing_srl}" >> $target
 
 for f in $srlfiles; do
   name=$(basename "$f")
   label=${name/\./_}
-  echo "\\subsubsection{${name/_/\_}}" >> $target
+  echo "\\subsection{${name/_/\_}}" >> $target
   echo "\\label{app:$label}" >> $target
   echo "\\lstinputlisting[language=rl]{${suite_dir}/${name}}" >> $target
 done
 
 # RL
-echo "\\subsection{RL Files}" >> $target
-echo "\\label{app:test_rl_files}" >> $target
+echo "\\section{RL}" >> $target
+echo "\\label{app:testing_rl}" >> $target
 
 for f in $rlfiles; do
   name=$(basename "$f")
   label=${name/\./_}
-  echo "\\subsubsection{${name/_/\_}}" >> $target
+  echo "\\subsection{${name/_/\_}}" >> $target
   echo "\\label{app:$label}" >> $target
   echo "\\lstinputlisting[language=rl]{${suite_dir}/${name}}" >> $target
 done

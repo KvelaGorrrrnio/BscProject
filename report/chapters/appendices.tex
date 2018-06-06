@@ -1,44 +1,44 @@
 \begin{appendices}
 \lstset{style=appendix}
-\addtocontents{toc}{\protect\setcounter{tocdepth}{3}}
-\makeatletter
-\addtocontents{toc}{%
-  \begingroup
-  \let\protect\l@chapter\protect\l@section
-  \let\protect\l@section\protect\l@subsection
-}
-\makeatother
-  \chapter{Source Code}
-  \section{Interpreters}
-  \label{app:interpreters}
-  \input{chapters/appendices/hsfiles}
 
+  \input{chapters/appendices/interpreter}
   \input{chapters/appendices/web}
   \input{chapters/appendices/test}
+  \input{chapters/appendices/ui}
 
-\addtocontents{toc}{\endgroup}
 \end{appendices}
 
 % Appendix
 
-  % Source Code           -- Chapter
-    % Interpreters        -- Section
-      % Common/.....      -- Subsections
-      % RL/.....
-      % SRL/.....
-    % Web Interface       -- Section
-      % Server/...        -- Subsections
-      % Client/...
+  % Interpreter Source Code  -- Chapter
+    % Common/                -- Section
+      % files                -- Subsections
+    % RL                     -- Section
+      % files                -- Subsections
+    % SRL                    -- Section
+      % files                -- Subsections
 
-  % Testing               -- Chapter
-    % Framework           -- Section
-      % De to .hs filer   -- Subsections
-    % SRL Files           -- Section
-      % ...srl            -- Subsections
-    % RL Files            -- Section
-      % ...rl             -- Subsections
-    % Web Files           -- Section
-      % ......            -- Subsections
+  % Web Source Code          -- Chapter
+    % Client                 -- Section
+      % files                -- Subsections
+    % Server                 -- Section
+      % files                -- Subsections
 
-  % Screenshots
-    % Web user interface  -- Sections
+  % Testing                  -- Chapter
+    % Framework              -- Section
+      % files                -- Subsections
+    % SRL                    -- Section
+      % files                -- Subsections
+    % RL                     -- Section
+      % files                -- Subsections
+    % Web                    -- Section
+      % ......               -- Subsections
+
+  % User Interface           -- Chapter
+    % Images                 -- Sections
+
+
+
+
+
+

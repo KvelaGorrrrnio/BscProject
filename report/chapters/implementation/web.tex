@@ -19,11 +19,6 @@ This chapter described the implementation of these.
 Before explaining the actual implementation of the client interface, we will describe the features of this interface.
 If we look at the user interface (seen in Appendix~\ref{fig:web_client_ui}), we have 3 rectangular areas: The toolbar at the top, the code editor located below the toolbar on the left-hand side, and the result area located below the toolbar on the right-hand side.
 
-%\begin{figure}
-%  \includegraphics[width=\textwidth]{web_client_ui.png}
-%  \caption{Screenshot of web client UI.}
-%  \label{fig:web_client_ui}
-%\end{figure}
 
 At the far left of the toolbar we have two radio buttons with the options SRL and RL, respectively. The highlighted option indicates how the code in the code editor should be interpreted; if RL is chosen, the code is interpreted as an RL program and similarly, if SRL is chosen, the code is interpreted as an SRL program.
 
@@ -31,50 +26,23 @@ In the middle of the toolbar, above the code editor, we have a group of five ico
 \begin{description}
 
   \item[\inlineicon{themes.png} Themes]~\\
-    By hovering over this icon a dropdown menu, for choosing the color scheme/ theme of the client interface, appears. %This can be seen in Fig.~\ref{app:web_client_themes}.
-    %Fig. \ref{fig:web_client_white_ui} shows the color scheme when the white theme is chosen.
-    %\begin{figure}
-    %  \includegraphics[width=\textwidth]{web_client_themes.png}
-    %  \caption{Web client themes dropdown menu.}
-    %  \label{fig:web_client_themes}
-    %\end{figure}
-    %\begin{figure}
-    %  \includegraphics[width=\textwidth]{web_client_white_ui.png}
-    %  \caption{Web client UI in white theme color scheme.}
-    %  \label{fig:web_client_white_ui}
-    %\end{figure}
+    By hovering over this icon a dropdown menu, for choosing the color scheme/ theme of the client interface, appears. This can be seen in Appendix~\ref{app:web_client_themes}.
 
   \item[\inlineicon{help.png} Help]~\\
     By clicking on this icon a modal window displaying some help text opens. This help text seeks to explain the web interface, the modes and the languages to the user.
-    %\begin{figure}
-    %  \includegraphics[width=\textwidth]{web_client_help.png}
-    %  \caption{Web client help modal window displaying the Run mode help page.}
-    %  \label{fig:web_client_help}
-    %\end{figure}
+    This can be seen in Appendix~\ref{app:web_client_help}.
 
   \item[\inlineicon{template.png} Templates]~\\
     By hovering over this icon a dropdown menu appears. This menu contains a series of template programs for both RL and SRL which can be loaded into the code editor.
-    %\begin{figure}
-    %  \includegraphics[width=\textwidth]{web_client_templates.png}
-    %  \caption{Web client templates dropdown menu.}
-    %  \label{fig:web_client_templates}
-    %\end{figure}
+    This can be seen in Appendix~\ref{app:web_client_templates}.
 
   \item[\inlineicon{open.png} Open]~\\
     By clicking on this icon a modal window opens. Here it is possible to import and open previously stored programs.
-    %\begin{figure}
-    %  \includegraphics[width=\textwidth]{web_client_open.png}
-    %  \caption{Web client open modal window.}
-    %  \label{fig:web_client_open}
-    %\end{figure}
+    This can be seen in Appendix~\ref{app:web_client_open}.
 
   \item[\inlineicon{save.png} Save]~\\
     By clicking on this icon a modal window opens. Here it is possible to export, share and store the code currently loaded into the code editor.
-    %\begin{figure}
-    %  \includegraphics[width=\textwidth]{web_client_save.png}
-    %  \caption{Web client save modal window.}
-    %  \label{fig:web_client_save}
-    %\end{figure}
+    This can be seen in Appendix~\ref{app:web_client_save}.
 
 \end{description}
 The right-hand side of the toolbar is dedicated to modes and their associated actions.
@@ -102,13 +70,7 @@ There are 4 modes which are selected from the radio button group at the far righ
     The \textit{Translate} mode translates the code in the editor depending on the chosen language. This is done by clicking \inlineicon{play} \textbf{translate}.
 
 \end{description}
-All the above modes have the ability to fail on a parse- or static error. % Fig. \ref{fig:web_client_error} illustrates a case where a parse error occurs.
-
-%\begin{figure}
-%  \includegraphics[width=\textwidth]{web_client_error.png}
-%  \caption{Web client with parse error.}
-%  \label{fig:web_client_error}
-%\end{figure}
+All the above modes have the ability to fail on a parse- or static error. Appendix \ref{app:web_client_error} illustrates a case where a parse error occurs.
 
 %%%%%%%%%%%%%%%%%%%
 %%% Implementation

@@ -8,7 +8,7 @@ When located at the root of the project, tests for the interpreters command-line
 For only getting output relevant for testing, build all targets with \texttt{\$ make} before running the tests.
 
 %% Setup
-The test system is being built and executed by running \texttt{\$ stack test}. It is written in Haskell and is located at \path{/src/test} in \texttt{Lib.hs} and \texttt{Spec.hs} where \texttt{Spec.hs} is the main entry point.
+The test system is being built and executed by running \texttt{\$ stack test}. It is written in Haskell and is located at \path{/src/test} in \texttt{Lib.hs} and \texttt{Spec.hs} where \texttt{Spec.hs} is the main entry point. The files of the test framework can be found in Appendix~\ref{app:testing_framework}.
 
 It works by fetching all RL- and SRL program files located in \path{/src/test/suite} and, for each of these, testing its output against some predefined output files. Every output file follows a certain naming convention defined loosely as something like \texttt{[script].[option].[mode].out}; this makes it easy for us to test every output of a single program systematically.
 Outfiles in a test-suite can have the formats described in the table below.
@@ -54,7 +54,7 @@ These are the exact prime factors of 1829.
 
 %% Client: Packages (Mocha - Chai - Enzyme) - Kun leaf components
 The web client is not fully tested, but a test framework is set up and simple tests have been implemented. Components without direct access to application state have been tested. This includes the Button, Radio and Dropdown components.
-These files can be found in Appendix \ref{app:test_web_files}.
+These files can be found in Appendix \ref{app:testing_web}.
 
 The framework uses Mocha as its test-framework, Chai as assertion-library and Enzyme for shallow-rendering of components (simulates the rendering of single component-tree).
 To run the tests when standing at the root of the project, run the command \texttt{\$ make test-web}.

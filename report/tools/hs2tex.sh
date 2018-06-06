@@ -7,37 +7,37 @@ rm -f "$target"
 touch "$target"
 
 # Common
-echo "\\subsection{Common Files}" >> $target
-echo "\\label{app:Common_files}" >> $target
+echo "\\section{Common}" >> $target
+echo "\\label{app:interpreter_common}" >> $target
 
 for f in $commonfiles; do
   name=$(basename "$f")
   label=${name/\./_}
-  echo "\\subsubsection{Common/${name/_/\_}}" >> $target
+  echo "\\subsection{Common/${name/_/\_}}" >> $target
   echo "\\label{app:Common_$label}" >> $target
   echo "\\lstinputlisting[language=Haskell]{../$f}" >> $target
 done
 
 # SRL
-echo "\\subsection{SRL Files}" >> $target
-echo "\\label{app:SRL_files}" >> $target
+echo "\\section{SRL}" >> $target
+echo "\\label{app:interpreter_srl}" >> $target
 
 for f in $srlfiles; do
   name=$(basename "$f")
   label=${name/\./_}
-  echo "\\subsubsection{SRL/${name/_/\_}}" >> $target
+  echo "\\subsection{SRL/${name/_/\_}}" >> $target
   echo "\\label{app:SRL_$label}" >> $target
   echo "\\lstinputlisting[language=Haskell]{../$f}" >> $target
 done
 
 # RL
-echo "\\subsection{RL Files}" >> $target
-echo "\\label{app:RL_files}" >> $target
+echo "\\section{RL}" >> $target
+echo "\\label{app:interpreter_rl}" >> $target
 
 for f in $rlfiles; do
   name=$(basename "$f")
   label=${name/\./_}
-  echo "\\subsubsection{RL/${name/_/\_}}" >> $target
+  echo "\\subsection{RL/${name/_/\_}}" >> $target
   echo "\\label{app:RL_$label}" >> $target
   echo "\\lstinputlisting[language=Haskell]{../$f}" >> $target
 done
