@@ -1,3 +1,0 @@
-Syntax highlighting:
-  - https://github.com/hadijaveed/All-Convertors
-  - https://github.com/JedWatson/react-codemirror
