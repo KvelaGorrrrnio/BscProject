@@ -26,8 +26,8 @@ server:
 cserver:
 	@make -C web cserver
 
-release:
-	@zip -r src.zip release
+release: clean
+	@zip release.zip -r Makefile src web vim autocomplete
 
 test: test-src
 test-src:
