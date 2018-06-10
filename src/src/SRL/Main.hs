@@ -65,10 +65,10 @@ main = do
               | null o      -> print len
               | otherwise   -> writeFile o $ (++"\n") (show len)
           where getLen ast = case ast of
-                  If _ b1 b2 _   -> getLen b1 + getLen b2
-                  Loop _ b1 b2 _ -> getLen b1 + getLen b2
-                  Seq b1 b2      -> getLen b1 + getLen b2
                   Step _         -> 1
+                  If _ b1 b2 _   -> 1 + getLen b1 + getLen b2
+                  Loop _ b1 b2 _ -> 1 + getLen b1 + getLen b2
+                  Seq b1 b2      -> getLen b1 + getLen b2
 
     m -> do
       (f,o,j,c,transform) <- case m of
