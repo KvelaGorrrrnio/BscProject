@@ -13,11 +13,20 @@ data Prog
   | Run       { file  :: FilePath, out   :: FilePath
               , json  :: Bool,     code  :: Bool
               , log   :: Bool                    }
+  | Blocks    { file  :: FilePath, out   :: FilePath
+              , json  :: Bool,     code  :: Bool }
   deriving (Data,Typeable,Show,Eq)
 
 helpOutput = help "Write the output to the specified file"
 helpCode   = help "Give a string to be treated as [S]RL code"
 helpJSON   = help "Format the output as JSON"
+
+blocks = record Blocks{} [
+    file  := def += args += typFile
+  , out   := def         += typFile  += helpOutput
+  , json  := def                     += helpJSON
+  , code  := def                     += helpCode
+  ] += help "Print the number of blocks in the program"
 
 translate_ = record Translate{} [
     file  := def += args += typFile
@@ -41,7 +50,7 @@ interpret = record Run{} [
   , log   := def += help "Output log instead of final state"
   ] += help "Interpret an [S]RL program" += auto
 
-mode = cmdArgsMode_ $ modes_ [interpret, invert_, translate_]
+mode = cmdArgsMode_ $ modes_ [interpret, invert_, translate_, blocks]
   += help    "Interpret, invert or translate an [S]RL program"
   += summary "The Glorious [S]RL Interpreter System, version 1.0.0"
   += program "[s]rl"

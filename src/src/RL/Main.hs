@@ -52,6 +52,20 @@ main = do
             (Left err,_)                      -> eout' err
           Just n  -> eout' (StaticError (0,0) $ DuplicateVarDec n)
 
+    Blocks f o j c -> do
+      unless c $ do
+        exists <- doesFileExist f
+        unless exists $ noFileExist j o f
+
+      let eout' = eout j o
+      staticcheck <$> getAST c f >>= \case
+        Left err  -> eout' err
+        Right (ttab,ast) -> case length ast of
+          len | j && null o -> print len
+              | j           -> writeFile o $ (++"\n") (show len)
+              | null o      -> print len
+              | otherwise   -> writeFile o $ (++"\n") (show len)
+
     m -> do
       (f,o,j,c,transform) <- case m of
         Invert    f o j c -> return (f, o, j, c, \ttab -> showAST ttab . invert)

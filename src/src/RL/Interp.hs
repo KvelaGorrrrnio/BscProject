@@ -7,9 +7,11 @@ import Common.Error
 
 import Control.Monad.Reader
 
+import qualified Data.HashMap.Strict as M
 
 -- The program state
-type ProgState = ReaderT AST VarState
+type ASTMap = M.HashMap Label Block
+type ProgState = ReaderT ASTMap VarState
 
 
 -- ==================
@@ -20,7 +22,7 @@ runProgram :: AST -> TypeTab -> (Either Error VarTab, Log)
 runProgram ast ttab =
   let entry   = (fst . head) ast
       vtab    = buildVTab ttab
-      (vt,ms) = execVarState vtab . runReaderT (interp [] entry) $ ast
+      (vt,ms) = execVarState vtab . runReaderT (interp [] entry) $ M.fromList ast
     in (vt, Log vtab ms)
 
 
@@ -31,7 +33,7 @@ runProgram ast ttab =
 interp :: Label -> Label -> ProgState ()
 interp from l = do
 
-  Just (f,ss,j) <- asks (lookup l)
+  Just (f,ss,j) <- asks (M.lookup l)
 
   case f of
     Entry p      -> unless (null from)
