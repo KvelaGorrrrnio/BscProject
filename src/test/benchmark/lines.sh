@@ -13,7 +13,7 @@ do
   code=$(cat $start)
   echo t, l, rl_hm, rl_lin, srl > $filename.csv
 
-  for i in {0..6}
+  for i in {0..4}
   do
     # fetch number of blocks
     num=$($interp blocks <(echo $code) )
@@ -22,13 +22,13 @@ do
     if [ $interp = "rl" ]
     then
       # time hm
-      pre=$(date +%s%N)
+      pre=$(gdate +%s%N)
       bin/rl_hm <(echo $code) > /dev/null
-      time=$(echo "scale=4; ($(date +%s%N) - $pre)/1000000000" | bc)
+      time=$(echo "scale=4; ($(gdate +%s%N) - $pre)/1000000000" | bc)
       # time lin
-      pre=$(date +%s%N)
+      pre=$(gdate +%s%N)
       bin/rl_lin <(echo $code) > /dev/null
-      time2=$(echo "scale=4; ($(date +%s%N) - $pre)/1000000000" | bc)
+      time2=$(echo "scale=4; ($(gdate +%s%N) - $pre)/1000000000" | bc)
 
       # record
       echo $i, $num, $time, $time2, {}  >> $filename.csv
@@ -40,9 +40,9 @@ do
       interp="srl"
     else
       # time std
-      pre=$(date +%s%N)
+      pre=$(gdate +%s%N)
       $interp <(echo $code) > /dev/null
-      time=$(echo "scale=4; ($(date +%s%N) - $pre)/1000000000" | bc)
+      time=$(echo "scale=4; ($(gdate +%s%N) - $pre)/1000000000" | bc)
 
       # record
       echo $i, $num, {}, {}, $time >> $filename.csv
