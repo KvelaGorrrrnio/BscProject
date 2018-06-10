@@ -21,11 +21,11 @@ do
     # change interpreter and record
     if [ $interp = "rl" ]
     then
-      # time lin
+      # time hm
       pre=$(date +%s%N)
       bin/rl_hm <(echo $code) > /dev/null
       time=$(echo "scale=4; ($(date +%s%N) - $pre)/1000000000" | bc)
-      # time hm
+      # time lin
       pre=$(date +%s%N)
       bin/rl_lin <(echo $code) > /dev/null
       time2=$(echo "scale=4; ($(date +%s%N) - $pre)/1000000000" | bc)

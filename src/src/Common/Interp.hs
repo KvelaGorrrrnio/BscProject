@@ -163,6 +163,8 @@ exec (Swap id1 id2 p) = do
 
 -- initialising a list
 exec (Init id exps p) = do
+  when (any (`dimContain` id) exps) $ logError p $ DimSelfAbuse id
+
   v <- rd (Id id []) p
 
   case v of
@@ -192,6 +194,8 @@ exec (Init id exps p) = do
 
 -- freeing a list
 exec (Free id exps p) = do
+  when (any (`dimContain` id) exps) $ logError p $ DimSelfAbuse id
+
   v <- rd (Id id []) p
 
   case v of
@@ -318,3 +322,14 @@ checkCond :: Exp -> VarState Bool
 checkCond e = eval e >>= \case
   IntV q -> return $ q/=0
   w      -> logError (getExpPos e) $ ConflictingType IntT (getType w)
+
+-- free and init
+dimContain :: Exp -> String ->  Bool
+dimContain Lit{} _               = False
+dimContain (Var id' _) id        = id' == id
+dimContain (Binary _ e1 e2 _) id = e1 `dimContain` id || e2 `dimContain` id
+dimContain (Unary Top e p) id    = e  `dimContain` id
+dimContain (Index e _ _) id      = e  `dimContain` id
+dimContain (Unary Size e _) id   = e  `dimContain` id
+dimContain (Unary _ e _) id      = e  `dimContain` id
+dimContain (Parens e _) id       = e  `dimContain` id

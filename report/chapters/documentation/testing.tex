@@ -12,7 +12,7 @@ All tests pass, indicating that the implementation of the command-line interface
 The test system is being built and executed by running \texttt{\$ stack test}. It is written in Haskell and is located at \path{/src/test} in \texttt{Lib.hs} and \texttt{Spec.hs} where \texttt{Spec.hs} is the main entry point. The files of the test framework can be found in Appendix~\ref{app:testing_framework}.
 
 It works by fetching all RL- and SRL program files located in \path{/src/test/suite} and, for each of these, testing its output against some predefined output files. Every output file follows a certain naming convention defined loosely as something like \texttt{[script].[option].[mode].out}; this makes it easy for us to test every output of a single program systematically.
-Outfiles in a test-suite can have the formats described in the table below.
+Output files in a test suite can have the formats described in the table below.
 \[
   \begin{tabular}{|l|l|}\hline
     \textbf{Format}             & \textbf{Expected command}\\\hline
@@ -28,7 +28,7 @@ Outfiles in a test-suite can have the formats described in the table below.
   %\caption{Possible outfiles for the file test.srl.}
   %\label{fig:test_suite_formats}
 \]
-This way of structuring test-files ensures that the different ways one can interact with the command-line interface are behaving as intended, even where errors are given.
+This way of structuring test files ensures that the different ways one can interact with the command-line interface are behaving as intended, even where errors are given.
 
 There are currently written 53 test programs; some are trivial and written simply to test the behavior of specific features, and some are less trivial in order to test the overall usefulness of the implemented languages. Two of the less trivial programs are \texttt{phys} and \texttt{primefac}, written both in RL and SRL.
 

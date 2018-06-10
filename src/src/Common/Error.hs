@@ -23,6 +23,7 @@ data RuntimeError
   | IndexOnNonListExp
   | NonIntegerIndex
   | SelfAbuse Id
+  | DimSelfAbuse String
   | NegativeIndex
   | IndexOutOfBounds
   | PushToNonList Id
@@ -79,6 +80,7 @@ instance Show RuntimeError where
   show IndexOnNonListExp = "Tried indexing on non-list value"
   show NonIntegerIndex = "Tried indexing with non-integer value"
   show (SelfAbuse idx) = "Update on variable '" ++ show idx ++ "' contains the identifier itself."
+  show (DimSelfAbuse id) = "Dimension list contains variable '" ++ id ++ "' being (de)allocated."
   show NegativeIndex = "Index is negative"
   show IndexOutOfBounds = "Index out of bounds"
   show (PushToNonList idx) = "Tried pushing to non-list identifier: " ++ show idx
