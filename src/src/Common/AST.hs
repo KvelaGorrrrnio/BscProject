@@ -1,7 +1,7 @@
 module Common.AST (module Common.AST, Int32) where
 
 import Data.Bits (xor)
-import Data.Int (Int32)
+import Data.Int
 import Data.List (intercalate, sortBy)
 import Data.Function (on)
 import qualified Data.HashMap.Strict as M
