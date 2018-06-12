@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, LambdaCase #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Common.Interp (module Common.Interp, module Common.Log) where
 
@@ -6,14 +6,10 @@ import Common.Error
 import Common.Log
 import Common.AST
 
-import Data.Bits (xor)
-
 import Control.Monad.State
 import Control.Monad.Writer
 import Control.Monad.Except
 import Control.Monad.Loops (allM)
-
-import Debug.Trace
 
 import qualified Data.HashMap.Strict as M
 
@@ -163,7 +159,7 @@ exec (Swap id1 id2 p) = do
 
 -- initialising a list
 exec (Init id exps p) = do
-  when (any (`dimContain` id) exps) $ logError p $ DimSelfAbuse id
+  when (exps `contain` id) $ logError p $ DimSelfAbuse id
 
   v <- rd (Id id []) p
 
@@ -194,7 +190,7 @@ exec (Init id exps p) = do
 
 -- freeing a list
 exec (Free id exps p) = do
-  when (any (`dimContain` id) exps) $ logError p $ DimSelfAbuse id
+  when (exps `contain` id) $ logError p $ DimSelfAbuse id
 
   v <- rd (Id id []) p
 
@@ -323,13 +319,18 @@ checkCond e = eval e >>= \case
   IntV q -> return $ q/=0
   w      -> logError (getExpPos e) $ ConflictingType IntT (getType w)
 
--- free and init
-dimContain :: Exp -> String ->  Bool
-dimContain Lit{} _               = False
-dimContain (Var id' _) id        = id' == id
-dimContain (Binary _ e1 e2 _) id = e1 `dimContain` id || e2 `dimContain` id
-dimContain (Unary Top e p) id    = e  `dimContain` id
-dimContain (Index e _ _) id      = e  `dimContain` id
-dimContain (Unary Size e _) id   = e  `dimContain` id
-dimContain (Unary _ e _) id      = e  `dimContain` id
-dimContain (Parens e _) id       = e  `dimContain` id
+-- helper for free and init
+contain :: [Exp] -> String -> Bool
+contain exps id = any (`dimContains` id) exps
+
+  where
+
+    dimContains :: Exp -> String ->  Bool
+    dimContains Lit{} _               = False
+    dimContains (Var id' _) id        = id' == id
+    dimContains (Binary _ e1 e2 _) id = e1 `dimContains` id || e2 `dimContains` id
+    dimContains (Unary Top e p) id    = e  `dimContains` id
+    dimContains (Index e _ _) id      = e  `dimContains` id
+    dimContains (Unary Size e _) id   = e  `dimContains` id
+    dimContains (Unary _ e _) id      = e  `dimContains` id
+    dimContains (Parens e _) id       = e  `dimContains` id

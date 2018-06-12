@@ -1,0 +1,4 @@
+list int l
+
+init l [size l + 2]
+free l [10]
