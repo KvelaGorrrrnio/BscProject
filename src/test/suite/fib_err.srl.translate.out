@@ -7,7 +7,7 @@ l0: entry
 goto l1
 
 l1: from l0
-  n ^= 16
+  n ^= 0
 goto l6
 
 l6: from l1

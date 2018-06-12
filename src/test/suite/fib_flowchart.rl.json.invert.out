@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int n\nint v\nint w\n\nend: entry\n  skip\nif (n) l1 l2\n\nl2: fi (n = 0) end l1\n  n += 1\n  swap v w\ngoto l1\n\nl1: fi (v < w) end l2\n  v -= w\nif (v = 0) start l2\n\nstart: from l1\n  w ^= 1\n  n ^= 0\nexit" }

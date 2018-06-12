@@ -10,4 +10,4 @@ loop
   skip
 until (v = 0)
 w ^= 1
-n ^= 16
+n ^= 0

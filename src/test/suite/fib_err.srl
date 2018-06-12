@@ -3,7 +3,7 @@
 int n
 int v int w
 
-n ^= 16
+n ^= 0
 w ^= 1
 from (v = 0) do
   v += w

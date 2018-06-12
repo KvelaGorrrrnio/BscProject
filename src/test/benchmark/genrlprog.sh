@@ -2,7 +2,7 @@
 
 IFS=
 
-code="int n\n\nl1: entry\n  n += $2\ngoto l2"
+code="int n\nl1: entry\n  n += $2\ngoto l2"
 code="${code}\nl2: fi n = $2 l1 l$(($1 - 1))\n  skip\ngoto l3"
 
 max=$(($1 - 2))

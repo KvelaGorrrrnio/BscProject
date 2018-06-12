@@ -1,0 +1,86 @@
+\documentclass[12pt,oneside,openright,pdftex,a4paper]{report}
+
+% Load styles
+\usepackage{style/style}
+
+\begin{document}
+
+
+
+\begin{figure}
+  \centering
+  $$\begin{aligned}
+    & \mathcal{G}_{RL}(b,i) =                             & \qquad \qquad & \mathcal{G}_{SRL}(b,i) =          \\
+    & \quad \texttt{int n}                                & \qquad \qquad & \quad \texttt{int n}              \\
+    & \quad l_1: \texttt{entry}                           & \qquad \qquad & \quad \texttt{n += $i$}           \\
+    & \quad \ \ \ \ \ \ \texttt{n += } i                  & \qquad \qquad & \quad \texttt{from (n=$i$) do}    \\
+    & \quad \ \ \ \ \ \ \texttt{goto }l_2                 & \qquad \qquad & \quad \ \ \ \ \ \ \texttt{skip}   \\
+    & \quad l_2: \texttt{fi (n=$i$)} \ \ l_1 \ \ l_{b-1}  & \qquad \qquad & \quad \ \ \ \ \ \ \dots
+    \qquad \qquad \smash{\left.\begin{array}{@{}c@{}}\\[\jot]\\[\jot]\\[\jot]\end{array}\right\}} b-4 \\[\jot]
+    & \quad \ \ \ \ \ \ \texttt{skip}                     & \qquad \qquad & \quad \ \ \ \ \ \ \texttt{skip}   \\
+    & \quad \ \ \ \ \ \ \texttt{goto }l_3                 & \qquad \qquad & \quad \ \ \ \ \ \ \texttt{n -= 1} \\
+    & \quad \dots                                         & \qquad \qquad & \quad \texttt{loop skip}          \\
+    & \quad l_{b-1}: \texttt{from } l_{b-2}               & \qquad \qquad & \quad \texttt{until (n=0)}        \\
+    & \quad \ \ \ \ \ \ \texttt{n -= 1}                   & \qquad \qquad & \quad \texttt{skip}               \\
+    & \quad \ \ \ \ \ \ \texttt{if (n=0) }l_b \ \ l_2                                                         \\
+    & \quad l_b: \texttt{from } l_{b-1}                                                                       \\
+    & \quad \ \ \ \ \ \ \texttt{skip}                                                                         \\
+    & \quad \ \ \ \ \ \ \texttt{exit}
+  \end{aligned}$$
+  \caption{Translation from structured SRL to unstructured RL.}
+\end{figure}
+
+
+
+
+
+\pgfplotsset{compat = 1.3}
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+  \begin{axis} [
+      no markers,
+      every axis plot/.append style={ultra thick},
+      %smooth,
+      xlabel=\#blocks,
+      ylabel=\#seconds,
+      %ylabel shift=-2 pt,
+      width=0.7\textwidth,
+      legend style={at={(0.3,1)},anchor=north west},
+      axis x line=middle,
+      axis y line=middle,
+      every axis x label/.style=
+                  {at={(ticklabel cs: 0.5,0)}, anchor=north},
+      scaled x ticks = true
+      %x tick label style={/pgf/number format/.cd,%
+      %          scaled y ticks = false,
+      %          set thousands separator={},
+      %          fixed}
+    ]
+
+    \addplot table [
+      x=b,
+      y=srl,
+      col sep=comma,
+    ] {../bm.csv};
+    \addlegendentry{SRL}
+
+    \addplot table [
+      x=b,
+      y=rl_hm,
+      col sep=comma,
+    ] {../bm.csv};
+    \addlegendentry{RL (hash map)}
+
+    \addplot table [
+      x=b,
+      y=rl_lin,
+      col sep=comma,
+    ] {../bm.csv};
+    \addlegendentry{RL (association list)}
+
+  \end{axis}
+  \end{tikzpicture}
+\end{figure}
+
+\end{document}

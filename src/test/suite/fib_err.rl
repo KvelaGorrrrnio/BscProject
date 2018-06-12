@@ -4,7 +4,7 @@ int n
 int v int w
 
 start: entry
-  n ^= 16
+  n ^= 0
   w ^= 1
 goto loop
 

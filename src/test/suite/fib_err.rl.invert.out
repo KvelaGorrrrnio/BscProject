@@ -14,5 +14,5 @@ if (v = 0) start loop
 
 start: from loop
   w ^= 1
-  n ^= 16
+  n ^= 0
 exit

@@ -70,7 +70,8 @@ reserved      = Token.reserved      lexer
 reservedOp n  = Token.reservedOp    lexer n >> pos
 parens        = Token.parens        lexer
 brackets      = Token.brackets      lexer
-integer       = Token.integer       lexer
+integer       = fromIntegral <$>
+                Token.integer       lexer
 colon         = Token.colon         lexer
 comma         = Token.comma         lexer
 whiteSpace    = Token.whiteSpace    lexer
