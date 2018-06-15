@@ -93,9 +93,9 @@ For windows see [stack documentation](https://docs.haskellstack.org/en/stable/RE
 ### Web interface
 To build and run the web interface Node is required.
 ```bash
-brew install node # Mac OS
+brew install node               # Mac OS
 sudo apt-get install nodejs npm # Ubuntu
-sudo pacman -S nodejs npm # Arch
+sudo pacman -S nodejs npm       # Arch
 ```
 
 ## Installing
@@ -127,6 +127,7 @@ make web
 ```bash
 autoload bashcompinit # ZSH only
 bashcompinit          # ZSH only
+
 function _autocomplete_srl_or_rl() {
   if [[ $# != 3 ]]; then
     return;
@@ -136,6 +137,9 @@ function _autocomplete_srl_or_rl() {
   local prev="${COMP_WORDS[COMP_CWORD - 1]}"
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local files=( $(IFS=' '; find . -maxdepth 1 -name "${cur}*.${lng}") )
+  if [[ -f "${cur}${lng}" ]]; then
+    files=( "${cur}${lng}" )
+  fi
   if [[ "$prev"  = "${lng}" ]]; then
     local modes=( $(compgen -W "$allmodes" -- "$cur") )
     COMPREPLY=( ${modes[@]} ${files[@]/.\//} )
