@@ -90,10 +90,10 @@ brew install haskell-stack cabal-install ghc # MacOS
 curl -sSL https://get.haskellstack.org/ | sh # Unix
 wget -qO- https://get.haskellstack.org/ | sh # Unix alternative
 ```
-For windows see [stack documentation](https://docs.haskellstack.org/en/stable/README/).
+For Windows see [stack documentation](https://docs.haskellstack.org/en/stable/README/).
 
 ### Web interface
-To build and run the web interface Node is required.
+To build and run the web interface, Node is required.
 ```bash
 brew install node               # Mac OS
 sudo apt-get install nodejs npm # Ubuntu
@@ -187,6 +187,8 @@ complete -F _autocomplete_srl_or_rl "srl" srl
 ### Syntax highlighting
 
 We have defined a syntax highlighter for each of the two languages for Vim. Move `vim/syntax/(s)rl.vim` to `.vim/syntax` and `vim/ftdetect/(s)rl.vim` to `.vim/ftdetect`.
+
+![alt text](https://raw.githubusercontent.com/KvelaGorrrrnio/BscProject/origin/syntax.png)
 
 ### Web interface
 
