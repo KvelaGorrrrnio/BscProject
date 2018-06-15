@@ -188,7 +188,7 @@ complete -F _autocomplete_srl_or_rl "srl" srl
 
 We have defined syntax highlighting for each of the two languages for Vim. Move `vim/syntax/(s)rl.vim` to `.vim/syntax` and `vim/ftdetect/(s)rl.vim` to `.vim/ftdetect`.
 
-![syntax highlighting](https://imgur.com/KFKOYkK.png)
+![syntax highlighting](https://imgur.com/X8KVpHP.png)
 
 ### Web interface
 
