@@ -1,4 +1,4 @@
-# Problem definition {#sec:problem_definition}
+# Problem definition
 
 The project concerns the implementation of interpreters for each of the
 two reversible programming languages RL and SRL as described in the
@@ -11,7 +11,7 @@ Furthermore, our implementation will support two interesting program transformat
 program inversion of each language and translation <i>between</i> them - as proven possible by the Reversible Structured Program Theorem. To test our implementation and evaluate the practicality of the two
 languages, we write a collection of test programs of varying complexity.
 
-# Boundaries of problem definition {#sec:boundaries_of_problem_definition}
+# Boundaries of problem definition
 
 The focus of the project is on writing the two interpreters in Haskell.
 Each of the interpreters has to run reasonably fast, although the main
@@ -27,7 +27,7 @@ complexity.
 We will also implement a command-line interface for the interpreters
 along with a web-based interface for running and testing the languages.
 
-# Motivation {#sec:motivation}
+# Motivation
 
 Many sequential programming languages today are forward deterministic; a
 given instruction in a program uniquely defines the next state. Most of
@@ -49,7 +49,7 @@ efficiency of modern computers.
 In this project we will implement interpreters for RL and SRL along with
 some useful program transformations.
 
-# Tasks {#sec:tasks}
+# Tasks
 
 1.  Decide on whether to use a parser generator or write our own parser.
     If we choose to use a parser generator, we have to decide on which
