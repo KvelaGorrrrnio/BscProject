@@ -112,7 +112,7 @@ To instal the binaries to local bin
 make install
 ```
 
-### Webinterface
+### Web interface
 The web interface can be built with
 ```bash
 make web
@@ -121,6 +121,36 @@ make web
 ## Usage
 
 ### Interpreters
+
+#### Help
+```bash
+The Glorious [S]RL Interpreter System, version 1.0.0
+
+[s]rl [COMMAND] ... [OPTIONS]
+  Interpret, invert or translate an [S]RL program
+
+Common flags:
+  -o --out=FILE         Write the output to the specified file
+  -j --json             Format the output as JSON
+  -c --code             Give a string to be treated as [S]RL code
+  -h --help             Display help message
+  -v --version          Print version information
+     --numeric-version  Print just the version number
+
+[s]rl [run] [OPTIONS] [FILE]
+  Interpret an [S]RL program
+
+  -l --log              Output log instead of final state
+
+[s]rl invert [OPTIONS] [FILE]
+  Invert an [S]RL program
+
+[s]rl translate [OPTIONS] [FILE]
+  Translate a program in one language to a program in the other language
+
+[s]rl blocks [OPTIONS] [FILE]
+  Print the number of blocks in the program
+```
 
 #### Autocompletion
 
@@ -151,7 +181,11 @@ complete -F _autocomplete_srl_or_rl "rl"  rl
 complete -F _autocomplete_srl_or_rl "srl" srl
 ```
 
-### Webinterface
+### Syntax highlighting
+
+We have defined a syntax highlighter for each of the two languages for Vim. Move `vim/syntax/(s)rl.vim` to `.vim/syntax` and `vim/ftdetect/(s)rl.vim` to `.vim/ftdetect`.
+
+### Web interface
 
 To start the web server, run
 ```bash
