@@ -3,7 +3,7 @@ function _autocomplete_srl_or_rl() {
     return;
   fi
   local lng="$1"
-  local allmodes="run translate invert"
+  local allmodes="run translate invert blocks"
   local prev="${COMP_WORDS[COMP_CWORD - 1]}"
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local files=( $(IFS=' '; find . -maxdepth 1 -name "${cur}*.${lng}") )
