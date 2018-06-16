@@ -1,2 +1,2 @@
 A runtime error occurred at (line 7, column 1):
-Update on variable 'a[4,1,4,2,4]' contains the identifier itself.
+'a[4,1,4,2,4]' occurs on both sides of an update.

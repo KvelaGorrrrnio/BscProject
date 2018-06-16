@@ -9,7 +9,7 @@ import Common.AST
 import Control.Monad.State
 import Control.Monad.Writer
 import Control.Monad.Except
-import Control.Monad.Loops (allM)
+import Control.Monad.Loops (allM, anyM)
 
 import qualified Data.HashMap.Strict as M
 
@@ -76,14 +76,15 @@ adjust' op (e:es) vo = do
 exec :: Step -> VarState ()
 
 -- variable updates
-exec (Update (Id id exps) op e p) = do
-  cont <- contains e (Id id exps) []
-  when cont $ logError p $ SelfAbuse (Id id exps)
+exec (Update (Id id is) op e p) = do
+  when (is `contain` id) $ logError p $ ListInOwnIndex id
+  cont <- contains2 e (Id id is) []
+  when cont $ logError p $ SelfAbuse (Id id is)
 
-  v1 <- rd (Id id exps) p
+  v1 <- rd (Id id is) p
   n <- case v1 of
     IntV n -> return n
-    w      -> logError p $ UpdateOnNonInt32 (Id id exps) (getType w)
+    w      -> logError p $ UpdateOnNonInt32 (Id id is) (getType w)
 
   v2 <- eval e
   m <- case v2 of
@@ -99,25 +100,33 @@ exec (Update (Id id exps) op e p) = do
     _ -> return ()
 
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
-  adjust (const res) (Id id exps) p
+  adjust (const res) (Id id is) p
 
-  where contains :: Exp -> Id -> [Exp] -> VarState Bool
-        contains Lit{} _ _ = return False
-        contains (Var id2 _) (Id id1 exps1) exps2
-          | id1 == id2 = (&&) (length exps1 == length exps2) <$>
-                         ( (==) <$> mapM eval exps1 <*> mapM eval exps2 )
+  where
+        -- =========================================================
+        -- Use this instead of 'contains' for a bit more flexibility
+        -- =========================================================
+        contains2 :: Exp -> Id -> [Exp] -> VarState Bool
+        contains2 Lit{} _ _ = return False
+        contains2 (Var id2 _) (Id id1 exps1) exps2
+          | id1 == id2 = if length exps1 == length exps2 then
+              (==) <$> mapM eval exps1 <*> mapM eval exps2
+            else return False
           | otherwise = return False
-        contains (Binary _ e1 e2 _) id is = (||) <$> contains e1 id is <*> contains e2 id is
-        contains (Unary Top e p) id is    = contains e id (Binary Minus (Unary Size e p) (Lit (IntV 1) p) p : is)
-        contains (Index l exps _) id is   = contains l id (exps ++ is)
-        contains (Unary Size _ _) _ _     = return False
-        contains (Unary _ e _) id is      = contains e id is
-        contains (Parens e _) id is       = contains e id is
+        contains2 (Binary _ e1 e2 _) id is = (||) <$> contains2 e1 id is <*> contains2 e2 id is
+        contains2 (Unary Top e p) id is    =
+          contains2 e id (Binary Minus (Unary Size e p) (Lit (IntV 1) p) p : is)
+        contains2 (Unary Size _ _) _ _     = return False
+        contains2 (Unary _ e _) id is      = contains2 e id is
+        contains2 (Index l exps _) id is   =
+          (||) <$> anyM (\e -> contains2 e id []) exps <*> contains2 l id (exps ++ is)
+        contains2 (Parens e _) id is       = contains2 e id is
 
 -- list modification
 exec (Push id1 id2 p) = do
   v1 <- rd id1 p
   v2 <- rd id2 p
+
   case v2 of
     ListV ls (ListT t)
       | t == getType v1 -> do
@@ -125,14 +134,14 @@ exec (Push id1 id2 p) = do
         adjust (push v1) id2 p
       | otherwise -> logError p $ ConflictingType t (getType v1)
     _ -> logError p $ PushToNonList id2
+
   where push v (ListV ls t) = ListV (ls++[v]) t
         clear (IntV _)      = IntV 0
         clear (ListV _ t)   = ListV [] t
 
 exec (Pop id1 id2 p) = do
   v1 <- rd id1 p
-  unless (isClear v1) $
-    logError p $ PopToNonEmpty id1
+  unless (isClear v1) $ logError p $ PopToNonEmpty id1
 
   v2 <- rd id2 p
   case v2 of
@@ -152,8 +161,7 @@ exec (Swap id1 id2 p) = do
 
   let t1 = getType v1
       t2 = getType v2
-  unless (t1 == t2)
-    $ logError p $ SwapNotSameType t1 t2
+  unless (t1 == t2) $ logError p $ SwapNotSameType t1 t2
 
   adjust (const v2) id1 p >> adjust (const v1) id2 p
 
@@ -172,13 +180,10 @@ exec (Init id exps p) = do
 
   unless (isClear v) $ logError p $ InitNonEmptyList id
 
-  nv <- foldrM repl (IntV 0) exps
-
+  nv <- foldr ((=<<) . repl) (pure $ IntV 0) exps
   adjust (const nv) (Id id []) p
 
   where
-
-    foldrM f e = foldr ((=<<) . f) (return e)
 
     repl e acc = eval e >>= \case
       IntV n
@@ -204,8 +209,7 @@ exec (Free id exps p) = do
   unless (allZero v) $ logError p $ FreeNonEmptyList id
 
   eql <- equalLengths v exps
-  unless eql
-    $ logError p ConflictingLengths
+  unless eql $ logError p ConflictingLengths
 
   adjust (const . getDefaultValue . getType $ v) (Id id []) p
 
@@ -217,7 +221,7 @@ exec (Free id exps p) = do
           ListV ls t  -> (&&) (length ls == fromIntegral n) <$> allM (`equalLengths` exps) ls
           IntV _      -> logError p $ FreeOnNonList id
         | otherwise -> logError (getExpPos e) NegativeDimension
-      ListV _ t -> logError (getExpPos e) $ NonInt32Dimension t -- Maybe ListT t
+      ListV _ t -> logError (getExpPos e) $ NonInt32Dimension t
     equalLengths ListV{} [] = return False
     equalLengths IntV{}  [] = return True
 
@@ -319,18 +323,14 @@ checkCond e = eval e >>= \case
   IntV q -> return $ q/=0
   w      -> logError (getExpPos e) $ ConflictingType IntT (getType w)
 
--- helper for free and init
+-- helper for some functionality
 contain :: [Exp] -> String -> Bool
-contain exps id = any (`dimContains` id) exps
+contain exps id = any (`contains` id) exps
 
-  where
-
-    dimContains :: Exp -> String ->  Bool
-    dimContains Lit{} _               = False
-    dimContains (Var id' _) id        = id' == id
-    dimContains (Binary _ e1 e2 _) id = e1 `dimContains` id || e2 `dimContains` id
-    dimContains (Unary Top e p) id    = e  `dimContains` id
-    dimContains (Index e _ _) id      = e  `dimContains` id
-    dimContains (Unary Size e _) id   = e  `dimContains` id
-    dimContains (Unary _ e _) id      = e  `dimContains` id
-    dimContains (Parens e _) id       = e  `dimContains` id
+contains :: Exp -> String ->  Bool
+contains Lit{} _               = False
+contains (Var id' _) id        = id' == id
+contains (Binary _ e1 e2 _) id = e1 `contains` id || e2 `contains` id
+contains (Unary _ e _) id      = e  `contains` id
+contains (Index e exps _) id   = e  `contains` id || exps `contain` id
+contains (Parens e _) id       = e  `contains` id
