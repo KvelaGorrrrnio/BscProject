@@ -109,7 +109,7 @@ The interpreters can be built with
 make src # Binaries can be found in /src/bin
 ```
 
-To instal the binaries to local bin
+To install the binaries to local bin, run
 ```bash
 make install
 ```
