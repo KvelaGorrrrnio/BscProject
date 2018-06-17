@@ -23,7 +23,7 @@
 
 ## RL & SRL: An overview
 RL and SRL are two reversible programming languages proposed in the paper *Fundamentals of reversible flowchart languages* by Yokoyama et al. RL is a low-level, assembler-style language with unstructured jumps. SRL is, as the name implies, a structured version of RL with control structures, i.e. loops and conditionals. \
-&nbsp;&nbsp;&nbsp;&nbsp;This interface provides an easy way to play around with RL and SRL. Other than simple execution of programs, the interface also supports inversion and translation of programs - where translation means translating from structured SRL to unstructured RL, or, as proven possible by the *structured reversible program theorem*, from unstructured RL to structured SRL.
+\ \ \ \ This interface provides an easy way to play around with RL and SRL. Other than simple execution of programs, the interface also supports inversion and translation of programs - where translation means translating from structured SRL to unstructured RL, or, as proven possible by the *structured reversible program theorem*, from unstructured RL to structured SRL.
 
 ## Table of Contents
 1. [Common](#common)
@@ -220,7 +220,7 @@ Jumps and come-from assertions can either be conditional, unconditional or mark 
 - `exit`
 
 If the expression in a conditional come-from assertion evaluates to true, control flow should have been passed from the first label. Otherwise, it should have been passed from the second. Intuitively, if a block can be reached from two different places in the program, it should have a conditional come-from assertion that uniquely determines the exact origin at the given instance.\
-&nbsp;&nbsp;&nbsp;&nbsp;For the program to be well formed, it has to have exactly one entry and one exit. Furthermore, the entry has to be the first block in the program, and the exit has to be the last.
+\ \ \ \ For the program to be well formed, it has to have exactly one entry and one exit. Furthermore, the entry has to be the first block in the program, and the exit has to be the last.
 
 ### RL example
 The following program will compute the $n^{th}$ Fibonacci pair reversibly.
@@ -260,7 +260,7 @@ from [exp] do [body] loop [body] until [exp]
 where each body is another sequence of one or more SRL blocks.
 
 To ensure reversibility, the conditional ends with an assertion. This assertion **must** evaluate to true if the then-branch was taken, and false otherwise. This makes it clear which path to take when inverting the program.\
-&nbsp;&nbsp;&nbsp;&nbsp;The loop, on the other hand, *starts* with an assertion. This assertion must hold when entering the loop from the outside, and it must *not* hold when coming from the inside.
+\ \ \ \ The loop, on the other hand, *starts* with an assertion. This assertion must hold when entering the loop from the outside, and it must *not* hold when coming from the inside.
 
 The loop works by first evaluating the assertion. If it holds, we continue by executing the first body. If the terminating condition holds afterwards, we are done. If not, we execute the second body and evaluate the assertion once again. This time, if this does *not* hold, we continue and repeat. Thus, we can simulate both do-until- and while loops with this loop construct.
 
