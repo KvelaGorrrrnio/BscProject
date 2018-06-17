@@ -21,6 +21,7 @@ import Data.List (stripPrefix,concat)
 import Control.Monad (mapM,join, filterM)
 import Control.Monad.Except
 import Data.Char (isSpace)
+import Data.Maybe (isJust)
 import Text.Regex
 
 data Target
@@ -111,7 +112,7 @@ runSuite' file (OutFile o m) = do
     case (ec1,ec2) of
       (ExitSuccess, ExitSuccess) ->
         let so1' = removeAllSpace . trim . removeLineNumbers $ so1
-            so2' = removeAllSpace . removeStateVariable lng . trim . removeLineNumbers $ so2
+            so2' = removeAllSpace . (if hasLineNumbers so2 then id else removeStateVariable lng) . trim . removeLineNumbers $ so2
           in if so1' == so2' then return ()
         else throwError $ "Execution of '" ++ file ++ "' and '" ++ o ++ "' have different output:\n" ++ expColor (trim so1) ++ "\n" ++ maxDash out exp ++ "\n" ++ errColor (trim so2) ++ "\n"
       _                          -> throwError $ "Either '" ++ file ++ "' and/or '" ++ o ++ "' wasn't executed."
@@ -121,8 +122,12 @@ runSuite' file (OutFile o m) = do
         swapInterpreter "srl" = "rl"
         swapInterpreter s = s
 
+lineNumberRE = mkRegex "(line [0-9]+, column [0-9]+)"
 removeLineNumbers :: String -> String
-removeLineNumbers s = subRegex (mkRegex "(line [0-9]+, column [0-9]+)") s ""
+removeLineNumbers s = subRegex lineNumberRE s ""
+
+hasLineNumbers :: String -> Bool
+hasLineNumbers s = isJust $ matchRegex lineNumberRE s
 
 removeStateVariable :: String -> String -> String
 removeStateVariable "rl" s = unlines . init . lines $ s
