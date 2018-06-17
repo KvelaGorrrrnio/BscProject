@@ -1,1 +1,1 @@
-{ "type" : "error", "position" : { "line" : 25, "column" : 3 }, "message" : "A runtime error occurred at (line 25, column 3):\nUpdate on variable 'lst[1 + 2]' contains the identifier itself." }
+{ "type" : "error", "position" : { "line" : 25, "column" : 3 }, "message" : "A runtime error occurred at (line 25, column 3):\n'lst[1 + 2]' occurs on both sides of an update." }

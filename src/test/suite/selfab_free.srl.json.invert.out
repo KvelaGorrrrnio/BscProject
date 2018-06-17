@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "list int l\n\ninit l [size l + 2]\nfree l [10]" }

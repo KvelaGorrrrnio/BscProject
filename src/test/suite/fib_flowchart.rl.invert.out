@@ -1,0 +1,21 @@
+int n
+int v
+int w
+
+end: entry
+  skip
+if (n) l1 l2
+
+l2: fi (n = 0) end l1
+  n += 1
+  swap v w
+goto l1
+
+l1: fi (v < w) end l2
+  v -= w
+if (v = 0) start l2
+
+start: from l1
+  w ^= 1
+  n ^= 0
+exit

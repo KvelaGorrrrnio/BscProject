@@ -36,7 +36,7 @@ from (w_[0,1,0]) do
     swap w_[2,2,1] w_[2,2,2]
   else
   if (w_[2,2,2]) then
-    if (n = 0) then
+    if (n = 0 || v > w) then
       swap w_[2,2,2] w_[2,3,0]
     else
       swap w_[2,2,2] w_[2,2,0]

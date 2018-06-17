@@ -1,2 +1,2 @@
 A runtime error occurred at (line 25, column 3):
-Update on variable 'lst[1 + 2]' contains the identifier itself.
+'lst[1 + 2]' occurs on both sides of an update.

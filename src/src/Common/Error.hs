@@ -21,8 +21,9 @@ data RuntimeError
   = NonDefinedId String
   | IndexOnNonList String
   | IndexOnNonListExp
-  | NonIntegerIndex
+  | NonInt32Index
   | SelfAbuse Id
+  | ListInOwnIndex String
   | DimSelfAbuse String
   | NegativeIndex
   | IndexOutOfBounds
@@ -35,17 +36,17 @@ data RuntimeError
   | SwapNotSameType Type Type
   | EmptyTop
   | NonListExp Type
-  | NonIntegerExp Type
+  | NonInt32Exp Type
   | DivByZero
   | DivHasRest
   | MultByZero
-  | UpdateOnNonInteger Id Type
+  | UpdateOnNonInt32 Id Type
   | InitOnNonList String
   | InitNonEmptyList String
   | ConflictingDimensions
   | ConflictingLengths
   | NegativeDimension
-  | NonIntegerDimension Type
+  | NonInt32Dimension Type
   | FreeOnNonList String
   | FreeNonEmptyList String
   -- RL specific runtime errors
@@ -78,8 +79,9 @@ instance Show RuntimeError where
   show (NonDefinedId id) = "Variable '" ++ id ++ "' is not defined."
   show (IndexOnNonList id) = "Tried indexing on non-list identifier: " ++ id
   show IndexOnNonListExp = "Tried indexing on non-list value"
-  show NonIntegerIndex = "Tried indexing with non-integer value"
-  show (SelfAbuse idx) = "Update on variable '" ++ show idx ++ "' contains the identifier itself."
+  show NonInt32Index = "Tried indexing with non-integer value"
+  show (SelfAbuse id) = "'" ++ show id ++ "' occurs on both sides of an update."
+  show (ListInOwnIndex id) = "List variable '" ++ id ++ "' used as index on itself in an update."
   show (DimSelfAbuse id) = "Dimension list contains variable '" ++ id ++ "' being (de)allocated."
   show NegativeIndex = "Index is negative"
   show IndexOutOfBounds = "Index out of bounds"
@@ -92,17 +94,17 @@ instance Show RuntimeError where
   show (SwapNotSameType t1 t2) = "Trying to swap two variables of different types: " ++ show t1 ++ " and " ++ show t2
   show EmptyTop = "Tried reading top of empty list."
   show (NonListExp t) = "Expected list from expression, but received " ++ show t
-  show (NonIntegerExp t) = "Expected " ++ show IntT ++ " from expression, but received " ++ show t
+  show (NonInt32Exp t) = "Expected " ++ show IntT ++ " from expression, but received " ++ show t
   show DivByZero = "Division by zero."
   show DivHasRest = "Division has rest."
   show MultByZero = "Multiplication update by zero."
-  show (UpdateOnNonInteger idx t) = "Tried updating non-" ++ show IntT ++ " identifier '" ++ show idx ++ "' of type " ++ show t
+  show (UpdateOnNonInt32 idx t) = "Tried updating non-" ++ show IntT ++ " identifier '" ++ show idx ++ "' of type " ++ show t
   show (InitOnNonList id) = "Tried initializing non-list identifier '" ++ id ++ "'"
   show (InitNonEmptyList id) = "Tried initliazing non-empty list identifier '" ++ id ++ "'"
   show ConflictingDimensions = "The number of dimensions specified does not match depth of list type."
   show ConflictingLengths = "The lengths specified do not match lengths of the of list."
   show NegativeDimension = "Encountered negative dimension"
-  show (NonIntegerDimension t) = "Expected dimension size to be of type " ++ show IntT ++ ", received " ++ show t
+  show (NonInt32Dimension t) = "Expected dimension size to be of type " ++ show IntT ++ ", received " ++ show t
   show (FreeOnNonList id) = "Tried freeing non-list identifier '" ++ id ++ "'"
   show (FreeNonEmptyList id) = "Tried freeing non-empty list identifier '" ++ id ++ "'"
   show (AssertionFailed exp e r) = "Assertion '" ++ show exp ++ "' expected " ++ show e ++ ", but evaluated to " ++ show r

@@ -1,2 +1,2 @@
 A runtime error occurred at (line 5, column 3):
-Update on variable 'N[2,3,3]' contains the identifier itself.
+'N[2,3,3]' occurs on both sides of an update.

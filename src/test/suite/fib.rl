@@ -1,8 +1,7 @@
 // Compute the n'th fibonacci pair
 
 int n
-int v
-int w
+int v int w
 
 start: entry
   n ^= 16
@@ -13,7 +12,7 @@ loop: fi (v = 0) start loop
   v += w
   swap v w
   n -= 1
-if n = 0 end loop
+if (n = 0 || v > w) end loop
 
 end: from loop
 exit

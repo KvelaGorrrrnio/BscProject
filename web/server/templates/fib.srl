@@ -10,4 +10,4 @@ from (v = 0) do
   swap v w
   n -= 1
 loop .
-until (n = 0)
+until (n = 0 || v > w)

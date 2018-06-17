@@ -2,7 +2,7 @@ const initState = {
   theme: 'default',
   mode: 'run',
   language: 'srl',
-  code: '// Program for computing the n\'th fibonacci pair\nint n\nint v int w\n\nn ^= 16\nw ^= 1\nfrom (v = 0) do\n  v += w\n  swap v w\n  n -= 1\nloop .\nuntil (n = 0)\n',
+  code: '// Compute the n\'th fibonacci pair\n\nint n\nint v int w\n\nn ^= 16\nw ^= 1\nfrom (v = 0) do\n  v += w\n  swap v w\n  n -= 1\nloop .\nuntil (n = 0 || v > w)\n',
   stepState: {
     stepping: false,
     index: 0,
@@ -50,8 +50,8 @@ const rootReducer = (state = initState, action) => {
       }
     case 'change-result-log':
       return { ...state,
-        result: { ...state.result, 
-          error: {}, 
+        result: { ...state.result,
+          error: {},
           log: {
             state: action.payload.state.table,
             table: action.payload.table,

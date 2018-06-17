@@ -6,7 +6,7 @@ end: entry
   skip
 goto loop
 
-loop: fi (n = 0) end loop
+loop: fi (n = 0 || v > w) end loop
   n += 1
   swap v w
   v -= w

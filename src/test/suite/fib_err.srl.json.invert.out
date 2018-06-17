@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "int n\nint v\nint w\n\nfrom (n = 0 || v > w) do\n  n += 1\n  swap v w\n  v -= w\nloop\n  skip\nuntil (v = 0)\nw ^= 1\nn ^= 0" }

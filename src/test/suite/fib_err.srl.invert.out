@@ -1,0 +1,13 @@
+int n
+int v
+int w
+
+from (n = 0 || v > w) do
+  n += 1
+  swap v w
+  v -= w
+loop
+  skip
+until (v = 0)
+w ^= 1
+n ^= 0

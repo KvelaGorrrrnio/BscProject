@@ -60,7 +60,7 @@ goto l5
 
 l2: from l9
   skip
-if (n = 0) l3 l10
+if (n = 0 || v > w) l3 l10
 
 l3: from l2
   skip

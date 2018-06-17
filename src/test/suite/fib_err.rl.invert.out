@@ -1,0 +1,18 @@
+int n
+int v
+int w
+
+end: entry
+  skip
+goto loop
+
+loop: fi (n = 0 || v > w) end loop
+  n += 1
+  swap v w
+  v -= w
+if (v = 0) start loop
+
+start: from loop
+  w ^= 1
+  n ^= 0
+exit
