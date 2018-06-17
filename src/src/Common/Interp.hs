@@ -114,8 +114,7 @@ exec (Update (Id id is) op e p) = do
             else return False
           | otherwise = return False
         contains2 (Binary _ e1 e2 _) id is = (||) <$> contains2 e1 id is <*> contains2 e2 id is
-        contains2 (Unary Top e p) id is    =
-          contains2 e id (Binary Minus (Unary Size e p) (Lit (IntV 1) p) p : is)
+        contains2 (Unary Top e p) id is    = contains2 e id (Lit (IntV 0) p : is)
         contains2 (Unary Size _ _) _ _     = return False
         contains2 (Unary _ e _) id is      = contains2 e id is
         contains2 (Index l exps _) id is   =
@@ -124,6 +123,9 @@ exec (Update (Id id is) op e p) = do
 
 -- list modification
 exec (Push id1 id2 p) = do
+  when (id1 `containsId` id2) $ logError p $ PopPushToSelf id1
+  when (id2 `containsId` id1) $ logError p $ PopPushToSelf id1
+
   v1 <- rd id1 p
   v2 <- rd id2 p
 
@@ -135,21 +137,24 @@ exec (Push id1 id2 p) = do
       | otherwise -> logError p $ ConflictingType t (getType v1)
     _ -> logError p $ PushToNonList id2
 
-  where push v (ListV ls t) = ListV (ls++[v]) t
+  where push v (ListV ls t) = ListV (v:ls) t
         clear (IntV _)      = IntV 0
         clear (ListV _ t)   = ListV [] t
 
 exec (Pop id1 id2 p) = do
+  when (id1 `containsId` id2) $ logError p $ PopPushToSelf id1
+  when (id2 `containsId` id1) $ logError p $ PopPushToSelf id1
+
   v1 <- rd id1 p
   unless (isClear v1) $ logError p $ PopToNonEmpty id1
 
   v2 <- rd id2 p
   case v2 of
     ListV [] _ -> logError p $ PopFromEmpty id2
-    ListV ls (ListT t)
+    ListV (v:ls) (ListT t)
       | t == getType v1 -> do
-        adjust (const $ last ls) id1 p
-        adjust (const $ ListV (init ls) (ListT t)) id2 p
+        adjust (const v) id1 p
+        adjust (const $ ListV ls (ListT t)) id2 p
       | otherwise ->
         logError p $ ConflictingType t (getType v1)
     _  -> logError p $ PopFromNonList id2
@@ -293,7 +298,7 @@ eval (Unary op exp p)
     ListV ls t -> case op of
       Top   -> case ls of
         []    -> logError p EmptyTop
-        ls    -> return $ last ls
+        v:ls  -> return v
       Empty -> return $ IntV (boolToInt . null $ ls)
       Size  -> return $ IntV (fromIntegral . length $ ls)
     w  -> logError p $ NonListExp (getType w)
@@ -334,3 +339,7 @@ contains (Binary _ e1 e2 _) id = e1 `contains` id || e2 `contains` id
 contains (Unary _ e _) id      = e  `contains` id
 contains (Index e exps _) id   = e  `contains` id || exps `contain` id
 contains (Parens e _) id       = e  `contains` id
+
+containsId :: Id -> Id -> Bool
+containsId (Id id is) (Id id' _) =
+  id' == id || is `contain` id'

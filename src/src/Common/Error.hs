@@ -23,6 +23,7 @@ data RuntimeError
   | IndexOnNonListExp
   | NonInt32Index
   | SelfAbuse Id
+  | PopPushToSelf Id
   | ListInOwnIndex String
   | DimSelfAbuse String
   | NegativeIndex
@@ -81,6 +82,7 @@ instance Show RuntimeError where
   show IndexOnNonListExp = "Tried indexing on non-list value"
   show NonInt32Index = "Tried indexing with non-integer value"
   show (SelfAbuse id) = "'" ++ show id ++ "' occurs on both sides of an update."
+  show (PopPushToSelf (Id id _)) = "Variable '" ++ id ++ "' occurs in both operands in push or pop."
   show (ListInOwnIndex id) = "List variable '" ++ id ++ "' used as index on itself in an update."
   show (DimSelfAbuse id) = "Dimension list contains variable '" ++ id ++ "' being (de)allocated."
   show NegativeIndex = "Index is negative"
