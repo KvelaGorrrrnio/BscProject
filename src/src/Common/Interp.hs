@@ -77,7 +77,7 @@ exec :: Step -> VarState ()
 
 -- variable updates
 exec (Update (Id id is) op e p) = do
-  when (is `contain` id) $ logError p $ ListInOwnIndex id
+  when (is `contain` id) $ logError p $ ListInOwnIndex (Id id is)
   cont <- contains2 e (Id id is) []
   when cont $ logError p $ SelfAbuse (Id id is)
 
@@ -123,8 +123,10 @@ exec (Update (Id id is) op e p) = do
 
 -- list modification
 exec (Push id1 id2 p) = do
-  when (id1 `containsId` id2) $ logError p $ PopPushToSelf id1
+  when (id1 `containsId` id2) $ logError p $ PopPushToSelf id2
   when (id2 `containsId` id1) $ logError p $ PopPushToSelf id1
+  when (containsItself id1)   $ logError p $ ListInOwnIndex id1
+  when (containsItself id2)   $ logError p $ ListInOwnIndex id2
 
   v1 <- rd id1 p
   v2 <- rd id2 p
@@ -142,13 +144,15 @@ exec (Push id1 id2 p) = do
         clear (ListV _ t)   = ListV [] t
 
 exec (Pop id1 id2 p) = do
-  when (id1 `containsId` id2) $ logError p $ PopPushToSelf id1
+  when (id1 `containsId` id2) $ logError p $ PopPushToSelf id2
   when (id2 `containsId` id1) $ logError p $ PopPushToSelf id1
+  when (containsItself id1)   $ logError p $ ListInOwnIndex id1
+  when (containsItself id2)   $ logError p $ ListInOwnIndex id2
 
   v1 <- rd id1 p
   unless (isClear v1) $ logError p $ PopToNonEmpty id1
-
   v2 <- rd id2 p
+
   case v2 of
     ListV [] _ -> logError p $ PopFromEmpty id2
     ListV (v:ls) (ListT t)
@@ -343,3 +347,6 @@ contains (Parens e _) id       = e  `contains` id
 containsId :: Id -> Id -> Bool
 containsId (Id id is) (Id id' _) =
   id' == id || is `contain` id'
+
+containsItself :: Id -> Bool
+containsItself (Id id is) = is `contain` id

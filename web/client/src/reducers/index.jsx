@@ -2,7 +2,7 @@ const initState = {
   theme: 'default',
   mode: 'run',
   language: 'srl',
-  code: '// Compute the n\'th fibonacci pair\n\nint n\nint v int w\n\nn ^= 16\nw ^= 1\nfrom (v = 0) do\n  v += w\n  swap v w\n  n -= 1\nloop .\nuntil (n = 0 || v > w)\n',
+  code: '// Compute the n\'th fibonacci pair\n\nint n\nint v int w\n\nn ^= 16\nw ^= 1\nfrom (v = 0) do\n  v += w\n  swap v w\n  n -= 1\nloop skip\nuntil (n = 0 || v > w)\n',
   stepState: {
     stepping: false,
     index: 0,

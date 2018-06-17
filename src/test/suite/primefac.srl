@@ -1,7 +1,6 @@
 // Compute the prime factors of n
-// where n >= 2
-int n
-int v
+
+int v int v
 list int p
 
 n += 1829
