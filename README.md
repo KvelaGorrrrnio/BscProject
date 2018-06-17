@@ -10,7 +10,7 @@ assembler-style language with jumps that is, thus, non-structured. SRL,
 which is an abbreviation of Structured Reversible Language, is, as the
 name implies, a structured version of RL (with conditionals and loops).
 Furthermore, our implementation will support two interesting program transformations, namely
-program inversion of each language and translation <i>between</i> them - as proven possible by the Reversible Structured Program Theorem. To test our implementation and evaluate the practicality of the two
+program inversion of each language and translation <i>between</i> them - as proven possible by the Structured Reversible Program Theorem. To test our implementation and evaluate the practicality of the two
 languages, we write a collection of test programs of varying complexity.
 
 ## Boundaries of problem definition

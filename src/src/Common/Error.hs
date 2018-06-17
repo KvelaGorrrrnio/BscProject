@@ -108,7 +108,7 @@ instance Show RuntimeError where
   show (FreeOnNonList id) = "Tried freeing non-list identifier '" ++ id ++ "'"
   show (FreeNonEmptyList id) = "Tried freeing non-empty list identifier '" ++ id ++ "'"
   show (AssertionFailed exp e r) = "Assertion '" ++ show exp ++ "' expected " ++ show e ++ ", but evaluated to " ++ show r
-  show (FromFail f e) = "From-clause not consistent.\n Coming from " ++ f ++ ", but expected " ++ e ++ "."
+  show (FromFail f e) = "Come-from assertion not consistent.\n Coming from " ++ f ++ ", but expected " ++ e ++ "."
 
 instance Show StaticError where
   show (DuplicateLabel l)  = "Label '" ++ l ++ "' has been defined multiple times."
