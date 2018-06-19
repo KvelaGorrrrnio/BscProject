@@ -33,8 +33,8 @@ getIdx (ListV lst _) idx = eval idx >>= \case
     | otherwise -> case index lst i of
       Just v  -> return v
       Nothing -> logError (getExpPos idx) IndexOutOfBounds
-  w -> logError (getExpPos idx) NonInt32Index
-  where index :: [Value] -> Int32 -> Maybe Value
+  w -> logError (getExpPos idx) NonWord32Index
+  where index :: [Value] -> Word32 -> Maybe Value
         index lst i = if fromIntegral i >= length lst then Nothing else Just $ lst !! fromIntegral i
 
 logStep :: Step -> VarState ()
@@ -63,10 +63,10 @@ adjust' op (e:es) vo = do
   case vo of
     ListV lst t -> eval e >>= \case
       IntV i -> return $ ListV (replace lst i vi) t
-      w     -> logError (getExpPos e) NonInt32Index
+      w     -> logError (getExpPos e) NonWord32Index
     _ -> logError (getExpPos e) IndexOnNonListExp
 
-  where replace :: [Value]  -> Int32 -> Value -> [Value]
+  where replace :: [Value]  -> Word32 -> Value -> [Value]
         replace (_:vs) 0 nv = nv:vs
         replace (v:vs) i nv = v : replace vs (i-1) nv
 
@@ -84,12 +84,12 @@ exec (Update (Id id is) op e p) = do
   v1 <- rd (Id id is) p
   n <- case v1 of
     IntV n -> return n
-    w      -> logError p $ UpdateOnNonInt32 (Id id is) (getType w)
+    w      -> logError p $ UpdateOnNonWord32 (Id id is) (getType w)
 
   v2 <- eval e
   m <- case v2 of
     IntV m -> return m
-    w      -> logError p $ NonInt32Exp (getType w)
+    w      -> logError p $ NonWord32Exp (getType w)
 
   case op of
     DivEq  | m == 0       -> logError p DivByZero
@@ -200,7 +200,7 @@ exec (Init id exps p) = do
           ListV ls t  -> return $ ListV (replicate (fromIntegral n) acc) (ListT t)
           IntV _      -> return $ ListV (replicate (fromIntegral n) acc) (ListT IntT)
         | otherwise -> logError (getExpPos e) NegativeDimension
-      ListV _ t  -> logError (getExpPos e) $ NonInt32Dimension t
+      ListV _ t  -> logError (getExpPos e) $ NonWord32Dimension t
 
 -- freeing a list
 exec (Free id exps p) = do
@@ -230,7 +230,7 @@ exec (Free id exps p) = do
           ListV ls t  -> (&&) (length ls == fromIntegral n) <$> allM (`equalLengths` exps) ls
           IntV _      -> logError p $ FreeOnNonList id
         | otherwise -> logError (getExpPos e) NegativeDimension
-      ListV _ t -> logError (getExpPos e) $ NonInt32Dimension t
+      ListV _ t -> logError (getExpPos e) $ NonWord32Dimension t
     equalLengths ListV{} [] = return False
     equalLengths IntV{}  [] = return True
 
@@ -281,20 +281,20 @@ eval (Binary op l r p)
     IntV v | v/=0 && op==Or -> return $ IntV 1
     IntV _ -> eval r >>= \case
         IntV n -> return $ IntV (if n==0 then 0 else 1)
-        w      -> logError p $ NonInt32Exp (getType w)
-    w -> logError p $ NonInt32Exp (getType w)
+        w      -> logError p $ NonWord32Exp (getType w)
+    w -> logError p $ NonWord32Exp (getType w)
 
 eval (Unary op exp p)
 
   -- unary arithmetic
   | op <= Sign = eval exp >>= \case
     IntV n -> return $ IntV (mapUnOp op n)
-    w      -> logError p $ NonInt32Exp (getType w)
+    w      -> logError p $ NonWord32Exp (getType w)
 
   -- unary logical
   | op <= Not = eval exp >>= \case
     IntV n -> return $ IntV (mapUnOp op n)
-    w      -> logError p $ NonInt32Exp (getType w)
+    w      -> logError p $ NonWord32Exp (getType w)
 
   -- unary list
   | op == Null = IntV . boolToInt . allZero <$> eval exp

@@ -1,13 +1,14 @@
-module Common.AST (module Common.AST, Int32) where
+module Common.AST (module Common.AST, Word32) where
 
 import Data.Bits (xor)
 import Data.Int
+import Data.Word
 import Data.List (intercalate, sortBy)
 import Data.Function (on)
 import qualified Data.HashMap.Strict as M
 
 -- values
-data Value = IntV Int32 | ListV [Value] Type deriving Eq
+data Value = IntV Word32 | ListV [Value] Type deriving Eq
 instance Show Value where
   show (IntV n)       = show n
   show (ListV ls _)   = show ls
@@ -221,5 +222,5 @@ mapUnOp Sign = signum
 mapUnOp Not  = boolToInt . (==0)
 
 -- converting bool to val
-boolToInt :: Bool -> Int32
+boolToInt :: Bool -> Word32
 boolToInt b = if b then 1 else 0

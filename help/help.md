@@ -283,5 +283,4 @@ from (v = 0) do
 loop .
 until (n = 0 || v > w)
 ```
-
 </article>
