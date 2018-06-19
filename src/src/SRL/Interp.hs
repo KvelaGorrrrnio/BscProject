@@ -28,8 +28,8 @@ runProgram ast ttab = let (vt,ms) = (execVarState vtab . interp) ast in (vt, Log
 
 interp :: Block -> VarState ()
 interp (Step s) = do
-  vtab <- get
   trace (show s ++ "\n\n") $ logStep s
+  vtab <- get
   trace (showTab vtab ++ "\n\n") $ return ()
 
 interp (If t b1 b2 a) = do
