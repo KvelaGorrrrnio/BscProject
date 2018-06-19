@@ -1,0 +1,14 @@
+list int l
+list int p
+list list int b
+
+init l [10]
+init b [10,1]
+init p [5]
+
+l[0] += 5
+l[5] += 3
+l[3] += 1
+l[1] += 10
+
+l[3] += l[l[ top l ]]
