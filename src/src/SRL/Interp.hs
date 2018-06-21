@@ -5,11 +5,6 @@ import SRL.AST
 import Common.Error
 import Common.Interp
 
------
-import Debug.Trace
-import Control.Monad.State
------
-
 import Control.Monad.Reader
 import Control.Monad.Loops (whileM_)
 
@@ -27,10 +22,7 @@ runProgram ast ttab = let (vt,ms) = (execVarState vtab . interp) ast in (vt, Log
 -- ============
 
 interp :: Block -> VarState ()
-interp (Step s) = do
-  trace (show s ++ "\n\n") $ logStep s
-  vtab <- get
-  trace (showTab vtab ++ "\n\n") $ return ()
+interp (Step s) = logStep s
 
 interp (If t b1 b2 a) = do
   q <- checkCond t
@@ -39,8 +31,7 @@ interp (If t b1 b2 a) = do
 
   r <- checkCond a
 
-  unless (q == r)
-    $ logAssertErr a q r
+  unless (q == r) $ logAssertErr a q r
 
 interp (Loop a b1 b2 t) = do
   qo <- checkCond a
