@@ -29,8 +29,11 @@
       transition: opacity 0.5s;
     }
 
-    .dropdown:hover {
+    .dropdown:hover:not(.disabled) {
       background-color: rgba($forground-color,0.5);
+    }
+    .dropdown.disabled {
+      cursor: not-allowed;
     }
 
     .dropdown li {

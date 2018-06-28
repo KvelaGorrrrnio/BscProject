@@ -13,7 +13,7 @@
   $icon-value: map-get($theme, 'icon-value');
 
   .theme-#{$name} {
-          
+
     .button {
       box-sizing: border-box;
       height: 50px;
@@ -24,13 +24,14 @@
       text-align: center;
     }
 
-    .button:hover {
+    .button:hover:not(.disabled) {
       background-color: rgba($forground-color,0.5);
     }
 
     .button.disabled img {
       opacity: 0.5;
       transition: opacity 0.5s;
+      cursor: not-allowed;
     }
 
   }

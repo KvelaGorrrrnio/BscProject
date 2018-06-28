@@ -24,6 +24,7 @@
 
     ul.radio-wrapper li.disabled  {
       opacity: 0.5;
+      cursor: not-allowed;
     }
 
     ul.radio-wrapper li.current {
@@ -31,7 +32,7 @@
       opacity: 1.0;
       transition: opacity 0.5s;
     }
-    ul.radio-wrapper li:hover {
+    ul.radio-wrapper li:hover:not(.disabled) {
       background-color: rgba($forground-color, 0.5);
       transition: background-color 0.2s;
     }
