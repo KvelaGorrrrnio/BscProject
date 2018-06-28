@@ -69,6 +69,11 @@
     .modal-wrapper .button.half {
       width: 50%;
     }
+    .modal-wrapper .button.disabled {
+      background: none;
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     .modal-wrapper input {
       display: block;

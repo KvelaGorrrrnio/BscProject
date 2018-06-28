@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="11px" viewBox="0 0 24 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>open</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="V2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Run" transform="translate(-663.000000, -15.000000)" fill="#000000">
+            <g id="Head" transform="translate(613.000000, 15.000000)">
+                <path d="M59.6,8.8 L59.6,13.6 L52,13.6 C50.8954305,13.6 50,12.7045695 50,11.6 L50,10.8 C50,9.6954305 50.8954305,8.8 52,8.8 L59.6,8.8 Z M64.4,8.8 L72,8.8 C73.1045695,8.8 74,9.6954305 74,10.8 L74,11.6 C74,12.7045695 73.1045695,13.6 72,13.6 L64.4,13.6 L64.4,8.8 Z M70.8,12 C71.2418278,12 71.6,11.6418278 71.6,11.2 C71.6,10.7581722 71.2418278,10.4 70.8,10.4 C70.3581722,10.4 70,10.7581722 70,11.2 C70,11.6418278 70.3581722,12 70.8,12 Z M63.6,4.8 L63.6,20 L60.4,20 L60.4,4.8 L57.2,4.8 L62,0 L66.8,4.8 L63.6,4.8 Z" id="open"></path>
+            </g>
+        </g>
+    </g>
+</svg>

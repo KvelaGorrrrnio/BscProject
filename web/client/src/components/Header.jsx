@@ -171,10 +171,6 @@ class Header extends Component {
     this.props.showOpenModal();
   }
 
-  openHelp() {
-    this.props.showHelpModal();
-  }
-
   getActions(mode) {
     switch (mode) {
       case 'run':
@@ -230,7 +226,7 @@ class Header extends Component {
           <Radio items={items} selected={this.props.language} onChange={this.changeLanguage.bind(this)} disabled={this.props.stepState.stepping} />
           <span className='actions'>
             <Dropdown disabled={this.props.stepState.stepping} selected={this.props.theme} items={this.getThemes()}><img className='icon' src={themesIcon}/></Dropdown>
-            <Button disabled={this.props.stepState.stepping} onClick={this.openHelp.bind(this)}><img className='icon' src={helpIcon}/></Button>
+            <a href='/help' target='_help'><Button disabled={this.props.stepState.stepping}><img className='icon' src={helpIcon}/></Button></a>
             <Dropdown disabled={this.props.stepState.stepping} items={[this.state.templates.srl,this.state.templates.rl]}><img className='icon' src={templatesIcon}/></Dropdown>
             <Button disabled={this.props.stepState.stepping} onClick={this.openLocal.bind(this)}><img className='icon' src={openIcon}/></Button>
             <Button disabled={this.props.stepState.stepping} onClick={this.saveLocal.bind(this)}><img className='icon' src={saveIcon}/></Button>
@@ -275,7 +271,6 @@ const mapDispatchToProps = dispatch => { return {
   prevStep:          ()          => dispatch(actions.prevStep()),
   showSaveModal:     ()          => dispatch(actions.showSaveModal()),
   showOpenModal:     ()          => dispatch(actions.showOpenModal()),
-  showHelpModal:     ()          => dispatch(actions.showHelpModal()),
   changeTheme:       theme       => dispatch(actions.changeTheme(theme)),
 }};
 

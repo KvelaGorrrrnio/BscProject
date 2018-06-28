@@ -1,0 +1,7 @@
+site_name: RL and SRL documentation
+theme: readthedocs
+pages:
+  - Overview:  index.md
+  - Languages: languages.md
+  - Interface: interface.md
+  - CLI:       cli.md

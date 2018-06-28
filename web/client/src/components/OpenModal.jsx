@@ -43,6 +43,7 @@ class OpenModal extends Component {
 
   hide() {
     this.props.hideOpenModal();
+    this.setState({ index: -1 });
   }
 
   openFileDialog() {
@@ -93,7 +94,7 @@ class OpenModal extends Component {
             <DropZone onChange={this.handleFileDrop.bind(this)} onClick={this.openFileDialog.bind(this)}>Drag and drop files here to import.<br/><br/>Or click for file dialog.</DropZone>
               <input type='file' style={{ display: 'none' }} onChange={this.handleFileSelect.bind(this)} ref='fileImporter' />
             <p className='fancy'><span> or </span></p>
-            <Button className='half' onClick={this.openFile.bind(this)}>Open</Button>
+            <Button className='half' disabled={this.state.index < 0} onClick={this.openFile.bind(this)}>Open</Button>
             <Button className='half' onClick={this.hide.bind(this)}>Cancel</Button>
           </div><div className='_2column'>
             <ul className='notranslate'>

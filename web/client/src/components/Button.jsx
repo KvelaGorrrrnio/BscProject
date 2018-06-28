@@ -15,6 +15,7 @@ class Button extends Component {
   render() {
     const disabled = this.props.disabled ? 'disabled' : '';
     const className = ['button',this.props.className, disabled].join(' ');
+    console.log(className);
     return (
       <div className={className} onClick={this.handleClick.bind(this)}>{this.props.children}</div>
     );

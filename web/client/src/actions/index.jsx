@@ -65,14 +65,6 @@ export const hideOpenModal = () => { return {
   type: 'hide-open-modal'
 }};
 
-export const showHelpModal = () => { return {
-  type: 'show-help-modal'
-}};
-
-export const hideHelpModal = () => { return {
-  type: 'hide-help-modal'
-}};
-
 export const changeTheme = theme => { return {
   type: 'change-theme',
   payload: theme

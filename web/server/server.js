@@ -18,6 +18,9 @@ app.use((req, res, next) => {
 import api from './api';
 app.use('/api', api);
 
+// Setup help
+app.use('/help', express.static('docs'));
+
 // Setup web-interface
 app.get('/', (req,res) => {
   console.log(c.call('\n' + new Date(Date.now()).toLocaleString() + ': Requested ' + req.originalUrl));

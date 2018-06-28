@@ -98,7 +98,7 @@ class SaveModal extends Component {
           <h2>Save, export or share your script</h2>
           <div className='_2column'>
             <input type='text' value={filename} onChange={this.onChange.bind(this)} />
-            <Button className='half' onClick={this.saveFile.bind(this)}>{saveText}</Button>
+            <Button className='half' disabled={this.state.filename==''} onClick={this.saveFile.bind(this)}>{saveText}</Button>
             <Button className='half' onClick={this.hide.bind(this)}>Cancel</Button>
             <p className='fancy'><span> or </span></p>
             <Button onClick={this.exportScript.bind(this)}>Export to computer</Button>
