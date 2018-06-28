@@ -1,7 +1,7 @@
 # Reversible Flowchart Languages
 
-The languages are based upon *Reversible Flowcharts* and thus are called *Reversible Flowchart Languages*.
-RL (**R**eversible **L**angauge) and SRL (**S**tructured **R**eversible **L**anguage) can be split into 3 parts: A common part which, handles e.g. the step operations (instructions) and expressions, a RL specific part and a SRL specific. See the following sections for information regarding these.
+The languages are based on *Reversible Flowcharts* and are thus called *Reversible Flowchart Languages*.
+RL (**R**eversible **L**anguage) and SRL (**S**tructured **R**eversible **L**anguage) can be split into 3 parts: A common part which, handles e.g. the step operations (instructions) and expressions, an RL-specific part and an SRL-specific. See the following sections for information regarding these.
 
 ## Common
 The common part handles the parts that are common to both RL and SRL. This includes variable declarations, step operations and expresssions.
@@ -19,7 +19,7 @@ Both languages use type declarations for controlling variable types. The variabl
 <dl>
 `[var] [op]= [exp]`
   <dd>
-  The variable update. Each declared variable has an initial value of `0`, if it is a scalar, or `[]`, if it is a list. Update operators must be injective. Four operators are supported:
+  The variable update. Each declared variable has an initial value of `0`, if it is a scalar, or `[]`, if it is a list. Update operators must be injective. Five operators are supported:
 
   | Operator      | Functionality  | Inverse |
   | :-----------: |:--------------:| :-----: |
@@ -78,7 +78,7 @@ Both languages use type declarations for controlling variable types. The variabl
 
 `swap [var] [var]`
   <dd>
-  Swap two variables.
+  Swap the contents of two variables.
 
   **Inverse**: `swap`
 
@@ -148,7 +148,7 @@ The unary operators currently supported are
 | `?` or `empty` | Is the operand empty? |
 | `^` or `top`   | Top of the operand (first element) |
 
-Note that boolean values are represented as integers: 0 is evaluated to false and everything else is evaluated to true. If a logical express, e.g. `a && b`, evaluates to true, the resulting value is 1. If not, the resulting value is 0.
+Note that boolean values are represented as integers: 0 is evaluated to false and everything else is evaluated to true. If a logical expression, e.g. `a && b`, evaluates to true, the resulting value is 1. If not, the resulting value is 0.
 
 Furthermore, expressions support indexing. That is, we do not need to index directly on varibale names:
 ```
@@ -188,11 +188,12 @@ Jumps and come-from assertions can either be conditional, unconditional or mark 
 - `if [exp] [label] [label]`
 - `exit`
 
-If the expression in a conditional come-from assertion evaluates to true, control flow should have been passed from the first label. Otherwise, it should have been passed from the second. Intuitively, if a block can be reached from two different places in the program, it should have a conditional come-from assertion that uniquely determines the exact origin at the given instance.\
-\ \ \ \ For the program to be well formed, it has to have exactly one entry and one exit. Furthermore, the entry has to be the first block in the program, and the exit has to be the last.
+If the expression in a conditional come-from assertion evaluates to true, control flow should have been passed from the first label. Otherwise, it should have been passed from the second. Intuitively, if a block can be reached from two different places in the program, it should have a conditional come-from assertion that uniquely determines the exact origin at the given instance.
+
+For the program to be well formed, it has to have exactly one entry and one exit. Furthermore, the entry has to be the first block in the program, and the exit has to be the last.
 
 ### RL example
-The following program will compute the $n^{th}$ Fibonacci pair reversibly.
+The following program will compute the nth Fibonacci pair reversibly.
 
 ```
 // Compute the n'th fibonacci pair
@@ -228,8 +229,7 @@ from [exp] do [body] loop [body] until [exp]
 `,
 where each body is another sequence of one or more SRL blocks.
 
-To ensure reversibility, the conditional ends with an assertion. This assertion **must** evaluate to true if the then-branch was taken, and false otherwise. This makes it clear which path to take when inverting the program.\
-\ \ \ \ The loop, on the other hand, *starts* with an assertion. This assertion must hold when entering the loop from the outside, and it must *not* hold when coming from the inside.
+To ensure reversibility, the conditional ends with an assertion. This assertion **must** evaluate to true if the then-branch was taken, and false otherwise. This makes it clear which path to take when inverting the program. The loop, on the other hand, *starts* with an assertion. This assertion must hold when entering the loop from the outside, and it must *not* hold when coming from the inside.
 
 The loop works by first evaluating the assertion. If it holds, we continue by executing the first body. If the terminating condition holds afterwards, we are done. If not, we execute the second body and evaluate the assertion once again. This time, if this does *not* hold, we continue and repeat. Thus, we can simulate both do-until- and while loops with this loop construct.
 

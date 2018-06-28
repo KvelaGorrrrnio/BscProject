@@ -6,8 +6,8 @@ This interface provides an easy way to play around with RL and SRL. Other than s
 
 ## CLI
 
-The webinterface interacts with at commandline interface, that can be downloaded and build from [github](https://github.com/KvelaGorrrrnio/BscProject).
-For instructions on how to install and run see the [CLI-section](./cli).
+The web interface interacts with command-line interface that can be downloaded and built at [the github repo](https://github.com/KvelaGorrrrnio/BscProject).
+For instructions on how to install and run see the [CLI section](./cli).
 
 ## Further Reading
 
