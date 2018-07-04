@@ -1,7 +1,6 @@
 # Interface
 This web application is an interactive interface for two reversible programming languages, **SRL** and **RL**.
-Common for both languages is that they are primarily explicitly strongly typed with dynamic checks.
-For more information on syntax and the languages, refer to their individual help pages ([SRL](./languages/#srl)|[RL](./languages/#rl)).
+For more information on the languages, refer to their individual sections ([SRL](./languages/#srl)|[RL](./languages/#rl)).
 This section explains the interface, which features and functionality is embedded into it, and how to use it.
 
 ## Windows
@@ -53,12 +52,12 @@ The actions of **Toolbar** are divided into 4 groups.
         <td>Help & IO</td>
         <td>Left Center</td>
         <td>
-          This action group has 4 actions:  
-            ![Themes](img/themes.svg) **Themes**, which alters the colour scheme of the interface;  
-            ![Help](img/help.svg) **Help**, which shows this help dialogue;  
-            ![Template](img/template.svg) **Template**, which reveals a dropdown menu with template programs for both **RL** and **SRL**;  
-            ![Open](img/open.svg) **Open**, which reveals a dialogue for opening files from the browser or importing the code from a file on the local computer.  
-            ![Save](img/save.svg) **Save**, which reveals a dialogue for saving files to the browser, sharing the script with the code embeded into a link or exporting/downloading the code as a file to the local computer.  
+          This action group has 4 actions:
+            ![Themes](img/themes.svg) **Themes**, which alters the colour scheme of the interface;
+            ![Help](img/help.svg) **Help**, which shows this help dialogue;
+            ![Template](img/template.svg) **Template**, which reveals a dropdown menu with template programs for both **RL** and **SRL**;
+            ![Open](img/open.svg) **Open**, which reveals a dialogue for opening files from the browser or importing the code from a file on the local computer.
+            ![Save](img/save.svg) **Save**, which reveals a dialogue for saving files to the browser, sharing the script with the code embeded into a link or exporting/downloading the code as a file to the local computer.
         </td>
       </tr>
       <tr>
