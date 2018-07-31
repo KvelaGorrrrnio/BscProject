@@ -1,4 +1,4 @@
-// Compute the n'th fibonacci pair
+// Compute the nth fibonacci pair
 
 int n
 int v int w

@@ -8,7 +8,7 @@ import Data.Function (on)
 import qualified Data.HashMap.Strict as M
 
 -- values
-data Value = IntV Word32 | ListV [Value] Type deriving Eq
+data Value = IntV Word32 | CharV Char | ListV [Value] Type deriving Eq
 instance Show Value where
   show (IntV n)       = show n
   show (ListV ls _)   = show ls
