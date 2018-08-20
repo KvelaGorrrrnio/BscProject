@@ -1,0 +1,7 @@
+string r
+string s
+string t
+
+r -= s - t
+t -= World!
+s -= Hello World!

@@ -50,6 +50,8 @@ data RuntimeError
   | NonWord32Dimension Type
   | FreeOnNonList String
   | FreeNonEmptyList String
+  | StringLength String String
+  | StringSuffix String String
   -- RL specific runtime errors
   | AssertionFailed Exp Bool Bool
   | FromFail String String
@@ -105,6 +107,8 @@ instance Show RuntimeError where
   show (InitNonEmptyList id) = "Tried initliazing non-empty list identifier '" ++ id ++ "'"
   show ConflictingDimensions = "The number of dimensions specified does not match depth of list type."
   show ConflictingLengths = "The lengths specified do not match lengths of the of list."
+  show (StringLength s t) = "Can't remove string \"" ++ t ++ "\" from \"" ++ s ++ "\" since, the first string is shorter than the second." 
+  show (StringSuffix s t) = "\"" ++ s ++ "\" does not have \"" ++ t ++ "\" as suffix, thus the chosen suffix can't be removed."
   show NegativeDimension = "Encountered negative dimension"
   show (NonWord32Dimension t) = "Expected dimension size to be of type " ++ show IntT ++ ", received " ++ show t
   show (FreeOnNonList id) = "Tried freeing non-list identifier '" ++ id ++ "'"

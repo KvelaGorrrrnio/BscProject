@@ -27,7 +27,14 @@ rd (Id id exps) p = gets (M.lookup id) >>= \case
   Nothing -> logError p $ NonDefinedId id
 
 getIdx :: Value -> Exp -> VarState Value
-getIdx (IntV n) idx = logError (getExpPos idx) IndexOnNonListExp
+getIdx (IntV n)      idx = logError (getExpPos idx) IndexOnNonListExp
+getIdx (StringV s)   idx = eval idx >>= \case
+  IntV i | i < 0                -> logError (getExpPos idx) NegativeIndex
+         | n <- (fromIntegral . length) s :: Word32,
+            i >= n              -> logError (getExpPos idx) IndexOutOfBounds
+         | otherwise, 
+            i <- fromIntegral i -> return $ StringV $ [s !! i]
+  w -> logError (getExpPos idx) NonWord32Index
 getIdx (ListV lst _) idx = eval idx >>= \case
   IntV i | i < 0     -> logError (getExpPos idx) NegativeIndex
     | otherwise -> case index lst i of
@@ -83,13 +90,15 @@ exec (Update (Id id is) op e p) = do
 
   v1 <- rd (Id id is) p
   n <- case v1 of
-    IntV n -> return n
-    w      -> logError p $ UpdateOnNonWord32 (Id id is) (getType w)
+    IntV n    -> return n
+    StringV s -> return 0
+    w         -> logError p $ UpdateOnNonWord32 (Id id is) (getType w)
 
   v2 <- eval e
   m <- case v2 of
-    IntV m -> return m
-    w      -> logError p $ NonWord32Exp (getType w)
+    IntV m    -> return m
+    StringV t -> return 0
+    w         -> logError p $ NonWord32Exp (getType w)
 
   case op of
     DivEq  | m == 0       -> logError p DivByZero
@@ -98,7 +107,7 @@ exec (Update (Id id is) op e p) = do
     MultEq | m == 0       -> logError p MultByZero
            | otherwise    -> return ()
     _ -> return ()
-
+  
   res <- eval $ mapUpdOp op (Lit v1 p) (Lit v2 p) p
   adjust (const res) (Id id is) p
 
@@ -260,6 +269,13 @@ eval (Binary op l r p)
     vr <- eval r
     case (vl, vr) of
       (IntV n, IntV m) -> return $ IntV (mapBinOp op n m)
+      (StringV s, StringV t) -> case op of
+        Minus -> do
+          unless (length t <= length s) $ logError p $ StringLength s t
+          let st = reverse . take (length t) . reverse $ s
+          unless (t==st) $ logError p $ StringSuffix s t
+          return $ StringV $ reverse . drop (length t) . reverse $ s
+        _     -> return $ StringV (mapSBinOp op s t)
       (ListV ls1 t1, ListV ls2 t2)
         | op == Equal && t1 == t2 -> return $ IntV (boolToInt $ ls1==ls2)
         | op == Neq   && t1 == t2 -> return $ IntV (boolToInt $ ls1/=ls2)

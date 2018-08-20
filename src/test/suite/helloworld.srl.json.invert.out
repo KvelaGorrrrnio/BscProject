@@ -1,0 +1,1 @@
+{ "type" : "code", "code" : "string r\nstring s\nstring t\n\nr -= s - t\nt -= World!\ns -= Hello World!" }

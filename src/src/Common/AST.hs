@@ -8,9 +8,10 @@ import Data.Function (on)
 import qualified Data.HashMap.Strict as M
 
 -- values
-data Value = IntV Word32 | CharV Char | ListV [Value] Type deriving Eq
+data Value = IntV Word32 | StringV [Char] | ListV [Value] Type deriving Eq
 instance Show Value where
   show (IntV n)       = show n
+  show (StringV s)    = s
   show (ListV ls _)   = show ls
 isClear (IntV n)      = n == 0
 isClear (ListV ls _)  = null ls
@@ -171,7 +172,7 @@ instance Show UnOp where
 -- ================
 
 type TypeTab = [(String, Type)]
-data Type = IntT | ListT Type deriving Eq
+data Type = IntT | StringT | ListT Type deriving Eq
 showTypeTab :: TypeTab -> String
 showTypeTab = (++"\n") . concatMap (\(id,t) -> show t ++ " " ++ id ++ "\n") . sort'
 
@@ -181,17 +182,20 @@ hasDupDec = hasDupDec' . map fst
         hasDupDec' (n:ns) = if n `elem` ns then Just n else hasDupDec' ns
 
 instance Show Type where
-  show IntT = "int"
+  show IntT       = "int"
+  show StringT    = "string"
   show (ListT tp) = "list " ++ show tp
 buildVTab :: TypeTab -> VarTab
 buildVTab = M.map getDefaultValue . M.fromList
 getType :: Value -> Type
 getType (IntV _)    = IntT
+getType (StringV _) = StringT
 getType (ListV _ t) = t
 
 getDefaultValue :: Type -> Value
-getDefaultValue IntT  = IntV 0
-getDefaultValue listt = ListV [] listt
+getDefaultValue IntT    = IntV 0
+getDefaultValue StringT = StringV []
+getDefaultValue listt   = ListV [] listt
 
 -- =======
 -- helpers
@@ -216,6 +220,9 @@ mapBinOp Less    = \n -> boolToInt . (n<)
 mapBinOp Leq     = \n -> boolToInt . (n<=)
 mapBinOp Greater = \n -> boolToInt . (n>)
 mapBinOp Geq     = \n -> boolToInt . (n>=)
+
+-- StringBinOp
+mapSBinOp Plus = (++)
 
 mapUnOp Neg  = negate
 mapUnOp Sign = signum
