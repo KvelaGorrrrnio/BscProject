@@ -50,6 +50,7 @@ data RuntimeError
   | NonWord32Dimension Type
   | FreeOnNonList String
   | FreeNonEmptyList String
+  | NonReversable Id
   | StringLength String String
   | StringSuffix String String
   -- RL specific runtime errors
@@ -111,8 +112,9 @@ instance Show RuntimeError where
   show (StringSuffix s t) = "\"" ++ s ++ "\" does not have \"" ++ t ++ "\" as suffix, thus the chosen suffix can't be removed."
   show NegativeDimension = "Encountered negative dimension"
   show (NonWord32Dimension t) = "Expected dimension size to be of type " ++ show IntT ++ ", received " ++ show t
-  show (FreeOnNonList id) = "Tried freeing non-list identifier '" ++ id ++ "'"
-  show (FreeNonEmptyList id) = "Tried freeing non-empty list identifier '" ++ id ++ "'"
+  show (FreeOnNonList id) = "Tried freeing non-list identifier '" ++ id ++ "'."
+  show (FreeNonEmptyList id) = "Tried freeing non-empty list identifier '" ++ id ++ "'."
+  show (NonReversable id)    = show id ++ " is a non-reversable value."
   show (AssertionFailed exp e r) = "Assertion '" ++ show exp ++ "' expected " ++ show e ++ ", but evaluated to " ++ show r
   show (FromFail f e) = "Come-from assertion not consistent.\n Coming from " ++ f ++ ", but expected " ++ e ++ "."
 

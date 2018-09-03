@@ -31,6 +31,7 @@ languageDef =
                                       , "swap"
                                       , "push"
                                       , "pop"
+                                      , "reverse"
                                       , "init"
                                       , "free"
                                       -- expressions
@@ -115,6 +116,7 @@ step = pos >>= \p -> (\s->s p)
         <|> skipStep
         <|> pushStep
         <|> popStep
+        <|> reverseStep
         <|> initStep
         <|> freeStep)
 
@@ -138,6 +140,9 @@ pushStep = reserved "push" >> Push <$> identifier <*> identifier
 
 popStep :: Parser (Pos -> Step)
 popStep = reserved "pop" >> Pop <$> identifier <*> identifier
+
+reverseStep :: Parser (Pos -> Step)
+reverseStep = reserved "reverse" >> Reverse <$> identifier
 
 initStep :: Parser (Pos -> Step)
 initStep = do

@@ -183,6 +183,14 @@ exec (Swap id1 id2 p) = do
 
   adjust (const v2) id1 p >> adjust (const v1) id2 p
 
+-- reverse
+exec (Reverse id p) = do
+  rd id p >>= \case
+    IntV _    -> logError p $ NonReversable id
+    StringV s -> adjust (const $ StringV (reverse s)) id p
+    ListV v t -> adjust (const $ ListV (reverse v) t) id p
+  
+
 -- initialising a list
 exec (Init id exps p) = do
   when (exps `contain` id) $ logError p $ DimSelfAbuse id

@@ -8,7 +8,7 @@ import Data.Function (on)
 import qualified Data.HashMap.Strict as M
 
 -- values
-data Value = IntV Word32 | StringV [Char] | ListV [Value] Type deriving Eq
+data Value = IntV Word32 | StringV String | ListV [Value] Type deriving Eq
 instance Show Value where
   show (IntV n)       = show n
   show (StringV s)    = s
@@ -46,6 +46,7 @@ data Step = Update Id UpdOp Exp Pos
           | Pop  Id Id Pos
           | Skip Pos
           | Swap Id Id Pos
+          | Reverse Id Pos
           | Init String [Exp] Pos
           | Free String [Exp] Pos
           deriving Eq
