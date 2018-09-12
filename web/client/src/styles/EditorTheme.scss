@@ -25,6 +25,7 @@
   $codemirror-label: map-get($theme, 'codemirror-label');
   $codemirror-type: map-get($theme, 'codemirror-type');
   $codemirror-operator: map-get($theme, 'codemirror-operator');
+  $codemirror-string: map-get($theme, 'codemirror-string');
   $codemirror-bracket: map-get($theme, 'codemirror-bracket');
 
   .theme-#{$name} {
@@ -52,6 +53,7 @@
     .cm-s-editor-theme span.cm-label { color: $codemirror-label; }
     .cm-s-editor-theme span.cm-type { color: $codemirror-type; }
     .cm-s-editor-theme span.cm-bracket { color: $codemirror-operator; }
+    .cm-s-editor-theme span.cm-string { color: $codemirror-string; }
 
     .cm-s-editor-theme .CodeMirror-activeline-background { background: #2F2F2F; }
     .cm-s-editor-theme .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }

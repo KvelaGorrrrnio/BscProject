@@ -70,6 +70,11 @@ import * as CodeMirror from 'codemirror';
         return null;
       }
 
+      // String
+      if (stream.match(/"[^"]*"/)) {
+        return 'string'
+      }
+
       // Comment
       if(stream.match(cmtRE)) {
         stream.skipToEnd();
@@ -115,7 +120,7 @@ import * as CodeMirror from 'codemirror';
         };
       }
 
-      setGroup('type')('list', 'int');
+      setGroup('type')('list', 'int', 'string');
 
       setGroup('keyword')(
         'swap', 'push', 'pop', 'skip', '\.',

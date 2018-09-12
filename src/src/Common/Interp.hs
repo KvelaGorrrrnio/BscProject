@@ -329,6 +329,12 @@ eval (Unary op exp p)
         v:ls  -> return v
       Empty -> return $ IntV (boolToInt . null $ ls)
       Size  -> return $ IntV (fromIntegral . length $ ls)
+    StringV s -> case op of
+      Top   -> case s of
+        []   -> logError p EmptyTop
+        v:ls -> return $ StringV [v]
+      Empty -> return $ IntV (boolToInt . null $ s)
+      Size  -> return $ IntV (fromIntegral . length $ s)
     w  -> logError p $ NonListExp (getType w)
 
 -- index
