@@ -21,7 +21,7 @@ data RuntimeError
   = NonDefinedId String
   | IndexOnNonList String
   | IndexOnNonListExp
-  | NonWord32Index
+  | NonInt64Index
   | SelfAbuse Id
   | PopPushToSelf Id
   | ListInOwnIndex Id
@@ -37,17 +37,17 @@ data RuntimeError
   | SwapNotSameType Type Type
   | EmptyTop
   | NonListExp Type
-  | NonWord32Exp Type
+  | NonInt64Exp Type
   | DivByZero
   | DivHasRest
   | MultByZero
-  | UpdateOnNonWord32 Id Type
+  | UpdateOnNonInt64 Id Type
   | InitOnNonList String
   | InitNonEmptyList String
   | ConflictingDimensions
   | ConflictingLengths
   | NegativeDimension
-  | NonWord32Dimension Type
+  | NonInt64Dimension Type
   | FreeOnNonList String
   | FreeNonEmptyList String
   | NonReversable Id
@@ -83,7 +83,7 @@ instance Show RuntimeError where
   show (NonDefinedId id) = "Variable '" ++ id ++ "' is not defined."
   show (IndexOnNonList id) = "Tried indexing on non-list identifier: " ++ id
   show IndexOnNonListExp = "Tried indexing on non-list value"
-  show NonWord32Index = "Tried indexing with non-integer value"
+  show NonInt64Index = "Tried indexing with non-integer value"
   show (SelfAbuse id) = "'" ++ show id ++ "' occurs on both sides of an update."
   show (PopPushToSelf (Id id _)) = "Variable '" ++ id ++ "' occurs in both operands in push or pop."
   show (ListInOwnIndex (Id id _)) = "List variable '" ++ id ++ "' used as index on itself in an update."
@@ -99,11 +99,11 @@ instance Show RuntimeError where
   show (SwapNotSameType t1 t2) = "Trying to swap two variables of different types: " ++ show t1 ++ " and " ++ show t2
   show EmptyTop = "Tried reading top of empty list."
   show (NonListExp t) = "Expected list from expression, but received " ++ show t
-  show (NonWord32Exp t) = "Expected " ++ show IntT ++ " from expression, but received " ++ show t
+  show (NonInt64Exp t) = "Expected " ++ show IntT ++ " from expression, but received " ++ show t
   show DivByZero = "Division by zero."
   show DivHasRest = "Division has rest."
   show MultByZero = "Multiplication update by zero."
-  show (UpdateOnNonWord32 idx t) = "Tried updating non-" ++ show IntT ++ " identifier '" ++ show idx ++ "' of type " ++ show t
+  show (UpdateOnNonInt64 idx t) = "Tried updating non-" ++ show IntT ++ " identifier '" ++ show idx ++ "' of type " ++ show t
   show (InitOnNonList id) = "Tried initializing non-list identifier '" ++ id ++ "'"
   show (InitNonEmptyList id) = "Tried initliazing non-empty list identifier '" ++ id ++ "'"
   show ConflictingDimensions = "The number of dimensions specified does not match depth of list type."
@@ -111,7 +111,7 @@ instance Show RuntimeError where
   show (StringLength s t) = "Can't remove string \"" ++ t ++ "\" from \"" ++ s ++ "\" since, the first string is shorter than the second." 
   show (StringSuffix s t) = "\"" ++ s ++ "\" does not have \"" ++ t ++ "\" as suffix, thus the chosen suffix can't be removed."
   show NegativeDimension = "Encountered negative dimension"
-  show (NonWord32Dimension t) = "Expected dimension size to be of type " ++ show IntT ++ ", received " ++ show t
+  show (NonInt64Dimension t) = "Expected dimension size to be of type " ++ show IntT ++ ", received " ++ show t
   show (FreeOnNonList id) = "Tried freeing non-list identifier '" ++ id ++ "'."
   show (FreeNonEmptyList id) = "Tried freeing non-empty list identifier '" ++ id ++ "'."
   show (NonReversable id)    = show id ++ " is a non-reversable value."

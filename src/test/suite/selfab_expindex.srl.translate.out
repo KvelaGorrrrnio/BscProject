@@ -13,7 +13,7 @@ l6: from l1
 goto l7
 
 l7: from l6
-  a[4,1,4,2,4] ^= 10
+  a[0,1,0,2,0] ^= 10
 goto l4
 
 l4: from l7
@@ -21,7 +21,7 @@ l4: from l7
 goto l5
 
 l5: from l4
-  a[4,1,4,2,4] += (top (top (top a)[1])[2])
+  a[0,1,0,2,0] += (top (top (top a)[1])[2])
 goto l2
 
 l2: from l5

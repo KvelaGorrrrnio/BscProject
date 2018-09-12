@@ -1,19 +1,29 @@
-list list list int N
+string r
+string s
+string t
 
 l0: entry
   skip
 goto l1
 
 l1: from l0
-  init N [4,4,4]
+  s += Hello World!
+goto l6
+
+l6: from l1
+  skip
+goto l7
+
+l7: from l6
+  t += World!
 goto l4
 
-l4: from l1
+l4: from l7
   skip
 goto l5
 
 l5: from l4
-  N[2,0,0] += top (top N[2])
+  r += s - t
 goto l2
 
 l2: from l5

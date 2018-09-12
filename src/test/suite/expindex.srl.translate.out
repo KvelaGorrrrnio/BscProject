@@ -14,7 +14,7 @@ l6: from l1
 goto l7
 
 l7: from l6
-  a[2,1] ^= 30
+  a[0,1] ^= 30
 goto l4
 
 l4: from l7

@@ -1,1 +1,1 @@
-{ "type" : "variable", "table" : [{ "id" : "r", "value" : "Hello " }, { "id" : "s", "value" : "Hello World!" }, { "id" : "t", "value" : "World!" }] }
+{ "type" : "variable", "table" : [{ "id" : "r", "value" : ""Hello "" }, { "id" : "s", "value" : ""Hello World!"" }, { "id" : "t", "value" : ""World!"" }] }

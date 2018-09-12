@@ -1,1 +1,1 @@
-{ "type" : "error", "position" : { "line" : 5, "column" : 3 }, "message" : "A runtime error occurred at (line 5, column 3):\n'N[2,3,3]' occurs on both sides of an update." }
+{ "type" : "variable", "table" : [{ "id" : "N", "value" : "[[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]]" }] }

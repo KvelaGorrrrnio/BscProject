@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "list list list list list int a\n\na[4,1,4,2,4] -= (top (top (top a)[1])[2])\na[4,1,4,2,4] ^= 10\nfree a [5,5,5,5,5]" }
+{ "type" : "code", "code" : "list list list list list int a\n\na[0,1,0,2,0] -= (top (top (top a)[1])[2])\na[0,1,0,2,0] ^= 10\nfree a [5,5,5,5,5]" }

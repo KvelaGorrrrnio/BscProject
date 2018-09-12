@@ -1,1 +1,1 @@
-{ "type" : "code", "code" : "list list int a\nint t\n\nt ^= (top a)[1]\na[2,1] ^= 30\nfree a [3,3]" }
+{ "type" : "code", "code" : "list list int a\nint t\n\nt ^= (top a)[1]\na[0,1] ^= 30\nfree a [3,3]" }
