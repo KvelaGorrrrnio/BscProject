@@ -1,2 +1,2 @@
 A runtime error occurred at (line 4, column 1):
-'N[2,3,3]' occurs on both sides of an update.
+'N[2,0,0]' occurs on both sides of an update.
